@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r, results='asis'}
-library(rologpp)
+library(rolog)
 call(quote(use_module(library(rologpp))))
 consult('pl/mathml.pl')
 
