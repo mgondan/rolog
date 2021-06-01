@@ -1,30 +1,30 @@
 .onLoad = function(libname, pkgname)
 {
-	rolog_init(libname, pkgname, commandArgs()[1])
+  rolog_init(libname, pkgname, commandArgs()[1])
 }
 
 rolog_init = function(libname, pkgname, argv1)
 {
-	init(argv1)
+  init_(argv1)
 }
 
 rolog_done = function()
 {
-  done()
+  done_()
 }
 
-rolog_consult = function(fname='pl/likes.pl')
+rolog_consult = function(fname='likes.pl')
 {
-  consult(fname)
+  consult_(fname)
 }
 
-rolog_call = function(call = quote(consult('pl/likes')))
+rolog_call = function(call = quote(consult('likes')))
 {
-  call(call)
+  call_(call)
 }
 
 rolog_findall = function(predicate=quote(likes(sam)))
 {
-  l = as.list(findall(predicate))
+  l = as.list(findall_(predicate))
   l[length(l):1]
 }
