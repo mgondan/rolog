@@ -5,7 +5,7 @@
 
 rolog_init = function(libname, pkgname, argv1)
 {
-	init(commandArgs()[1])
+	init(argv1)
 }
 
 rolog_done = function()
