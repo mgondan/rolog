@@ -1,11 +1,11 @@
 #include <SWI-cpp.h>
 #include "Rcpp.h"
-using namespace Rcpp;
+using namespace Rcpp ;
 
 PlEngine* pl = NULL ;
 
 // [[Rcpp::export]]
-LogicalVector init(String argv0)
+LogicalVector init_(String argv0)
 {
   if(pl)
   {
@@ -18,7 +18,7 @@ LogicalVector init(String argv0)
 }
 
 // [[Rcpp::export]]
-LogicalVector done()
+LogicalVector done_()
 {
   if(!pl)
   {
@@ -32,7 +32,7 @@ LogicalVector done()
 }
 
 // [[Rcpp::export]]
-LogicalVector consult(CharacterVector files)
+LogicalVector consult_(CharacterVector files)
 {
   for(R_xlen_t i=0; i<files.size(); i++)
   {
@@ -240,7 +240,7 @@ PlTerm r2pl(SEXP arg)
 }
 
 // [[Rcpp::export]]
-LogicalVector call(RObject lang)
+LogicalVector call_(RObject lang)
 {
   PlTerm arg = r2pl(lang) ;
   
@@ -261,7 +261,7 @@ LogicalVector call(RObject lang)
 }
 
 // [[Rcpp::export]]
-List findall(RObject lang)
+List findall_(RObject lang)
 {
   PlTermv args(2) ;
   args[0] = r2pl(lang) ;
