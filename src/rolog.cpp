@@ -9,7 +9,7 @@ LogicalVector init(String argv0)
 {
   if(pl)
   {
-    Rcerr << "rologpp_init: engine already initialized" << std::endl ;
+    Rcerr << "rolog_init: engine already initialized" << std::endl ;
     return false ;
   }
   
@@ -22,7 +22,7 @@ LogicalVector done()
 {
   if(!pl)
   {
-    Rcerr << "rologpp_done: engine has not been initialized" << std::endl ;
+    Rcerr << "rolog_done: engine has not been initialized" << std::endl ;
     return false ;
   }
 
