@@ -1,11 +1,11 @@
-Package: rologpp
+Package: rolog
 Type: Package
-Title: What the Package Does in One 'Title Case' Line
+Title: Invoke SWI-Prolog from R
 Version: 1.0
 Date: 2021-05-19
-Author: Your Name
-Maintainer: Your Name <your@email.com>
-Description: One paragraph description of what the package does as one or more full sentences.
+Author: Matthias Gondan
+Maintainer: Matthias Gondan <Matthias.Gondan@psy.ku.dk>
+Description: Invoke SWI-Prolog from R (consult, call, findall)
 License: GPL (>= 2)
 Imports: Rcpp (>= 1.0.6)
 LinkingTo: Rcpp
