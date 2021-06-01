@@ -7,13 +7,13 @@ output: html_document
 
 ```{r, results='asis'}
 library(rolog)
-call(quote(use_module(library(rologpp))))
-consult('pl/mathml.pl')
+rolog_call(quote(use_module(library(rologpp))))
+rolog_consult('mathml.pl')
 
 html_print = function(term)
 {
 	t = as.call(list(quote(rml), term))
-	cat(sapply(findall(t)[[1]], as.character), sep='')
+	cat(sapply(rolog_findall(t)[[1]], as.character), sep='')
 }
 
 # 
