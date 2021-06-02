@@ -11,15 +11,15 @@ Access SWI-Prolog from R
 
 3. Please make sure you have a `git` client on your computer, the one recommended by RStudio is https://git-scm.com/download/win. As before, please allow the program to change the `PATH` so that `git.exe` is found.
 
-4. Start SWI-Prolog and install the `rologpp` library. This one enables invoking R from Prolog, i.e., the other way round.
+4. Start RStudio _as administrator_ and install the two libraries `Rcpp` and `RInside`. There are obviously better ways to do this, and I will update this step in the future.
+
+`install.packages("Rcpp", lib=.Library)`
+
+`install.packages("RInside", lib=.Library)`
+
+5. Start SWI-Prolog and install the `rologpp` library. This one enables invoking R from Prolog, i.e., the other way round.
 
 `pack_install(rologpp).`
-
-5. Start RStudio _as administrator_ and install the two libraries `Rcpp` and `RInside`.
-
-`install.packages("Rcpp")`
-
-`install.packages("RInside")`
 
 6. Restart/Open R or RStudio to take the change in the `PATH` into effect, then 
 
