@@ -23,6 +23,14 @@ Access SWI-Prolog from R
 
 `pack_install(rologpp).`
 
+You might want to run some tests, e.g.,
+
+`use_module(library(rologpp)).` (should just say true*)
+
+`r_init.` (should just say true)
+
+`r_eval(methods::formalArgs(args(sin)), X).` (should respond `X = #("x").`)
+
 6. Restart/Open R or RStudio, then 
 
 `library(devtools)`
