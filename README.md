@@ -13,7 +13,7 @@ Access SWI-Prolog from R
 
 4. Restart/Open R or RStudio to take the change in the `PATH` into effect, then 
 
-`install.packages("devtools")` (if needed)
-`library(devtools)`
-`install_github("mgondan/rolog")`
+    `install.packages("devtools")` (if needed)
+    `library(devtools)`
+    `install_github("mgondan/rolog")`
 
