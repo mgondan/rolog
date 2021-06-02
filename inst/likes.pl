@@ -18,8 +18,6 @@
 ?- likes(sam,curry).
 */
 
-:- use_module(library(rologpp)).
-
 likes(sam, Food) :-
     indian(Food),
     mild(Food).
