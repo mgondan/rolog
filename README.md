@@ -19,3 +19,17 @@ Access SWI-Prolog from R
 
 `install_github("mgondan/rolog")`
 
+For some reasons, this does not work, the system complains that `init_` is not found. Write me if you know how to fix this. Otherwise, move on to the next step.
+
+5. In RStudio, File/New project... and then Version Control and Git. Then type in `https://github.com/mgondan/rolog` as the repository and choose a suitable directory on your own computer.
+
+6. In RStudio again, choose Build/Install and restart. You should now see the Welcome message from SWI-Prolog. 
+
+## Example 1
+
+`library(rolog)`
+
+Load some facts and rules with `rolog_consult(system.file("likes.pl", package="rolog"))`
+
+Run a query such as `findall(X, likes(sam, X), List)` with `rolog_findall(quote(likes(sam)))`.
+
