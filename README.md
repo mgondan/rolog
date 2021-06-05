@@ -1,6 +1,52 @@
 # rolog
 Access SWI-Prolog from R
 
+## Installation (Linux)
+
+1. Please install SWI-Prolog from https://www.swi-prolog.org. You may wish to use the development version since this offers the new Picat-style syntax which is used in Example 2 below. 
+
+`git clone https://github.com/SWI-Prolog/swipl-devel`
+
+`cd swipl-devel`
+
+`git submodule update --init`
+
+`mkdir build`
+
+`cd build`
+
+`cmake ..`
+
+`make`
+
+`sudo make install`
+
+More detailed installation instructions are found on the webpage.
+
+2. Please install R on your computer
+
+`sudo apt install r-base`
+
+3. Please install the "rologpp" pack for SWI-prolog
+
+`swipl`
+
+`pack_install(rologpp).` (and respond with yes)
+
+`halt.`
+
+4. Please install the "rolog" pack for SWI-prolog
+
+`R`
+
+`install.packages("remotes")`
+
+`library(remotes)`
+
+`install_github("mgondan/rolog")`
+
+Then move on to the examples.
+
 ## Installation instructions (Windows)
 
 `rolog` is a source package, so a few things need to be done before you get started.
@@ -33,17 +79,13 @@ You might want to run some tests, e.g.,
 
 6. Restart/Open R or RStudio as a normal user, then 
 
-`install.packages("devtools")`
+`install.packages("remotes")`
 
-`library(devtools)`
+`library(remotes)`
 
 `install_github("mgondan/rolog")`
 
-For some reasons, this does not work, the system complains that `init_` is not found. Write me if you know how to fix this. Otherwise, move on to the next step.
-
-7. In RStudio, File/New project... and then Version Control and Git. Then type in `https://github.com/mgondan/rolog` as the repository and choose a suitable directory on your own computer.
-
-8. In RStudio again, choose Build/Install and restart. You should now see the Welcome message from SWI-Prolog. 
+`library(rolog)`
 
 ## Example 1
 
@@ -53,7 +95,7 @@ This is a hello(world).
 
 Load some facts and rules with `rolog_consult(system.file("likes.pl", package="rolog"))`
 
-Run a query such as `findall(X, likes(sam, X), List)` with `rolog_findall(quote(likes(sam)))`.
+Run a query such as findall(X, likes(sam, X), List) with `rolog_findall(quote(likes(sam)))`.
 
 ## Example 2
 
