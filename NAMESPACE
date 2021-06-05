@@ -1,3 +1,2 @@
 useDynLib(rolog, .registration=TRUE)
-exportPattern("^[[:alpha:]]+_")
 importFrom(Rcpp, evalCpp)
