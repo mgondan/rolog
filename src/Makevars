@@ -1,1 +1,4 @@
-123
+PKG_CPPFLAGS=-I`swipl --dump-runtime-variables | grep PLBASE | sed 's/;$//'` -fPIC -D_REENTRANT -D__SWI_PROLOG__ -D__SWI_EMBEDDED__ -mtune=generic
+PKG_LIBS=-L`swipl --dump-runtime-variables | grep PLLIBDIR | sed 's/;$//'` -l`swipl --dump-runtime-variables | grep PLLIB | sed 's/;$//'`
+
+all: $(SHLIB)
