@@ -1,4 +1,4 @@
 PKG_CPPFLAGS=-I$(shell swipl --dump-runtime-variables | grep 'PLBASE=' | sed 's/^PLBASE=//' | sed 's/;$$//')/include -fPIC -D_REENTRANT -D__SWI_PROLOG__ -D__SWI_EMBEDDED__ -mtune=generic
-PKG_LIBS=-L$(shell swipl --dump-runtime-variables | grep 'PLLIBDIR=' | sed 's/^PLLIBDIR=//' | sed 's/;$$//') -l$(shell swipl --dump-runtime-variables | grep 'PLLIB=' | sed 's/^PLLIB=//' | sed 's/;$$//')
+PKG_LIBS=-L$(shell swipl --dump-runtime-variables | grep 'PLLIBDIR=' | sed 's/^PLLIBDIR=//' | sed 's/;$$//') $(shell swipl --dump-runtime-variables | grep 'PLLIB=' | sed 's/^PLLIB=//' | sed 's/;$$//')
 
 all: $(SHLIB)
