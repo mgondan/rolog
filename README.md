@@ -21,7 +21,7 @@ Access SWI-Prolog from R
 
 `sudo make install`
 
-More detailed installation instructions are found on the webpage.
+More detailed installation instructions are found on the SWI-Prolog webpage.
 
 2. Please install R on your computer
 
@@ -99,8 +99,8 @@ Run a query such as findall(X, likes(sam, X), List) with `rolog_findall(quote(li
 
 ## Example 2
 
-`library(rolog)`
-
-Open the mathml.Rmd example, you find it in `system.file("mathml.Rmd", package="rolog"))`
+`library(rmarkdown)` (you may need to install this package first)
 
 Knit the file for HTML output. The example uses Prolog for rendering R expressions as MathML.
+
+`render(system.file('mathml.Rmd', package='rolog'), output_file="~/mathml.html")`
