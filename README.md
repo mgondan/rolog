@@ -3,7 +3,11 @@ Access SWI-Prolog from R
 
 ## Installation (Linux)
 
-1. Please install SWI-Prolog from https://www.swi-prolog.org. You may wish to use the development version since this offers the new Picat-style syntax which is used in Example 2 below. 
+1. You obviously need R on your computer, maybe also pandoc to render Rmd files to html.
+
+`sudo apt install r-base pandoc`
+
+2. Please install SWI-Prolog from https://www.swi-prolog.org. You may wish to use the development version since this offers the new Picat-style syntax which is used in Example 2 below. 
 
 `git clone https://github.com/SWI-Prolog/swipl-devel`
 
@@ -15,7 +19,7 @@ Access SWI-Prolog from R
 
 `cd build`
 
-_Please note:_ There is currently a problem with missing symbols from SWI-Prolog packs that are loaded from the R package. I don't know what is the underlying problem, but it can be fixed by adding libswipl to the SWIPL_LIBRARIES
+_Please note:_ There is currently a problem with missing symbols from SWI-Prolog packs that are loaded from the R package. I don't know what is the underlying problem, but it can be fixed by adding libswipl to the SWIPL_LIBRARIES. If you know a better solution, please let me know.
 
 `cmake -DSWIPL_LIBRARIES=libswipl ..`
 
@@ -24,10 +28,6 @@ _Please note:_ There is currently a problem with missing symbols from SWI-Prolog
 `sudo make install`
 
 More detailed installation instructions are found on the SWI-Prolog webpage.
-
-2. Please install R on your computer
-
-`sudo apt install r-base`
 
 3. Please install the "rologpp" pack for SWI-prolog. This is needed for the reverse direction (e.g. Prolog asking R the name of a specific function argument).
 
@@ -39,9 +39,9 @@ More detailed installation instructions are found on the SWI-Prolog webpage.
 
 4. Please install the "rolog" pack for R
 
-`R` (see above)
+`R`
 
-`install.packages("remotes")`
+`install.packages("remotes", "rmarkdown")`
 
 `library(remotes)`
 
@@ -95,14 +95,20 @@ This is a hello(world).
 
 `library(rolog)`
 
-Load some facts and rules with `rolog_consult(system.file("likes.pl", package="rolog"))`
+Load some facts and rules with 
 
-Run a query such as findall(X, likes(sam, X), List) with `rolog_findall(quote(likes(sam)))`
+`rolog_consult(system.file("likes.pl", package="rolog"))`
+
+Run a query such as findall(X, likes(sam, X), List) with 
+
+`rolog_findall(quote(likes(sam)))`
 
 ## Example 2
 
-`library(rmarkdown)` (you may need to install this package first)
+The is is a nice illustration of two-way communication between R and Prolog. The example uses Prolog for rendering R expressions as MathML.
 
-Knit the file for HTML output. The example uses Prolog for rendering R expressions as MathML.
+`library(rmarkdown)`
+
+Knit the file for HTML output. 
 
 `render(system.file('mathml.Rmd', package='rolog'), output_file="~/mathml.html")`
