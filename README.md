@@ -111,7 +111,7 @@ This is a hello(world).
 
 Load some facts and rules with `rolog_consult(system.file("likes.pl", package="rolog"))`
 
-Run a query such as findall(X, likes(sam, X), List) with `rolog_findall(quote(likes(sam)))`.
+Run a query such as findall(X, likes(sam, X), List) with `rolog_findall(quote(likes(sam)))`
 
 ## Example 2
 
