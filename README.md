@@ -23,7 +23,7 @@ Access SWI-Prolog from R
 
 More detailed installation instructions are found on the SWI-Prolog webpage.
 
-_Please note:_ There is currently a problem with missing symbols from SWI-Prolog packs that are loaded from the R package. I am aware of two fixes. 
+_Please note:_ There is currently a problem with missing symbols from SWI-Prolog packs that are loaded from the R package. I don't know what is the underlying problem, but I am aware of two fixes. 
 
 Either you invoke R below with LD_PRELOAD:
 
@@ -37,13 +37,13 @@ Or, alternatively, recompile and reinstall swipl:
 
 `sudo make install`
 
-I guess both of them are "cruel", so any hint is welcome.
+I guess both of these fixes are somehow "cruel", so any hint is welcome.
 
-3. Please install R on your computer
+2. Please install R on your computer
 
 `sudo apt install r-base`
 
-4. Please install the "rologpp" pack for SWI-prolog
+3. Please install the "rologpp" pack for SWI-prolog. This is needed for the reverse direction (e.g. Prolog asking R the name of a specific function argument).
 
 `swipl`
 
@@ -51,7 +51,7 @@ I guess both of them are "cruel", so any hint is welcome.
 
 `halt.`
 
-5. Please install the "rolog" pack for R
+4. Please install the "rolog" pack for R
 
 `R` (see above)
 
@@ -69,7 +69,7 @@ Then move on to the examples.
 
 1. Please install SWI-Prolog from https://www.swi-prolog.org. You may wish to use the development version since this offers the new Picat-style syntax which is used in Example 2 below. In the last dialog, the Prolog installer asks if swipl should be in the `PATH`, please respond with yes.
 
-2. Please install the new RTools 4.0 from https://cran.r-project.org/bin/windows/Rtools/. On that page they explain how to make `gcc` and `make` accessible to R and RStudio. I think this is not sufficient. You have to add something like `c:\rtools40\mingw64\bin` and `c:\rtools40\usr\bin` to the system `PATH`, e.g. by right-clicking on My Computer in the Windows explorer and then "Administration" and "Environment variables".
+2. Please install the new RTools 4.0 from https://cran.r-project.org/bin/windows/Rtools/. On that page they explain how to make `gcc` and `make` accessible to R and RStudio. I think this is not sufficient. You have to add something like `c:\rtools40\mingw64\bin` and `c:\rtools40\usr\bin` to the system `PATH`, e.g. by right-clicking on My Computer in the Windows explorer and then "Properties", "Extended system settings" and "Environment variables".
 
 3. Please make sure you have a `git` client on your computer, the one recommended by RStudio is https://git-scm.com/download/win. As before, please allow the program to change the `PATH` so that `git.exe` is found.
 
