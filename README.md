@@ -15,29 +15,15 @@ Access SWI-Prolog from R
 
 `cd build`
 
-`cmake ..`
+_Please note:_ There is currently a problem with missing symbols from SWI-Prolog packs that are loaded from the R package. I don't know what is the underlying problem, but it can be fixed by adding libswipl to the SWIPL_LIBRARIES
+
+`cmake -DSWIPL_LIBRARIES=libswipl ..`
 
 `make`
 
 `sudo make install`
 
 More detailed installation instructions are found on the SWI-Prolog webpage.
-
-_Please note:_ There is currently a problem with missing symbols from SWI-Prolog packs that are loaded from the R package. I don't know what is the underlying problem, but I am aware of two fixes. 
-
-Either you invoke R below with LD_PRELOAD:
-
-`LD_PRELOAD=/usr/local/lib/swipl/lib/x86_64-linux/libswipl.so R`
-
-Or, alternatively, recompile and reinstall swipl:
-
-`cmake .. -DCMAKE_C_STANDARD_LIBRARIES="-lswipl"`
-
-`make`
-
-`sudo make install`
-
-I guess both of these fixes are somehow "cruel", so any hint is welcome.
 
 2. Please install R on your computer
 
