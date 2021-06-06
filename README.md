@@ -23,11 +23,27 @@ Access SWI-Prolog from R
 
 More detailed installation instructions are found on the SWI-Prolog webpage.
 
-2. Please install R on your computer
+_Please note:_ There is currently a problem with missing symbols from SWI-Prolog packs that are loaded from the R package. I am aware of two fixes. 
+
+Either you invoke R below with LD_PRELOAD:
+
+`LD_PRELOAD=/usr/local/lib/swipl/lib/x86_64-linux/libswipl.so R`
+
+Or, alternatively, recompile and reinstall swipl:
+
+`cmake .. -DCMAKE_C_STANDARD_LIBRARIES="-lswipl"`
+
+`make`
+
+`sudo make install`
+
+I guess both of them are "cruel", so any hint is welcome.
+
+3. Please install R on your computer
 
 `sudo apt install r-base`
 
-3. Please install the "rologpp" pack for SWI-prolog
+4. Please install the "rologpp" pack for SWI-prolog
 
 `swipl`
 
@@ -35,9 +51,9 @@ More detailed installation instructions are found on the SWI-Prolog webpage.
 
 `halt.`
 
-4. Please install the "rolog" pack for SWI-prolog
+5. Please install the "rolog" pack for R
 
-`R`
+`R` (see above)
 
 `install.packages("remotes")`
 
