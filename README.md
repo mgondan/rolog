@@ -37,7 +37,9 @@ More detailed installation instructions are found on the SWI-Prolog webpage.
 
 `R`
 
-`install.packages("remotes", "rmarkdown")`
+`install.packages("remotes")`
+
+`install.packages("rmarkdown")`
 
 `library(remotes)`
 
