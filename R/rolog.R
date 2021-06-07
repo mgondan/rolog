@@ -1,6 +1,6 @@
 .onLoad = function(libname, pkgname)
 {
-  dyn.load(system.file(paste('libs', .Platform$file.sep, 'rolog', .Platform$dynlib.ext, sep=''), package='rolog'), FALSE, TRUE)
+  dyn.load(system.file(paste('libs', .Platform$file.sep, 'rolog', .Platform$dynlib.ext, sep=''), package='rolog'), local=FALSE, TRUE)
   rolog_init(libname, pkgname, commandArgs()[1])
 }
 
