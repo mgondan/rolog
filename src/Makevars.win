@@ -1,4 +1,0 @@
-PKG_CPPFLAGS=-I"C:/Program Files/swipl/include" -fPIC -D_REENTRANT -D__SWI_PROLOG__ -D__SWI_EMBEDDED__ -mtune=generic
-PKG_LIBS=-L"C:/Program Files/swipl/bin" -lswipl -mtune=generic
-
-all: $(SHLIB)
