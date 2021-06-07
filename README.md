@@ -7,7 +7,7 @@ Access SWI-Prolog from R
 
 `sudo apt install r-base r-cran-rcpp r-cran-rinside pandoc`
 
-2. Please install SWI-Prolog from https://www.swi-prolog.org. You may wish to use the development version since this offers the new Picat-style syntax which is used in Example 2 below. 
+2. Please install SWI-Prolog from https://www.swi-prolog.org. You may wish to use the development version since this offers the new Picat-style syntax which is used in Example 2 below. Here's a way to install the current development version:
 
 `git clone https://github.com/SWI-Prolog/swipl-devel`
 
@@ -18,10 +18,6 @@ Access SWI-Prolog from R
 `mkdir build`
 
 `cd build`
-
-_Please note:_ There is currently a problem with missing symbols from SWI-Prolog packs that are loaded from the R package. I don't know what is the underlying problem, but it can be fixed by adding libswipl to the SWIPL_LIBRARIES. If you know a better solution, please let me know.
-
-`cmake -DSWIPL_LIBRARIES=libswipl ..`
 
 `make`
 
