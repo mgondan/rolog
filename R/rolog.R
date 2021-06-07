@@ -1,6 +1,6 @@
 .onLoad = function(libname, pkgname)
 {
-  dyn.load(system.file(paste('libs', .Platform$file.sep, 'rolog', .Platform$dynlib.ext, sep=''), package='rolog'), local=FALSE, TRUE)
+  dyn.load(system.file(paste('libs', .Platform$file.sep, 'x64', .Platform$file.sep, 'rolog', .Platform$dynlib.ext, sep=''), package='rolog'), local=FALSE, TRUE)
   rolog_init(libname, pkgname, commandArgs()[1])
 }
 
@@ -12,7 +12,7 @@ rolog_init = function(libname, pkgname, argv1)
 rolog_done = function()
 {
   done_()
-  dyn.unload(system.file(paste('libs', .Platform$file.sep, 'rolog', .Platform$dynlib.ext, sep=''), package='rolog'))
+  dyn.unload(system.file(paste('libs', .Platform$file.sep, 'x64', .Platform$file.sep, 'rolog', .Platform$dynlib.ext, sep=''), package='rolog'))
 }
 
 rolog_consult = function(fname='likes.pl')
