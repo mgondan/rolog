@@ -29,7 +29,7 @@ More detailed installation instructions are found on the SWI-Prolog webpage.
 
 `swipl`
 
-`pack_install(rologpp).` (and respond with yes)
+`pack_install(rologpp).`
 
 `halt.`
 
