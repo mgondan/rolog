@@ -3,9 +3,19 @@ Access SWI-Prolog from R
 
 ## Installation (Linux)
 
-1. You obviously need R and a few packages on your computer, maybe also pandoc to render Rmd files to html.
+1. You obviously need R and a few packages on your computer, maybe also rmarkdown and pandoc to render Rmd files to html (see Example 2). Please use R version 4.1.
 
-`sudo apt install r-base r-cran-rcpp r-cran-rinside pandoc`
+`sudo apt install r-base pandoc`
+
+`R`
+
+`install.packages('Rcpp')`
+
+`install.packages('RInside')`
+
+`install.packages('rmarkdown')`
+
+`install.packages('remotes')`
 
 2. Please install SWI-Prolog from https://www.swi-prolog.org. You may wish to use the development version since this offers the new Picat-style syntax which is used in Example 2 below. Here's a way to install the current development version:
 
