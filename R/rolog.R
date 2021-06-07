@@ -1,7 +1,7 @@
 .onLoad = function(libname, pkgname)
 {
   name = paste('rolog', .Platform$dynlib.ext, sep='')
-  path = list.files(pattern=name, path=system.file(package="RInside"), recursive=TRUE)[1]
+  path = list.files(pattern=name, path=system.file(package="rolog"), recursive=TRUE)[1]
   dyn.load(path, local=FALSE, TRUE)
   rolog_init(libname, pkgname, commandArgs()[1])
 }
@@ -15,7 +15,7 @@ rolog_done = function()
 {
   done_()
   name = paste('rolog', .Platform$dynlib.ext, sep='')
-  path = list.files(pattern=name, path=system.file(package="RInside"), recursive=TRUE)[1]
+  path = list.files(pattern=name, path=system.file(package="rolog"), recursive=TRUE)[1]
   dyn.unload(path)
 }
 
