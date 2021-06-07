@@ -1,6 +1,8 @@
 .onLoad = function(libname, pkgname)
 {
-  dyn.load(system.file(paste('libs', .Platform$file.sep, 'x64', .Platform$file.sep, 'rolog', .Platform$dynlib.ext, sep=''), package='rolog'), local=FALSE, TRUE)
+  name = paste('rolog', .Platform$dynlib.ext, sep='')
+  path = list.files(pattern=name, path=system.file(package="RInside"), recursive=TRUE)[1]
+  dyn.load(path, local=FALSE, TRUE)
   rolog_init(libname, pkgname, commandArgs()[1])
 }
 
@@ -12,7 +14,9 @@ rolog_init = function(libname, pkgname, argv1)
 rolog_done = function()
 {
   done_()
-  dyn.unload(system.file(paste('libs', .Platform$file.sep, 'x64', .Platform$file.sep, 'rolog', .Platform$dynlib.ext, sep=''), package='rolog'))
+  name = paste('rolog', .Platform$dynlib.ext, sep='')
+  path = list.files(pattern=name, path=system.file(package="RInside"), recursive=TRUE)[1]
+  dyn.unload(path)
 }
 
 rolog_consult = function(fname='likes.pl')
