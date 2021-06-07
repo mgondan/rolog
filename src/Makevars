@@ -2,6 +2,6 @@ PKG_CPPFLAGS=-I$(shell swipl --dump-runtime-variables | grep 'PLBASE=' | sed 's/
 PKG_LIBS=-L$(shell swipl --dump-runtime-variables | grep 'PLLIBDIR=' | sed 's/^PLLIBDIR=//' | sed 's/;$$//')
 PKG_LIBS+=$(shell swipl --dump-runtime-variables | grep 'PLLIB=' | sed 's/^PLLIB=//' | sed 's/;$$//')
 PKG_LIBS+=-Wl,-Bsymbolic-functions -Wl,-z,relro 
-PKG_LIBS+=-Wl,-rpath=$(shell swipl --dump-runtime-variables | grep 'PLLIBDIR=' | sed 's/^PLLIBDIR=//' | sed 's/;$$//')
+PKG_LIBS+=-Wl,-rpath='$(shell swipl --dump-runtime-variables | grep 'PLLIBDIR=' | sed 's/^PLLIBDIR=//' | sed 's/;$$//')'
 
 all: $(SHLIB)
