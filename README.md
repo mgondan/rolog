@@ -47,6 +47,8 @@ More detailed installation instructions are found on the SWI-Prolog webpage.
 
 `R`
 
+`library(remotes)`
+
 `install_github("mgondan/rolog")`
 
 Then move on to the examples.
