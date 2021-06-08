@@ -47,12 +47,6 @@ More detailed installation instructions are found on the SWI-Prolog webpage.
 
 `R`
 
-`install.packages("remotes")`
-
-`install.packages("rmarkdown")`
-
-`library(remotes)`
-
 `install_github("mgondan/rolog")`
 
 Then move on to the examples.
