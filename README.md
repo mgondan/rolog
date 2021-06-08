@@ -115,4 +115,4 @@ The is is a nice illustration of two-way communication between R and Prolog. The
 
 Knit the file for HTML output. 
 
-`render(system.file('mathml.Rmd', package='rolog'), output_file="~/mathml.html", output_dir=getwd())`
+`render(system.file('mathml.Rmd', package='rolog'), output_file="mathml.html", output_dir=getwd())`
