@@ -6,7 +6,7 @@
   write(name)
   write(path)
   write(lib)
-  stop("111")
+  stop("111", name, path, lib)
   if(length(lib) == 0)
     stop("Unable to find shared library", libname, pkgname, name, path)
 
