@@ -1,10 +1,13 @@
 .onLoad = function(libname, pkgname)
 {
-  print(libname)
-  print(pkgname)
   name = paste('rolog', .Platform$dynlib.ext, sep='')
-  path = list.files(pattern=name, recursive=TRUE)[1]
-  dyn.load(path, local=FALSE, TRUE)
+  path = paste(libname, sep=.Platform$file.sep, pkgname)
+  lib = list.files(path=path, pattern=name, recursive=TRUE)
+  if(length(lib) == 0)
+    stop("Unable to find shared library", libname, pkgname, name, path)
+
+  assign('m_sharedlib', lib[1], envir = topenv())
+  dyn.load(m_sharedlib, local=FALSE, TRUE)
   rolog_init(libname, pkgname, commandArgs()[1])
 }
 
@@ -16,9 +19,7 @@ rolog_init = function(libname, pkgname, argv1)
 rolog_done = function()
 {
   done_()
-  name = paste('rolog', .Platform$dynlib.ext, sep='')
-  path = list.files(pattern=name, recursive=TRUE)[1]
-  dyn.unload(path)
+  dyn.unload(m_sharedlib)
 }
 
 rolog_consult = function(fname='likes.pl')
