@@ -1,11 +1,12 @@
 .onLoad = function(libname, pkgname)
 {
   name = paste('rolog', .Platform$dynlib.ext, sep='')
-  write(name)
   path = paste(libname, sep=.Platform$file.sep, pkgname)
-  write(path)
   lib = list.files(path=path, pattern=name, recursive=TRUE)
+  write(name)
+  write(path)
   write(lib)
+  stop("111")
   if(length(lib) == 0)
     stop("Unable to find shared library", libname, pkgname, name, path)
 
