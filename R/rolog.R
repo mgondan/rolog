@@ -11,7 +11,7 @@
   write(path)
   write(lib)
   write(full)
-  stop("111", name, path, lib)
+  stop("111", name, path, lib, full)
 
   dyn.load(full, local=FALSE, TRUE)
   assign('m_sharedlib', full, envir = topenv())
