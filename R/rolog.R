@@ -1,5 +1,7 @@
 .onLoad = function(libname, pkgname)
 {
+  print(libname)
+  print(pkgname)
   name = paste('rolog', .Platform$dynlib.ext, sep='')
   path = list.files(pattern=name, recursive=TRUE)[1]
   dyn.load(path, local=FALSE, TRUE)
