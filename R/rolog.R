@@ -11,7 +11,7 @@
   rolog_init(libname, pkgname, commandArgs()[1])
 }
 
-.onDetach = function(libpath)
+.onUnload = function(libpath)
 {
   name = paste('rolog', .Platform$dynlib.ext, sep='')
   lib = list.files(path=libpath, pattern=name, recursive=TRUE)
