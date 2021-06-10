@@ -12,6 +12,12 @@
   rolog_init(libname, pkgname, commandArgs()[1])
 }
 
+.onUnload = function(libpath)
+{
+  stop(libpath)
+  dyn.unload(m_sharedlib)
+}
+
 rolog_init = function(libname, pkgname, argv1)
 {
   init_(argv1)
@@ -20,7 +26,6 @@ rolog_init = function(libname, pkgname, argv1)
 rolog_done = function()
 {
   done_()
-  dyn.unload(m_sharedlib)
 }
 
 rolog_consult = function(fname='likes.pl')
