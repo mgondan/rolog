@@ -14,7 +14,7 @@
 
 .onDetach = function(libpath)
 {
-  stop(libpath)
+  stop(libpath, m_sharedlib)
   dyn.unload(m_sharedlib)
 }
 
