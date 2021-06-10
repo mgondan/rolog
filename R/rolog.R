@@ -5,7 +5,7 @@
   arch = list.files(path=path, pattern=.Platform$r_arch, recursive=TRUE, include.dirs=TRUE)
   if(length(arch) > 0)
     path = paste(path, sep=.Platform$file.sep, arch)
-  lib = list.files(path=path, pattern=name, recursive=TRUE)
+  lib = list.files(path=path, pattern=name, recursive=(length(arch) == 0))
   if(length(lib) == 0)
     stop("Unable to find shared library", libname, pkgname, name, path)
   
@@ -21,7 +21,7 @@
   lib = list.files(path=path, pattern=.Platform$r_arch, recursive=TRUE, include.dirs=TRUE)
   if(length(arch) > 0)
     path = paste(path, sep=.Platform$file.sep, arch)
-  lib = list.files(path=path, pattern=name, recursive=TRUE)
+  lib = list.files(path=path, pattern=name, recursive=(length(arch) == 0))
   if(length(lib) == 0)
     stop("Unable to find shared library", libpath, " ", name)
   
