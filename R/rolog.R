@@ -8,14 +8,18 @@
   
   full = paste(path, sep=.Platform$file.sep, lib[1])
   dyn.load(full, local=FALSE, TRUE)
-  assign('m_sharedlib', full, envir = topenv())
   rolog_init(libname, pkgname, commandArgs()[1])
 }
 
 .onDetach = function(libpath)
 {
-  stop(libpath, m_sharedlib)
-  dyn.unload(m_sharedlib)
+  name = paste('rolog', .Platform$dynlib.ext, sep='')
+  lib = list.files(path=libpath, pattern=name, recursive=TRUE)
+  if(length(lib) == 0)
+    stop("Unable to find shared library", libpath, " ", name)
+  
+  full = paste(libpath, sep=.Platform$file.sep, lib[1])
+  dyn.unload(full)
 }
 
 rolog_init = function(libname, pkgname, argv1)
