@@ -12,7 +12,7 @@
   rolog_init(libname, pkgname, commandArgs()[1])
 }
 
-.onUnload = function(libpath)
+.onDetach = function(libpath)
 {
   stop(libpath)
   dyn.unload(m_sharedlib)
