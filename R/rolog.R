@@ -2,6 +2,9 @@
 {
   name = paste('rolog', .Platform$dynlib.ext, sep='')
   path = paste(libname, sep=.Platform$file.sep, pkgname)
+  arch = list.files(path=path, pattern=.Platform$r_arch, recursive=TRUE, include.dirs=TRUE)
+  if(length(arch) > 0)
+    path = paste(path, sep=.Platform$file.sep, arch)
   lib = list.files(path=path, pattern=name, recursive=TRUE)
   if(length(lib) == 0)
     stop("Unable to find shared library", libname, pkgname, name, path)
@@ -14,7 +17,11 @@
 .onUnload = function(libpath)
 {
   name = paste('rolog', .Platform$dynlib.ext, sep='')
-  lib = list.files(path=libpath, pattern=name, recursive=TRUE)
+  path = libpath
+  lib = list.files(path=path, pattern=.Platform$r_arch, recursive=TRUE, include.dirs=TRUE)
+  if(length(arch) > 0)
+    path = paste(path, sep=.Platform$file.sep, arch)
+  lib = list.files(path=path, pattern=name, recursive=TRUE)
   if(length(lib) == 0)
     stop("Unable to find shared library", libpath, " ", name)
   
