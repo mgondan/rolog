@@ -8,7 +8,7 @@
     if(length(arch) > 0)
       path = paste(path, sep=.Platform$file.sep, arch)
   }
-  lib = list.files(path=path, pattern=name, recursive=(.Platform$r_arch != '' & length(arch) == 0))
+  lib = list.files(path=path, pattern=name, recursive=(.Platform$r_arch != '' && length(arch) == 0))
   if(length(lib) == 0)
     stop("Unable to find shared library", libname, pkgname, name, path)
   
@@ -27,9 +27,7 @@
     if(length(arch) > 0)
       path = paste(path, sep=.Platform$file.sep, arch)
   }
-  if(length(arch) > 0)
-    path = paste(path, sep=.Platform$file.sep, arch)
-  lib = list.files(path=path, pattern=name, recursive=(.Platform$r_arch != '' & length(arch) == 0))
+  lib = list.files(path=path, pattern=name, recursive=(.Platform$r_arch != '' && length(arch) == 0))
   if(length(lib) == 0)
     stop("Unable to find shared library", libpath, " ", name)
   
