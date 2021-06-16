@@ -63,15 +63,17 @@ Then move on to the examples.
 
 3. Please make sure you have a `git` client on your computer, the one recommended by RStudio is https://git-scm.com/download/win. As before, please allow the program to change the `PATH` so that `git.exe` is found.
 
-4. Start RStudio install the libraries `Rcpp`, `RInside` (please recompile it by setting type="source").
+4. Start R or RStudio install the libraries `Rcpp`, `RInside` (please recompile it by setting type="source").
 
 `install.packages("Rcpp")`
 
 `install.packages("RInside", type="source")`
 
+In general, packages are installed below the user's documents folder, e.g., `C:\Users\username\Documents\R\win-library\4.1`. For Step 5, you might need to tell the R program the location of this folder, so please set the environment variable `R_LIBS_USER` accordingly.
+
 5. Start SWI-Prolog and install the `rologpp` library. This one enables invoking R from Prolog, i.e., the other way round.
 
-`assert(prolog_pack:environment('R_LIBS_USER', X) :- getenv('R_LIBS_USER', X)).` (This is needed to make R aware of the R packages installed at the user's home directory)
+`assert(prolog_pack:environment('R_LIBS_USER', X) :- getenv('R_LIBS_USER', X)).` (This is needed to make R aware of the R packages installed at the user's home directory, see last step)
 
 `pack_install(rologpp).`
 
