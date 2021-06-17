@@ -29,6 +29,8 @@ Access SWI-Prolog from R
 
 `cd build`
 
+`cmake ..`
+
 `make`
 
 `sudo make install`
