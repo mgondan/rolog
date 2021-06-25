@@ -54,8 +54,11 @@
 
 .onAttach = function(libname, pkgname)
 {
-  print("Attaching rolog")
+  print("Attaching rolog")  
+  if(rolog_init(libname, pkgname, commandArgs()[1]))
+    return(TRUE) ;
   
+  print("Try again")  
   rolog_init(libname, pkgname, commandArgs()[1])
 }
 
