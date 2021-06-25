@@ -23,7 +23,7 @@ LogicalVector init_(String argv0)
     if(!PL_initialise(1, av))
     {
       Rcerr << "rolog_init: failed initialize" << std::endl ;      
-      throw PlError("failed to initialise");
+      return false ; // throw PlError("failed to initialise");
     }
     pl = 1 ;
   
