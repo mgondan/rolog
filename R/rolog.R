@@ -23,7 +23,8 @@
   
   full = paste(path, sep=.Platform$file.sep, lib[1])
   print(full)
-  dyn.load(full, local=FALSE, DLLpath=path)
+  r = dyn.load(full, local=FALSE, DLLpath=path)
+  print(r)
   # rolog_init(libname, pkgname, gsub("Program Files", "PROGRA~1", commandArgs()[1]))
   rolog_init(libname, pkgname, full)
 }
