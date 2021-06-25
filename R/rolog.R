@@ -1,29 +1,27 @@
 .onLoad = function(libname, pkgname)
 {
   name = paste('rolog', .Platform$dynlib.ext, sep='')
-  print(name)
+  print(c(name=name))
   path = paste(libname, sep=.Platform$file.sep, pkgname)
-  print(path)
+  print(c(path=path))
   recursive = TRUE
   if(.Platform$r_arch != '')
   {
     arch = list.files(path=path, pattern=.Platform$r_arch, recursive=TRUE, include.dirs=TRUE)
-    print(arch)
+    print(c(arch=arch))
     if(length(arch) > 0)
     {
       path = paste(path, sep=.Platform$file.sep, arch)
-      print(path)
+      print(c(path=path))
       recursive = FALSE 
     }
   }
   lib = list.files(path=path, pattern=name, recursive=recursive)
-  print(lib)
+  print(c(lib=lib))
   if(length(lib) == 0)
     stop("Unable to find shared library", libname, pkgname, name, path)
   
-  full = paste(path, sep=.Platform$file.sep, lib[1])
-  print(full)
-  r = dyn.load(full, local=FALSE, DLLpath=path)
+  r = dyn.load(lib, local=FALSE, DLLpath=path)
   print(r)
   # rolog_init(libname, pkgname, gsub("Program Files", "PROGRA~1", commandArgs()[1]))
   # rolog_init(libname, pkgname, full)
