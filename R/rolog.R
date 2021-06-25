@@ -29,6 +29,8 @@
 
 .onUnload = function(libpath)
 {
+  rolog_done()
+  
   name = paste('rolog', .Platform$dynlib.ext, sep='')
   path = libpath
   recursive = TRUE
@@ -44,7 +46,7 @@
   lib = list.files(path=path, pattern=name, recursive=recursive)
   if(length(lib) == 0)
     stop("Unable to find shared library", libpath, " ", name)
-  
+
   full = paste(libpath, sep=.Platform$file.sep, lib[1])
   dyn.unload(full)
 }
