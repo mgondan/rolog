@@ -21,7 +21,9 @@
   if(length(lib) == 0)
     stop("Unable to find shared library", libname, pkgname, name, path)
   
-  r = dyn.load(lib, local=FALSE, DLLpath=path)
+  full = paste(path, sep=.Platform$file.sep, lib[1])  
+  print(c(full=full))
+  r = dyn.load(full, local=FALSE, DLLpath=path)
   print(r)
   # rolog_init(libname, pkgname, gsub("Program Files", "PROGRA~1", commandArgs()[1]))
   # rolog_init(libname, pkgname, full)
