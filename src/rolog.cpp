@@ -13,6 +13,7 @@ LogicalVector init_(String argv0)
     return false ;
   }
   
+  Rcerr << "rolog_init: starting PlEngine(\"" << const_cast<char*>(argv0.get_cstring()) << "\")" << std::endl ;
   pl = new PlEngine(const_cast<char*>(argv0.get_cstring())) ;
   return true ;
 }
