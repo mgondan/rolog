@@ -20,7 +20,7 @@ LogicalVector init_(String argv0)
   
   int ac = 0;
 
-  av[ac++] = "libswipl.dll" ; // const_cast<char*>(argv0.get_cstring());
+  av[ac++] = const_cast<char*>(argv0.get_cstring()) ;
   av[ac]   = NULL;
   
     Rcerr << "rolog_init: initialize with " << av[0] << std::endl ;      
