@@ -24,7 +24,7 @@
   full = paste(path, sep=.Platform$file.sep, lib[1])
   print(full)
   dyn.load(full, local=FALSE, TRUE)
-  rolog_init(libname, pkgname, commandArgs()[1])
+  rolog_init(libname, pkgname, shQuote(commandArgs()[1]))
 }
 
 .onUnload = function(libpath)
