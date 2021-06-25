@@ -2,7 +2,8 @@
 #include "Rcpp.h"
 using namespace Rcpp ;
 
-PlEngine* pl = NULL ;
+// PlEngine* pl = NULL ;
+int pl = 0 ;
 
 // [[Rcpp::export]]
 LogicalVector init_(String argv0)
@@ -14,7 +15,18 @@ LogicalVector init_(String argv0)
   }
   
   Rcerr << "rolog_init: starting PlEngine(\"" << const_cast<char*>(argv0.get_cstring()) << "\")" << std::endl ;
-  pl = new PlEngine(const_cast<char*>(argv0.get_cstring())) ;
+  // pl = new PlEngine(const_cast<char*>(argv0.get_cstring())) ;
+  
+    int ac = 0;
+    char **av = (char **)malloc(sizeof(char *) * 2);
+    av[ac++] = av0;
+    if(!PL_initialise(1, av))
+    {
+      Rcerr << "rolog_init: failed initialize" << std::endl ;      
+      throw PlError("failed to initialise");
+    }
+    pl = 1 ;
+  
   return true ;
 }
 
@@ -27,8 +39,10 @@ LogicalVector done_()
     return false ;
   }
 
-  delete pl ;
-  pl = NULL ;
+  // delete pl ;
+  // pl = NULL ;
+  PL_cleanup(0);
+  pl = 0 ;
   return true ;
 }
 
