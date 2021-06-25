@@ -26,14 +26,11 @@
   r = dyn.load(full, local=FALSE, DLLpath=path)
   print(r)
   # rolog_init(libname, pkgname, gsub("Program Files", "PROGRA~1", commandArgs()[1]))
-  rolog_init(libname, pkgname, full)
+  # rolog_init(libname, pkgname, full)
 }
 
 .onUnload = function(libpath)
 {
-  if(!rolog_done())
-    stop("rolog: not initialized")
-  
   print("Unloading rolog")
   name = paste('rolog', .Platform$dynlib.ext, sep='')
   path = libpath
@@ -53,6 +50,21 @@
 
   full = paste(libpath, sep=.Platform$file.sep, lib[1])
   dyn.unload(full)
+}
+
+.onAttach = function(libname, pkgname)
+{
+  print("Attaching rolog")
+  
+  rolog_init(libname, pkgname, commandArgs()[1])
+}
+
+.onDetach = function(libpath)
+{
+  print("Detaching rolog")
+  
+  if(!rolog_done())
+    stop("rolog: not initialized")  
 }
 
 rolog_init = function(libname, pkgname, argv1)
