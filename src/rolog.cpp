@@ -20,9 +20,10 @@ LogicalVector init_(String argv0)
     int ac = 0;
     char **av = (char **)malloc(sizeof(char *) * 2);
     av[ac++] = const_cast<char*>(argv0.get_cstring()) ;
-    if(!PL_initialise(1, av))
+    int ret = PL_initialise(1, av) ;
+    if(!ret)
     {
-      Rcerr << "rolog_init: failed initialize" << std::endl ;      
+      Rcerr << "rolog_init: failed initialize, return value " << ret << std::endl ;      
       return false ; // throw PlError("failed to initialise");
     }
     pl = 1 ;
