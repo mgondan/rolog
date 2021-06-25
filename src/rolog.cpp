@@ -20,6 +20,7 @@ LogicalVector init_(String argv0)
     int ac = 0;
     char **av = (char **)malloc(sizeof(char *) * 2);
     av[ac++] = const_cast<char*>(argv0.get_cstring()) ;
+    Rcerr << "rolog_init: initialize with " << av[0] << std::endl ;      
     int ret = PL_initialise(1, av) ;
     if(!ret)
     {
