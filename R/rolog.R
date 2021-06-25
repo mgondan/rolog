@@ -29,8 +29,10 @@
 
 .onUnload = function(libpath)
 {
-  rolog_done()
+  if(!rolog_done())
+    stop("rolog: not initialized")
   
+  print("Unloading rolog")
   name = paste('rolog', .Platform$dynlib.ext, sep='')
   path = libpath
   recursive = TRUE
