@@ -1,5 +1,7 @@
 .onLoad = function(libname, pkgname)
 {
+  return(TRUE)
+  
   print(c(libname=libname))
   print(c(pkgname=pkgname))
   
@@ -37,6 +39,8 @@
 
 .onUnload = function(libpath)
 {
+  return(TRUE)
+  
   print("Unloading rolog")
   print(c(libpath=libpath))
   
