@@ -116,8 +116,6 @@ Run a query such as findall(X, likes(sam, X), List) with
 The second example uses Prolog for rendering R expressions as MathML. This is a nice illustration of two-way communication between R and Prolog, because Prolog has to ask
 back for the name of the integration variable (the x in dx).
 
-`library(rmarkdown)`
+`rmarkdown::render(system.file('mathml.Rmd', package='rolog'), output_file="mathml.html", output_dir=getwd())`
 
-Knit the file for HTML output. 
-
-`render(system.file('mathml.Rmd', package='rolog'), output_file="mathml.html", output_dir=getwd())`
+You should find an HTML page with nice equations in the file `mathml.html` of the current folder. Note that it uses MathML, which yields best results with the Firefox browser.
