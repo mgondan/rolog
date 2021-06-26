@@ -38,6 +38,11 @@
 .onUnload = function(libpath)
 {
   print("Unloading rolog")
+  print(c(libpath=libpath))
+  
+  library.dynam.unload("rolog", libpath=libpath, verbose=TRUE)
+  return(TRUE)
+  
   name = paste('rolog', .Platform$dynlib.ext, sep='')
   path = libpath
   recursive = TRUE
