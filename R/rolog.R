@@ -1,6 +1,6 @@
 .onLoad = function(libname, pkgname)
 {
-  # "Reload" rolog.so with local=FALSE
+  # local=FALSE is needed under Linux
   library.dynam(chname="rolog", package=pkgname, lib.loc=libname, local=FALSE)
   return(TRUE)
 }
