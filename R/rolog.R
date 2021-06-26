@@ -3,7 +3,7 @@
   print(c(libname=libname))
   print(c(pkgname=pkgname))
   
-  library.dynam(chname="rolog", package="rolog", verbose=TRUE, local=FALSE)
+  library.dynam(chname="rolog", package=pkgname, verbose=TRUE, local=FALSE)
   return(TRUE)
   
   name = paste('rolog', .Platform$dynlib.ext, sep='')
