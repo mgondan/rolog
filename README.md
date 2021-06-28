@@ -93,7 +93,9 @@ You might want to run some tests, e.g.,
 
 `library(remotes)`
 
-`install_github("mgondan/rolog")`
+`install_github("mgondan/rolog", INSTALL_opts="--no-multiarch")`
+
+The --no-multiarch is needed to prevent R from compiling the 32-bit version of the package (which doesn't exist).
 
 `library(rolog)`
 
