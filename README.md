@@ -109,9 +109,11 @@ Load some facts and rules with
 
 `rolog_consult(system.file("likes.pl", package="rolog"))`
 
-Run a query such as findall(X, likes(sam, X), List) with 
+Run a query such as findall(X, likes(sam, X), L) with 
 
-`rolog_findall(quote(likes(sam)))`
+`L = rolog_findall(quote(likes(sam)))`
+
+Note that `rolog_findall` is currently limited to prolog predicates with a single "output argument" in the last position.
 
 ## Example 2
 
