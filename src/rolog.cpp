@@ -204,7 +204,7 @@ PlTerm r2pl_var(ExpressionVector arg, CharacterVector& names, PlTermv vars)
     }
   
   names.push_back(res[0]) ;  
-  t = vars[names.length()] ;
+  t = vars[names.length()-1] ;
   return t ;
 }
 
