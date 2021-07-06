@@ -300,12 +300,11 @@ PlTerm r2pl(SEXP arg)
 // [[Rcpp::export]]
 LogicalVector call_(RObject lang)
 {
-  PlTermv args(2) ;
   CharacterVector names ;
   PlTermv vars(5) ;
-  args[0] = r2pl(lang, names, vars) ;
+  PlTerm arg = r2pl(lang, names, vars) ;
   
-  PlQuery q("call", args) ;
+  PlQuery q("call", arg) ;
   try
   {
     q.next_solution() ;
@@ -313,7 +312,7 @@ LogicalVector call_(RObject lang)
   
   catch(PlException& ex)
   { 
-    Rcerr << "call failed: " << (char*) args << std::endl ;
+    Rcerr << "call failed: " << (char*) arg << std::endl ;
     Rcerr << (char*) ex << std::endl ;
     PL_clear_exception() ;
     return false ;
