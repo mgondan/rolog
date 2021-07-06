@@ -308,7 +308,7 @@ PlTerm r2pl(SEXP arg)
 }
 
 // [[Rcpp::export]]
-LogicalVector once_(RObject lang)
+List once_(RObject lang)
 {
   CharacterVector names ;
   PlTermv vars(5) ;
