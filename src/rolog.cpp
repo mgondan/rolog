@@ -188,7 +188,7 @@ PlTerm r2pl_var(SEXP arg, CharacterVector& vars)
 {
   List name = as<List>(arg) ;
   if(as<String>(name[0]) != "_")
-    vars.push_back(name[0]) ;
+    vars.push_back(as<String>(name[0])) ;
   
   return PlTerm() ;
 }
