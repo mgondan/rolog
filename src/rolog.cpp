@@ -15,23 +15,21 @@ LogicalVector init_(String argv0)
     return false ;
   }
   
-  Rcerr << "rolog_init: starting PlEngine(\"" << const_cast<char*>(argv0.get_cstring()) << "\")" << std::endl ;
   // pl = new PlEngine(const_cast<char*>(argv0.get_cstring())) ;
   
   int ac = 0;
-
   av[ac++] = const_cast<char*>(argv0.get_cstring()) ;
   av[ac]   = NULL;
   
-    Rcerr << "rolog_init: initialize with " << av[0] << std::endl ;      
-    int ret = PL_initialise(ac, av) ;
-    if(!ret)
-    {
-      Rcerr << "rolog_init: failed initialize, return value " << ret << std::endl ;      
-      return false ; // throw PlError("failed to initialise");
-    }
-    pl = 1 ;
-  
+  Rcerr << "rolog_init: initialize with " << av[0] << std::endl ;      
+  int ret = PL_initialise(ac, av) ;
+  if(!ret)
+  {
+    Rcerr << "rolog_init: failed initialize, return value " << ret << std::endl ;      
+    return false ; // throw PlError("failed to initialise");
+  }
+
+  pl = 1 ;  
   return true ;
 }
 
@@ -188,9 +186,9 @@ PlTerm r2pl_integer(IntegerVector arg)
 
 PlTerm r2pl_var(SEXP arg, CharacterVector& vars)
 {
-  String name = as<String>(arg) ;
+  CharacterVector name = as<CharacterVector>(arg) ;
   if(name != "_")
-    vars.push_back(name) ;
+    vars.push_back(name[0]) ;
   
   return PlTerm() ;
 }
