@@ -330,7 +330,7 @@ List once_(RObject lang)
 
   List r ;
   for(int i=0 ; i<names.length() ; i++)
-    r.push_back(pl2r(vars[i]), names(i)) ;
+    r.push_back(pl2r(vars[i]), as<String>(names(i))) ;
 
   return r ;
 }
