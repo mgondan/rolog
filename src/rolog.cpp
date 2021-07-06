@@ -186,10 +186,13 @@ PlTerm r2pl_integer(IntegerVector arg)
 
 PlTerm r2pl_var(ExpressionVector arg, CharacterVector& vars)
 {
-  // Rcerr << "r2pl_var: " << arg[0].c_str() << std::endl ;
+  // Very cumbersome
+  Environment env = Environment::global_env();
+  Function f = env["as.character"];
+  CharacterVector res = f(arg);
   
-  if(as<CharacterVector>(arg)[0] != String("_"))
-    vars.push_back(as<CharacterVector>(arg)[0]) ;
+  if(res[0] != "_")
+    vars.push_back(res[0]) ;
   
   return PlTerm() ;
 }
