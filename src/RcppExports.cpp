@@ -37,14 +37,14 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// call_
-LogicalVector call_(RObject lang);
-RcppExport SEXP _rolog_call_(SEXP langSEXP) {
+// once_
+List once_(RObject lang);
+RcppExport SEXP _rolog_once_(SEXP langSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< RObject >::type lang(langSEXP);
-    rcpp_result_gen = Rcpp::wrap(call_(lang));
+    rcpp_result_gen = Rcpp::wrap(once_(lang));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -64,7 +64,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rolog_init_", (DL_FUNC) &_rolog_init_, 1},
     {"_rolog_done_", (DL_FUNC) &_rolog_done_, 0},
     {"_rolog_consult_", (DL_FUNC) &_rolog_consult_, 1},
-    {"_rolog_call_", (DL_FUNC) &_rolog_call_, 1},
+    {"_rolog_once_", (DL_FUNC) &_rolog_once_, 1},
     {"_rolog_findall_", (DL_FUNC) &_rolog_findall_, 1},
     {NULL, NULL, 0}
 };
