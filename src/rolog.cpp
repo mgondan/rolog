@@ -187,9 +187,9 @@ PlTerm r2pl_integer(IntegerVector arg)
 PlTerm r2pl_var(ExpressionVector arg, CharacterVector& vars)
 {
   // Very cumbersome
-  Environment env = Environment::global_env();
-  Function f = env["as.character"];
-  CharacterVector res = f(arg);
+  Environment env("package:base") ;
+  Function f = env["as.character"] ;
+  CharacterVector res = f(arg) ;
   
   if(res[0] != "_")
     vars.push_back(res[0]) ;
