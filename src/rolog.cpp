@@ -164,7 +164,7 @@ SEXP pl2r(PlTerm arg)
   return R_NilValue ;
 }
 
-PlTerm r2pl(SEXP arg, CharacterVector& vars) ;
+PlTerm r2pl(SEXP arg, CharacterVector& vars, PlTermv& terms) ;
 
 PlTerm r2pl_real(NumericVector arg)
 {
