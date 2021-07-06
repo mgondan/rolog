@@ -191,17 +191,22 @@ PlTerm r2pl_var(ExpressionVector arg, CharacterVector& names, PlTermv vars)
   Function f = env["as.character"] ;
   CharacterVector res = f(arg) ;
 
+  PlTerm t ;
   if(res[0] == "_")
-    return PlTerm() ;
+    return t ;
 
   // Very cumbersome
   bool has = false ;
   for(int i=0 ; i<names.length() ; i++)
     if(res[0] == names[i])
-      return PlTerm() = vars[i] ;
+    {
+      t = vars[i] ;
+      return t ;
+    }
   
   names.push_back(res[0]) ;  
-  return PlTerm() = vars[names.length()] ;
+  t = vars[names.length()] ;
+  return t ;
 }
 
 PlTerm r2pl_atom(Symbol arg)
