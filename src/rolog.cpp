@@ -192,7 +192,7 @@ PlTerm r2pl_var(ExpressionVector arg, CharacterVector& vars)
   CharacterVector res = f(arg) ;
   
   // Very cumbersome
-  has = false ;
+  bool has = false ;
   for(int i=0 ; i<vars.length() ; i++)
     if(res[0] == vars[i])
       has = true ;
