@@ -186,6 +186,11 @@ PlTerm r2pl_integer(IntegerVector arg)
   return PlTerm((long) arg(0)) ;
 }
 
+PlTerm r2pl_var(SEXP arg)
+{
+  return PlTerm() ;
+}
+
 PlTerm r2pl_atom(Symbol arg)
 {
   return PlAtom(as<Symbol>(arg).c_str()) ;
@@ -244,6 +249,9 @@ PlTerm r2pl(SEXP arg)
   if(TYPEOF(arg) == INTSXP)
     return r2pl_integer(arg) ;
   
+  if(TYPEOF(arg) == EXPRSXP)
+    return r2pl_var(arg) ;
+
   if(TYPEOF(arg) == SYMSXP)
     return r2pl_atom(arg) ;
 
