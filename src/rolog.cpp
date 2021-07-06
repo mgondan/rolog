@@ -106,7 +106,7 @@ Symbol pl2r_symbol(PlTerm arg)
 ExpressionVector pl2r_variable(PlTerm arg)
 {
   ExpressionVector r(1) ;
-  r(0) = (char*) arg ;
+  r(0) = "VAR" ; // (char*) arg ;
   return r ;
 }
 
