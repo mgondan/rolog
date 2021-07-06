@@ -43,9 +43,9 @@ rolog_consult = function(fname='likes.pl')
   consult_(fname)
 }
 
-rolog_call = function(call=quote(consult('likes')))
+rolog_once = function(call=quote(consult('likes')))
 {
-  call_(call)
+  once_(call)
 }
 
 rolog_findall = function(predicate=quote(likes(sam)))
