@@ -166,7 +166,7 @@ SEXP pl2r(PlTerm arg)
   return R_NilValue ;
 }
 
-PlTerm r2pl(SEXP arg) ;
+PlTerm r2pl(SEXP arg, CharacterVector& vars) ;
 
 PlTerm r2pl_real(NumericVector arg)
 {
@@ -186,8 +186,9 @@ PlTerm r2pl_integer(IntegerVector arg)
   return PlTerm((long) arg(0)) ;
 }
 
-PlTerm r2pl_var(SEXP arg)
+PlTerm r2pl_var(SEXP arg, CharacterVector& vars)
 {
+  vars.push_back(as<String>(arg)) ;
   return PlTerm() ;
 }
 
@@ -213,32 +214,32 @@ PlTerm r2pl_na()
   return PlTerm("NA") ;
 }
 
-PlTerm r2pl_compound(Language arg)
+PlTerm r2pl_compound(Language arg, CharacterVector& vars)
 {
   PlTermv args(arg.size() - 1) ;
   
   R_xlen_t i=0 ;
   for(SEXP cons=CDR(arg) ; cons != R_NilValue ; cons = CDR(cons))
-    args[i++] = r2pl(CAR(cons)) ;
+    args[i++] = r2pl(CAR(cons), vars) ;
 
   return PlCompound(as<Symbol>(CAR(arg)).c_str(), args) ;
 }
 
-PlTerm r2pl_list(List arg)
+PlTerm r2pl_list(List arg, CharacterVector& vars)
 {
   PlTerm r ;
   PlTail l(r);
   for(R_xlen_t i=0; i<arg.size() ; i++)
-    l.append(r2pl(arg(i))) ;
+    l.append(r2pl(arg(i), vars)) ;
   l.close() ;
   
   return r ;
 }
 
-PlTerm r2pl(SEXP arg)
+PlTerm r2pl(SEXP arg, CharacterVector& vars)
 {
   if(TYPEOF(arg) == LANGSXP)
-    return r2pl_compound(arg) ;
+    return r2pl_compound(arg, vars) ;
 
   if(TYPEOF(arg) == REALSXP)
     return r2pl_real(arg) ;
@@ -250,7 +251,7 @@ PlTerm r2pl(SEXP arg)
     return r2pl_integer(arg) ;
   
   if(TYPEOF(arg) == EXPRSXP)
-    return r2pl_var(arg) ;
+    return r2pl_var(arg, vars) ;
 
   if(TYPEOF(arg) == SYMSXP)
     return r2pl_atom(arg) ;
@@ -259,7 +260,7 @@ PlTerm r2pl(SEXP arg)
     return r2pl_string(arg) ;
 
   if(TYPEOF(arg) == VECSXP)
-    return r2pl_list(arg) ;
+    return r2pl_list(arg, vars) ;
   
   if(TYPEOF(arg) == NILSXP)
     return r2pl_null() ;
@@ -270,7 +271,8 @@ PlTerm r2pl(SEXP arg)
 // [[Rcpp::export]]
 LogicalVector call_(RObject lang)
 {
-  PlTerm arg = r2pl(lang) ;
+  CharacterVector vars ;
+  PlTerm arg = r2pl(lang, vars) ;
   
   PlQuery q("call", arg) ;
   try
@@ -292,7 +294,9 @@ LogicalVector call_(RObject lang)
 List findall_(RObject lang)
 {
   PlTermv args(2) ;
-  args[0] = r2pl(lang) ;
+  
+  CharacterVector vars ;
+  args[0] = r2pl(lang, vars) ;
 
   PlQuery q("call", args) ;
   List r ;
