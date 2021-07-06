@@ -292,7 +292,8 @@ PlTerm r2pl(SEXP arg)
   
   for(int i=0 ; i<names.length() ; i++)
     Rcout << "pl2r: variable " << (char*) names[i] << std::endl ;
-  
+
+  Rcout << "pl2r: term " << (char*) t << std::endl ;
   return t ;
 }
 
