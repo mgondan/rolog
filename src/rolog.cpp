@@ -300,9 +300,10 @@ PlTerm r2pl(SEXP arg)
 // [[Rcpp::export]]
 LogicalVector call_(RObject lang)
 {
+  PlTermv args(2) ;
   CharacterVector names ;
   PlTermv vars(5) ;
-  PlTerm t = r2pl(arg, names, vars) ;
+  args[0] = r2pl(lang, names, vars) ;
   
   PlQuery q("call", arg) ;
   try
