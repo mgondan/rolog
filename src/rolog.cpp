@@ -164,7 +164,7 @@ SEXP pl2r(PlTerm arg)
   return R_NilValue ;
 }
 
-PlTerm r2pl(SEXP arg, CharacterVector& vars, PlTermv& terms) ;
+PlTerm r2pl(SEXP arg, CharacterVector& vars) ;
 
 PlTerm r2pl_real(NumericVector arg)
 {
@@ -191,7 +191,13 @@ PlTerm r2pl_var(ExpressionVector arg, CharacterVector& vars)
   Function f = env["as.character"] ;
   CharacterVector res = f(arg) ;
   
-  if(res[0] != "_")
+  // Very cumbersome
+  has = false ;
+  for(int i=0 ; i<vars.length() ; i++)
+    if(res[0] == vars[i])
+      has = true ;
+  
+  if(res[0] != "_" & !has)
     vars.push_back(res[0]) ;
   
   return PlTerm() ;
