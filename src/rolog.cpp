@@ -271,11 +271,21 @@ PlTerm r2pl(SEXP arg, CharacterVector& vars)
   return r2pl_na() ;
 }
 
+PlTerm r2pl(SEXP arg)
+{
+  CharacterVector vars ;
+  PlTerm t = r2pl(arg, vars) ;
+  
+  for(int i=0 ; i<vars.length() ; i++)
+    Rcout << "pl2r: variable " << (char*) vars[i] << std::endl ;
+  
+  return t ;
+}
+
 // [[Rcpp::export]]
 LogicalVector call_(RObject lang)
 {
-  CharacterVector vars ;
-  PlTerm arg = r2pl(lang, vars) ;
+  PlTerm arg = r2pl(lang) ;
   
   PlQuery q("call", arg) ;
   try
@@ -297,9 +307,7 @@ LogicalVector call_(RObject lang)
 List findall_(RObject lang)
 {
   PlTermv args(2) ;
-  
-  CharacterVector vars ;
-  args[0] = r2pl(lang, vars) ;
+  args[0] = r2pl(lang) ;
 
   PlQuery q("call", args) ;
   List r ;
