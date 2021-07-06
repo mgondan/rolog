@@ -305,7 +305,7 @@ LogicalVector call_(RObject lang)
   PlTermv vars(5) ;
   args[0] = r2pl(lang, names, vars) ;
   
-  PlQuery q("call", arg) ;
+  PlQuery q("call", args) ;
   try
   {
     q.next_solution() ;
@@ -313,7 +313,7 @@ LogicalVector call_(RObject lang)
   
   catch(PlException& ex)
   { 
-    Rcerr << "call failed: " << (char*) arg << std::endl ;
+    Rcerr << "call failed: " << (char*) args << std::endl ;
     Rcerr << (char*) ex << std::endl ;
     PL_clear_exception() ;
     return false ;
