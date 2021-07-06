@@ -328,10 +328,11 @@ LogicalVector call_(RObject lang)
     return false ;
   }
 
+  List r ;
   for(int i=0 ; i<names.length() ; i++)
-    Rcout << "pl2r: variable " << (char*) names[i] << " = " << (char*) vars[i] << std::endl ;
+    l.push_back(Named(names[i], pl2r(vars[i]))) ;
 
-  return true ;
+  return r ;
 }
 
 // [[Rcpp::export]]
