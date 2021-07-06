@@ -103,6 +103,13 @@ Symbol pl2r_symbol(PlTerm arg)
   return Symbol((char*) arg) ;
 }
 
+ExpressionVector pl2r_variable(PlTerm arg)
+{
+  ExpressionVector r(1) ;
+  r(0) = (char*) arg ;
+  return r ;
+}
+
 List pl2r_list(PlTerm arg)
 {
   List r ;
@@ -159,6 +166,9 @@ SEXP pl2r(PlTerm arg)
   
   if(PL_is_compound(arg))
     return pl2r_compound(arg) ;
+  
+  if(PL_is_variable(arg))
+    return pl2r_variable(arg) ;
   
   Rcout << "pl2r: Cannot convert " << (char*) arg << std::endl ;
   return R_NilValue ;
