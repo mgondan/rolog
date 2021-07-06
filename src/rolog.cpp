@@ -186,8 +186,8 @@ PlTerm r2pl_integer(IntegerVector arg)
 
 PlTerm r2pl_var(SEXP arg, CharacterVector& vars)
 {
-  String name = as<String>(arg) ;
-  if(name[0] != "_")
+  List name = as<List>(arg) ;
+  if(as<String>(name[0]) != "_")
     vars.push_back(name[0]) ;
   
   return PlTerm() ;
