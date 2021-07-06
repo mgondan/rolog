@@ -196,7 +196,6 @@ PlTerm r2pl_var(ExpressionVector arg, CharacterVector& names, PlTermv vars)
     return t ;
 
   // Very cumbersome
-  bool has = false ;
   for(int i=0 ; i<names.length() ; i++)
     if(res[0] == names[i])
     {
