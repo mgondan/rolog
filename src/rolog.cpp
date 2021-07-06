@@ -197,7 +197,7 @@ PlTerm r2pl_var(ExpressionVector arg, CharacterVector& vars)
     if(res[0] == vars[i])
       has = true ;
   
-  if(res[0] != "_" & !has)
+  if(res[0] != "_" && !has)
     vars.push_back(res[0]) ;
   
   return PlTerm() ;
