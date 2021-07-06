@@ -164,7 +164,7 @@ SEXP pl2r(PlTerm arg)
   return R_NilValue ;
 }
 
-PlTerm r2pl(SEXP arg, CharacterVector& vars) ;
+PlTerm r2pl(SEXP arg, CharacterVector& names, PlTermv& vars) ;
 
 PlTerm r2pl_real(NumericVector arg)
 {
@@ -184,23 +184,24 @@ PlTerm r2pl_integer(IntegerVector arg)
   return PlTerm((long) arg(0)) ;
 }
 
-PlTerm r2pl_var(ExpressionVector arg, CharacterVector& vars)
+PlTerm r2pl_var(ExpressionVector arg, CharacterVector& names, PlTermv vars)
 {
   // Very cumbersome
   Environment env("package:base") ;
   Function f = env["as.character"] ;
   CharacterVector res = f(arg) ;
-  
+
+  if(res[0] == "_")
+    return PlTerm() ;
+
   // Very cumbersome
   bool has = false ;
-  for(int i=0 ; i<vars.length() ; i++)
-    if(res[0] == vars[i])
-      has = true ;
+  for(int i=0 ; i<names.length() ; i++)
+    if(res[0] == names[i])
+      return PlTerm() = vars[i] ;
   
-  if(res[0] != "_" && !has)
-    vars.push_back(res[0]) ;
-  
-  return PlTerm() ;
+  names.push_back(res[0]) ;  
+  return PlTerm() = vars[names.length()] ;
 }
 
 PlTerm r2pl_atom(Symbol arg)
@@ -225,32 +226,32 @@ PlTerm r2pl_na()
   return PlTerm("NA") ;
 }
 
-PlTerm r2pl_compound(Language arg, CharacterVector& vars)
+PlTerm r2pl_compound(Language arg, CharacterVector& names, PlTermv& vars)
 {
   PlTermv args(arg.size() - 1) ;
   
   R_xlen_t i=0 ;
   for(SEXP cons=CDR(arg) ; cons != R_NilValue ; cons = CDR(cons))
-    args[i++] = r2pl(CAR(cons), vars) ;
+    args[i++] = r2pl(CAR(cons), names, vars) ;
 
   return PlCompound(as<Symbol>(CAR(arg)).c_str(), args) ;
 }
 
-PlTerm r2pl_list(List arg, CharacterVector& vars)
+PlTerm r2pl_list(List arg, CharacterVector& names, PlTermv& vars)
 {
   PlTerm r ;
   PlTail l(r);
   for(R_xlen_t i=0; i<arg.size() ; i++)
-    l.append(r2pl(arg(i), vars)) ;
+    l.append(r2pl(arg(i), names, vars)) ;
   l.close() ;
   
   return r ;
 }
 
-PlTerm r2pl(SEXP arg, CharacterVector& vars)
+PlTerm r2pl(SEXP arg, CharacterVector& names, PlTermv& vars)
 {
   if(TYPEOF(arg) == LANGSXP)
-    return r2pl_compound(arg, vars) ;
+    return r2pl_compound(arg, names, vars) ;
 
   if(TYPEOF(arg) == REALSXP)
     return r2pl_real(arg) ;
@@ -262,7 +263,7 @@ PlTerm r2pl(SEXP arg, CharacterVector& vars)
     return r2pl_integer(arg) ;
   
   if(TYPEOF(arg) == EXPRSXP)
-    return r2pl_var(arg, vars) ;
+    return r2pl_var(arg, names, vars) ;
 
   if(TYPEOF(arg) == SYMSXP)
     return r2pl_atom(arg) ;
@@ -271,7 +272,7 @@ PlTerm r2pl(SEXP arg, CharacterVector& vars)
     return r2pl_string(arg) ;
 
   if(TYPEOF(arg) == VECSXP)
-    return r2pl_list(arg, vars) ;
+    return r2pl_list(arg, names, vars) ;
   
   if(TYPEOF(arg) == NILSXP)
     return r2pl_null() ;
@@ -281,11 +282,12 @@ PlTerm r2pl(SEXP arg, CharacterVector& vars)
 
 PlTerm r2pl(SEXP arg)
 {
-  CharacterVector vars ;
-  PlTerm t = r2pl(arg, vars) ;
+  CharacterVector names ;
+  PlTermv vars(5) ;
+  PlTerm t = r2pl(arg, names, vars) ;
   
-  for(int i=0 ; i<vars.length() ; i++)
-    Rcout << "pl2r: variable " << (char*) vars[i] << std::endl ;
+  for(int i=0 ; i<names.length() ; i++)
+    Rcout << "pl2r: variable " << (char*) names[i] << std::endl ;
   
   return t ;
 }
