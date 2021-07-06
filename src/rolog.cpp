@@ -184,11 +184,10 @@ PlTerm r2pl_integer(IntegerVector arg)
   return PlTerm((long) arg(0)) ;
 }
 
-PlTerm r2pl_var(SEXP arg, CharacterVector& vars)
+PlTerm r2pl_var(ExpressionVector arg, CharacterVector& vars)
 {
-  List name = as<List>(arg) ;
-  if(as<String>(name[0]) != "_")
-    vars.push_back(as<String>(name[0])) ;
+  if(as<String>(arg[0]) != "_")
+    vars.push_back(as<String>(arg[0])) ;
   
   return PlTerm() ;
 }
