@@ -13,8 +13,8 @@ consult_ <- function(files) {
     .Call('_rolog_consult_', PACKAGE = 'rolog', files)
 }
 
-call_ <- function(lang) {
-    .Call('_rolog_call_', PACKAGE = 'rolog', lang)
+once_ <- function(lang) {
+    .Call('_rolog_once_', PACKAGE = 'rolog', lang)
 }
 
 findall_ <- function(lang) {

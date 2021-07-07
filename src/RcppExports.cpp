@@ -38,7 +38,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // once_
-List once_(RObject lang);
+RObject once_(RObject lang);
 RcppExport SEXP _rolog_once_(SEXP langSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
