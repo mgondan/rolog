@@ -107,9 +107,11 @@ Load some facts and rules with
 
 `rolog_consult(system.file("likes.pl", package="rolog"))`
 
-Run a query such as findall(X, likes(sam, X), L) with 
+Run a query such as likes(sam, X) with 
 
 `rolog_findall(call('likes', quote(sam), expression(X)))`
+
+Sorry for the cumbersome syntax. At the moment, expression(X) encapsulates variables.
 
 ## Example 2
 
