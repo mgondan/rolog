@@ -1,7 +1,7 @@
 ---
 title: "MathML via Prolog"
 author: "Matthias Gondan"
-date: "19 5 2021"
+date: "7 7 2021"
 output: html_document
 ---
 
@@ -9,13 +9,13 @@ Some preparation is needed.
 
 ```{r}
 library(rolog)
-rolog_call(quote(use_module(library(rologpp))))
+rolog_once(quote(use_module(library(rologpp))))
 rolog_consult(system.file('mathml.pl', package='rolog'))
 
 html_print = function(term)
 {
-  t = as.call(list(quote(rml), term))
-  cat(sapply(rolog_findall(t)[[1]], as.character), sep='')
+  t = call('rml', term, expression(X))
+  cat(sapply(rolog_once(t)$X, as.character), sep='')
 }
 ```
 
