@@ -49,9 +49,7 @@ More detailed installation instructions are found on the SWI-Prolog webpage.
 
 `R`
 
-`library(remotes)`
-
-`install_github("mgondan/rolog")`
+`remotes::install_github('mgondan/rolog')`
 
 Then move on to the examples.
 
@@ -89,15 +87,15 @@ You might want to run some tests, e.g.,
 
 6. Restart/Open R or RStudio as a normal user, then 
 
-`install.packages("remotes")`
+`install.packages('remotes')`
 
-`library(remotes)`
-
-`install_github("mgondan/rolog", INSTALL_opts="--no-multiarch")`
+`remotes::install_github("mgondan/rolog", INSTALL_opts="--no-multiarch")`
 
 The --no-multiarch is needed to prevent R from compiling the 32-bit version of the package (which doesn't exist).
 
 `library(rolog)`
+
+If you run into problems, check if swipl.exe is visible from RStudio using `Sys.which('swipl')`, and set the PATH within RStudio if needed. Moreover, you might need to set the environment variable SWI_HOME_DIR to the installation folder of SWI-Prolog.
 
 ## Example 1
 
@@ -111,9 +109,7 @@ Load some facts and rules with
 
 Run a query such as findall(X, likes(sam, X), L) with 
 
-`L = rolog_findall(quote(likes(sam)))`
-
-Note that `rolog_findall` is currently limited to prolog predicates with a single "output argument" in the last position.
+`rolog_findall(call('likes', quote(sam), expression(X)))`
 
 ## Example 2
 
