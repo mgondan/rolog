@@ -50,6 +50,5 @@ rolog_once = function(call=quote(consult('likes')))
 
 rolog_findall = function(predicate=quote(likes(sam)))
 {
-  l = as.list(findall_(predicate))
-  l[length(l):1]
+  findall_(predicate)
 }

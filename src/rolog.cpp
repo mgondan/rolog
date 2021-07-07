@@ -350,25 +350,39 @@ List findall_(RObject lang)
 {
   CharacterVector names ;
   PlTermv vars(5) ;
+  PlTerm arg = r2pl(lang, names, vars) ;
+  
+  for(int i=0 ; i<names.length() ; i++)
+    Rcerr << (char*) as<Symbol>(names[i]).c_str() << ": " << (char*) vars[i] << std::endl ;
 
-  PlTermv args(2) ;
-  args[0] = r2pl(lang, names, vars) ;
-
-  PlQuery q("call", args) ;
-  List r ;
-  try 
+  PlQuery q("call", arg) ;
+  List all ;
+  while(true)
   {
-    while(q.next_solution())
-      r.push_back(pl2r(args[1], names, vars)) ;
+    try
+    {
+      if(!q.next_solution())
+        return all ;
+    }
+    
+    catch(PlException& ex)
+    { 
+      Rcerr << "call failed: " << (char*) arg << std::endl ;
+      Rcerr << (char*) ex << std::endl ;
+      PL_clear_exception() ;
+      return all ;
+    }
+    
+    List l ;
+    for(int i=0 ; i<names.length() ; i++)
+    {
+      RObject r = pl2r(vars[i], names, vars) ;
+      if(TYPEOF(r) == EXPRSXP && !strcmp(as<Symbol>(names[i]).c_str(), as<Symbol>(as<ExpressionVector>(r)[0]).c_str()))
+        continue ;
+      
+      l.push_back(r, as<Symbol>(names[i]).c_str()) ;
+    }
+    
+    all.push_back(l) ;
   }
-  
-  catch(PlException& ex)
-  { 
-    Rcerr << "query failed: " << (char*) args[0] << std::endl ;
-    Rcerr << (char*) ex << std::endl ;
-    PL_clear_exception() ;
-    return false ;
-  }
-  
-  return r ;
 }
