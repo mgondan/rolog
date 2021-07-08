@@ -134,9 +134,9 @@ List pl2r_list(PlTerm arg, CharacterVector& names, PlTermv& vars)
 
 Language pl2r_compound(PlTerm term, CharacterVector& names, PlTermv& vars)
 {
-  if(!PL_is_acyclic())
+  if(!PL_is_acyclic(term))
   {
-    Rcout << "pl2r: Cannot convert cyclic term" << (char*) arg << std::endl ;
+    Rcout << "pl2r: Cannot convert cyclic term" << (char*) term << std::endl ;
     return R_NilValue ;
   }
   
