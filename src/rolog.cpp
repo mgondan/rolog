@@ -134,6 +134,12 @@ List pl2r_list(PlTerm arg, CharacterVector& names, PlTermv& vars)
 
 Language pl2r_compound(PlTerm term, CharacterVector& names, PlTermv& vars)
 {
+  if(!PL_is_acyclic())
+  {
+    Rcout << "pl2r: Cannot convert cyclic term" << (char*) arg << std::endl ;
+    return R_NilValue ;
+  }
+  
   Language r(term.name()) ;
   
   for(unsigned int i=1 ; i<=term.arity() ; i++)
