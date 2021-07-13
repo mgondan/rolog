@@ -214,18 +214,12 @@ PlTerm r2pl_var(ExpressionVector arg, CharacterVector& names, PlTermv vars)
 {
   CharacterVector n = as<CharacterVector>(arg[0]) ;
 
-  /*
-  // Very cumbersome
-  Environment env("package:base") ;
-  Function f = env["as.character"] ;
-  CharacterVector res = f(arg) ;
-  */
-  
+  // anonymous variable
   PlTerm t ;
   if(n[0] == "_")
     return t ;
 
-  // Very cumbersome
+  // Unify with existing variable of the same name
   for(int i=0 ; i<names.length() ; i++)
     if(n[0] == names[i])
     {
@@ -233,6 +227,7 @@ PlTerm r2pl_var(ExpressionVector arg, CharacterVector& names, PlTermv vars)
       return t ;
     }
   
+  // Create new variable
   names.push_back(n[0]) ;  
   t = vars[names.length()-1] ;
   return t ;
