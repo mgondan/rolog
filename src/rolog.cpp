@@ -212,24 +212,28 @@ PlTerm r2pl_integer(IntegerVector arg)
 
 PlTerm r2pl_var(ExpressionVector arg, CharacterVector& names, PlTermv vars)
 {
+  CharacterVector n = as<CharacterVector>(arg[0]) ;
+
+  /*
   // Very cumbersome
   Environment env("package:base") ;
   Function f = env["as.character"] ;
   CharacterVector res = f(arg) ;
-
+  */
+  
   PlTerm t ;
-  if(res[0] == "_")
+  if(n[0] == "_")
     return t ;
 
   // Very cumbersome
   for(int i=0 ; i<names.length() ; i++)
-    if(res[0] == names[i])
+    if(n[0] == names[i])
     {
       t = vars[i] ;
       return t ;
     }
   
-  names.push_back(res[0]) ;  
+  names.push_back(n[0]) ;  
   t = vars[names.length()-1] ;
   return t ;
 }
