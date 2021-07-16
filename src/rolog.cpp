@@ -226,7 +226,7 @@ PlTerm r2pl_integer(IntegerVector arg)
   return PlTerm((long) arg(0)) ;
 }
 
-PlTerm r2pl_var(ExpressionVector arg, CharacterVector& names, PlTerm vars)
+PlTerm r2pl_var(ExpressionVector arg, CharacterVector& names, PlTerm& vars)
 {
   CharacterVector n = as<CharacterVector>(arg[0]) ;
 
