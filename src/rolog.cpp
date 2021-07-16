@@ -198,7 +198,7 @@ PlTerm r2pl_na()
 
 PlTerm r2pl_real(NumericVector arg)
 {
-  if(is_na(arg)(0))
+  if(arg(0) == NA_REAL)
     return r2pl_na() ;
   
   return PlTerm(arg(0)) ;
@@ -206,7 +206,7 @@ PlTerm r2pl_real(NumericVector arg)
 
 PlTerm r2pl_logical(LogicalVector arg)
 {
-  if(is_na(arg)(0))
+  if(arg(0) == NA_LOGICAL)
     return r2pl_na() ;
   
   return PlAtom(arg(0) ? "TRUE" : "FALSE") ;
@@ -214,7 +214,7 @@ PlTerm r2pl_logical(LogicalVector arg)
 
 PlTerm r2pl_integer(IntegerVector arg)
 {
-  if(is_na(arg)(0))
+  if(arg(0) == NA_INTEGER)
     return r2pl_na() ;
   
   return PlTerm((long) arg(0)) ;
@@ -245,7 +245,7 @@ PlTerm r2pl_atom(Symbol arg)
 
 PlTerm r2pl_string(CharacterVector arg)
 {
-  if(is_na(arg)(0))
+  if(arg(0) == NA_STRING)
     return r2pl_na() ;
   
   return PlString(arg(0)) ;
