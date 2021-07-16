@@ -199,7 +199,7 @@ PlTerm r2pl_real(NumericVector arg)
 
 PlTerm r2pl_logical(LogicalVector arg)
 {
-  return PLAtom(arg(0) ? "TRUE" : "FALSE") ;
+  return PlAtom(arg(0) ? "TRUE" : "FALSE") ;
 }
 
 PlTerm r2pl_integer(IntegerVector arg)
