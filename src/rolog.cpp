@@ -333,6 +333,7 @@ RObject once_(RObject lang)
   PlTerm vars ;
   PlTerm arg = r2pl(lang, names, vars) ;
 
+  Rcerr << "Variables: " << (char*) vars << std::endl ;
   PlTerm t = vars ;  
   {
     PlTail tail(t) ;
