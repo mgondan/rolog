@@ -326,12 +326,14 @@ RObject once_(RObject lang)
   PlTerm vars ;
   PlTerm arg = r2pl(lang, names, vars) ;
 
-  PlTerm t = vars ;
-  PlTail tail(t) ;
-  for(int i=0 ; i<names.length() ; i++)
+  PlTerm t = vars ;  
   {
-    Rcerr << (char*) as<Symbol>(names[i]).c_str() << ": " << (char*) t << std::endl ;
-    tail.next(t) ;
+    PlTail tail(t) ;
+    for(int i=0 ; i<names.length() ; i++)
+    {
+      Rcerr << (char*) as<Symbol>(names[i]).c_str() << ": " << (char*) t << std::endl ;
+      tail.next(t) ;
+    }
   }
   
   PlQuery q("call", arg) ;
@@ -349,13 +351,16 @@ RObject once_(RObject lang)
     return NULL ;
   }
 
-  tail = t = vars ;
-  for(int i=0 ; i<names.length() ; i++)
-  {    
-    Rcerr << (char*) as<Symbol>(names[i]).c_str() << ": " << (char*) t << std::endl ;
-    tail.next(t) ;
+  t = vars ;
+  {
+    PlTail tail(t) ;
+    for(int i=0 ; i<names.length() ; i++)
+    {    
+      Rcerr << (char*) as<Symbol>(names[i]).c_str() << ": " << (char*) t << std::endl ;
+      tail.next(t) ;
+    }
   }
-
+  
   List l ;
   t = vars ;
   for(int i=0 ; i<names.length() ; i++)
