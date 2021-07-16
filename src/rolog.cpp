@@ -198,7 +198,7 @@ PlTerm r2pl_na()
 
 PlTerm r2pl_real(NumericVector arg)
 {
-  if(is.na(arg(0)))
+  if(is.na(arg[0]))
     return r2pl_na() ;
   
   return PlTerm(arg(0)) ;
