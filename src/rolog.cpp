@@ -2,7 +2,6 @@
 #include "Rcpp.h"
 using namespace Rcpp ;
 
-// PlEngine* pl = NULL ;
 int pl = 0 ;
 char *av[2];
 
@@ -10,12 +9,7 @@ char *av[2];
 LogicalVector init_(String argv0)
 {
   if(pl)
-  {
-    Rcerr << "rolog_init: engine already initialized" << std::endl ;
-    return false ;
-  }
-  
-  // pl = new PlEngine(const_cast<char*>(argv0.get_cstring())) ;
+    stop("rolog_init: engine already initialized") ;
   
   int ac = 0;
   av[ac++] = const_cast<char*>(argv0.get_cstring()) ;
@@ -23,10 +17,7 @@ LogicalVector init_(String argv0)
   
   int ret = PL_initialise(ac, av) ;
   if(!ret)
-  {
-    Rcerr << "rolog_init: failed initialize, return value " << ret << std::endl ;      
-    return false ; // throw PlError("failed to initialise");
-  }
+    stop("rolog_init: failed initialize, return value %i") ;
 
   pl = 1 ;  
   return true ;
@@ -36,13 +27,8 @@ LogicalVector init_(String argv0)
 LogicalVector done_()
 {
   if(!pl)
-  {
-    Rcerr << "rolog_done: engine has not been initialized" << std::endl ;
-    return false ;
-  }
+    stop("rolog_done: engine has not been initialized") ;
 
-  // delete pl ;
-  // pl = NULL ;
   PL_cleanup(0);
   pl = 0 ;
   return true ;
@@ -57,12 +43,11 @@ LogicalVector consult_(CharacterVector files)
     {
       PlCall("consult", PlString((char*) files(i))) ;
     }
+    
     catch(PlException& ex)
     { 
-      Rcerr << "failed to consult " << (char*) files(i) << std::endl ;
-      Rcerr << (char*) ex << std::endl ;
       PL_clear_exception() ;
-      return false ;
+      stop("failed to consult %s: %s", (char*) files(i), (char*) ex) ;
     }
   }
 
