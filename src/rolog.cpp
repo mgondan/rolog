@@ -174,7 +174,7 @@ SEXP pl2r(PlTerm arg, CharacterVector& names, PlTermv& vars)
   return R_NilValue ;
 }
 
-PlTerm r2pl(SEXP arg, CharacterVector& names, PlTermv& vars) ;
+PlTerm r2pl(SEXP arg, CharacterVector& names, PlTerm& vars) ;
 
 PlTerm r2pl_null()
 {
@@ -221,7 +221,7 @@ PlTerm r2pl_integer(IntegerVector arg)
   return PlTerm((long) arg(0)) ;
 }
 
-PlTerm r2pl_var(ExpressionVector arg, CharacterVector& names, PlTermv vars)
+PlTerm r2pl_var(ExpressionVector arg, CharacterVector& names, PlTerm vars)
 {
   CharacterVector n = as<CharacterVector>(arg[0]) ;
 
@@ -230,13 +230,22 @@ PlTerm r2pl_var(ExpressionVector arg, CharacterVector& names, PlTermv vars)
     return PlTerm() ;
 
   // Unify with existing variable of the same name
+  PlTerm t = vars ;
+  PlTail l(t) ;
   for(int i=0 ; i<names.length() ; i++)
+  {
     if(n[0] == names[i])
-      return vars[i] ;
+      return t ;
+    
+    l.next(t) ;
+  }
   
   // Create new variable
-  names.push_back(n[0]) ;  
-  return vars[names.length()-1] ;
+  names.push_back(n[0]) ;
+  
+  PlTerm v ;
+  l.append(v) ;
+  return v ;
 }
 
 PlTerm r2pl_atom(Symbol arg)
@@ -255,7 +264,7 @@ PlTerm r2pl_string(CharacterVector arg)
   return PlString(arg(0)) ;
 }
 
-PlTerm r2pl_compound(Language arg, CharacterVector& names, PlTermv& vars)
+PlTerm r2pl_compound(Language arg, CharacterVector& names, PlTerm& vars)
 {
   PlTermv args(arg.size() - 1) ;
   
@@ -266,7 +275,7 @@ PlTerm r2pl_compound(Language arg, CharacterVector& names, PlTermv& vars)
   return PlCompound(as<Symbol>(CAR(arg)).c_str(), args) ;
 }
 
-PlTerm r2pl_list(List arg, CharacterVector& names, PlTermv& vars)
+PlTerm r2pl_list(List arg, CharacterVector& names, PlTerm& vars)
 {
   PlTerm r ;
   PlTail l(r) ;
@@ -278,7 +287,7 @@ PlTerm r2pl_list(List arg, CharacterVector& names, PlTermv& vars)
   return r ;
 }
 
-PlTerm r2pl(SEXP arg, CharacterVector& names, PlTermv& vars)
+PlTerm r2pl(SEXP arg, CharacterVector& names, PlTerm& vars)
 {
   if(TYPEOF(arg) == LANGSXP)
     return r2pl_compound(arg, names, vars) ;
@@ -314,11 +323,16 @@ PlTerm r2pl(SEXP arg, CharacterVector& names, PlTermv& vars)
 RObject once_(RObject lang)
 {
   CharacterVector names ;
-  PlTermv vars(5) ;
+  PlTerm vars ;
   PlTerm arg = r2pl(lang, names, vars) ;
 
+  PlTerm t = vars ;
+  PlTail tail(t) ;
   for(int i=0 ; i<names.length() ; i++)
-    Rcerr << (char*) as<Symbol>(names[i]).c_str() << ": " << (char*) vars[i] << std::endl ;
+  {
+    Rcerr << (char*) as<Symbol>(names[i]).c_str() << ": " << (char*) t << std::endl ;
+    tail.next(t) ;
+  }
   
   PlQuery q("call", arg) ;
   try
@@ -335,13 +349,18 @@ RObject once_(RObject lang)
     return NULL ;
   }
 
+  tail = t = vars ;
   for(int i=0 ; i<names.length() ; i++)
-    Rcerr << (char*) as<Symbol>(names[i]).c_str() << ": " << (char*) vars[i] << std::endl ;
+  {    
+    Rcerr << (char*) as<Symbol>(names[i]).c_str() << ": " << (char*) t << std::endl ;
+    tail.next(t) ;
+  }
 
   List l ;
+  t = vars ;
   for(int i=0 ; i<names.length() ; i++)
   {
-    RObject r = pl2r(vars[i], names, vars) ;
+    RObject r = pl2r(t, names, vars) ;
     if(TYPEOF(r) == EXPRSXP && !strcmp(as<Symbol>(names[i]).c_str(), as<Symbol>(as<ExpressionVector>(r)[0]).c_str()))
       continue ;
 
@@ -355,11 +374,16 @@ RObject once_(RObject lang)
 List findall_(RObject lang)
 {
   CharacterVector names ;
-  PlTermv vars(5) ;
+  PlTerm vars ;
   PlTerm arg = r2pl(lang, names, vars) ;
   
+  PlTerm t = vars ;
+  PlTail tail(t) ;
   for(int i=0 ; i<names.length() ; i++)
-    Rcerr << (char*) as<Symbol>(names[i]).c_str() << ": " << (char*) vars[i] << std::endl ;
+  {
+    Rcerr << (char*) as<Symbol>(names[i]).c_str() << ": " << (char*) t << std::endl ;
+    tail.next(t) ;
+  }
 
   PlQuery q("call", arg) ;
   List all ;
@@ -380,9 +404,10 @@ List findall_(RObject lang)
     }
     
     List l ;
+    t = vars ;
     for(int i=0 ; i<names.length() ; i++)
     {
-      RObject r = pl2r(vars[i], names, vars) ;
+      RObject r = pl2r(t, names, vars) ;
       if(TYPEOF(r) == EXPRSXP && !strcmp(as<Symbol>(names[i]).c_str(), as<Symbol>(as<ExpressionVector>(r)[0]).c_str()))
         continue ;
       
