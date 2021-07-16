@@ -235,14 +235,13 @@ PlTerm r2pl_var(ExpressionVector arg, CharacterVector& names, PlTerm& vars)
     return PlTerm() ;
 
   // Unify with existing variable of the same name
-  PlTerm t = vars ;
-  PlTail l(t) ;
+  PlTail l(vars) ;
+  PlTerm t ;
   for(int i=0 ; i<names.length() ; i++)
   {
+    l.next(t) ;
     if(n[0] == names[i])
       return t ;
-    
-    l.next(t) ;
   }
   
   // Create new variable
