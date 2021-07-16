@@ -199,10 +199,7 @@ PlTerm r2pl_real(NumericVector arg)
 
 PlTerm r2pl_logical(LogicalVector arg)
 {
-  if(arg(0))
-    return PlAtom("TRUE") ;
-  
-  return PlAtom("FALSE") ;
+  return PLAtom(arg(0) ? "TRUE" : "FALSE") ;
 }
 
 PlTerm r2pl_integer(IntegerVector arg)
@@ -245,7 +242,7 @@ PlTerm r2pl_string(CharacterVector arg)
 
 PlTerm r2pl_null()
 {
-  PlTerm r = PL_NIL ;
+  PlTerm r ;
   PlTail(r).close() ;
   return r ;
 }
