@@ -250,6 +250,8 @@ PlTerm r2pl_var(ExpressionVector arg, CharacterVector& names, PlTerm& vars)
   
   PlTerm v ;
   l.append(v) ;
+  
+  Rcerr << "Adding variable " << (char*) n[0] << " as " << (char*) v << std::endl ;
   return v ;
 }
 
