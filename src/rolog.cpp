@@ -199,12 +199,15 @@ PlTerm r2pl_na()
 
 PlTerm r2pl_real(NumericVector arg)
 {
+  if(is.na(arg(0)))
+    return r2pl_na() ;
+  
   return PlTerm(arg(0)) ;
 }
 
 PlTerm r2pl_logical(LogicalVector arg)
 {
-  if(arg(0) == NA_LOGICAL)
+  if(is.na(arg(0)))
     return r2pl_na() ;
   
   return PlAtom(arg(0) ? "TRUE" : "FALSE") ;
@@ -212,6 +215,9 @@ PlTerm r2pl_logical(LogicalVector arg)
 
 PlTerm r2pl_integer(IntegerVector arg)
 {
+  if(is.na(arg(0)))
+    return r2pl_na() ;
+  
   return PlTerm((long) arg(0)) ;
 }
 
@@ -220,22 +226,17 @@ PlTerm r2pl_var(ExpressionVector arg, CharacterVector& names, PlTermv vars)
   CharacterVector n = as<CharacterVector>(arg[0]) ;
 
   // anonymous variable
-  PlTerm t ;
   if(n[0] == "_")
-    return t ;
+    return PlTerm() ;
 
   // Unify with existing variable of the same name
   for(int i=0 ; i<names.length() ; i++)
     if(n[0] == names[i])
-    {
-      t = vars[i] ;
-      return t ;
-    }
+      return vars[i] ;
   
   // Create new variable
   names.push_back(n[0]) ;  
-  t = vars[names.length()-1] ;
-  return t ;
+  return vars[names.length()-1] ;
 }
 
 PlTerm r2pl_atom(Symbol arg)
