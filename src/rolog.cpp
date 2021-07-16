@@ -198,7 +198,7 @@ PlTerm r2pl_na()
 
 PlTerm r2pl_real(NumericVector arg)
 {
-  if(is.na(arg[0]))
+  if(is_na(arg(0)))
     return r2pl_na() ;
   
   return PlTerm(arg(0)) ;
@@ -214,7 +214,7 @@ PlTerm r2pl_logical(LogicalVector arg)
 
 PlTerm r2pl_integer(IntegerVector arg)
 {
-  if(is.na(arg(0)))
+  if(is_na(arg(0)))
     return r2pl_na() ;
   
   return PlTerm((long) arg(0)) ;
@@ -245,7 +245,7 @@ PlTerm r2pl_atom(Symbol arg)
 
 PlTerm r2pl_string(CharacterVector arg)
 {
-  if(is.na(arg(0)))
+  if(is_na(arg(0)))
     return r2pl_na() ;
   
   return PlString(arg(0)) ;
