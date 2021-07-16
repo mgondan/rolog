@@ -21,7 +21,6 @@ LogicalVector init_(String argv0)
   av[ac++] = const_cast<char*>(argv0.get_cstring()) ;
   av[ac]   = NULL;
   
-  Rcerr << "rolog_init: initialize with " << av[0] << std::endl ;      
   int ret = PL_initialise(ac, av) ;
   if(!ret)
   {
@@ -246,6 +245,9 @@ PlTerm r2pl_atom(Symbol arg)
 
 PlTerm r2pl_string(CharacterVector arg)
 {
+  if(is.na(arg(0)))
+    return r2pl_na() ;
+  
   return PlString(arg(0)) ;
 }
 
@@ -270,11 +272,12 @@ PlTerm r2pl_compound(Language arg, CharacterVector& names, PlTermv& vars)
 PlTerm r2pl_list(List arg, CharacterVector& names, PlTermv& vars)
 {
   PlTerm r ;
-  PlTail l(r);
+  PlTail l(r) ;
+  
   for(R_xlen_t i=0; i<arg.size() ; i++)
     l.append(r2pl(arg(i), names, vars)) ;
-  l.close() ;
   
+  l.close() ;
   return r ;
 }
 
