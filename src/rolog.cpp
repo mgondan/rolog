@@ -121,7 +121,7 @@ List pl2r_list(PlTerm arg, CharacterVector& names, PlTerm& vars)
   return r ;
 }
 
-Language pl2r_compound(PlTerm term, CharacterVector& names, PlTerm& var)
+Language pl2r_compound(PlTerm term, CharacterVector& names, PlTerm& vars)
 {
   if(!PL_is_acyclic(term))
   {
