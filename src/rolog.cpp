@@ -54,7 +54,7 @@ LogicalVector consult_(CharacterVector files)
   return true ;
 }
 
-SEXP pl2r(PlTerm arg, CharacterVector& names, PlTermv& vars) ;
+SEXP pl2r(PlTerm arg, CharacterVector& names, PlTerm& vars) ;
 
 SEXP pl2r_null()
 {
@@ -87,24 +87,29 @@ Symbol pl2r_symbol(PlTerm arg)
   return Symbol((char*) arg) ;
 }
 
-SEXP pl2r_variable(PlTerm arg, CharacterVector& names, PlTermv& vars)
+SEXP pl2r_variable(PlTerm arg, CharacterVector& names, PlTerm& vars)
 {
   ExpressionVector r(1) ;
 
   // Find variable
+  PlTail tail(vars) ;
   for(int i=0 ; i<names.length() ; i++)
-    if(!strcmp((const char*) arg, (const char*) vars[i]))
+  {
+    if(!strcmp((const char*) arg, (const char*) vars))
     {
       r(0) = names(i) ;
       return r ;
     }
+    
+    tail.next(vars) ;
+  }
   
   // is this ever needed?
   r(0) = (const char*) arg ;
   return r ;
 }
 
-List pl2r_list(PlTerm arg, CharacterVector& names, PlTermv& vars)
+List pl2r_list(PlTerm arg, CharacterVector& names, PlTerm& vars)
 {
   List r ;
   
@@ -116,7 +121,7 @@ List pl2r_list(PlTerm arg, CharacterVector& names, PlTermv& vars)
   return r ;
 }
 
-Language pl2r_compound(PlTerm term, CharacterVector& names, PlTermv& vars)
+Language pl2r_compound(PlTerm term, CharacterVector& names, PlTermv& var)
 {
   if(!PL_is_acyclic(term))
   {
@@ -144,7 +149,7 @@ Language pl2r_compound(PlTerm term, CharacterVector& names, PlTermv& vars)
   return r ;
 }
 
-SEXP pl2r(PlTerm arg, CharacterVector& names, PlTermv& vars)
+SEXP pl2r(PlTerm arg, CharacterVector& names, PlTerm& vars)
 {
   if(PL_term_type(arg) == PL_NIL)
     return pl2r_null() ;
