@@ -13,7 +13,6 @@
 
 .onAttach = function(libname, pkgname)
 {
-  print("Attaching rolog")  
   if(rolog_init(commandArgs()[1]))
     return(TRUE) ;
   
@@ -23,7 +22,6 @@
 
 .onDetach = function(libpath)
 {
-  print("Detaching rolog")  
   if(!rolog_done())
     stop("rolog: not initialized")  
 }
