@@ -245,7 +245,7 @@ PlTerm r2pl_string(CharacterVector arg)
 
 PlTerm r2pl_null()
 {
-  PlTerm r ;
+  PlTerm r = PL_NIL ;
   PlTail(r).close() ;
   return r ;
 }
