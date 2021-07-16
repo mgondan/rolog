@@ -191,6 +191,13 @@ SEXP pl2r(PlTerm arg, CharacterVector& names, PlTermv& vars)
 
 PlTerm r2pl(SEXP arg, CharacterVector& names, PlTermv& vars) ;
 
+PlTerm r2pl_null()
+{
+  PlTerm r ;
+  PlTail(r).close() ;
+  return r ;
+}
+
 PlTerm r2pl_na()
 {
   return PlTerm("NA") ;
@@ -261,13 +268,6 @@ PlTerm r2pl_string(CharacterVector arg)
     return r2pl_na() ;
   
   return PlString(arg(0)) ;
-}
-
-PlTerm r2pl_null()
-{
-  PlTerm r ;
-  PlTail(r).close() ;
-  return r ;
 }
 
 PlTerm r2pl_compound(Language arg, CharacterVector& names, PlTermv& vars)
