@@ -199,6 +199,9 @@ PlTerm r2pl_real(NumericVector arg)
 
 PlTerm r2pl_logical(LogicalVector arg)
 {
+  if(arg(0) == NA_LOGICAL)
+    return r2pl_na() ;
+  
   return PlAtom(arg(0) ? "TRUE" : "FALSE") ;
 }
 
