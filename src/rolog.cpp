@@ -54,7 +54,7 @@ LogicalVector consult_(CharacterVector files)
   return true ;
 }
 
-SEXP pl2r(PlTerm arg, CharacterVector& names, PlTermv& vars) ;
+SEXP pl2r(PlTerm arg, CharacterVector& names, PlTermv& vars, PlTerm& varlist) ;
 
 SEXP pl2r_null()
 {
@@ -87,36 +87,42 @@ Symbol pl2r_symbol(PlTerm arg)
   return Symbol((char*) arg) ;
 }
 
-SEXP pl2r_variable(PlTerm arg, CharacterVector& names, PlTermv& vars)
+SEXP pl2r_variable(PlTerm arg, CharacterVector& names, PlTermv& vars, PlTerm& varlist)
 {
   ExpressionVector r(1) ;
 
+  PlTail tail(varlist) ;
+  
   // Find variable
   for(int i=0 ; i<names.length() ; i++)
+  {
+    PlTerm v ;
+    tail.next(v) ;
     if(!strcmp((const char*) arg, (const char*) vars[i]))
     {
       r(0) = names(i) ;
       return r ;
     }
+  }
   
   // is this ever needed?
   r(0) = (const char*) arg ;
   return r ;
 }
 
-List pl2r_list(PlTerm arg, CharacterVector& names, PlTermv& vars)
+List pl2r_list(PlTerm arg, CharacterVector& names, PlTermv& vars, PlTerm& varlist)
 {
   List r ;
   
   PlTail tail(arg) ;
   PlTerm e ;
   while(tail.next(e))
-    r.push_back(pl2r(e, names, vars)) ;
+    r.push_back(pl2r(e, names, vars, varlist)) ;
   
   return r ;
 }
 
-Language pl2r_compound(PlTerm term, CharacterVector& names, PlTermv& vars)
+Language pl2r_compound(PlTerm term, CharacterVector& names, PlTermv& vars, PlTerm& varlist)
 {
   if(!PL_is_acyclic(term))
   {
@@ -138,13 +144,13 @@ Language pl2r_compound(PlTerm term, CharacterVector& names, PlTermv& vars)
      }
      */
     
-    r.push_back(pl2r(term[i], names, vars)) ;
+    r.push_back(pl2r(term[i], names, vars, varlist)) ;
   }
   
   return r ;
 }
 
-SEXP pl2r(PlTerm arg, CharacterVector& names, PlTermv& vars)
+SEXP pl2r(PlTerm arg, CharacterVector& names, PlTermv& vars, PlTerm& varlist)
 {
   if(PL_term_type(arg) == PL_NIL)
     return pl2r_null() ;
@@ -162,19 +168,19 @@ SEXP pl2r(PlTerm arg, CharacterVector& names, PlTermv& vars)
     return pl2r_symbol(arg) ;
   
   if(PL_is_list(arg))
-    return pl2r_list(arg, names, vars) ;
+    return pl2r_list(arg, names, vars, varlist) ;
   
   if(PL_is_compound(arg))
-    return pl2r_compound(arg, names, vars) ;
+    return pl2r_compound(arg, names, vars, varlist) ;
   
   if(PL_is_variable(arg))
-    return pl2r_variable(arg, names, vars) ;
+    return pl2r_variable(arg, names, vars, varlist) ;
   
   Rcout << "pl2r: Cannot convert " << (char*) arg << std::endl ;
   return R_NilValue ;
 }
 
-PlTerm r2pl(SEXP arg, CharacterVector& names, PlTermv& vars) ;
+PlTerm r2pl(SEXP arg, CharacterVector& names, PlTermv& vars, PlTerm& varlist) ;
 
 PlTerm r2pl_null()
 {
@@ -221,7 +227,7 @@ PlTerm r2pl_integer(IntegerVector arg)
   return PlTerm((long) arg(0)) ;
 }
 
-PlTerm r2pl_var(ExpressionVector arg, CharacterVector& names, PlTermv vars)
+PlTerm r2pl_var(ExpressionVector arg, CharacterVector& names, PlTermv& vars, PlTerm& varlist)
 {
   CharacterVector n = as<CharacterVector>(arg[0]) ;
 
@@ -229,13 +235,24 @@ PlTerm r2pl_var(ExpressionVector arg, CharacterVector& names, PlTermv vars)
   if(n[0] == "_")
     return PlTerm() ;
 
-  // Unify with existing variable of the same name
-  for(int i=0 ; i<names.length() ; i++)
-    if(n[0] == names[i])
-      return vars[i] ;
   
+  // Unify with existing variable of the same name
+  PlTail tail(varlist) ;
+  for(int i=0 ; i<names.length() ; i++)
+  {
+    PlTerm v ;
+    tail.next(v) ;
+    if(n[0] == names[i])
+    {
+      Rcerr << "found variable " << (char*) names[i] << ": " << (char*) v << std::endl ;
+      return vars[i] ;
+    }
+  }
+
   // Create new variable
-  names.push_back(n[0]) ;  
+  names.push_back(n[0]) ;
+  PlTerm v ;
+  tail.append(v) ;
   return vars[names.length()-1] ;
 }
 
@@ -255,33 +272,33 @@ PlTerm r2pl_string(CharacterVector arg)
   return PlString(arg(0)) ;
 }
 
-PlTerm r2pl_compound(Language arg, CharacterVector& names, PlTermv& vars)
+PlTerm r2pl_compound(Language arg, CharacterVector& names, PlTermv& vars, PlTerm& varlist)
 {
   PlTermv args(arg.size() - 1) ;
   
   R_xlen_t i=0 ;
   for(SEXP cons=CDR(arg) ; cons != R_NilValue ; cons = CDR(cons))
-    args[i++] = r2pl(CAR(cons), names, vars) ;
+    args[i++] = r2pl(CAR(cons), names, vars, varlist) ;
 
   return PlCompound(as<Symbol>(CAR(arg)).c_str(), args) ;
 }
 
-PlTerm r2pl_list(List arg, CharacterVector& names, PlTermv& vars)
+PlTerm r2pl_list(List arg, CharacterVector& names, PlTermv& vars, PlTerm& varlist)
 {
   PlTerm r ;
   PlTail l(r) ;
   
   for(R_xlen_t i=0; i<arg.size() ; i++)
-    l.append(r2pl(arg(i), names, vars)) ;
+    l.append(r2pl(arg(i), names, vars, varlist)) ;
   
   l.close() ;
   return r ;
 }
 
-PlTerm r2pl(SEXP arg, CharacterVector& names, PlTermv& vars)
+PlTerm r2pl(SEXP arg, CharacterVector& names, PlTermv& vars, PlTerm& varlist)
 {
   if(TYPEOF(arg) == LANGSXP)
-    return r2pl_compound(arg, names, vars) ;
+    return r2pl_compound(arg, names, vars, varlist) ;
 
   if(TYPEOF(arg) == REALSXP)
     return r2pl_real(arg) ;
@@ -293,7 +310,7 @@ PlTerm r2pl(SEXP arg, CharacterVector& names, PlTermv& vars)
     return r2pl_integer(arg) ;
   
   if(TYPEOF(arg) == EXPRSXP)
-    return r2pl_var(arg, names, vars) ;
+    return r2pl_var(arg, names, vars, varlist) ;
 
   if(TYPEOF(arg) == SYMSXP)
     return r2pl_atom(arg) ;
@@ -302,7 +319,7 @@ PlTerm r2pl(SEXP arg, CharacterVector& names, PlTermv& vars)
     return r2pl_string(arg) ;
 
   if(TYPEOF(arg) == VECSXP)
-    return r2pl_list(arg, names, vars) ;
+    return r2pl_list(arg, names, vars, varlist) ;
   
   if(TYPEOF(arg) == NILSXP)
     return r2pl_null() ;
@@ -314,11 +331,18 @@ PlTerm r2pl(SEXP arg, CharacterVector& names, PlTermv& vars)
 RObject once_(RObject lang)
 {
   CharacterVector names ;
+  PlTerm varlist ;
   PlTermv vars(5) ;
-  PlTerm arg = r2pl(lang, names, vars) ;
-
+  PlTerm arg = r2pl(lang, names, vars, varlist) ;
+  
+  PlTail tail(varlist) ;
   for(int i=0 ; i<names.length() ; i++)
+  {
+    PlTerm v ;
+    tail.next(v) ;
     Rcerr << (char*) as<Symbol>(names[i]).c_str() << ": " << (char*) vars[i] << std::endl ;
+  }
+  tail.close() ;
   
   PlQuery q("call", arg) ;
   try
@@ -341,7 +365,7 @@ RObject once_(RObject lang)
   List l ;
   for(int i=0 ; i<names.length() ; i++)
   {
-    RObject r = pl2r(vars[i], names, vars) ;
+    RObject r = pl2r(vars[i], names, vars, varlist) ;
     if(TYPEOF(r) == EXPRSXP && !strcmp(as<Symbol>(names[i]).c_str(), as<Symbol>(as<ExpressionVector>(r)[0]).c_str()))
       continue ;
 
@@ -355,12 +379,21 @@ RObject once_(RObject lang)
 List findall_(RObject lang)
 {
   CharacterVector names ;
+  PlTerm varlist ;
   PlTermv vars(5) ;
-  PlTerm arg = r2pl(lang, names, vars) ;
-  
-  for(int i=0 ; i<names.length() ; i++)
-    Rcerr << (char*) as<Symbol>(names[i]).c_str() << ": " << (char*) vars[i] << std::endl ;
+  PlTerm arg = r2pl(lang, names, vars, varlist) ;
 
+  PlTail tail(varlist) ;
+  for(int i=0 ; i<names.length() ; i++)
+  {
+    Rcerr << (char*) as<Symbol>(names[i]).c_str() << ": " << (char*) vars[i] << std::endl ;
+    PlTerm v ;
+    tail.next(v) ;
+  }
+  tail.close() ;
+  
+  Rcerr << (char*) varlist << std::endl ;
+  
   PlQuery q("call", arg) ;
   List all ;
   while(true)
@@ -382,7 +415,7 @@ List findall_(RObject lang)
     List l ;
     for(int i=0 ; i<names.length() ; i++)
     {
-      RObject r = pl2r(vars[i], names, vars) ;
+      RObject r = pl2r(vars[i], names, vars, varlist) ;
       if(TYPEOF(r) == EXPRSXP && !strcmp(as<Symbol>(names[i]).c_str(), as<Symbol>(as<ExpressionVector>(r)[0]).c_str()))
         continue ;
       
