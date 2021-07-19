@@ -10,7 +10,9 @@ LogicalVector init_(String argv0)
   if(pl_initialized)
     stop("rolog_init: already initialized") ;
   
-  int ret = PL_initialise(1, const_cast<char*>(argv0.get_cstring())) ;
+  char* argv = const_cast<char*>(argv0.get_cstring()) ;
+  
+  int ret = PL_initialise(1, &argv) ;
   if(!ret)
     stop("rolog_init: failed initialize, return value %i") ;
 
