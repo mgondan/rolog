@@ -2,35 +2,30 @@
 #include "Rcpp.h"
 using namespace Rcpp ;
 
-int pl = 0 ;
-char *av[2];
+bool pl_initialized = false ;
 
 // [[Rcpp::export]]
 LogicalVector init_(String argv0)
 {
-  if(pl)
-    stop("rolog_init: engine already initialized") ;
+  if(pl_initialized)
+    stop("rolog_init: already initialized") ;
   
-  int ac = 0;
-  av[ac++] = const_cast<char*>(argv0.get_cstring()) ;
-  av[ac]   = NULL;
-  
-  int ret = PL_initialise(ac, av) ;
+  int ret = PL_initialise(1, const_cast<char*>(argv0.get_cstring())) ;
   if(!ret)
     stop("rolog_init: failed initialize, return value %i") ;
 
-  pl = 1 ;  
+  pl_initialized = true ;  
   return true ;
 }
 
 // [[Rcpp::export]]
 LogicalVector done_()
 {
-  if(!pl)
+  if(!pl_initialized)
     stop("rolog_done: engine has not been initialized") ;
 
   PL_cleanup(0);
-  pl = 0 ;
+  pl_initialized = false ;
   return true ;
 }
 
