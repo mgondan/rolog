@@ -92,7 +92,12 @@ SEXP pl2r_variable(PlTerm arg, CharacterVector& names, PlTerm& varlist)
 {
   ExpressionVector r(1) ;
 
-  // Find variable
+  // names and varlist is a list of all the variables from the R query,
+  // a typical member of names is something like X, a member of varlist 
+  // is something like _1545.
+  //
+  // For the return value, I search for the variable (e.g., _1545) and
+  // return its R name (say, X) as an expression.
   PlTail tail(varlist) ;
   for(int i=0 ; i<names.length() ; i++)
   {
@@ -105,7 +110,9 @@ SEXP pl2r_variable(PlTerm arg, CharacterVector& names, PlTerm& varlist)
     }
   }
   
-  // is this ever reached?
+  // If the variable is not found, it's a new one created by Prolog, e.g.,
+  // if we ask rolog_once(call('member', 1, expression(Y))) [Note that this does not work yet properly!]
+  // hence do not translate it.
   r(0) = (const char*) arg ;
   return r ;
 }
