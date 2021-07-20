@@ -10,6 +10,8 @@ LogicalVector init_(String argv0)
   if(pl_initialized)
     stop("rolog_init: already initialized") ;
   
+  // Prolog documentation requires that argv is accessible during the entire session,
+  // unsure if this is guaranteed here
   char* argv = const_cast<char*>(argv0.get_cstring()) ;
   int ret = PL_initialise(1, &argv) ;
   if(!ret)
@@ -25,6 +27,9 @@ LogicalVector done_()
   if(!pl_initialized)
     stop("rolog_done: engine has not been initialized") ;
 
+  // Prolog documentation says that PL_cleanup is not fully functional, so this
+  // code is preliminary. In particular, it is currently not possible to unload 
+  // rolog and load it again in the same R session.
   PL_cleanup(0);
   pl_initialized = false ;
   return true ;
@@ -37,7 +42,7 @@ LogicalVector consult_(CharacterVector files)
   {
     try 
     {
-      PlCall("consult", PlString((char*) files(i))) ;
+      PlCall("consult", PlString(files(i))) ;
     }
     
     catch(PlException& ex)
