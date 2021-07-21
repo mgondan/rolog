@@ -110,22 +110,10 @@ SEXP pl2r_variable(PlTerm arg, CharacterVector& names, PlTerm& varlist)
     }
   }
   
-  // If the variable is not found, it's a new one created by Prolog, e.g.,
-  // if we ask rolog_once(call('member', 1, expression(Y))) [Note that this does not work yet properly!]
-  // hence do not translate it.
-  r(0) = (const char*) arg ;
-  return r ;
-}
-
-List pl2r_list(PlTerm arg, CharacterVector& names, PlTerm& varlist)
-{
-  List r ;
-  
-  PlTail tail(arg) ;
-  PlTerm e ;
-  while(tail.next(e))
-    r.push_back(pl2r(e, names, varlist)) ;
-  
+  // If the variable is not found, it's a new one created by Prolog, e.g., in
+  // queries like member(1, Y), Y is unified with [1 | _NewVar ]. This variable
+  // cannot be translated.
+  r(0) = Symbol((const char*) arg) ;
   return r ;
 }
 
@@ -155,6 +143,46 @@ Language pl2r_compound(PlTerm term, CharacterVector& names, PlTerm& varlist)
   }
   
   return r ;
+}
+
+SEXP pl2r_list(PlTerm arg, CharacterVector& names, PlTerm& varlist)
+{
+  /* This does not work for lists like [1 | Tail]
+   * 
+   * PlTail tail(arg) ;
+   * PlTerm e ;
+   * while(tail.next(e))
+   * {
+   *   Rcout << "pl2r: elem " << (char*) e << std::endl ;
+   *   r.push_back(pl2r(e, names, varlist)) ;
+   * }
+   * return r ;
+   */
+  
+  Rcerr << (char*) arg << std::endl ;
+  
+  // [_ | []]
+  SEXP r = pl2r(arg[2], names, varlist) ;
+  if(TYPEOF(r) == NILSXP)
+  {
+    List l ;
+    l.push_front(pl2r(arg[1], names, varlist)) ;
+    return l ;
+  }
+
+  // [_ | [_ | _]]
+  if(TYPEOF(r) == VECSXP)
+  {
+    List l = as<List>(r) ;
+    l.push_front(pl2r(arg[1], names, varlist)) ;
+    return l ;
+  }
+    
+  // [_ | Variable]
+  Language l(arg.name()) ;
+  l.push_back(pl2r(arg[1], names, varlist)) ;
+  l.push_back(pl2r(arg[2], names, varlist)) ;
+  return l ;
 }
 
 SEXP pl2r(PlTerm arg, CharacterVector& names, PlTerm& varlist)
@@ -341,15 +369,6 @@ RObject once_(RObject lang)
   PlTerm varlist ;
   PlTerm arg = r2pl(lang, names, varlist) ;
   
-  PlTail tail(varlist) ;
-  for(int i=0 ; i<names.length() ; i++)
-  {
-    PlTerm v ;
-    tail.next(v) ;
-    Rcerr << (char*) as<Symbol>(names[i]).c_str() << ": " << (char*) v << std::endl ;
-  }
-  tail.close() ;
-  
   PlQuery q("call", arg) ;
   try
   {
@@ -372,6 +391,7 @@ RObject once_(RObject lang)
     {
       PlTerm v ;
       tail.next(v) ;
+
       RObject r = pl2r(v, names, varlist) ;
       if(TYPEOF(r) == EXPRSXP && !strcmp(as<Symbol>(names[i]).c_str(), as<Symbol>(as<ExpressionVector>(r)[0]).c_str()))
         continue ;
@@ -390,17 +410,6 @@ List findall_(RObject lang)
   PlTerm varlist ;
   PlTerm arg = r2pl(lang, names, varlist) ;
 
-  PlTail tail(varlist) ;
-  for(int i=0 ; i<names.length() ; i++)
-  {
-    PlTerm v ;
-    tail.next(v) ;
-    Rcerr << (char*) as<Symbol>(names[i]).c_str() << ": " << (char*) v << std::endl ;
-  }
-  tail.close() ;
-  
-  Rcerr << (char*) varlist << std::endl ;
-  
   PlQuery q("call", arg) ;
   List all ;
   while(true)
@@ -421,10 +430,11 @@ List findall_(RObject lang)
     
     List l ;
     PlTail tail(varlist) ;
+    PlTerm v ;
     for(int i=0 ; i<names.length() ; i++)
     {
-      PlTerm v ;
       tail.next(v) ;
+
       RObject r = pl2r(v, names, varlist) ;
       if(TYPEOF(r) == EXPRSXP && !strcmp(as<Symbol>(names[i]).c_str(), as<Symbol>(as<ExpressionVector>(r)[0]).c_str()))
         continue ;
