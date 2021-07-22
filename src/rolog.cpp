@@ -159,26 +159,35 @@ SEXP pl2r_list(PlTerm arg, CharacterVector& names, PlTerm& varlist)
    * return r ;
    */
 
-  // [_ | []]
+  
+  // [_ | []] or [_ | [_ | _]]
+  PlTerm n = arg[1] ;
   SEXP r = pl2r(arg[2], names, varlist) ;
-  if(TYPEOF(r) == NILSXP)
-  {
-    List l ;
-    l.push_front(pl2r(arg[1], names, varlist)) ;
-    return l ;
-  }
-
-  // [_ | [_ | _]]
-  if(TYPEOF(r) == VECSXP)
+  if(TYPEOF(r) == VECSXP || TYPEOF(r) == NILSXP)
   {
     List l = as<List>(r) ;
-    l.push_front(pl2r(arg[1], names, varlist)) ;
+    
+    if(PL_is_compound(n) && !strcmp(n.name(), "-") && n.arity() == 2 && PL_is_atom(n[1]))
+    {
+      // Convert prolog pair a-X to named list element
+      l.push_front(pl2r(n[2], names, varlist), n[1].name()) ;
+    }
+    else
+      l.push_front(pl2r(n, names, varlist)) ;
+    
     return l ;
   }
     
   // [_ | Variable]
   Language l(arg.name()) ;
-  l.push_back(pl2r(arg[1], names, varlist)) ;
+  if(PL_is_compound(n) && !strcmp(n.name(), "-") && n.arity() == 2 && PL_is_atom(n[1]))
+  {
+    // Convert prolog pair a-X to named list element
+    l.push_back(Named(n[1].name()) = pl2r(n[2], names, varlist)) ;
+  }
+  else
+    l.push_back(pl2r(n, names, varlist)) ;
+  
   l.push_back(pl2r(arg[2], names, varlist)) ;
   return l ;
 }
@@ -276,10 +285,7 @@ PlTerm r2pl_var(ExpressionVector arg, CharacterVector& names, PlTerm& varlist)
     PlTerm v ;
     tail.next(v) ;
     if(n[0] == names[i])
-    {
-      Rcerr << "found variable " << (char*) names[i] << ": " << (char*) v << std::endl ;
       return v ;
-    }
   }
 
   // Create new variable
@@ -319,12 +325,27 @@ PlTerm r2pl_compound(Language arg, CharacterVector& names, PlTerm& varlist)
 PlTerm r2pl_list(List arg, CharacterVector& names, PlTerm& varlist)
 {
   PlTerm r ;
-  PlTail l(r) ;
+  PlTail tail(r) ;
+  
+  CharacterVector n ;
+  if(TYPEOF(arg.names()) == STRSXP)
+    n = as<CharacterVector>(arg.names()) ;
   
   for(R_xlen_t i=0; i<arg.size() ; i++)
-    l.append(r2pl(arg(i), names, varlist)) ;
-  
-  l.close() ;
+    if(n.length() && n(i) != "")
+    {
+      // Convert named arguments to prolog pairs a-X. This may change, since 
+      // the minus sign is a bit specific to prolog, and the conversion in the 
+      // reverse direction may be ambiguous.
+      Language ai("-") ;
+      ai.push_back(as<Symbol>(n(i))) ;
+      ai.push_back(arg(i)) ;
+      tail.append(r2pl(ai, names, varlist)) ;
+    }
+    else
+      tail.append(r2pl(arg(i), names, varlist)) ;
+
+  tail.close() ;
   return r ;
 }
 
