@@ -145,12 +145,8 @@ Language pl2r_compound(PlTerm term, CharacterVector& names, PlTerm& varlist)
   return r ;
 }
 
-List pl2r_list(PlTerm arg, CharacterVector& names, PlTerm& varlist)
+SEXP pl2r_list(PlTerm arg, CharacterVector& names, PlTerm& varlist)
 {
-  List r = pl2r(arg[2], names, varlist) ;
-  r.push_front(pl2r(arg[1], names, varlist)) ;
-  return r ;
-  
   /* This does not work for lists like [1 | Tail]
    * 
    * PlTail tail(arg) ;
@@ -162,6 +158,31 @@ List pl2r_list(PlTerm arg, CharacterVector& names, PlTerm& varlist)
    * }
    * return r ;
    */
+
+  Rcerr << (char*) arg << std::endl ;
+  
+  // [_ | []]
+  SEXP r = pl2r(arg[2], names, varlist) ;
+  if(TYPEOF(r) == NILSXP)
+  {
+    List l ;
+    l.push_front(pl2r(arg[1], names, varlist)) ;
+    return l ;
+  }
+
+  // [_ | [_ | _]]
+  if(TYPEOF(r) == VECSXP)
+  {
+    List l = as<List>(r) ;
+    l.push_front(pl2r(arg[1], names, varlist)) ;
+    return l ;
+  }
+    
+  // [_ | Variable]
+  Language l(arg.name()) ;
+  l.push_back(pl2r(arg[1], names, varlist)) ;
+  l.push_back(pl2r(arg[2], names, varlist)) ;
+  return l ;
 }
 
 SEXP pl2r(PlTerm arg, CharacterVector& names, PlTerm& varlist)
