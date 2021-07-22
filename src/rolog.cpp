@@ -159,8 +159,6 @@ SEXP pl2r_list(PlTerm arg, CharacterVector& names, PlTerm& varlist)
    * return r ;
    */
 
-  Rcerr << (char*) arg << std::endl ;
-  
   // [_ | []]
   SEXP r = pl2r(arg[2], names, varlist) ;
   if(TYPEOF(r) == NILSXP)
