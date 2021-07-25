@@ -15,7 +15,7 @@ consult(system.file('mathml.pl', package='rolog'))
 html_print = function(term)
 {
   t = call('rml', term, expression(X))
-  cat(sapply(rolog_once(t)$X, as.character), sep='')
+  cat(sapply(once(t)$X, as.character), sep='')
 }
 ```
 
