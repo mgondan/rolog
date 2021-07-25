@@ -13,15 +13,15 @@ consult_ <- function(files) {
     .Call('_rolog_consult_', PACKAGE = 'rolog', files)
 }
 
-once_ <- function(lang) {
-    .Call('_rolog_once_', PACKAGE = 'rolog', lang)
+once_ <- function(query) {
+    .Call('_rolog_once_', PACKAGE = 'rolog', query)
 }
 
-findall_ <- function(lang) {
-    .Call('_rolog_findall_', PACKAGE = 'rolog', lang)
+findall_ <- function(query) {
+    .Call('_rolog_findall_', PACKAGE = 'rolog', query)
 }
 
-portray_ <- function(lang) {
-    .Call('_rolog_portray_', PACKAGE = 'rolog', lang)
+portray_ <- function(query) {
+    .Call('_rolog_portray_', PACKAGE = 'rolog', query)
 }
 

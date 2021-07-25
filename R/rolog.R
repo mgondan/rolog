@@ -21,7 +21,7 @@
 # This is a bit of a mystery.
 #
 # Initialization of the rolog system works fine under linux, under Windows using
-# RStudio.exe, under Windows using RTerm.exe, but fails under RGui.exe (the 
+# RStudio.exe, under Windows using RTerm.exe, but fails under RGui.exe (aka. 
 # "blue R"). Even stranger, it works in the second attempt. 
 #
 # For this reason, I invoke rolog_init twice here. Any hint to a cleaner
@@ -46,26 +46,32 @@
     stop('rolog: not initialized')
 }
 
+# SWI prolog is automatically initialized when the rolog library is loaded, so
+# this function is generally not directly invoked.
 rolog_init = function(argv1=commandArgs()[1])
 {
   init_(argv1)
 }
 
+# Clean up when detaching the library. See comments in rolog.cpp
 rolog_done = function()
 {
   done_()
 }
 
+# Shortcut to prolog consult/1
 consult = function(fname=system.file('likes.pl', package='rolog'))
 {
   consult_(fname)
 }
 
+# Translate query to prolog and pretty print it
 portray = function(query=call('member', expression(X), list(1, 2, 3)))
 {
   portray_(query)
 }
 
+# Invoke query once
 once = function(query=call('member', expression(X), list(1, 2, 3)), attr=TRUE)
 {
   r = once_(query)
@@ -76,6 +82,7 @@ once = function(query=call('member', expression(X), list(1, 2, 3)), attr=TRUE)
   return(r)
 }
 
+# Invoke query several times
 findall = function(query=call('member', expression(X), list(1, 2, 3)), attr=TRUE)
 {
   r = findall_(query)

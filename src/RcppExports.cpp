@@ -43,35 +43,35 @@ BEGIN_RCPP
 END_RCPP
 }
 // once_
-RObject once_(RObject lang);
-RcppExport SEXP _rolog_once_(SEXP langSEXP) {
+RObject once_(RObject query);
+RcppExport SEXP _rolog_once_(SEXP querySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< RObject >::type lang(langSEXP);
-    rcpp_result_gen = Rcpp::wrap(once_(lang));
+    Rcpp::traits::input_parameter< RObject >::type query(querySEXP);
+    rcpp_result_gen = Rcpp::wrap(once_(query));
     return rcpp_result_gen;
 END_RCPP
 }
 // findall_
-List findall_(RObject lang);
-RcppExport SEXP _rolog_findall_(SEXP langSEXP) {
+List findall_(RObject query);
+RcppExport SEXP _rolog_findall_(SEXP querySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< RObject >::type lang(langSEXP);
-    rcpp_result_gen = Rcpp::wrap(findall_(lang));
+    Rcpp::traits::input_parameter< RObject >::type query(querySEXP);
+    rcpp_result_gen = Rcpp::wrap(findall_(query));
     return rcpp_result_gen;
 END_RCPP
 }
 // portray_
-RObject portray_(RObject lang);
-RcppExport SEXP _rolog_portray_(SEXP langSEXP) {
+RObject portray_(RObject query);
+RcppExport SEXP _rolog_portray_(SEXP querySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< RObject >::type lang(langSEXP);
-    rcpp_result_gen = Rcpp::wrap(portray_(lang));
+    Rcpp::traits::input_parameter< RObject >::type query(querySEXP);
+    rcpp_result_gen = Rcpp::wrap(portray_(query));
     return rcpp_result_gen;
 END_RCPP
 }
