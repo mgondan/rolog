@@ -9,8 +9,8 @@ Some preparation is needed.
 
 ```{r}
 library(rolog)
-rolog_once(quote(use_module(library(rologpp))))
-rolog_consult(system.file('mathml.pl', package='rolog'))
+once(quote(use_module(library(rologpp))))
+consult(system.file('mathml.pl', package='rolog'))
 
 html_print = function(term)
 {
