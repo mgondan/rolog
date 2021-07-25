@@ -61,12 +61,27 @@ consult = function(fname=system.file('likes.pl', package='rolog'))
   consult_(fname)
 }
 
-once = function(query=call('member', expression(X), list(1, 2, 3)))
+portray = function(query=call('member', expression(X), list(1, 2, 3)))
 {
-  once_(call)
+  portray_(query)
 }
 
-findall = function(query=call('member', expression(X), list(1, 2, 3)))
+once = function(query=call('member', expression(X), list(1, 2, 3)), attr=TRUE)
 {
-  findall_(predicate)
+  r = once_(query)
+
+  if(attr)
+    attr(r, 'query') = portray(query)
+  
+  return(r)
+}
+
+findall = function(query=call('member', expression(X), list(1, 2, 3)), attr=TRUE)
+{
+  r = findall_(query)
+  
+  if(attr)
+    attr(r, 'query') = portray(query)
+  
+  return(r)
 }

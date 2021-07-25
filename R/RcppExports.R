@@ -21,3 +21,7 @@ findall_ <- function(lang) {
     .Call('_rolog_findall_', PACKAGE = 'rolog', lang)
 }
 
+portray_ <- function(lang) {
+    .Call('_rolog_portray_', PACKAGE = 'rolog', lang)
+}
+

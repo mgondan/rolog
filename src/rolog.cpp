@@ -129,17 +129,13 @@ Language pl2r_compound(PlTerm term, CharacterVector& names, PlTerm& varlist)
   
   for(unsigned int i=1 ; i<=term.arity() ; i++)
   {
-    /*
-     * // compounds like '='(x, y) are named arguments
-     if(PL_is_compound(t[i]) && t[i].name() == std::string("=") && t[i].arity() == 2)
-     {
-     PlTerm u = t[i] ;
-     l.push_back(Named(u[1].name()) = pl2r_leaf(u[2])) ;
-     continue ;
-     }
-     */
-    
-    r.push_back(pl2r(term[i], names, varlist)) ;
+    PlTerm t = term[i] ;
+
+    // Compounds like '='(x, y) are named arguments
+    if(PL_is_compound(t) && !strcmp(t.name(), "=") && t.arity() == 2 && PL_is_atom(t[1]))
+      r.push_back(Named(t[1].name()) = pl2r(t[2], names, varlist)) ;
+    else
+      r.push_back(pl2r(t, names, varlist)) ;
   }
   
   return r ;
@@ -222,7 +218,7 @@ SEXP pl2r(PlTerm arg, CharacterVector& names, PlTerm& varlist)
   return R_NilValue ;
 }
 
-PlTerm r2pl(SEXP arg, CharacterVector& names, PlTerm& varlist) ;
+PlTerm r2pl(SEXP arg, CharacterVector& names, PlTerm& varlist, bool atomize) ;
 
 PlTerm r2pl_null()
 {
@@ -269,9 +265,13 @@ PlTerm r2pl_integer(IntegerVector arg)
   return PlTerm((long) arg(0)) ;
 }
 
-PlTerm r2pl_var(ExpressionVector arg, CharacterVector& names, PlTerm& varlist)
+PlTerm r2pl_var(ExpressionVector arg, CharacterVector& names, PlTerm& varlist, bool atomize)
 {
   CharacterVector n = as<CharacterVector>(arg[0]) ;
+  
+  // If the variable should be "atomized" for pretty printing
+  if(atomize)
+    return PlAtom(as<Symbol>(n[0]).c_str()) ;
 
   // anonymous variable
   if(n[0] == "_")
@@ -297,7 +297,7 @@ PlTerm r2pl_var(ExpressionVector arg, CharacterVector& names, PlTerm& varlist)
 
 PlTerm r2pl_atom(Symbol arg)
 {
-  return PlAtom(as<Symbol>(arg).c_str()) ;
+  return PlAtom(arg.c_str()) ;
 }
 
 PlTerm r2pl_string(CharacterVector arg)
@@ -311,18 +311,30 @@ PlTerm r2pl_string(CharacterVector arg)
   return PlString(arg(0)) ;
 }
 
-PlTerm r2pl_compound(Language arg, CharacterVector& names, PlTerm& varlist)
+PlTerm r2pl_compound(Language arg, CharacterVector& names, PlTerm& varlist, bool atomize)
 {
-  PlTermv args(arg.size() - 1) ;
+  List l = as<List>(CDR(arg)) ;
   
-  R_xlen_t i=0 ;
-  for(SEXP cons=CDR(arg) ; cons != R_NilValue ; cons = CDR(cons))
-    args[i++] = r2pl(CAR(cons), names, varlist) ;
+  CharacterVector n ;
+  if(TYPEOF(l.names()) == STRSXP)
+    n = as<CharacterVector>(l.names()) ;
+  
+  PlTermv args(l.size()) ;
+  for(R_xlen_t i=0 ; i<l.size() ; i++)
+  {
+    PlTerm elem = r2pl(l(i), names, varlist, atomize) ;
+    
+    // Convert named arguments to prolog compounds a=X
+    if(n.length() && n(i) != "")
+      args[i] = PlCompound("=", PlTermv(PlAtom(n(i)), elem)) ;
+    else
+      args[i] = elem ;
+  }
 
   return PlCompound(as<Symbol>(CAR(arg)).c_str(), args) ;
 }
 
-PlTerm r2pl_list(List arg, CharacterVector& names, PlTerm& varlist)
+PlTerm r2pl_list(List arg, CharacterVector& names, PlTerm& varlist, bool atomize)
 {
   PlTerm r ;
   PlTail tail(r) ;
@@ -332,27 +344,28 @@ PlTerm r2pl_list(List arg, CharacterVector& names, PlTerm& varlist)
     n = as<CharacterVector>(arg.names()) ;
   
   for(R_xlen_t i=0; i<arg.size() ; i++)
+  {
+    PlTerm elem = r2pl(arg(i), names, varlist, atomize) ;
+    
     if(n.length() && n(i) != "")
     {
       // Convert named arguments to prolog pairs a-X. This may change, since 
       // the minus sign is a bit specific to prolog, and the conversion in the 
       // reverse direction may be ambiguous.
-      Language ai("-") ;
-      ai.push_back(as<Symbol>(n(i))) ;
-      ai.push_back(arg(i)) ;
-      tail.append(r2pl(ai, names, varlist)) ;
+      tail.append(PlCompound("-", PlTermv(PlAtom(n(i)), elem))) ;
     }
     else
-      tail.append(r2pl(arg(i), names, varlist)) ;
-
+      tail.append(elem) ;
+  }
+  
   tail.close() ;
   return r ;
 }
 
-PlTerm r2pl(SEXP arg, CharacterVector& names, PlTerm& varlist)
+PlTerm r2pl(SEXP arg, CharacterVector& names, PlTerm& varlist, bool atomize)
 {
   if(TYPEOF(arg) == LANGSXP)
-    return r2pl_compound(arg, names, varlist) ;
+    return r2pl_compound(arg, names, varlist, atomize) ;
 
   if(TYPEOF(arg) == REALSXP)
     return r2pl_real(arg) ;
@@ -364,7 +377,7 @@ PlTerm r2pl(SEXP arg, CharacterVector& names, PlTerm& varlist)
     return r2pl_integer(arg) ;
   
   if(TYPEOF(arg) == EXPRSXP)
-    return r2pl_var(arg, names, varlist) ;
+    return r2pl_var(arg, names, varlist, atomize) ;
 
   if(TYPEOF(arg) == SYMSXP)
     return r2pl_atom(arg) ;
@@ -373,7 +386,7 @@ PlTerm r2pl(SEXP arg, CharacterVector& names, PlTerm& varlist)
     return r2pl_string(arg) ;
 
   if(TYPEOF(arg) == VECSXP)
-    return r2pl_list(arg, names, varlist) ;
+    return r2pl_list(arg, names, varlist, atomize) ;
   
   if(TYPEOF(arg) == NILSXP)
     return r2pl_null() ;
@@ -386,8 +399,8 @@ RObject once_(RObject lang)
 {
   CharacterVector names ;
   PlTerm varlist ;
-  PlTerm arg = r2pl(lang, names, varlist) ;
-  
+  PlTerm arg = r2pl(lang, names, varlist, false) ;
+
   PlQuery q("call", arg) ;
   try
   {
@@ -427,7 +440,7 @@ List findall_(RObject lang)
 {
   CharacterVector names ;
   PlTerm varlist ;
-  PlTerm arg = r2pl(lang, names, varlist) ;
+  PlTerm arg = r2pl(lang, names, varlist, false) ;
 
   PlQuery q("call", arg) ;
   List all ;
@@ -464,3 +477,35 @@ List findall_(RObject lang)
     all.push_back(l) ;
   }
 }
+
+// [[Rcpp::export]]
+RObject portray_(RObject lang)
+{
+  CharacterVector names ;
+  PlTerm varlist ;
+  PlTermv arg(3) ;
+  arg[0] = r2pl(lang, names, varlist, true) ;
+  PlTail tail(arg[2]) ;
+  tail.append(PlCompound("quoted", PlTermv(PlAtom("false")))) ;
+  tail.append(PlCompound("spacing", PlTermv(PlAtom("next_argument")))) ;
+  tail.close() ;
+
+  PlQuery q("term_string", arg) ;
+  try
+  {
+    if(!q.next_solution())
+      return LogicalVector(false) ;
+  }
+  
+  catch(PlException& ex)
+  { 
+    Rcerr << "call failed: " << (char*) arg[0] << std::endl ;
+    Rcerr << (char*) ex << std::endl ;
+    PL_clear_exception() ;
+    return NULL ;
+  }
+  
+  return pl2r(arg[1], names, varlist) ;
+}
+
+// with_output_to(string(S), write_term(member(X), [variable_names(['X'=X])])).

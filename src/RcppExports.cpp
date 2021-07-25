@@ -64,6 +64,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// portray_
+RObject portray_(RObject lang);
+RcppExport SEXP _rolog_portray_(SEXP langSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< RObject >::type lang(langSEXP);
+    rcpp_result_gen = Rcpp::wrap(portray_(lang));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rolog_init_", (DL_FUNC) &_rolog_init_, 1},
@@ -71,6 +82,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rolog_consult_", (DL_FUNC) &_rolog_consult_, 1},
     {"_rolog_once_", (DL_FUNC) &_rolog_once_, 1},
     {"_rolog_findall_", (DL_FUNC) &_rolog_findall_, 1},
+    {"_rolog_portray_", (DL_FUNC) &_rolog_portray_, 1},
     {NULL, NULL, 0}
 };
 
