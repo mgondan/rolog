@@ -1,10 +1,11 @@
 # Load rolog.dll/rolog.so on startup
 # 
-# This cannot be delegated to a useDynLib directive in NAMESPACE. The reason is
-# that rolog.so itself is able to load other packages, and therefore exports 
-# a number of prolog-specific symbols. The additional option "local=FALSE" makes
-# sure these symbols are imported on startup. This option is not available in 
-# if we use useDynLib in NAMESPACE.
+# This cannot be delegated to a useDynLib directive in NAMESPACE (at least not
+# under linux). The reason is that rolog.so itself is able to load other 
+# packages (i.e. prolog libraries), and therefore exports a number of 
+# prolog-specific symbols. The additional option "local=FALSE" makes sure these
+# symbols are imported on startup. This option is not available in if we use
+# useDynLib in NAMESPACE.
 #
 .onLoad = function(libname, pkgname)
 {
@@ -46,48 +47,120 @@
     stop('rolog: not initialized')
 }
 
-# SWI prolog is automatically initialized when the rolog library is loaded, so
-# this function is generally not directly invoked.
+#' rolog_init
+#'
+#' SWI prolog is automatically initialized when the rolog library is loaded, so
+#' this function is normally not directly invoked.
+#' 
+#' @param argv1: file name of the R executable
+#' @return TRUE on success
+#' 
 rolog_init = function(argv1=commandArgs()[1])
 {
   init_(argv1)
 }
 
-# Clean up when detaching the library. See comments in rolog.cpp
+#' rolog_done
+#'
+#' Clean up when detaching the library. At this stage, this function is of
+#' little practical use, since it is not yet possible to initialize prolog
+#' twice in the same R session. See the source file rolog.cpp for details.
+#' 
+#' @return `TRUE` on success
+#' @md
+#' 
 rolog_done = function()
 {
   done_()
 }
 
-# Shortcut to prolog consult/1
+#' consult
+#'
+#' Consult a prolog database
+#' 
+#' @param fname: file name of database
+#' @return `TRUE` on success
+#' @md
+#'
+#' @seealso [once()] and [findall()] for executing queries
+#' 
+#' @examples
+#' consult(fname=system.file("likes.pl", package="rolog"))
+#' findall(call("likes", quote(sam), expression(X)))
+#' 
 consult = function(fname=system.file('likes.pl', package='rolog'))
 {
   consult_(fname)
 }
 
-# Translate query to prolog and pretty print it
+#' portray
+#'
+#' Translate an R call to a prolog compound and pretty print it
+#' 
+#' @param query: an R call
+#' @return a character string with the prolog version of the call
+#' @md
+#'
+#' @details
+#' R to prolog
+#' 
+#' * numeric -> real
+#' * integer -> integer
+#' * character -> string
+#' * symbol/name -> atom
+#' * call/language -> compound
+#' * expression -> variable
+#' * boolean -> true, false (atoms)
+#' 
 portray = function(query=call('member', expression(X), list(1, 2, 3)))
 {
   portray_(query)
 }
 
-# Invoke query once
-once = function(query=call('member', expression(X), list(1, 2, 3)), attr=TRUE)
+#' Invoke a query once
+#'
+#' @param query: an R call
+#' @param portray: boolean, add the prolog translation as an attribute
+#' @return `FALSE` if the query fails; otherwise, a list with conditions
+#' @md
+#' 
+#' @seealso [findall()] for querying all solutions
+#' @seealso [portray()] for pretty-printing a query
+#'
+#' @examples
+#' once(call("=", 1, 2)) # FALSE 
+#' once(call("=", 1, 1)) # empty list
+#' once(member(1, list(2, expression(X)))) # list stating that it works if X = 1
+#' once(call("=", list(expression(X), expression(Y)), list(1, expression(Z)))) # list stating that X = 1 and Z = Y
+#' once(call("member", 1, expression(X))) # works for X = [1 | _]; i.e. something like [|](1, expression(_6330))
+#'
+once = function(query=call('member', expression(X), list(1, 2, 3)), portray=TRUE)
 {
   r = once_(query)
 
-  if(attr)
+  if(portray)
     attr(r, 'query') = portray(query)
   
   return(r)
 }
 
-# Invoke query several times
-findall = function(query=call('member', expression(X), list(1, 2, 3)), attr=TRUE)
+#' Invoke a query several times
+#'
+#' @param query: an R call
+#' @param portray: boolean, add the prolog translation as an attribute
+#' @return empty list if the query fails; otherwise, a list of conditions for each solution
+#' @md
+#'
+#' @seealso [once()] for a single query
+#' 
+#' @examples
+#' findall(call("member", expression(X), list(1, 2, 3))
+#' 
+findall = function(query=call('member', expression(X), list(1, 2, 3)), portray=TRUE)
 {
   r = findall_(query)
   
-  if(attr)
+  if(portray)
     attr(r, 'query') = portray(query)
   
   return(r)
