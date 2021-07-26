@@ -7,7 +7,7 @@
 consult(fname = system.file("likes.pl", package = "rolog"))
 }
 \arguments{
-\item{fname:}{file name of database}
+\item{fname}{file name of database}
 }
 \value{
 \code{TRUE} on success

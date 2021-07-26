@@ -4,7 +4,7 @@ using namespace Rcpp ;
 
 bool pl_initialized = false ;
 
-// [[Rcpp::export]]
+// [[Rcpp::export(.init)]]
 LogicalVector init_(String argv0)
 {
   // see comment below in done_
@@ -22,7 +22,7 @@ LogicalVector init_(String argv0)
   return true ;
 }
 
-// [[Rcpp::export]]
+// [[Rcpp::export(.done)]]
 LogicalVector done_()
 {
   if(!pl_initialized)
@@ -38,7 +38,7 @@ LogicalVector done_()
   return true ;
 }
 
-// [[Rcpp::export]]
+// [[Rcpp::export(.consult)]]
 LogicalVector consult_(CharacterVector files)
 {
   for(R_xlen_t i=0; i<files.size(); i++)
@@ -473,7 +473,7 @@ PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, bool atomize)
 //   e.g., something like [|]`(1, expression(`_6330`)). This is cumbersome, any
 //   better ideas are welcome.
 //
-// [[Rcpp::export]]
+// [[Rcpp::export(.once)]]
 RObject once_(RObject query)
 {
   CharacterVector names ;
@@ -514,7 +514,7 @@ RObject once_(RObject query)
 }
 
 // Same as once_ above, but return all solutions to a query.
-// [[Rcpp::export]]
+// [[Rcpp::export(.findall)]]
 List findall_(RObject query)
 {
   CharacterVector names ;
@@ -548,6 +548,7 @@ List findall_(RObject query)
       RObject r = pl2r(v, names, vars) ;
       if(TYPEOF(r) == EXPRSXP 
            && names[i] == as<Symbol>(as<ExpressionVector>(r)[0]).c_str())
+        continue ;
         
       l.push_back(r, (const char*) names[i]) ;
     }
@@ -559,7 +560,7 @@ List findall_(RObject query)
 // Pretty print query. Maybe simplify to something like this:
 // with_output_to(string(S), write_term(member(X), [variable_names(['X'=X])])).
 //
-// [[Rcpp::export]]
+// [[Rcpp::export(.portray)]]
 RObject portray_(RObject query)
 {
   CharacterVector names ;

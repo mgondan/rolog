@@ -7,9 +7,9 @@
 once(query = call("member", expression(X), list(1, 2, 3)), portray = TRUE)
 }
 \arguments{
-\item{query:}{an R call}
+\item{query}{an R call}
 
-\item{portray:}{boolean, add the prolog translation as an attribute}
+\item{portray}{boolean, add the prolog translation as an attribute}
 }
 \value{
 \code{FALSE} if the query fails; otherwise, a list with conditions
@@ -18,11 +18,21 @@ once(query = call("member", expression(X), list(1, 2, 3)), portray = TRUE)
 Invoke a query once
 }
 \examples{
-once(call("=", 1, 2)) # FALSE 
-once(call("=", 1, 1)) # empty list
-once(call("member", 1, list(2, expression(X)))) # list stating that it works if X = 1
-once(call("=", list(expression(X), expression(Y)), list(1, expression(Z)))) # list stating that X = 1 and Z = Y
-once(call("member", 1, expression(X))) # works for X = [1 | _]; i.e. something like [|](1, expression(_6330))
+
+# This query returns FALSE
+once(call("=", 1, 2))
+
+# This query returns an empty list meaning yes, it works
+once(call("=", 1, 1))
+
+# This query returns a list stating that it works if X = 1
+once(call("member", 1, list(2, expression(X))))
+
+# This query returns a list stating that X = 1 and Z = Y
+once(call("=", list(expression(X), expression(Y)), list(1, expression(Z))))
+
+# works for X = [1 | _]; i.e. something like [|](1, expression(_6330))
+once(call("member", 1, expression(X)))
 
 }
 \seealso{

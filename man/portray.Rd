@@ -7,7 +7,7 @@
 portray(query = call("member", expression(X), list(1, 2, 3)))
 }
 \arguments{
-\item{query:}{an R call}
+\item{query}{an R call}
 }
 \value{
 a character string with the prolog version of the call

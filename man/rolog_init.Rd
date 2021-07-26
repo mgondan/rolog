@@ -7,7 +7,7 @@
 rolog_init(argv1 = commandArgs()[1])
 }
 \arguments{
-\item{argv1:}{file name of the R executable}
+\item{argv1}{file name of the R executable}
 }
 \value{
 TRUE on success

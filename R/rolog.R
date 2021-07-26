@@ -52,12 +52,12 @@
 #' SWI prolog is automatically initialized when the rolog library is loaded, so
 #' this function is normally not directly invoked.
 #' 
-#' @param argv1: file name of the R executable
+#' @param argv1 file name of the R executable
 #' @return TRUE on success
 #' 
 rolog_init = function(argv1=commandArgs()[1])
 {
-  init_(argv1)
+  .init(argv1)
 }
 
 #' rolog_done
@@ -71,14 +71,14 @@ rolog_init = function(argv1=commandArgs()[1])
 #' 
 rolog_done = function()
 {
-  done_()
+  .done()
 }
 
 #' consult
 #'
 #' Consult a prolog database
 #' 
-#' @param fname: file name of database
+#' @param fname file name of database
 #' @return `TRUE` on success
 #' @md
 #'
@@ -90,14 +90,14 @@ rolog_done = function()
 #' 
 consult = function(fname=system.file('likes.pl', package='rolog'))
 {
-  consult_(fname)
+  .consult(fname)
 }
 
 #' portray
 #'
 #' Translate an R call to a prolog compound and pretty print it
 #' 
-#' @param query: an R call
+#' @param query an R call
 #' @return a character string with the prolog version of the call
 #' @md
 #'
@@ -114,13 +114,13 @@ consult = function(fname=system.file('likes.pl', package='rolog'))
 #' 
 portray = function(query=call('member', expression(X), list(1, 2, 3)))
 {
-  portray_(query)
+  .portray(query)
 }
 
 #' Invoke a query once
 #'
-#' @param query: an R call
-#' @param portray: boolean, add the prolog translation as an attribute
+#' @param query an R call
+#' @param portray boolean, add the prolog translation as an attribute
 #' @return `FALSE` if the query fails; otherwise, a list with conditions
 #' @md
 #' 
@@ -128,15 +128,25 @@ portray = function(query=call('member', expression(X), list(1, 2, 3)))
 #' @seealso [portray()] for pretty-printing a query
 #'
 #' @examples
-#' once(call("=", 1, 2)) # FALSE 
-#' once(call("=", 1, 1)) # empty list
-#' once(call("member", 1, list(2, expression(X)))) # list stating that it works if X = 1
-#' once(call("=", list(expression(X), expression(Y)), list(1, expression(Z)))) # list stating that X = 1 and Z = Y
-#' once(call("member", 1, expression(X))) # works for X = [1 | _]; i.e. something like [|](1, expression(_6330))
+#' 
+#' # This query returns FALSE
+#' once(call("=", 1, 2))
+#' 
+#' # This query returns an empty list meaning yes, it works
+#' once(call("=", 1, 1))
+#' 
+#' # This query returns a list stating that it works if X = 1
+#' once(call("member", 1, list(2, expression(X))))
+#' 
+#' # This query returns a list stating that X = 1 and Z = Y
+#' once(call("=", list(expression(X), expression(Y)), list(1, expression(Z))))
+#' 
+#' # works for X = [1 | _]; i.e. something like [|](1, expression(_6330))
+#' once(call("member", 1, expression(X)))
 #'
 once = function(query=call('member', expression(X), list(1, 2, 3)), portray=TRUE)
 {
-  r = once_(query)
+  r = .once(query)
 
   if(portray)
     attr(r, 'query') = portray(query)
@@ -146,8 +156,8 @@ once = function(query=call('member', expression(X), list(1, 2, 3)), portray=TRUE
 
 #' Invoke a query several times
 #'
-#' @param query: an R call
-#' @param portray: boolean, add the prolog translation as an attribute
+#' @param query an R call
+#' @param portray boolean, add the prolog translation as an attribute
 #' @return empty list if the query fails; otherwise, a list of conditions for each solution
 #' @md
 #'
@@ -158,7 +168,7 @@ once = function(query=call('member', expression(X), list(1, 2, 3)), portray=TRUE
 #' 
 findall = function(query=call('member', expression(X), list(1, 2, 3)), portray=TRUE)
 {
-  r = findall_(query)
+  r = .findall(query)
   
   if(portray)
     attr(r, 'query') = portray(query)
