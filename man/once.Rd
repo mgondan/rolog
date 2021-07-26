@@ -20,7 +20,7 @@ Invoke a query once
 \examples{
 once(call("=", 1, 2)) # FALSE 
 once(call("=", 1, 1)) # empty list
-once(member(1, list(2, expression(X)))) # list stating that it works if X = 1
+once(call("member", 1, list(2, expression(X)))) # list stating that it works if X = 1
 once(call("=", list(expression(X), expression(Y)), list(1, expression(Z)))) # list stating that X = 1 and Z = Y
 once(call("member", 1, expression(X))) # works for X = [1 | _]; i.e. something like [|](1, expression(_6330))
 

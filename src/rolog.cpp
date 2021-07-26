@@ -146,11 +146,19 @@ Language pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars)
     PlTerm arg = pl[i] ;
 
     // Compounds like mean=100 are translated to named function arguments
-    if(PL_is_compound(arg) && !strcmp(arg.name(), "=") && arg.arity() == 2
-         && PL_is_atom(arg[1]))
-      r.push_back(Named(arg[1].name()) = pl2r(arg[2], names, vars)) ;
-    else
-      r.push_back(pl2r(arg, names, vars)) ; // no name
+    if(PL_is_compound(arg) && !strcmp(arg.name(), "=") && arg.arity() == 2)
+    {
+      // A bit cumbersome workaround to avoid ISO C++ warnings
+      PlTerm a1 = arg.operator[](1) ;
+      PlTerm a2 = arg.operator[](2) ;
+      if(PL_is_atom(a1))
+      {
+        r.push_back(Named(a1.name()) = pl2r(a2, names, vars)) ;
+        continue ;
+      }
+    }
+
+    r.push_back(pl2r(arg, names, vars)) ; // no name
   }
 
   return r ;
@@ -169,21 +177,29 @@ Language pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars)
 //
 SEXP pl2r_list(PlTerm pl, CharacterVector& names, PlTerm& vars)
 {
-  PlTerm head = pl[1] ;
+  PlTerm head = pl.operator[](1) ;
   
   // if the tail is a list or empty, return a normal list
-  RObject tail = pl2r(pl[2], names, vars) ;
+  RObject tail = pl2r(pl.operator[](2), names, vars) ;
   if(TYPEOF(tail) == VECSXP || TYPEOF(tail) == NILSXP)
   {
     List r = as<List>(tail) ;
     
     // Convert prolog pair a-X to named list element
-    if(PL_is_compound(head) && !strcmp(head.name(), "-") && head.arity() == 2
-         && PL_is_atom(head[1]))
-      r.push_front(pl2r(head[2], names, vars), head[1].name()) ;
-    else
-      r.push_front(pl2r(head, names, vars)) ; // no name
+    if(PL_is_compound(head) && !strcmp(head.name(), "-") && head.arity() == 2)
+    {
+      // A bit cumbersome workaround to avoid ISO C++ warnings
+      PlTerm a1 = head.operator[](1) ;
+      PlTerm a2 = head.operator[](2) ;
+      if(PL_is_atom(a1))
+      {
+        r.push_front(pl2r(a2, names, vars), a1.name()) ;
+        return r ;
+      }
+    }
     
+    // no name
+    r.push_front(pl2r(head, names, vars)) ; 
     return r ;
   }
     
@@ -191,12 +207,20 @@ SEXP pl2r_list(PlTerm pl, CharacterVector& names, PlTerm& vars)
   Language r(pl.name()) ;
   
   // Convert prolog pair a-X to named list element
-  if(PL_is_compound(head) && !strcmp(head.name(), "-") && head.arity() == 2 
-       && PL_is_atom(head[1]))
-    r.push_back(Named(head[1].name()) = pl2r(head[2], names, vars)) ;
-  else
-    r.push_back(pl2r(head, names, vars)) ; // no name
-  
+  if(PL_is_compound(head) && !strcmp(head.name(), "-") && head.arity() == 2)
+  {
+    PlTerm a1 = head.operator[](1) ;
+    PlTerm a2 = head.operator[](2) ;
+    if(PL_is_atom(a1))
+    {
+      r.push_back(Named(a1.name()) = pl2r(a2, names, vars)) ;
+      r.push_back(tail) ;
+      return r ;
+    }
+  }
+
+  // no name
+  r.push_back(pl2r(head, names, vars)) ; 
   r.push_back(tail) ;
   return r ;
 }
@@ -440,12 +464,12 @@ PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, bool atomize)
 //
 // Examples:
 //
-// once(call('=', 1, 2)) -> FALSE
-// once(call('=', 1, 1)) -> empty list
-// once(member(1, list(2, expression(X)))) -> list stating that X = 1
-// once(call('=', list(expression(X), expression(Y)), list(1, expression(Z))))
+// once(call("=", 1, 2)) -> FALSE
+// once(call("=", 1, 1)) -> empty list
+// once(call("member", 1, list(2, expression(X)))) -> list stating that X = 1
+// once(call("=", list(expression(X), expression(Y)), list(1, expression(Z))))
 //   -> list stating that X = 1 and Z = Y
-// once(call('member', 1, expression(X))) -> list stating that X = [1 | _]; 
+// once(call("member", 1, expression(X))) -> list stating that X = [1 | _]; 
 //   e.g., something like [|]`(1, expression(`_6330`)). This is cumbersome, any
 //   better ideas are welcome.
 //
