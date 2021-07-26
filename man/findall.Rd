@@ -18,7 +18,7 @@ empty list if the query fails; otherwise, a list of conditions for each solution
 Invoke a query several times
 }
 \examples{
-findall(call("member", expression(X), list(1, 2, 3))
+findall(call("member", expression(X), list(1, 2, 3)))
 
 }
 \seealso{
