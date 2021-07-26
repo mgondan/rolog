@@ -154,7 +154,7 @@ once = function(query=call('member', expression(X), list(1, 2, 3)), portray=TRUE
 #' @seealso [once()] for a single query
 #' 
 #' @examples
-#' findall(call("member", expression(X), list(1, 2, 3))
+#' findall(call("member", expression(X), list(1, 2, 3)))
 #' 
 findall = function(query=call('member', expression(X), list(1, 2, 3)), portray=TRUE)
 {
