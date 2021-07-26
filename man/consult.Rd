@@ -2,7 +2,7 @@
 % Please edit documentation in R/rolog.R
 \name{consult}
 \alias{consult}
-\title{consult}
+\title{Consult a prolog database}
 \usage{
 consult(fname = system.file("likes.pl", package = "rolog"))
 }

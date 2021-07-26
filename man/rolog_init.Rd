@@ -2,7 +2,7 @@
 % Please edit documentation in R/rolog.R
 \name{rolog_init}
 \alias{rolog_init}
-\title{rolog_init}
+\title{Start prolog}
 \usage{
 rolog_init(argv1 = commandArgs()[1])
 }
@@ -13,6 +13,9 @@ rolog_init(argv1 = commandArgs()[1])
 TRUE on success
 }
 \description{
-SWI prolog is automatically initialized when the rolog library is loaded, so
+Start prolog
+}
+\details{
+SWI-prolog is automatically initialized when the rolog library is loaded, so
 this function is normally not directly invoked.
 }

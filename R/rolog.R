@@ -47,35 +47,35 @@
     stop('rolog: not initialized')
 }
 
-#' rolog_init
+#' Start prolog
 #'
-#' SWI prolog is automatically initialized when the rolog library is loaded, so
-#' this function is normally not directly invoked.
-#' 
 #' @param argv1 file name of the R executable
 #' @return TRUE on success
 #' 
+#' @details 
+#' SWI-prolog is automatically initialized when the rolog library is loaded, so
+#' this function is normally not directly invoked.
+#'
 rolog_init = function(argv1=commandArgs()[1])
 {
   .init(argv1)
 }
 
-#' rolog_done
-#'
-#' Clean up when detaching the library. At this stage, this function is of
-#' little practical use, since it is not yet possible to initialize prolog
-#' twice in the same R session. See the source file rolog.cpp for details.
+#' Clean up when detaching the library
 #' 
 #' @return `TRUE` on success
 #' @md
+#' 
+#' @details
+#' At this stage, this function is of
+#' little practical use, since it is not yet possible to initialize prolog
+#' twice in the same R session. See the source file rolog.cpp for details.
 #' 
 rolog_done = function()
 {
   .done()
 }
 
-#' consult
-#'
 #' Consult a prolog database
 #' 
 #' @param fname file name of database
@@ -93,8 +93,6 @@ consult = function(fname=system.file('likes.pl', package='rolog'))
   .consult(fname)
 }
 
-#' portray
-#'
 #' Translate an R call to a prolog compound and pretty print it
 #' 
 #' @param query an R call

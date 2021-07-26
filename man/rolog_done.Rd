@@ -2,7 +2,7 @@
 % Please edit documentation in R/rolog.R
 \name{rolog_done}
 \alias{rolog_done}
-\title{rolog_done}
+\title{Clean up when detaching the library}
 \usage{
 rolog_done()
 }
@@ -10,7 +10,10 @@ rolog_done()
 \code{TRUE} on success
 }
 \description{
-Clean up when detaching the library. At this stage, this function is of
+Clean up when detaching the library
+}
+\details{
+At this stage, this function is of
 little practical use, since it is not yet possible to initialize prolog
 twice in the same R session. See the source file rolog.cpp for details.
 }

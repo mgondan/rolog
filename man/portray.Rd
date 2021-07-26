@@ -2,7 +2,7 @@
 % Please edit documentation in R/rolog.R
 \name{portray}
 \alias{portray}
-\title{portray}
+\title{Translate an R call to a prolog compound and pretty print it}
 \usage{
 portray(query = call("member", expression(X), list(1, 2, 3)))
 }
