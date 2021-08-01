@@ -4,12 +4,20 @@
 \alias{once}
 \title{Invoke a query once}
 \usage{
-once(query = call("member", expression(X), list(1, 2, 3)), portray = TRUE)
+once(
+  query = call("member", expression(X), list(1, 2, 3)),
+  portray = TRUE,
+  tovec = FALSE
+)
 }
 \arguments{
 \item{query}{an R call}
 
 \item{portray}{boolean, add the prolog translation as an attribute}
+
+\item{tovec}{boolean. Vectors of characters, integers, and floats are
+translated to compounds of $, \% and #, respectively. Vectors of
+length 1 are translated to scalars unless tovec is set to TRUE.}
 }
 \value{
 \code{FALSE} if the query fails; otherwise, a list with conditions

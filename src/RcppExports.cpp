@@ -43,35 +43,38 @@ BEGIN_RCPP
 END_RCPP
 }
 // once_
-RObject once_(RObject query);
-RcppExport SEXP _rolog_once_(SEXP querySEXP) {
+RObject once_(RObject query, bool tovec);
+RcppExport SEXP _rolog_once_(SEXP querySEXP, SEXP tovecSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< RObject >::type query(querySEXP);
-    rcpp_result_gen = Rcpp::wrap(once_(query));
+    Rcpp::traits::input_parameter< bool >::type tovec(tovecSEXP);
+    rcpp_result_gen = Rcpp::wrap(once_(query, tovec));
     return rcpp_result_gen;
 END_RCPP
 }
 // findall_
-List findall_(RObject query);
-RcppExport SEXP _rolog_findall_(SEXP querySEXP) {
+List findall_(RObject query, bool tovec);
+RcppExport SEXP _rolog_findall_(SEXP querySEXP, SEXP tovecSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< RObject >::type query(querySEXP);
-    rcpp_result_gen = Rcpp::wrap(findall_(query));
+    Rcpp::traits::input_parameter< bool >::type tovec(tovecSEXP);
+    rcpp_result_gen = Rcpp::wrap(findall_(query, tovec));
     return rcpp_result_gen;
 END_RCPP
 }
 // portray_
-RObject portray_(RObject query);
-RcppExport SEXP _rolog_portray_(SEXP querySEXP) {
+RObject portray_(RObject query, bool tovec);
+RcppExport SEXP _rolog_portray_(SEXP querySEXP, SEXP tovecSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< RObject >::type query(querySEXP);
-    rcpp_result_gen = Rcpp::wrap(portray_(query));
+    Rcpp::traits::input_parameter< bool >::type tovec(tovecSEXP);
+    rcpp_result_gen = Rcpp::wrap(portray_(query, tovec));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -80,9 +83,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rolog_init_", (DL_FUNC) &_rolog_init_, 1},
     {"_rolog_done_", (DL_FUNC) &_rolog_done_, 0},
     {"_rolog_consult_", (DL_FUNC) &_rolog_consult_, 1},
-    {"_rolog_once_", (DL_FUNC) &_rolog_once_, 1},
-    {"_rolog_findall_", (DL_FUNC) &_rolog_findall_, 1},
-    {"_rolog_portray_", (DL_FUNC) &_rolog_portray_, 1},
+    {"_rolog_once_", (DL_FUNC) &_rolog_once_, 2},
+    {"_rolog_findall_", (DL_FUNC) &_rolog_findall_, 2},
+    {"_rolog_portray_", (DL_FUNC) &_rolog_portray_, 2},
     {NULL, NULL, 0}
 };
 

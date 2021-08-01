@@ -4,10 +4,14 @@
 \alias{portray}
 \title{Translate an R call to a prolog compound and pretty print it}
 \usage{
-portray(query = call("member", expression(X), list(1, 2, 3)))
+portray(query = call("member", expression(X), list(1, 2, 3)), tovec = FALSE)
 }
 \arguments{
 \item{query}{an R call}
+
+\item{tovec}{boolean. Vectors of characters, integers, and floats are
+translated to compounds of $, \% and #, respectively. Vectors of
+length 1 are translated to scalars unless tovec is set to TRUE.}
 }
 \value{
 a character string with the prolog version of the call

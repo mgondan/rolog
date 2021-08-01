@@ -4,15 +4,24 @@
 \alias{findall}
 \title{Invoke a query several times}
 \usage{
-findall(query = call("member", expression(X), list(1, 2, 3)), portray = TRUE)
+findall(
+  query = call("member", expression(X), list(1, 2, 3)),
+  portray = TRUE,
+  tovec = FALSE
+)
 }
 \arguments{
 \item{query}{an R call}
 
 \item{portray}{boolean, add the prolog translation as an attribute}
+
+\item{tovec}{boolean. Vectors of characters, integers, and floats are
+translated to compounds of $, \% and #, respectively. Vectors of
+length 1 are translated to scalars unless tovec is set to TRUE.}
 }
 \value{
-empty list if the query fails; otherwise, a list of conditions for each solution
+empty list if the query fails; otherwise, a list of conditions for
+each solution
 }
 \description{
 Invoke a query several times

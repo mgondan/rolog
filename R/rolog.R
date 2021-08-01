@@ -96,6 +96,9 @@ consult = function(fname=system.file('likes.pl', package='rolog'))
 #' Translate an R call to a prolog compound and pretty print it
 #' 
 #' @param query an R call
+#' @param tovec boolean. Vectors of characters, integers, and floats are
+#'              translated to compounds of $, % and #, respectively. Vectors of
+#'              length 1 are translated to scalars unless tovec is set to TRUE.
 #' @return a character string with the prolog version of the call
 #' @md
 #'
@@ -110,15 +113,18 @@ consult = function(fname=system.file('likes.pl', package='rolog'))
 #' * expression -> variable
 #' * boolean -> true, false (atoms)
 #' 
-portray = function(query=call('member', expression(X), list(1, 2, 3)))
+portray = function(query=call('member', expression(X), list(1, 2, 3)), tovec=FALSE)
 {
-  .portray(query)
+  .portray(query, tovec)
 }
 
 #' Invoke a query once
 #'
 #' @param query an R call
 #' @param portray boolean, add the prolog translation as an attribute
+#' @param tovec boolean. Vectors of characters, integers, and floats are
+#'              translated to compounds of $, % and #, respectively. Vectors of
+#'              length 1 are translated to scalars unless tovec is set to TRUE.
 #' @return `FALSE` if the query fails; otherwise, a list with conditions
 #' @md
 #' 
@@ -142,12 +148,12 @@ portray = function(query=call('member', expression(X), list(1, 2, 3)))
 #' # works for X = [1 | _]; i.e. something like [|](1, expression(_6330))
 #' once(call("member", 1, expression(X)))
 #'
-once = function(query=call('member', expression(X), list(1, 2, 3)), portray=TRUE)
+once = function(query=call('member', expression(X), list(1, 2, 3)), portray=TRUE, tovec=FALSE)
 {
-  r = .once(query)
+  r = .once(query, tovec)
 
   if(portray)
-    attr(r, 'query') = portray(query)
+    attr(r, 'query') = portray(query, tovec)
   
   return(r)
 }
@@ -156,7 +162,11 @@ once = function(query=call('member', expression(X), list(1, 2, 3)), portray=TRUE
 #'
 #' @param query an R call
 #' @param portray boolean, add the prolog translation as an attribute
-#' @return empty list if the query fails; otherwise, a list of conditions for each solution
+#' @param tovec boolean. Vectors of characters, integers, and floats are
+#'              translated to compounds of $, % and #, respectively. Vectors of
+#'              length 1 are translated to scalars unless tovec is set to TRUE.
+#' @return empty list if the query fails; otherwise, a list of conditions for 
+#'              each solution
 #' @md
 #'
 #' @seealso [once()] for a single query
@@ -164,12 +174,12 @@ once = function(query=call('member', expression(X), list(1, 2, 3)), portray=TRUE
 #' @examples
 #' findall(call("member", expression(X), list(1, 2, 3)))
 #' 
-findall = function(query=call('member', expression(X), list(1, 2, 3)), portray=TRUE)
+findall = function(query=call('member', expression(X), list(1, 2, 3)), portray=TRUE, tovec=FALSE)
 {
-  r = .findall(query)
+  r = .findall(query, tovec)
   
   if(portray)
-    attr(r, 'query') = portray(query)
+    attr(r, 'query') = portray(query, tovec)
   
   return(r)
 }
