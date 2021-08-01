@@ -8,6 +8,7 @@ Maintainer: Matthias Gondan <Matthias.Gondan@psy.ku.dk>
 Description: Invoke SWI-Prolog from R (consult, once, findall).
 License: LGPL-2.1
 Imports: Rcpp (>= 1.0.7)
+Suggests: RInside
 LinkingTo: Rcpp
 RoxygenNote: 7.1.1
 Encoding: UTF-8
