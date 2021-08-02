@@ -10,13 +10,26 @@
 .onLoad = function(libname, pkgname)
 {
   library.dynam(chname='rolog', package=pkgname, lib.loc=libname, local=FALSE)
-  return(TRUE)
+  
+  # prolog compound names for specific vectors 
+  op = options()
+  op.rolog = list(
+    rolog.realvec = '#',
+    rolog.intvec = '%',
+    rolog.boolvec = '!',
+    rolog.charvec = '$'
+  )
+  set = !(names(op.rolog) %in% names(op))
+  if(any(set))
+    options(op.rolog[set])
+
+  invisible()
 }
 
 .onUnload = function(libpath)
 {
   library.dynam.unload('rolog', libpath=libpath)
-  return(TRUE)
+  invisible()
 }
 
 # This is a bit of a mystery.
