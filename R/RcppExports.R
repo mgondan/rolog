@@ -13,15 +13,15 @@
     .Call('_rolog_consult_', PACKAGE = 'rolog', files)
 }
 
-.once <- function(query, tovec) {
-    .Call('_rolog_once_', PACKAGE = 'rolog', query, tovec)
+.once <- function(query, options) {
+    .Call('_rolog_once_', PACKAGE = 'rolog', query, options)
 }
 
-.findall <- function(query, tovec) {
-    .Call('_rolog_findall_', PACKAGE = 'rolog', query, tovec)
+.findall <- function(query, options) {
+    .Call('_rolog_findall_', PACKAGE = 'rolog', query, options)
 }
 
-.portray <- function(query, tovec) {
-    .Call('_rolog_portray_', PACKAGE = 'rolog', query, tovec)
+.portray <- function(query, options) {
+    .Call('_rolog_portray_', PACKAGE = 'rolog', query, options)
 }
 

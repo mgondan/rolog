@@ -43,38 +43,38 @@ BEGIN_RCPP
 END_RCPP
 }
 // once_
-RObject once_(RObject query, bool tovec);
-RcppExport SEXP _rolog_once_(SEXP querySEXP, SEXP tovecSEXP) {
+RObject once_(RObject query, List options);
+RcppExport SEXP _rolog_once_(SEXP querySEXP, SEXP optionsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< RObject >::type query(querySEXP);
-    Rcpp::traits::input_parameter< bool >::type tovec(tovecSEXP);
-    rcpp_result_gen = Rcpp::wrap(once_(query, tovec));
+    Rcpp::traits::input_parameter< List >::type options(optionsSEXP);
+    rcpp_result_gen = Rcpp::wrap(once_(query, options));
     return rcpp_result_gen;
 END_RCPP
 }
 // findall_
-List findall_(RObject query, bool tovec);
-RcppExport SEXP _rolog_findall_(SEXP querySEXP, SEXP tovecSEXP) {
+List findall_(RObject query, List options);
+RcppExport SEXP _rolog_findall_(SEXP querySEXP, SEXP optionsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< RObject >::type query(querySEXP);
-    Rcpp::traits::input_parameter< bool >::type tovec(tovecSEXP);
-    rcpp_result_gen = Rcpp::wrap(findall_(query, tovec));
+    Rcpp::traits::input_parameter< List >::type options(optionsSEXP);
+    rcpp_result_gen = Rcpp::wrap(findall_(query, options));
     return rcpp_result_gen;
 END_RCPP
 }
 // portray_
-RObject portray_(RObject query, bool tovec);
-RcppExport SEXP _rolog_portray_(SEXP querySEXP, SEXP tovecSEXP) {
+RObject portray_(RObject query, List options);
+RcppExport SEXP _rolog_portray_(SEXP querySEXP, SEXP optionsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< RObject >::type query(querySEXP);
-    Rcpp::traits::input_parameter< bool >::type tovec(tovecSEXP);
-    rcpp_result_gen = Rcpp::wrap(portray_(query, tovec));
+    Rcpp::traits::input_parameter< List >::type options(optionsSEXP);
+    rcpp_result_gen = Rcpp::wrap(portray_(query, options));
     return rcpp_result_gen;
 END_RCPP
 }

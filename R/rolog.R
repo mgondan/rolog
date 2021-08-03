@@ -11,15 +11,15 @@
 {
   library.dynam(chname='rolog', package=pkgname, lib.loc=libname, local=FALSE)
   
-  # prolog compound names for specific vectors 
-  op = options()
   op.rolog = list(
-    rolog.realvec = '#',
-    rolog.intvec = '%',
-    rolog.boolvec = '!',
-    rolog.charvec = '$'
+    rolog.realvec = '#',  # prolog representation of R numeric vectors
+    rolog.intvec = '%',   # prolog representation of R integer vectors
+    rolog.boolvec = '!',  # prolog representation of R boolean vectors
+    rolog.charvec = '$',  # prolog representation of R character vectors
+    rolog.portray = TRUE, # return prolog call, nicely formatted
+    rolog.scalar = TRUE   # convert R vectors of size 1 to scalars in Prolog
   )
-  set = !(names(op.rolog) %in% names(op))
+  set = !(names(op.rolog) %in% names(options()))
   if(any(set))
     options(op.rolog[set])
 
@@ -106,12 +106,38 @@ consult = function(fname=system.file('likes.pl', package='rolog'))
   .consult(fname)
 }
 
+#' Quick access to rolog's own options
+#' 
+#' @return list with some options for translating R expressions to Prolog 
+#' @md
+# 
+#' @details
+#' Translation of R to Prolog
+#' 
+#' * numeric vector of size N -> $realvec/N (default is #)
+#' * integer vector of size N -> $intvec/N (default is %)
+#' * boolean vector of size N -> $boolvec/n (default is !)
+#' * character vector of size N -> $charvec/N (default is $)
+#' * $scalar: if TRUE (default), translate R vectors of size 1 to scalars in
+#'   Prolog
+#' * $portray: whether to return the prolog translation as an attribute to 
+#'   once and findall (default is TRUE)
+rolog_options = function()
+{
+  list(
+    realvec=getOption('rolog.realvec', default='#'),
+    intvec=getOption('rolog.intvec', default='%'),
+    boolvec=getOption('rolog.boolvec', default='!'),
+    charvec=getOption('rolog.charvec', default='$'),
+    portray=getOption('rolog.portray', default=TRUE),
+    scalar=getOption('rolog.scalar', default=TRUE)
+  )
+}
+
 #' Translate an R call to a prolog compound and pretty print it
 #' 
 #' @param query an R call
-#' @param tovec boolean. Vectors of characters, integers, and floats are
-#'              translated to compounds of $, % and #, respectively. Vectors of
-#'              length 1 are translated to scalars unless tovec is set to TRUE.
+#' @param options boolean. See rolog_options
 #' @return a character string with the prolog version of the call
 #' @md
 #'
@@ -125,24 +151,26 @@ consult = function(fname=system.file('likes.pl', package='rolog'))
 #' * call/language -> compound
 #' * expression -> variable
 #' * boolean -> true, false (atoms)
+#'
+#' @seealso [rolog_options()] for options controlling R to prolog translation
 #' 
-portray = function(query=call('member', expression(X), list(1, 2, 3)), tovec=FALSE)
+portray = function(query=call('member', expression(X), list(1, 2, 3)), 
+  options=NULL)
 {
-  .portray(query, tovec)
+  options = c(options, rolog_options())
+  .portray(query, options)
 }
 
 #' Invoke a query once
 #'
 #' @param query an R call
 #' @param portray boolean, add the prolog translation as an attribute
-#' @param tovec boolean. Vectors of characters, integers, and floats are
-#'              translated to compounds of $, % and #, respectively. Vectors of
-#'              length 1 are translated to scalars unless tovec is set to TRUE.
+#' @param options boolean. See rolog_options
 #' @return `FALSE` if the query fails; otherwise, a list with conditions
 #' @md
 #' 
 #' @seealso [findall()] for querying all solutions
-#' @seealso [portray()] for pretty-printing a query
+#' @seealso [rolog_options()] for options controlling R to prolog translation
 #'
 #' @examples
 #' 
@@ -161,12 +189,13 @@ portray = function(query=call('member', expression(X), list(1, 2, 3)), tovec=FAL
 #' # works for X = [1 | _]; i.e. something like [|](1, expression(_6330))
 #' once(call("member", 1, expression(X)))
 #'
-once = function(query=call('member', expression(X), list(1, 2, 3)), portray=TRUE, tovec=FALSE)
+once = function(query=call('member', expression(X), list(1, 2, 3)), options=NULL)
 {
-  r = .once(query, tovec)
-
-  if(portray)
-    attr(r, 'query') = portray(query, tovec)
+  options = c(options, rolog_options())
+  
+  r = .once(query, options)
+  if(options$portray)
+    attr(r, 'query') = portray(query, options)
   
   return(r)
 }
@@ -175,24 +204,24 @@ once = function(query=call('member', expression(X), list(1, 2, 3)), portray=TRUE
 #'
 #' @param query an R call
 #' @param portray boolean, add the prolog translation as an attribute
-#' @param tovec boolean. Vectors of characters, integers, and floats are
-#'              translated to compounds of $, % and #, respectively. Vectors of
-#'              length 1 are translated to scalars unless tovec is set to TRUE.
+#' @param options boolean. See rolog_options
 #' @return empty list if the query fails; otherwise, a list of conditions for 
 #'              each solution
 #' @md
 #'
 #' @seealso [once()] for a single query
+#' @seealso [rolog_options()]
 #' 
 #' @examples
 #' findall(call("member", expression(X), list(1, 2, 3)))
 #' 
-findall = function(query=call('member', expression(X), list(1, 2, 3)), portray=TRUE, tovec=FALSE)
+findall = function(query=call('member', expression(X), list(1, 2, 3)), options=NULL)
 {
-  r = .findall(query, tovec)
-  
-  if(portray)
-    attr(r, 'query') = portray(query, tovec)
+  options = c(options, rolog_options())
+
+  r = .findall(query, options)
+  if(options$portray)
+    attr(r, 'query') = portray(query, options)
   
   return(r)
 }

@@ -4,14 +4,12 @@
 \alias{portray}
 \title{Translate an R call to a prolog compound and pretty print it}
 \usage{
-portray(query = call("member", expression(X), list(1, 2, 3)), tovec = FALSE)
+portray(query = call("member", expression(X), list(1, 2, 3)), options = NULL)
 }
 \arguments{
 \item{query}{an R call}
 
-\item{tovec}{boolean. Vectors of characters, integers, and floats are
-translated to compounds of $, \% and #, respectively. Vectors of
-length 1 are translated to scalars unless tovec is set to TRUE.}
+\item{options}{boolean. See rolog_options}
 }
 \value{
 a character string with the prolog version of the call
@@ -30,4 +28,7 @@ R to prolog
 \item expression -> variable
 \item boolean -> true, false (atoms)
 }
+}
+\seealso{
+\code{\link[=rolog_options]{rolog_options()}} for options controlling R to prolog translation
 }

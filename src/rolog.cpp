@@ -271,7 +271,7 @@ SEXP pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars)
 // atomize is a temporary solution that allows for pretty printing the
 // prolog query.
 //
-PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, bool atomize, bool tovec) ;
+PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, bool atomize, List options) ;
 
 PlTerm r2pl_null()
 {
@@ -293,12 +293,12 @@ PlTerm r2pl_real(double r)
   return PlTerm(r) ;
 }
 
-PlTerm r2pl_real(NumericVector r, bool tovec)
+PlTerm r2pl_real(NumericVector r, List options)
 {
   if(r.length() == 0)
     return r2pl_null() ;
 
-  if(!tovec && r.length() == 1)
+  if(as<LogicalVector>(options["scalar"])(0) && r.length() == 1)
     return r2pl_real(r(0)) ;
 
   PlTermv args(r.length()) ;
@@ -316,12 +316,12 @@ PlTerm r2pl_logical(bool r)
   return PlTerm(r ? "true" : "false") ;
 }
 
-PlTerm r2pl_logical(LogicalVector r, bool tovec)
+PlTerm r2pl_logical(LogicalVector r, List options)
 {
   if(r.length() == 0)
     return r2pl_null() ;
   
-  if(!tovec && r.length() == 1)
+  if(as<LogicalVector>(options["scalar"])(0) && r.length() == 1)
     return r2pl_logical(r(0)) ;
   
   PlTermv args(r.length()) ;
@@ -339,12 +339,12 @@ PlTerm r2pl_integer(long r)
   return PlTerm(r) ;
 }
 
-PlTerm r2pl_integer(IntegerVector r, bool tovec)
+PlTerm r2pl_integer(IntegerVector r, List options)
 {
   if(r.length() == 0)
     return r2pl_null() ;
   
-  if(!tovec && r.length() == 1)
+  if(as<LogicalVector>(options["scalar"])(0) && r.length() == 1)
     return r2pl_integer((long) r(0)) ;
   
   PlTermv args(r.length()) ;
@@ -407,12 +407,12 @@ PlTerm r2pl_elem(CharacterVector r, R_xlen_t i)
   return PlString(as<Symbol>(r(i)).c_str()) ;
 }
 
-PlTerm r2pl_string(CharacterVector r, bool tovec)
+PlTerm r2pl_string(CharacterVector r, List options)
 {
   if(r.length() == 0)
     return r2pl_null() ;
   
-  if(!tovec && r.length() == 1)
+  if(as<LogicalVector>(options["scalar"])(0) && r.length() == 1)
     return r2pl_elem(r, 0) ;
 
   PlTermv args(r.length()) ;
@@ -424,7 +424,7 @@ PlTerm r2pl_string(CharacterVector r, bool tovec)
 
 // Translate R call to prolog compound, taking into account the names of the
 // arguments, e.g., rexp(50, rate=1) -> rexp(50, =(rate, 1))
-PlTerm r2pl_compound(Language r, CharacterVector& names, PlTerm& vars, bool atomize, bool tovec)
+PlTerm r2pl_compound(Language r, CharacterVector& names, PlTerm& vars, bool atomize, List options)
 {
   List l = as<List>(CDR(r)) ;
 
@@ -436,7 +436,7 @@ PlTerm r2pl_compound(Language r, CharacterVector& names, PlTerm& vars, bool atom
   PlTermv pl(l.size()) ;
   for(R_xlen_t i=0 ; i<l.size() ; i++)
   {
-    PlTerm arg = r2pl(l(i), names, vars, atomize, tovec) ;
+    PlTerm arg = r2pl(l(i), names, vars, atomize, options) ;
     
     // Convert named arguments to prolog compounds a=X
     if(n.length() && n(i) != "")
@@ -453,7 +453,7 @@ PlTerm r2pl_compound(Language r, CharacterVector& names, PlTerm& vars, bool atom
 // minus sign is a bit specific to prolog, and the conversion in the reverse
 // direction may be ambiguous.
 //
-PlTerm r2pl_list(List r, CharacterVector& names, PlTerm& vars, bool atomize, bool tovec)
+PlTerm r2pl_list(List r, CharacterVector& names, PlTerm& vars, bool atomize, List options)
 {
   PlTerm pl ;
   PlTail tail(pl) ;
@@ -464,7 +464,7 @@ PlTerm r2pl_list(List r, CharacterVector& names, PlTerm& vars, bool atomize, boo
   
   for(R_xlen_t i=0; i<r.size() ; i++)
   {
-    PlTerm arg = r2pl(r(i), names, vars, atomize, tovec) ;
+    PlTerm arg = r2pl(r(i), names, vars, atomize, options) ;
     
     // Convert named argument to prolog pair a-X.
     if(n.length() && n(i) != "")
@@ -477,19 +477,19 @@ PlTerm r2pl_list(List r, CharacterVector& names, PlTerm& vars, bool atomize, boo
   return pl ;
 }
 
-PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, bool atomize, bool tovec)
+PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, bool atomize, List options)
 {
   if(TYPEOF(r) == LANGSXP)
-    return r2pl_compound(r, names, vars, atomize, tovec) ;
+    return r2pl_compound(r, names, vars, atomize, options) ;
 
   if(TYPEOF(r) == REALSXP)
-    return r2pl_real(r, tovec) ;
+    return r2pl_real(r, options) ;
   
   if(TYPEOF(r) == LGLSXP)
-    return r2pl_logical(r, tovec) ;
+    return r2pl_logical(r, options) ;
   
   if(TYPEOF(r) == INTSXP)
-    return r2pl_integer(r, tovec) ;
+    return r2pl_integer(r, options) ;
   
   if(TYPEOF(r) == EXPRSXP)
     return r2pl_var(r, names, vars, atomize) ;
@@ -498,10 +498,10 @@ PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, bool atomize, bool tov
     return r2pl_atom(r) ;
 
   if(TYPEOF(r) == STRSXP)
-    return r2pl_string(r, tovec) ;
+    return r2pl_string(r, options) ;
 
   if(TYPEOF(r) == VECSXP)
-    return r2pl_list(r, names, vars, atomize, tovec) ;
+    return r2pl_list(r, names, vars, atomize, options) ;
   
   if(TYPEOF(r) == NILSXP)
     return r2pl_null() ;
@@ -523,11 +523,11 @@ PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, bool atomize, bool tov
 //   better ideas are welcome.
 //
 // [[Rcpp::export(.once)]]
-RObject once_(RObject query, bool tovec)
+RObject once_(RObject query, List options)
 {
   CharacterVector names ;
   PlTerm vars ;
-  PlTerm pl = r2pl(query, names, vars, false, tovec) ;
+  PlTerm pl = r2pl(query, names, vars, false, options) ;
 
   PlQuery q("call", pl) ;
   try
@@ -564,11 +564,11 @@ RObject once_(RObject query, bool tovec)
 
 // Same as once_ above, but return all solutions to a query.
 // [[Rcpp::export(.findall)]]
-List findall_(RObject query, bool tovec)
+List findall_(RObject query, List options)
 {
   CharacterVector names ;
   PlTerm vars ;
-  PlTerm pl = r2pl(query, names, vars, false, tovec) ;
+  PlTerm pl = r2pl(query, names, vars, false, options) ;
 
   PlQuery q("call", pl) ;
   List results ;
@@ -610,12 +610,12 @@ List findall_(RObject query, bool tovec)
 // with_output_to(string(S), write_term(member(X), [variable_names(['X'=X])])).
 //
 // [[Rcpp::export(.portray)]]
-RObject portray_(RObject query, bool tovec)
+RObject portray_(RObject query, List options)
 {
   CharacterVector names ;
   PlTerm vars ;
   PlTermv pl(3) ;
-  pl[0] = r2pl(query, names, vars, true, tovec) ;
+  pl[0] = r2pl(query, names, vars, true, options) ;
   PlTail tail(pl[2]) ;
   tail.append(PlCompound("quoted", PlTermv(PlAtom("false")))) ;
   tail.append(PlCompound("spacing", PlTermv(PlAtom("next_argument")))) ;
