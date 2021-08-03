@@ -10,8 +10,6 @@ findall(query = call("member", expression(X), list(1, 2, 3)), options = NULL)
 \item{query}{an R call}
 
 \item{options}{boolean. See rolog_options}
-
-\item{portray}{boolean, add the prolog translation as an attribute}
 }
 \value{
 empty list if the query fails; otherwise, a list of conditions for

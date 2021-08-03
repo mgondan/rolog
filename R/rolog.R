@@ -164,7 +164,6 @@ portray = function(query=call('member', expression(X), list(1, 2, 3)),
 #' Invoke a query once
 #'
 #' @param query an R call
-#' @param portray boolean, add the prolog translation as an attribute
 #' @param options boolean. See rolog_options
 #' @return `FALSE` if the query fails; otherwise, a list with conditions
 #' @md
@@ -203,7 +202,6 @@ once = function(query=call('member', expression(X), list(1, 2, 3)), options=NULL
 #' Invoke a query several times
 #'
 #' @param query an R call
-#' @param portray boolean, add the prolog translation as an attribute
 #' @param options boolean. See rolog_options
 #' @return empty list if the query fails; otherwise, a list of conditions for 
 #'              each solution
