@@ -305,7 +305,7 @@ PlTerm r2pl_real(NumericVector r, List options)
   for(R_xlen_t i=0 ; i<r.length() ; i++)
     args[i] = r2pl_real(r(i)) ;
   
-  return PlCompound("#", args) ;
+  return PlCompound(as<String>(options["realvec"]), args) ;
 }
 
 PlTerm r2pl_logical(bool r)
