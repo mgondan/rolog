@@ -351,7 +351,7 @@ PlTerm r2pl_integer(IntegerVector r, List options)
   for(R_xlen_t i=0 ; i<r.length() ; i++)
     args[i] = r2pl_integer((long) r(i)) ;
   
-  return PlCompound("%", args) ;
+  return PlCompound(as<String>(options["intvec"]).get_cstring(), args) ;
 }
 
 // Translate R expression to prolog variable
@@ -419,7 +419,7 @@ PlTerm r2pl_string(CharacterVector r, List options)
   for(R_xlen_t i=0 ; i<r.length() ; i++)
     args[i] = r2pl_elem(r, i) ;
   
-  return PlCompound("$", args) ;
+  return PlCompound(as<String>(options["charvec"]).get_cstring(), args) ;
 }
 
 // Translate R call to prolog compound, taking into account the names of the
