@@ -328,7 +328,7 @@ PlTerm r2pl_logical(LogicalVector r, List options)
   for(R_xlen_t i=0 ; i<r.length() ; i++)
     args[i] = r2pl_logical(r(i)) ;
 
-  return PlCompound("!", args) ;
+  return PlCompound(as<String>(options["boolvec"]).get_cstring(), args) ;
 }
 
 PlTerm r2pl_integer(long r)
