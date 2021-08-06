@@ -97,6 +97,15 @@ IntegerVector pl2r_integer(PlTerm pl)
   return IntegerVector::create((long) pl) ;
 }
 
+IntegerVector pl2r_intvec(PlTerm pl)
+{
+  IntegerVector r(pl.arity()) ;
+  for(R_xlen_t i=0; i<pl.arity(); i++)
+    r(i) = (long) pl.operator[](i+1) ;
+
+  return r ;
+}
+
 CharacterVector pl2r_char(PlTerm pl)
 {
   return CharacterVector::create((char*) pl) ;
@@ -152,6 +161,10 @@ SEXP pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars)
   
   if(!strcmp(pl.name(), "#"))
     return pl2r_realvec(pl) ;
+
+  if(!strcmp(pl.name(), "%"))
+    return pl2r_intvec(pl) ;
+
 
   Language r(pl.name()) ;
   for(unsigned int i=1 ; i<=pl.arity() ; i++)
