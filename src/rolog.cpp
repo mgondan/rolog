@@ -83,6 +83,15 @@ DoubleVector pl2r_real(PlTerm pl)
   return DoubleVector::create((double) pl) ;
 }
 
+DoubleVector pl2r_realvec(PlTerm pl)
+{
+  DoubleVector r(pl.arity()) ;
+  for(R_xlen_t i=0; i<pl.arity(); i++)
+    r(i) = (double) pl[i+1] ;
+
+  return r ;
+}
+
 IntegerVector pl2r_integer(PlTerm pl)
 {
   return IntegerVector::create((long) pl) ;
@@ -141,6 +150,9 @@ SEXP pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars)
     return R_NilValue ;
   }
   
+  if(!strcmp(pl.name(), "#"))
+    return pl2r_realvec(pl) ;
+
   Language r(pl.name()) ;
   for(unsigned int i=1 ; i<=pl.arity() ; i++)
   {
