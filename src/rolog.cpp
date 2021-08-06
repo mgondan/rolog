@@ -87,7 +87,7 @@ DoubleVector pl2r_realvec(PlTerm pl)
 {
   DoubleVector r(pl.arity()) ;
   for(R_xlen_t i=0; i<pl.arity(); i++)
-    r(i) = (double) pl[i+1] ;
+    r(i) = (double) pl.operator[](i+1) ;
 
   return r ;
 }
