@@ -132,7 +132,7 @@ SEXP pl2r_variable(PlTerm pl, CharacterVector& names, PlTerm& vars)
 }
 
 // Translate prolog compound to R call
-Language pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars)
+SEXP pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars)
 {
   // This function does not (yet) work for cyclic terms
   if(!PL_is_acyclic(pl))
