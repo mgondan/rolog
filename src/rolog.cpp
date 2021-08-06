@@ -111,6 +111,15 @@ CharacterVector pl2r_char(PlTerm pl)
   return CharacterVector::create((char*) pl) ;
 }
 
+CharacterVector pl2r_charvec(PlTerm pl)
+{
+  CharacterVector r(pl.arity()) ;
+  for(R_xlen_t i=0; i<pl.arity(); i++)
+    r(i) = (char*) pl.operator[](i+1) ;
+
+  return r ;
+}
+
 // Convert prolog atom to R symbol (handle na, true, false).
 SEXP pl2r_symbol(PlTerm pl)
 {
@@ -165,6 +174,8 @@ SEXP pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars)
   if(!strcmp(pl.name(), "%"))
     return pl2r_intvec(pl) ;
 
+  if(!strcmp(pl.name(), "$"))
+    return pl2r_charvec(pl) ;
 
   Language r(pl.name()) ;
   for(unsigned int i=1 ; i<=pl.arity() ; i++)
