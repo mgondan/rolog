@@ -135,6 +135,29 @@ SEXP pl2r_symbol(PlTerm pl)
   return Symbol((char*) pl) ;
 }
 
+int pl2r_bool(PlTerm pl)
+{
+  if(!strcmp(pl, "na"))
+    return NA_LOGICAL ;
+  
+  if(!strcmp(pl, "true"))
+    return 1 ;
+  
+  if(!strcmp(pl, "false"))
+    return 0 ;
+
+  stop("r2pl_logical: invalid item %s", (char*) pl) ;
+}
+
+LogicalVector pl2r_boolvec(PlTerm pl)
+{
+  LogicalVector r(pl.arity()) ;
+  for(R_xlen_t i=0; i<pl.arity(); i++)
+    r(i) = pl2r_bool(pl.operator[](i+1)) ;
+
+  return r ;
+}
+
 SEXP pl2r_variable(PlTerm pl, CharacterVector& names, PlTerm& vars)
 {
   // names and vars is a list of all the variables from the R query,
@@ -176,6 +199,9 @@ SEXP pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars)
 
   if(!strcmp(pl.name(), "$"))
     return pl2r_charvec(pl) ;
+
+  if(!strcmp(pl.name(), "!"))
+    return pl2r_boolvec(pl) ;
 
   Language r(pl.name()) ;
   for(unsigned int i=1 ; i<=pl.arity() ; i++)
