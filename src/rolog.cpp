@@ -80,6 +80,9 @@ SEXP pl2r_null()
 
 double pl2r_double(PlTerm pl)
 {
+  if(!strcmp(pl, "na"))
+    return NA_REAL ;
+
   return (double) pl ;
 }
 
