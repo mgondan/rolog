@@ -78,16 +78,23 @@ SEXP pl2r_null()
   return R_NilValue ;
 }
 
+double pl2r_double(PlTerm pl)
+{
+  return (double) pl ;
+}
+
 DoubleVector pl2r_real(PlTerm pl)
 {
-  return DoubleVector::create((double) pl) ;
+  DoubleVector r(1) ;
+  r(0) = pl2r_double(pl) ;
+  return r ;
 }
 
 DoubleVector pl2r_realvec(PlTerm pl)
 {
   DoubleVector r(pl.arity()) ;
   for(R_xlen_t i=0; i<pl.arity(); i++)
-    r(i) = (double) pl.operator[](i+1) ;
+    r(i) = pl2r_double(pl.operator[](i+1)) ;
 
   return r ;
 }
