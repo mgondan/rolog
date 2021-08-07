@@ -71,7 +71,7 @@ LogicalVector consult_(CharacterVector files)
 // list -> list
 // todo: #(elements) -> vector
 //
-SEXP pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars) ;
+SEXP pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars, List options) ;
 
 SEXP pl2r_null()
 {
@@ -212,7 +212,7 @@ SEXP pl2r_variable(PlTerm pl, CharacterVector& names, PlTerm& vars)
 }
 
 // Translate prolog compound to R call
-SEXP pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars)
+SEXP pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars, List options)
 {
   // This function does not (yet) work for cyclic terms
   if(!PL_is_acyclic(pl))
@@ -221,16 +221,16 @@ SEXP pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars)
     return R_NilValue ;
   }
   
-  if(!strcmp(pl.name(), "#"))
+  if(!strcmp(pl.name(), as<String>(options["realvec"]).get_cstring()))
     return pl2r_realvec(pl) ;
 
-  if(!strcmp(pl.name(), "%"))
+  if(!strcmp(pl.name(), as<String>(options["intvec"]).get_cstring()))
     return pl2r_intvec(pl) ;
 
-  if(!strcmp(pl.name(), "$"))
+  if(!strcmp(pl.name(), as<String>(options["charvec"]).get_cstring()))
     return pl2r_charvec(pl) ;
 
-  if(!strcmp(pl.name(), "!"))
+  if(!strcmp(pl.name(), as<String>(options["boolvec"]).get_cstring()))
     return pl2r_boolvec(pl) ;
 
   Language r(pl.name()) ;
@@ -246,12 +246,12 @@ SEXP pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars)
       PlTerm a2 = arg.operator[](2) ;
       if(PL_is_atom(a1))
       {
-        r.push_back(Named(a1.name()) = pl2r(a2, names, vars)) ;
+        r.push_back(Named(a1.name()) = pl2r(a2, names, vars, options)) ;
         continue ;
       }
     }
 
-    r.push_back(pl2r(arg, names, vars)) ; // no name
+    r.push_back(pl2r(arg, names, vars, options)) ; // no name
   }
 
   return r ;
@@ -268,12 +268,12 @@ SEXP pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars)
 // [1, 2 | X] -> `[|]`(1, `[|]`(2, expression(X)))
 // [a-1, b-2, c-3] -> list(a=1, b=2, c=3)
 //
-SEXP pl2r_list(PlTerm pl, CharacterVector& names, PlTerm& vars)
+SEXP pl2r_list(PlTerm pl, CharacterVector& names, PlTerm& vars, List options)
 {
   PlTerm head = pl.operator[](1) ;
   
   // if the tail is a list or empty, return a normal list
-  RObject tail = pl2r(pl.operator[](2), names, vars) ;
+  RObject tail = pl2r(pl.operator[](2), names, vars, options) ;
   if(TYPEOF(tail) == VECSXP || TYPEOF(tail) == NILSXP)
   {
     List r = as<List>(tail) ;
@@ -286,13 +286,13 @@ SEXP pl2r_list(PlTerm pl, CharacterVector& names, PlTerm& vars)
       PlTerm a2 = head.operator[](2) ;
       if(PL_is_atom(a1))
       {
-        r.push_front(pl2r(a2, names, vars), a1.name()) ;
+        r.push_front(pl2r(a2, names, vars, options), a1.name()) ;
         return r ;
       }
     }
     
     // no name
-    r.push_front(pl2r(head, names, vars)) ; 
+    r.push_front(pl2r(head, names, vars, options)) ; 
     return r ;
   }
     
@@ -306,19 +306,19 @@ SEXP pl2r_list(PlTerm pl, CharacterVector& names, PlTerm& vars)
     PlTerm a2 = head.operator[](2) ;
     if(PL_is_atom(a1))
     {
-      r.push_back(Named(a1.name()) = pl2r(a2, names, vars)) ;
+      r.push_back(Named(a1.name()) = pl2r(a2, names, vars, options)) ;
       r.push_back(tail) ;
       return r ;
     }
   }
 
   // no name
-  r.push_back(pl2r(head, names, vars)) ; 
+  r.push_back(pl2r(head, names, vars, options)) ; 
   r.push_back(tail) ;
   return r ;
 }
 
-SEXP pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars)
+SEXP pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars, List options)
 {
   if(PL_term_type(pl) == PL_NIL)
     return pl2r_null() ;
@@ -336,10 +336,10 @@ SEXP pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars)
     return pl2r_symbol(pl) ;
   
   if(PL_is_list(pl))
-    return pl2r_list(pl, names, vars) ;
+    return pl2r_list(pl, names, vars, options) ;
   
   if(PL_is_compound(pl))
-    return pl2r_compound(pl, names, vars) ;
+    return pl2r_compound(pl, names, vars, options) ;
   
   if(PL_is_variable(pl))
     return pl2r_variable(pl, names, vars) ;
@@ -643,7 +643,7 @@ RObject once_(RObject query, List options)
   {
     tail.next(v) ;
 
-    RObject r = pl2r(v, names, vars) ;
+    RObject r = pl2r(v, names, vars, options) ;
     if(TYPEOF(r) == EXPRSXP 
          && names[i] == as<Symbol>(as<ExpressionVector>(r)[0]).c_str())
       continue ;
@@ -686,7 +686,7 @@ List findall_(RObject query, List options)
     {
       tail.next(v) ;
 
-      RObject r = pl2r(v, names, vars) ;
+      RObject r = pl2r(v, names, vars, options) ;
       if(TYPEOF(r) == EXPRSXP 
            && names[i] == as<Symbol>(as<ExpressionVector>(r)[0]).c_str())
         continue ;
@@ -727,5 +727,5 @@ RObject portray_(RObject query, List options)
     stop("portray failed: %s", (char*) pl[0]) ;
   }
   
-  return pl2r(pl[1], names, vars) ;
+  return pl2r(pl[1], names, vars, options) ;
 }
