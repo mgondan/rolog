@@ -92,16 +92,26 @@ DoubleVector pl2r_realvec(PlTerm pl)
   return r ;
 }
 
+long pl2r_int(PlTerm pl)
+{
+  if(!strcmp(pl, "na"))
+    return NA_INTEGER ;
+
+  return (long) pl ;
+}
+
 IntegerVector pl2r_integer(PlTerm pl)
 {
-  return IntegerVector::create((long) pl) ;
+  IntegerVector r(1) ;
+  r(0) = pl2r_int(pl) ;
+  return r ;
 }
 
 IntegerVector pl2r_intvec(PlTerm pl)
 {
   IntegerVector r(pl.arity()) ;
   for(R_xlen_t i=0; i<pl.arity(); i++)
-    r(i) = (long) pl.operator[](i+1) ;
+    r(i) = pl2r_int(pl.operator[](i+1)) ;
 
   return r ;
 }
