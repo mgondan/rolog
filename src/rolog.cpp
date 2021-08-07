@@ -96,7 +96,7 @@ DoubleVector pl2r_real(PlTerm pl)
 DoubleVector pl2r_realvec(PlTerm pl)
 {
   DoubleVector r(pl.arity()) ;
-  for(R_xlen_t i=0; i<pl.arity(); i++)
+  for(size_t i=0; i<pl.arity(); i++)
     r(i) = pl2r_double(pl.operator[](i+1)) ;
 
   return r ;
@@ -120,22 +120,32 @@ IntegerVector pl2r_integer(PlTerm pl)
 IntegerVector pl2r_intvec(PlTerm pl)
 {
   IntegerVector r(pl.arity()) ;
-  for(R_xlen_t i=0; i<pl.arity(); i++)
+  for(size_t i=0; i<pl.arity(); i++)
     r(i) = pl2r_int(pl.operator[](i+1)) ;
 
   return r ;
 }
 
+String pl2r_string(PlTerm pl)
+{
+  if(!strcmp(pl, "na"))
+    return NA_STRING ;
+  
+  return (char*) pl ;
+}
+
 CharacterVector pl2r_char(PlTerm pl)
 {
-  return CharacterVector::create((char*) pl) ;
+  CharacterVector r(1) ;
+  r(0) = pl2r_string(pl) ;
+  return r ;
 }
 
 CharacterVector pl2r_charvec(PlTerm pl)
 {
   CharacterVector r(pl.arity()) ;
-  for(R_xlen_t i=0; i<pl.arity(); i++)
-    r(i) = (char*) pl.operator[](i+1) ;
+  for(size_t i=0; i<pl.arity(); i++)
+    r(i) = pl2r_string(pl.operator[](i+1)) ;
 
   return r ;
 }
@@ -172,7 +182,7 @@ int pl2r_bool(PlTerm pl)
 LogicalVector pl2r_boolvec(PlTerm pl)
 {
   LogicalVector r(pl.arity()) ;
-  for(R_xlen_t i=0; i<pl.arity(); i++)
+  for(size_t i=0; i<pl.arity(); i++)
     r(i) = pl2r_bool(pl.operator[](i+1)) ;
 
   return r ;
