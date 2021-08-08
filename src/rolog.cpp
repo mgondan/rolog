@@ -379,7 +379,7 @@ PlTerm r2pl_na()
 
 PlTerm r2pl_real(double r)
 {
-  if(r == NA_REAL)
+  if(NumericVector::is_na(r))
     return r2pl_na() ;
   
   return PlTerm(r) ;
