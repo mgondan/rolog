@@ -405,7 +405,7 @@ PlTerm r2pl_real(NumericVector r, List options)
 
 PlTerm r2pl_logical(bool r)
 {
-  if(r == NA_LOGICAL)
+  if(LogicalVector::is_na(r))
     return r2pl_na() ;
   
   return PlTerm(r ? "true" : "false") ;
