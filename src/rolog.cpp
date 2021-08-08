@@ -379,6 +379,9 @@ PlTerm r2pl_na()
 
 PlTerm r2pl_real(double r)
 {
+  if(traits::is_nan<REALSXP>(r))
+    return PlTerm(r) ;
+
   if(NumericVector::is_na(r))
     return r2pl_na() ;
   
