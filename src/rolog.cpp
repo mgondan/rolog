@@ -377,15 +377,12 @@ PlTerm r2pl_na()
   return PlAtom("na") ;
 }
 
-PlTerm r2pl_real(double r)
+PlTerm r2pl_real(NumericVector r)
 {
-  if(traits::is_nan<REALSXP>(r))
-    return PlTerm(r) ;
-
   if(NumericVector::is_na(r))
     return r2pl_na() ;
   
-  return PlTerm(r) ;
+  return PlTerm(r(0)) ;
 }
 
 PlTerm r2pl_real(NumericVector r, List options)
