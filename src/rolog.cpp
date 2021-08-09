@@ -377,25 +377,30 @@ PlTerm r2pl_na()
   return PlAtom("na") ;
 }
 
-PlTerm r2pl_real(NumericVector r)
-{
-  if(NumericVector::is_na(r(0)))
-    return r2pl_na() ;
-  
-  return PlTerm((double) r(0)) ;
-}
-
 PlTerm r2pl_real(NumericVector r, List options)
 {
   if(r.length() == 0)
     return r2pl_null() ;
 
+  LogicalVector nan = is_nan(r) ;
+  LogicalVector na = is_na(r) ;
+  
   if(as<LogicalVector>(options["scalar"])(0) && r.length() == 1)
-    return r2pl_real(r) ;
+  {
+    if(na[0] && !nan[0])
+      return r2pl_na() ;
+    
+    return PlTerm((double) r[0]) ;
+  }
 
   PlTermv args(r.length()) ;
   for(R_xlen_t i=0 ; i<r.length() ; i++)
-    args[i] = r2pl_real(r(i)) ;
+  {
+    if(na[i] && !nan[i])
+      args[i] = r2pl_na() ;
+    else
+      args[i] = PlTerm((double) r[i]) ;
+  }
   
   return PlCompound(as<String>(options["realvec"]).get_cstring(), args) ;
 }
