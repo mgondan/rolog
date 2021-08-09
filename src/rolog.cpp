@@ -382,7 +382,7 @@ PlTerm r2pl_real(NumericVector r)
   if(NumericVector::is_na(r(0)))
     return r2pl_na() ;
   
-  return PlTerm(r(0)) ;
+  return PlTerm((double) r(0)) ;
 }
 
 PlTerm r2pl_real(NumericVector r, List options)
@@ -391,7 +391,7 @@ PlTerm r2pl_real(NumericVector r, List options)
     return r2pl_null() ;
 
   if(as<LogicalVector>(options["scalar"])(0) && r.length() == 1)
-    return r2pl_real(r(0)) ;
+    return r2pl_real(r) ;
 
   PlTermv args(r.length()) ;
   for(R_xlen_t i=0 ; i<r.length() ; i++)
