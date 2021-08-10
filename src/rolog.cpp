@@ -430,25 +430,28 @@ PlTerm r2pl_logical(LogicalVector r, List options)
   return PlCompound(as<String>(options["boolvec"]).get_cstring(), args) ;
 }
 
-PlTerm r2pl_integer(long r)
-{
-  if(r == NA_INTEGER)
-    return r2pl_na() ;
-  
-  return PlTerm(r) ;
-}
-
 PlTerm r2pl_integer(IntegerVector r, List options)
 {
   if(r.length() == 0)
     return r2pl_null() ;
   
+  LogicalVector na = is_na(r) ;
   if(as<LogicalVector>(options["scalar"])(0) && r.length() == 1)
-    return r2pl_integer((long) r(0)) ;
+  {
+    if(na[0])
+      return r2pl_na() ;
+    
+    return PlTerm((long) r(0)) ;
+  }
   
   PlTermv args(r.length()) ;
   for(R_xlen_t i=0 ; i<r.length() ; i++)
-    args[i] = r2pl_integer((long) r(i)) ;
+  {
+    if(na[i])
+      args[i] = r2pl_na() ;
+    else
+      args[i] = PlTerm((long) r[i]) ;
+  }
   
   return PlCompound(as<String>(options["intvec"]).get_cstring(), args) ;
 }
@@ -498,26 +501,29 @@ PlTerm r2pl_atom(Symbol r)
   return PlAtom(r.c_str()) ;
 }
 
-PlTerm r2pl_elem(CharacterVector r, R_xlen_t i)
-{
-  if(r(i) == NA_STRING)
-    return r2pl_na() ;
-  
-  return PlString(as<Symbol>(r(i)).c_str()) ;
-}
-
 PlTerm r2pl_string(CharacterVector r, List options)
 {
   if(r.length() == 0)
     return r2pl_null() ;
   
+  LogicalVector na = is_na(r) ;
   if(as<LogicalVector>(options["scalar"])(0) && r.length() == 1)
-    return r2pl_elem(r, 0) ;
-
+  {
+    if(na[0])
+      return r2pl_na() ;
+    
+    return PlString(as<std::string>(r[0]).c_str()) ;
+  }
+  
   PlTermv args(r.length()) ;
   for(R_xlen_t i=0 ; i<r.length() ; i++)
-    args[i] = r2pl_elem(r, i) ;
-  
+  {
+    if(na[i])
+      args[i] = r2pl_na() ;
+    else
+      args[i] = PlString(as<std::string>(r[i]).c_str()) ;
+  }
+
   return PlCompound(as<String>(options["charvec"]).get_cstring(), args) ;
 }
 
