@@ -384,7 +384,6 @@ PlTerm r2pl_real(NumericVector r, List options)
 
   LogicalVector nan = is_nan(r) ;
   LogicalVector na = is_na(r) ;
-  
   if(as<LogicalVector>(options["scalar"])(0) && r.length() == 1)
   {
     if(na[0] && !nan[0])
@@ -405,25 +404,28 @@ PlTerm r2pl_real(NumericVector r, List options)
   return PlCompound(as<String>(options["realvec"]).get_cstring(), args) ;
 }
 
-PlTerm r2pl_logical(bool r)
-{
-  if(LogicalVector::is_na(r))
-    return r2pl_na() ;
-  
-  return PlTerm(r ? "true" : "false") ;
-}
-
 PlTerm r2pl_logical(LogicalVector r, List options)
 {
   if(r.length() == 0)
     return r2pl_null() ;
   
+  LogicalVector na = is_na(r) ;
   if(as<LogicalVector>(options["scalar"])(0) && r.length() == 1)
-    return r2pl_logical(r(0)) ;
-  
+  {
+    if(na[0])
+      return r2pl_na() ;
+    
+    return PlTerm(r[0] ? "true" : "false") ;
+  }
+
   PlTermv args(r.length()) ;
   for(R_xlen_t i=0 ; i<r.length() ; i++)
-    args[i] = r2pl_logical(r(i)) ;
+  {
+    if(na[i])
+      args[i] = r2pl_na() ;
+    else
+      args[i] = PlTerm(r[i] ? "true" : "false") ;
+  }
 
   return PlCompound(as<String>(options["boolvec"]).get_cstring(), args) ;
 }
