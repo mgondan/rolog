@@ -71,9 +71,9 @@ LogicalVector consult_(CharacterVector files)
 // list -> list
 // todo: #(elements) -> vector
 //
-SEXP pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars, List options) ;
+RObject pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars, List options) ;
 
-SEXP pl2r_null()
+RObject pl2r_null()
 {
   return R_NilValue ;
 }
@@ -151,7 +151,7 @@ CharacterVector pl2r_charvec(PlTerm pl)
 }
 
 // Convert prolog atom to R symbol (handle na, true, false).
-SEXP pl2r_symbol(PlTerm pl)
+RObject pl2r_symbol(PlTerm pl)
 {
   if(!strcmp(pl, "na"))
     return(LogicalVector::create(NA_LOGICAL)) ;
@@ -162,7 +162,7 @@ SEXP pl2r_symbol(PlTerm pl)
   if(!strcmp(pl, "false"))
     return(LogicalVector::create(0)) ;
   
-  return Symbol((char*) pl) ;
+  return as<RObject>(Symbol((char*) pl)) ;
 }
 
 int pl2r_bool(PlTerm pl)
@@ -188,7 +188,7 @@ LogicalVector pl2r_boolvec(PlTerm pl)
   return r ;
 }
 
-SEXP pl2r_variable(PlTerm pl, CharacterVector& names, PlTerm& vars)
+RObject pl2r_variable(PlTerm pl, CharacterVector& names, PlTerm& vars)
 {
   // names and vars is a list of all the variables from the R query,
   // a typical member of names is something like X, a member of vars 
@@ -212,7 +212,7 @@ SEXP pl2r_variable(PlTerm pl, CharacterVector& names, PlTerm& vars)
 }
 
 // Translate prolog compound to R call
-SEXP pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars, List options)
+RObject pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars, List options)
 {
   // This function does not (yet) work for cyclic terms
   if(!PL_is_acyclic(pl))
@@ -254,7 +254,7 @@ SEXP pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars, List options
     r.push_back(pl2r(arg, names, vars, options)) ; // no name
   }
 
-  return r ;
+  return as<RObject>(r) ;
 }
 
 // Translate prolog list to R list
@@ -268,7 +268,7 @@ SEXP pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars, List options
 // [1, 2 | X] -> `[|]`(1, `[|]`(2, expression(X)))
 // [a-1, b-2, c-3] -> list(a=1, b=2, c=3)
 //
-SEXP pl2r_list(PlTerm pl, CharacterVector& names, PlTerm& vars, List options)
+RObject pl2r_list(PlTerm pl, CharacterVector& names, PlTerm& vars, List options)
 {
   PlTerm head = pl.operator[](1) ;
   
@@ -308,17 +308,17 @@ SEXP pl2r_list(PlTerm pl, CharacterVector& names, PlTerm& vars, List options)
     {
       r.push_back(Named(a1.name()) = pl2r(a2, names, vars, options)) ;
       r.push_back(tail) ;
-      return r ;
+      return as<RObject>(r) ;
     }
   }
 
   // no name
   r.push_back(pl2r(head, names, vars, options)) ; 
   r.push_back(tail) ;
-  return r ;
+  return as<RObject>(r) ;
 }
 
-SEXP pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars, List options)
+RObject pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars, List options)
 {
   if(PL_term_type(pl) == PL_NIL)
     return pl2r_null() ;
