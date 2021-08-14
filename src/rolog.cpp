@@ -88,7 +88,7 @@ LogicalVector consult_(CharacterVector files)
 // !(l1, l2, l3) -> LogicalVector (see option boolvec)
 // other atoms -> symbol/name
 // variable -> expression(variable name)
-// compound -> call ("Language")
+// compound -> call (aka. "language")
 // list -> list
 //
 RObject pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars, List options) ;
@@ -145,7 +145,7 @@ long pl2r_int(PlTerm pl)
   catch(PlException& ex)
   { 
     PL_clear_exception() ;
-    stop("cannot convert to integer %s", (char*) pl) ;
+    warning("cannot convert to integer %s", (char*) pl) ;
     return NA_INTEGER ;
   }
 }
@@ -168,7 +168,7 @@ IntegerVector pl2r_intvec(PlTerm pl)
 
 String pl2r_string(PlTerm pl)
 {
-  if(PL_is_atom(pl) && !strcmp(pl, "na"))
+  if(PL_is_atom(pl) && pl == "na")
     return NA_STRING ;
   
   return (char*) pl ;
@@ -193,13 +193,13 @@ CharacterVector pl2r_charvec(PlTerm pl)
 // Convert prolog atom to R symbol (handle na, true, false).
 RObject pl2r_symbol(PlTerm pl)
 {
-  if(!strcmp(pl, "na"))
+  if(pl == "na")
     return(LogicalVector::create(NA_LOGICAL)) ;
   
-  if(!strcmp(pl, "true"))
+  if(pl == "true")
     return(LogicalVector::create(1)) ;
   
-  if(!strcmp(pl, "false"))
+  if(pl == "false")
     return(LogicalVector::create(0)) ;
   
   return as<RObject>(Symbol((char*) pl)) ;
@@ -207,16 +207,17 @@ RObject pl2r_symbol(PlTerm pl)
 
 int pl2r_bool(PlTerm pl)
 {
-  if(!strcmp(pl, "na"))
+  if(PL_is_atom(pl) && pl == "na")
     return NA_LOGICAL ;
   
-  if(!strcmp(pl, "true"))
+  if(PL_is_atom(pl) && pl == "true")
     return 1 ;
   
-  if(!strcmp(pl, "false"))
+  if(PL_is_atom(pl) && pl == "false")
     return 0 ;
 
-  stop("r2pl_logical: invalid item %s", (char*) pl) ;
+  warning("r2pl_logical: invalid item %s, returning NA", (char*) pl) ;
+  return NA_LOGICAL ;
 }
 
 LogicalVector pl2r_boolvec(PlTerm pl)
@@ -241,7 +242,7 @@ RObject pl2r_variable(PlTerm pl, CharacterVector& names, PlTerm& vars)
   for(int i=0 ; i<names.length() ; i++)
   {
     tail.next(v) ;
-    if(!strcmp(pl, v))
+    if(pl == (char*) v)
       return ExpressionVector::create(Symbol(names(i))) ;
   }
   
@@ -256,11 +257,8 @@ RObject pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars, List opti
 {
   // This function does not (yet) work for cyclic terms
   if(!PL_is_acyclic(pl))
-  {
-    Rcout << "pl2r: Cannot convert cyclic term" << (char*) pl << std::endl ;
-    return R_NilValue ;
-  }
-  
+    stop("pl2r: Cannot convert cyclic term %s", (char*) pl) ;
+
   if(!strcmp(pl.name(), as<String>(options["realvec"]).get_cstring()))
     return pl2r_realvec(pl) ;
 
@@ -281,7 +279,6 @@ RObject pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars, List opti
     // Compounds like mean=100 are translated to named function arguments
     if(PL_is_compound(arg) && !strcmp(arg.name(), "=") && arg.arity() == 2)
     {
-      // A bit cumbersome workaround to avoid ISO C++ warnings
       PlTerm a1 = arg.operator[](1) ;
       PlTerm a2 = arg.operator[](2) ;
       if(PL_is_atom(a1))
@@ -321,7 +318,6 @@ RObject pl2r_list(PlTerm pl, CharacterVector& names, PlTerm& vars, List options)
     // Convert prolog pair a-X to named list element
     if(PL_is_compound(head) && !strcmp(head.name(), "-") && head.arity() == 2)
     {
-      // A bit cumbersome workaround to avoid ISO C++ warnings
       PlTerm a1 = head.operator[](1) ;
       PlTerm a2 = head.operator[](2) ;
       if(PL_is_atom(a1))
@@ -385,7 +381,6 @@ RObject pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars, List options)
     return pl2r_variable(pl, names, vars) ;
   
   stop("pl2r: Cannot convert %s", (char*) pl) ;
-  return R_NilValue ;
 }
 
 // Translate r expression to prolog
