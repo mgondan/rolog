@@ -262,13 +262,13 @@ RObject pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars, List opti
   if(!strcmp(pl.name(), options("realvec")))
     return pl2r_realvec(pl) ;
 
-  if(!strcmp(pl.name(), as<String>(options["intvec"]).get_cstring()))
+  if(!strcmp(pl.name(), options("intvec")))
     return pl2r_intvec(pl) ;
 
   if(!strcmp(pl.name(), options("charvec")))
     return pl2r_charvec(pl) ;
 
-  if(!strcmp(pl.name(), as<String>(options["boolvec"]).get_cstring()))
+  if(!strcmp(pl.name(), options("boolvec")))
     return pl2r_boolvec(pl) ;
 
   Language r(pl.name()) ;
