@@ -265,7 +265,7 @@ RObject pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars, List opti
   if(!strcmp(pl.name(), as<String>(options["intvec"]).get_cstring()))
     return pl2r_intvec(pl) ;
 
-  if(!strcmp(pl.name(), as<String>(options["charvec"]).get_cstring()))
+  if(!strcmp(pl.name(), options("charvec")))
     return pl2r_charvec(pl) ;
 
   if(!strcmp(pl.name(), as<String>(options["boolvec"]).get_cstring()))
