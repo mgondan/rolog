@@ -436,7 +436,7 @@ PlTerm r2pl_real(NumericVector r, List options)
       args[i] = PlTerm((double) r[i]) ;
   }
   
-  return PlCompound(as<String>(options["realvec"]).get_cstring(), args) ;
+  return PlCompound(options("realvec"), args) ;
 }
 
 PlTerm r2pl_logical(LogicalVector r, List options)
@@ -462,7 +462,7 @@ PlTerm r2pl_logical(LogicalVector r, List options)
       args[i] = PlTerm(r[i] ? "true" : "false") ;
   }
 
-  return PlCompound(as<String>(options["boolvec"]).get_cstring(), args) ;
+  return PlCompound(options("boolvec"), args) ;
 }
 
 PlTerm r2pl_integer(IntegerVector r, List options)
@@ -488,7 +488,7 @@ PlTerm r2pl_integer(IntegerVector r, List options)
       args[i] = PlTerm((long) r[i]) ;
   }
   
-  return PlCompound(as<String>(options["intvec"]).get_cstring(), args) ;
+  return PlCompound(options("intvec"), args) ;
 }
 
 // Translate R expression to prolog variable
@@ -559,7 +559,7 @@ PlTerm r2pl_string(CharacterVector r, List options)
       args[i] = PlString(r(i)) ;
   }
 
-  return PlCompound(as<String>(options["charvec"]).get_cstring(), args) ;
+  return PlCompound(options("charvec"), args) ;
 }
 
 // Translate R call to prolog compound, taking into account the names of the
@@ -678,9 +678,8 @@ RObject once_(RObject query, List options)
   
   catch(PlException& ex)
   { 
-    Rcerr << (char*) ex << std::endl ;
     PL_clear_exception() ;
-    stop("call failed: %s", (char*) pl) ;
+    stop("%s failed: %s", (char*) pl, (char*) ex) ;
   }
 
   List l ;
@@ -721,10 +720,9 @@ List findall_(RObject query, List options)
     }
     
     catch(PlException& ex)
-    { 
-      Rcerr << (char*) ex << std::endl ;
+    {
       PL_clear_exception() ;
-      stop("call failed: %s", (char*) pl) ;
+      stop("%s failed: %s", (char*) pl, (char*) ex) ;
     }
     
     List l ;
@@ -769,10 +767,9 @@ RObject portray_(RObject query, List options)
   }
   
   catch(PlException& ex)
-  { 
-    Rcerr << (char*) ex << std::endl ;
+  {
     PL_clear_exception() ;
-    stop("portray failed: %s", (char*) pl[0]) ;
+    stop("portray of %s failed: %s", (char*) pl[0], (char*) ex) ;
   }
   
   return pl2r(pl[1], names, vars, options) ;
