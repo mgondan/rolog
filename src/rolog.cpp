@@ -2,23 +2,33 @@
 #include "Rcpp.h"
 using namespace Rcpp ;
 
+// Initialize SWI-prolog. This needs a list of the command-line arguments of 
+// calling program, the most important being the name of the main executable,
+// argv[0]. The SWI system should not be initialized twice; therefore, we keep
+// track of it using a global flag.
 bool pl_initialized = false ;
 
 // [[Rcpp::export(.init)]]
 LogicalVector init_(String argv0)
 {
-  // see comment below in done_
+  // See comment below in done_
   if(pl_initialized)
-    stop("Please do not initialize prolog twice in the same R session.") ;
+    warning("Please do not initialize SWI-prolog twice in the same session.") ;
   
   // Prolog documentation requires that argv is accessible during the entire 
-  // session. I assume that this pointer is valid during the whole R session.
-  char* argv[2] ;
+  // session. I assume that this pointer is valid during the whole R session,
+  // and that I can safely cast it to const.
+  int argc = 2 ;
+  char* argv[argc] ;
   argv[0] = const_cast<char*>(argv0.get_cstring()) ;
-  argv[1] = const_cast<char*>("-q") ; // suppress SWI-Prolog's welcome message
-  int ret = PL_initialise(2, argv) ;
-  if(!ret)
-    stop("rolog_init: failed initialize, return value %d", ret) ;
+  
+  // Suppress SWI-Prolog's welcome message
+  argv[1] = const_cast<char*>("-q") ;
+  
+  // If initialization fails, SWI raises an exception with some diagnostic
+  // information.
+  if(!PL_initialise(argc, argv))
+    stop("rolog_init: initialization failed.") ;
 
   pl_initialized = true ;  
   return true ;
@@ -34,11 +44,16 @@ LogicalVector done_()
   // code is preliminary. In particular, it is currently not possible to unload 
   // rolog and load it again in the same R session.
   //
+  // For these reasons, the call to cleanup is currently suppressed.
+  //
   // PL_cleanup(0) ;
   // pl_initialized = false ;
   return true ;
 }
 
+// Consult one or more files. If something fails, the procedure stops, and
+// will not try to consult the remaining files.
+//
 // [[Rcpp::export(.consult)]]
 LogicalVector consult_(CharacterVector files)
 {
@@ -62,14 +77,19 @@ LogicalVector consult_(CharacterVector files)
 // Translate prolog expression to R
 //
 // [] -> NULL
-// real -> numeric
-// integer -> integer
-// string -> character
-// atom -> symbol/name (except for na, true, false)
+// real -> NumericVector
+// #(r1, r2, r3) -> NumericVector (# is a default, see option realvec)
+// integer -> IntegerVector
+// %(i1, i2, i3) -> IntegerVector (see option intvec for the name)
+// string -> CharacterVector
+// $(s1, s2, s3) CharacterVector
+// na (atom) -> NA
+// true, false (atoms) -> LogicalVector
+// !(l1, l2, l3) -> LogicalVector (see option boolvec)
+// other atoms -> symbol/name
 // variable -> expression(variable name)
-// call/language -> compound
+// compound -> call ("Language")
 // list -> list
-// todo: #(elements) -> vector
 //
 RObject pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars, List options) ;
 
@@ -80,10 +100,20 @@ RObject pl2r_null()
 
 double pl2r_double(PlTerm pl)
 {
-  if(!strcmp(pl, "na"))
+  if(PL_is_atom(pl) && pl == "na")
     return NA_REAL ;
 
-  return (double) pl ;
+  try 
+  {
+    return (double) pl ;
+  }
+
+  catch(PlException& ex)
+  { 
+    PL_clear_exception() ;
+    warning("cannot convert to floating point %s", (char*) pl) ;
+    return NA_REAL ;
+  }
 }
 
 DoubleVector pl2r_real(PlTerm pl)
@@ -104,10 +134,20 @@ DoubleVector pl2r_realvec(PlTerm pl)
 
 long pl2r_int(PlTerm pl)
 {
-  if(!strcmp(pl, "na"))
+  if(PL_is_atom(pl) && pl == "na")
     return NA_INTEGER ;
 
-  return (long) pl ;
+  try 
+  {
+    return (long) pl ;
+  }
+  
+  catch(PlException& ex)
+  { 
+    PL_clear_exception() ;
+    stop("cannot convert to integer %s", (char*) pl) ;
+    return NA_INTEGER ;
+  }
 }
 
 IntegerVector pl2r_integer(PlTerm pl)
@@ -344,7 +384,7 @@ RObject pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars, List options)
   if(PL_is_variable(pl))
     return pl2r_variable(pl, names, vars) ;
   
-  Rcout << "pl2r: Cannot convert " << (char*) pl << std::endl ;
+  stop("pl2r: Cannot convert %s", (char*) pl) ;
   return R_NilValue ;
 }
 
@@ -512,7 +552,7 @@ PlTerm r2pl_string(CharacterVector r, List options)
     if(na[0])
       return r2pl_na() ;
     
-    return PlString(as<std::string>(r[0]).c_str()) ;
+    return PlString(r(0)) ;
   }
   
   PlTermv args(r.length()) ;
@@ -521,7 +561,7 @@ PlTerm r2pl_string(CharacterVector r, List options)
     if(na[i])
       args[i] = r2pl_na() ;
     else
-      args[i] = PlString(as<std::string>(r[i]).c_str()) ;
+      args[i] = PlString(r(i)) ;
   }
 
   return PlCompound(as<String>(options["charvec"]).get_cstring(), args) ;
