@@ -202,7 +202,7 @@ RObject pl2r_symbol(PlTerm pl)
   if(pl == "false")
     return LogicalVector::create(0) ;
   
-  return as<RObject>(Symbol((char*) pl) ;
+  return as<RObject>(Symbol((char*) pl)) ;
 }
 
 int pl2r_bool(PlTerm pl)
