@@ -259,7 +259,7 @@ RObject pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars, List opti
   if(!PL_is_acyclic(pl))
     stop("pl2r: Cannot convert cyclic term %s", (char*) pl) ;
 
-  if(!strcmp(pl.name(), options("realvec"))
+  if(!strcmp(pl.name(), options("realvec")))
     return pl2r_realvec(pl) ;
 
   if(!strcmp(pl.name(), as<String>(options["intvec"]).get_cstring()))
