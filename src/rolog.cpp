@@ -242,7 +242,7 @@ RObject pl2r_variable(PlTerm pl, CharacterVector& names, PlTerm& vars)
   for(int i=0 ; i<names.length() ; i++)
   {
     tail.next(v) ;
-    if(pl == (char*) v)
+    if(pl == (const char*) v)
       return ExpressionVector::create(Symbol(names(i))) ;
   }
   
