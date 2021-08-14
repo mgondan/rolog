@@ -259,7 +259,7 @@ RObject pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars, List opti
   if(!PL_is_acyclic(pl))
     stop("pl2r: Cannot convert cyclic term %s", (char*) pl) ;
 
-  if(!strcmp(pl.name(), as<String>(options["realvec"]).get_cstring()))
+  if(!strcmp(pl.name(), options("realvec"))
     return pl2r_realvec(pl) ;
 
   if(!strcmp(pl.name(), as<String>(options["intvec"]).get_cstring()))
@@ -436,7 +436,7 @@ PlTerm r2pl_real(NumericVector r, List options)
       args[i] = PlTerm((double) r[i]) ;
   }
   
-  return PlCompound(options("realvec"), args) ;
+  return PlCompound((const char*) options("realvec"), args) ;
 }
 
 PlTerm r2pl_logical(LogicalVector r, List options)
@@ -462,7 +462,7 @@ PlTerm r2pl_logical(LogicalVector r, List options)
       args[i] = PlTerm(r[i] ? "true" : "false") ;
   }
 
-  return PlCompound(options("boolvec"), args) ;
+  return PlCompound((const char*) options("boolvec"), args) ;
 }
 
 PlTerm r2pl_integer(IntegerVector r, List options)
@@ -488,7 +488,7 @@ PlTerm r2pl_integer(IntegerVector r, List options)
       args[i] = PlTerm((long) r[i]) ;
   }
   
-  return PlCompound(options("intvec"), args) ;
+  return PlCompound((const char*) options("intvec"), args) ;
 }
 
 // Translate R expression to prolog variable
@@ -559,7 +559,7 @@ PlTerm r2pl_string(CharacterVector r, List options)
       args[i] = PlString(r(i)) ;
   }
 
-  return PlCompound(options("charvec"), args) ;
+  return PlCompound((const char*) options("charvec"), args) ;
 }
 
 // Translate R call to prolog compound, taking into account the names of the
