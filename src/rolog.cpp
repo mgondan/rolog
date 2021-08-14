@@ -194,15 +194,15 @@ CharacterVector pl2r_charvec(PlTerm pl)
 RObject pl2r_symbol(PlTerm pl)
 {
   if(pl == "na")
-    return(LogicalVector::create(NA_LOGICAL)) ;
+    return LogicalVector::create(NA_LOGICAL) ;
   
   if(pl == "true")
-    return(LogicalVector::create(1)) ;
+    return LogicalVector::create(1) ;
   
   if(pl == "false")
-    return(LogicalVector::create(0)) ;
+    return LogicalVector::create(0)) ;
   
-  return as<RObject>(Symbol((char*) pl)) ;
+  return as<RObject>(Symbol((char*) pl) ;
 }
 
 int pl2r_bool(PlTerm pl)
