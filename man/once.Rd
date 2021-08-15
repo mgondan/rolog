@@ -7,12 +7,29 @@
 once(query = call("member", expression(X), list(1, 2, 3)), options = NULL)
 }
 \arguments{
-\item{query}{an R call}
+\item{query}{an R call, consisting of symbols (= prolog atoms),
+numbers (= prolog numbers), strings (= prolog strings),
+boolean values (= prolog atoms true and false),
+expressions (= prolog variables) and lists (= prolog lists), and other
+calls (= prolog compounds). Vectors of booleans, integers, floating point
+numbers, and strings with length \emph{N} > 1 are translated to prolog
+compounds !/N, \%/N, #/N and $/N, respectively. The names can be modified
+with the options below.}
 
-\item{options}{boolean. See rolog_options}
+\item{options}{list of options controlling translation from and to prolog:
+boolvec (see option rolog.boolvec, default is !) is the name of the
+prolog compound for boolean vectors. intvec, realvec and charvec define
+the compound names for vectors of integers, doubles and strings,
+respectively (defaults are \%, # and $). If \emph{scalar} is TRUE (default),
+vectors of length 1 are translated to scalar prolog elements. If \emph{scalar}
+is FALSE, even vectors of length 1 are translated to compounds.}
 }
 \value{
-\code{FALSE} if the query fails; otherwise, a list with conditions
+If the query fails, an empty list is returned. If the query
+succeeds \emph{N} >= 1 times, a list of length \emph{N} is returned, each element
+being a list of conditions for each solution.
+
+\code{FALSE} if the query fails; otherwise, a list with conditions.
 }
 \description{
 Invoke a query once
@@ -34,6 +51,14 @@ once(call("=", list(expression(X), expression(Y)), list(1, expression(Z))))
 # works for X = [1 | _]; i.e. something like [|](1, expression(_6330))
 once(call("member", 1, expression(X)))
 
+# This works for S = '1.0' (scalar)
+once(call("format", call("string", expression(S)), quote(`~w`), list(1)), 
+  options=list(scalar=TRUE))
+  
+# This works for S = '#(1.0)' (vector)
+once(call("format", call("string", expression(S)), quote(`~w`), list(1)), 
+  options=list(scalar=FALSE))
+  
 }
 \seealso{
 \code{\link[=findall]{findall()}} for querying all solutions
