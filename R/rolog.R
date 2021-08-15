@@ -17,8 +17,8 @@
     rolog.boolvec = '!',  # prolog representation of R boolean vectors
     rolog.charvec = '$',  # prolog representation of R character vectors
     rolog.portray = TRUE, # return prolog call, nicely formatted
-    rolog.scalar = TRUE   # convert R vectors of size 1 to scalars in Prolog
-  )
+    rolog.scalar = TRUE)  # convert R vectors of size 1 to scalars in Prolog
+
   set = !(names(op.rolog) %in% names(options()))
   if(any(set))
     options(op.rolog[set])
@@ -43,15 +43,12 @@
 #
 .onAttach = function(libname, pkgname)
 {
-  if(rolog_init())
-    return(TRUE)
-  
-  # Try again
-  if(rolog_init())
-    return(TRUE)
-  
-  # Give up
-  stop('rolog: initialization of swipl failed.')  
+  if(!rolog_init() && !rolog_init())
+    stop('rolog: initialization of swipl failed.')  
+
+  W = once(call('message_to_string', quote(welcome), expression(W)))$W
+  packageStartupMessage(W)
+  invisible()
 }
 
 .onDetach = function(libpath)
@@ -130,8 +127,7 @@ rolog_options = function()
     boolvec=getOption('rolog.boolvec', default='!'),
     charvec=getOption('rolog.charvec', default='$'),
     portray=getOption('rolog.portray', default=TRUE),
-    scalar=getOption('rolog.scalar', default=TRUE)
-  )
+    scalar=getOption('rolog.scalar', default=TRUE))
 }
 
 #' Translate an R call to a prolog compound and pretty print it
@@ -195,7 +191,6 @@ once = function(query=call('member', expression(X), list(1, 2, 3)), options=NULL
   r = .once(query, options)
   if(options$portray)
     attr(r, 'query') = portray(query, options)
-  
   return(r)
 }
 
@@ -220,6 +215,5 @@ findall = function(query=call('member', expression(X), list(1, 2, 3)), options=N
   r = .findall(query, options)
   if(options$portray)
     attr(r, 'query') = portray(query, options)
-  
   return(r)
 }
