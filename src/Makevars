@@ -10,3 +10,6 @@ PKG_LIBS=-L$(shell swipl --dump-runtime-variables | grep 'PLLIBDIR=' | sed 's/^P
     -Wl,-rpath=$(shell swipl --dump-runtime-variables | grep 'PLLIBDIR=' | sed 's/^PLLIBDIR=\"//' | sed 's/\";$$//')
 
 all: $(SHLIB)
+
+
+

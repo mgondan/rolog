@@ -720,9 +720,10 @@ RObject once_(RObject query, List options)
   }
   
   catch(PlException& ex)
-  { 
+  {
+    char* s = ex ; // string is stored in a 16-ring-buffer
     PL_clear_exception() ;
-    stop("%s failed: %s", (char*) pl, (char*) ex) ;
+    stop("%s failed: %s", (char*) pl, s) ;
   }
 
   List l ;
@@ -765,8 +766,9 @@ List findall_(RObject query, List options)
     
     catch(PlException& ex)
     {
+      char* s = ex ;
       PL_clear_exception() ;
-      stop("%s failed: %s", (char*) pl, (char*) ex) ;
+      stop("%s failed: %s", (char*) pl, s) ;
     }
     
     List l ;
@@ -813,8 +815,9 @@ RObject portray_(RObject query, List options)
   
   catch(PlException& ex)
   {
+    char* s = ex ;
     PL_clear_exception() ;
-    stop("portray of %s failed: %s", (char*) pl[0], (char*) ex) ;
+    stop("portray of %s failed: %s", (char*) pl[0], s) ;
   }
   
   return pl2r(pl[1], names, vars, options) ;

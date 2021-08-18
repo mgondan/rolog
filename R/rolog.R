@@ -167,7 +167,7 @@ portray = function(query=call('member', expression(X), list(1, 2, 3)),
 #'   numbers, and strings with length _N_ > 1 are translated to prolog 
 #'   compounds !/N, %/N, #/N and $/N, respectively. The names can be modified
 #'   with the options below.
-#'   
+#'
 #' @param options list of options controlling translation from and to prolog: 
 #'   boolvec (see option rolog.boolvec, default is !) is the name of the
 #'   prolog compound for boolean vectors. intvec, realvec and charvec define
@@ -179,7 +179,7 @@ portray = function(query=call('member', expression(X), list(1, 2, 3)),
 #' @return If the query fails, an empty list is returned. If the query 
 #'   succeeds _N_ >= 1 times, a list of length _N_ is returned, each element
 #'   being a list of conditions for each solution.
-#'   
+#'
 #' @return `FALSE` if the query fails; otherwise, a list with conditions.
 #' 
 #' @md
@@ -211,7 +211,7 @@ portray = function(query=call('member', expression(X), list(1, 2, 3)),
 #' # This works for S = '#(1.0)' (vector)
 #' once(call("format", call("string", expression(S)), quote(`~w`), list(1)), 
 #'   options=list(scalar=FALSE))
-#'   
+#'
 once = function(query=call('member', expression(X), list(1, 2, 3)), options=NULL)
 {
   options = c(options, rolog_options())
