@@ -43,10 +43,19 @@
 #
 .onAttach = function(libname, pkgname)
 {
-  Sys.setenv(SWI_HOME_DIR=file.path(libname, pkgname, 'home'))
-  if(!rolog_init(file.path(libname, pkgname, 'home')) && !rolog_init())
-    stop('rolog: initialization of swipl failed.')  
+  if(.Platform$OS.type == "unix")
+  {
+    Sys.setenv(SWI_HOME_DIR=file.path(libname, pkgname, 'home'))
+    if(!rolog_init(file.path(libname, pkgname, 'home')))
+      stop('rolog: initialization of swipl failed.')  
+  }
 
+  if(.Platform$OS.type == "windows")
+  {
+    if(!rolog_init() && !rolog_init())
+      stop('rolog: initialization of swipl failed.')  
+  }
+  
   W = once(call('message_to_string', quote(welcome), expression(W)))$W
   packageStartupMessage(W)
   invisible()
@@ -54,7 +63,9 @@
 
 .onDetach = function(libpath)
 {
-  Sys.unsetenv('SWI_HOME_DIR')
+  if(.Platform$OS.type == "unix")
+    Sys.unsetenv('SWI_HOME_DIR')
+  
   if(!rolog_done())
     stop('rolog: not initialized')
 }
