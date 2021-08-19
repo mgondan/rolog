@@ -1,0 +1,15 @@
+PKG_CPPFLAGS=-I$(shell swipl --dump-runtime-variables | grep 'PLBASE=' | sed 's/^PLBASE=//' | sed 's/;$$//')/include \
+    $(CXXPICFLAGS) \
+    -D_REENTRANT \
+    -D__SWI_PROLOG__ \
+    -D__SWI_EMBEDDED__
+
+PKG_LIBS=-L$(shell swipl --dump-runtime-variables | grep 'PLLIBDIR=' | sed 's/^PLLIBDIR=\"//' | sed 's/\";$$//') \
+    $(shell swipl --dump-runtime-variables | grep 'PLLIB=' | sed 's/^PLLIB=\"//' | sed 's/\";$$//') \
+    -Wl,-Bsymbolic-functions \
+    -Wl,-rpath=$(shell swipl --dump-runtime-variables | grep 'PLLIBDIR=' | sed 's/^PLLIBDIR=\"//' | sed 's/\";$$//')
+
+all: $(SHLIB)
+
+
+

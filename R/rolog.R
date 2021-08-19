@@ -43,7 +43,8 @@
 #
 .onAttach = function(libname, pkgname)
 {
-  if(!rolog_init() && !rolog_init())
+  Sys.setenv(SWI_HOME_DIR=file.path(libname, pkgname, 'home'))
+  if(!rolog_init(file.path(libname, pkgname, 'home')) && !rolog_init())
     stop('rolog: initialization of swipl failed.')  
 
   W = once(call('message_to_string', quote(welcome), expression(W)))$W
@@ -53,6 +54,7 @@
 
 .onDetach = function(libpath)
 {
+  Sys.unsetenv('SWI_HOME_DIR')
   if(!rolog_done())
     stop('rolog: not initialized')
 }
