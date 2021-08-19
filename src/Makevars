@@ -44,8 +44,6 @@ OBJECTS=$(SWIOBJ) $(ROLOBJ)
 
 $(SHLIB): lib
 
-all: vmi defatom version boot packages
-
 vmi:
 	$(CC) $(PKG_CPPFLAGS) $(SWISRC)/mkvmi.c -o $(SWISRC)/mkvmi
 	cd $(SWISRC) && ./mkvmi
@@ -61,7 +59,7 @@ swipl: $(SWIOBJ)
 	$(CC) $(PKG_CPPFLAGS) -Dswipl_EXPORTS -c $(SWISRC)/pl-main.c -o $(SWISRC)/pl-main.o
 	$(CC) -Wl,--export-dynamic -rdynamic -o $(SWISRC)/swipl $(SWISRC)/pl-main.o $(SWIOBJ) -lcurses -lform -lpthread -lgmp -lz -ldl -lrt -lm
 
-%.o: %.c
+%.o: %.c vmi defatom version
 	$(CC) $(PKG_CPPFLAGS) -c $*.c -o $*.o
 
 boot: swipl
@@ -83,4 +81,4 @@ sgml:
 http:
 	cp -R $(SWIDIR)/packages/http ../inst/home/library
 
-lib: all $(ROLOG)
+lib: boot packages $(ROLOG)
