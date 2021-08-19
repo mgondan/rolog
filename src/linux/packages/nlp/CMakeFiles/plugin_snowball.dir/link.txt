@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o snowball.so CMakeFiles/plugin_snowball.dir/snowball.c.o  libstemmer_c/liblibstemmer.a 

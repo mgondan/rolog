@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o table.so CMakeFiles/plugin_table.dir/table.c.o CMakeFiles/plugin_table.dir/order.c.o CMakeFiles/plugin_table.dir/error.c.o 

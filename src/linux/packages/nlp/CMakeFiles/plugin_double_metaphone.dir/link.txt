@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o double_metaphone.so CMakeFiles/plugin_double_metaphone.dir/double_metaphone.c.o 

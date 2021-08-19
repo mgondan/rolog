@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o socket.so CMakeFiles/plugin_socket.dir/error.c.o CMakeFiles/plugin_socket.dir/socket.c.o CMakeFiles/plugin_socket.dir/nonblockio.c.o  -lnsl 

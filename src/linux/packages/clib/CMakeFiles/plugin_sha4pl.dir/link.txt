@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o sha4pl.so CMakeFiles/plugin_sha4pl.dir/error.c.o CMakeFiles/plugin_sha4pl.dir/sha4pl.c.o CMakeFiles/plugin_sha4pl.dir/sha1/sha1.c.o CMakeFiles/plugin_sha4pl.dir/sha1/sha2.c.o CMakeFiles/plugin_sha4pl.dir/sha1/hmac_sha1.c.o CMakeFiles/plugin_sha4pl.dir/sha1/hmac_sha256.c.o 

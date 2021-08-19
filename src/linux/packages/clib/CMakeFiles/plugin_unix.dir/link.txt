@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o unix.so CMakeFiles/plugin_unix.dir/error.c.o CMakeFiles/plugin_unix.dir/unix.c.o 

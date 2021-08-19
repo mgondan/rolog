@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o websocket.so CMakeFiles/plugin_websocket.dir/websocket.c.o 

@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o syslog.so CMakeFiles/plugin_syslog.dir/syslog.c.o 

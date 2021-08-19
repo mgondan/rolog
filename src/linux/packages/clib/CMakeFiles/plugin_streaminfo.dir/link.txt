@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o streaminfo.so CMakeFiles/plugin_streaminfo.dir/error.c.o CMakeFiles/plugin_streaminfo.dir/streaminfo.c.o 

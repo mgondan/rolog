@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o pcre4pl.so CMakeFiles/plugin_pcre4pl.dir/pcre4pl.c.o  /usr/lib/x86_64-linux-gnu/libpcre.so 

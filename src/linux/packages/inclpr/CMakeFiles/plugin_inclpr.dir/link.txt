@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o inclpr.so CMakeFiles/plugin_inclpr.dir/inclpr.c.o 

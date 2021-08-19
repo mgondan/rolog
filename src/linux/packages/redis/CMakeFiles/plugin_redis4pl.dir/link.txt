@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o redis4pl.so CMakeFiles/plugin_redis4pl.dir/redis4pl.c.o 

@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o bdb4pl.so CMakeFiles/plugin_bdb4pl.dir/bdb4pl.c.o  /usr/lib/x86_64-linux-gnu/libdb.so 
