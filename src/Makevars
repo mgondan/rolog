@@ -40,7 +40,7 @@ ROLOBJ=rolog.o RcppExports.o
 
 SWIOBJ=$(SWIPL) $(OS) $(LIBTAI) $(MINIZIP)
 
-OBJECTS=$(ROLOBJ) $(SWIOBJ)
+OBJECTS=$(SWIOBJ) $(ROLOBJ)
 
 $(SHLIB): lib
 
