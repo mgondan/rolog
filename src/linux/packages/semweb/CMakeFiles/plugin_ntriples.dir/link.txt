@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o ntriples.so CMakeFiles/plugin_ntriples.dir/ntriples.c.o 

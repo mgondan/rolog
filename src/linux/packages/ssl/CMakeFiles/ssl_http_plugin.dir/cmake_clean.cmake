@@ -1,0 +1,15 @@
+file(REMOVE_RECURSE
+  "ssl.aux"
+  "ssl.blg"
+  "ssl.idx"
+  "ssl.ilg"
+  "ssl.ind"
+  "ssl.log"
+  "ssl.out"
+  "ssl.toc"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang )
+  include(CMakeFiles/ssl_http_plugin.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

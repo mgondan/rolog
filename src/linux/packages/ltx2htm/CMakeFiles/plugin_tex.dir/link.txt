@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o tex.so CMakeFiles/plugin_tex.dir/tex.c.o CMakeFiles/plugin_tex.dir/psfile.c.o 

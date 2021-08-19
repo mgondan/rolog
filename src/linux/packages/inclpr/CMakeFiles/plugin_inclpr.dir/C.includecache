@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/matthias/rolog/src/swipl-devel/packages/inclpr/inclpr.c
+SWI-Prolog.h
+-
+stdio.h
+-
+math.h
+-
+fenv.h
+-
+inclpr_interval_arithmetic.h
+/home/matthias/rolog/src/swipl-devel/packages/inclpr/inclpr_interval_arithmetic.h
+
+/home/matthias/rolog/src/swipl-devel/packages/inclpr/inclpr_interval_arithmetic.h
+
+/home/matthias/rolog/src/swipl-devel/src/SWI-Prolog.h
+stdarg.h
+-
+stdlib.h
+-
+stddef.h
+-
+inttypes.h
+-
+

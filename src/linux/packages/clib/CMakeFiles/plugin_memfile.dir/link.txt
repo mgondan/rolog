@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o memfile.so CMakeFiles/plugin_memfile.dir/error.c.o CMakeFiles/plugin_memfile.dir/memfile.c.o 

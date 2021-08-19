@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o archive4pl.so CMakeFiles/plugin_archive4pl.dir/archive4pl.c.o  /usr/lib/x86_64-linux-gnu/libarchive.so 

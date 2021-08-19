@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o rlimit.so CMakeFiles/plugin_rlimit.dir/error.c.o CMakeFiles/plugin_rlimit.dir/rlimit.c.o 

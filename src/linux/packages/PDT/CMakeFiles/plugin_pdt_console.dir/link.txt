@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o pdt_console.so CMakeFiles/plugin_pdt_console.dir/pdt_console.c.o 

@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o uuid.so CMakeFiles/plugin_uuid.dir/uuid.c.o  /usr/lib/x86_64-linux-gnu/libossp-uuid.so 

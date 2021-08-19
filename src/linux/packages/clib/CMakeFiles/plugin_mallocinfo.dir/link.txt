@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o mallocinfo.so CMakeFiles/plugin_mallocinfo.dir/error.c.o CMakeFiles/plugin_mallocinfo.dir/mallocinfo.c.o 

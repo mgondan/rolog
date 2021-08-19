@@ -1,0 +1,1 @@
+/usr/bin/cc -O2 -gdwarf-2 -g3 -Wl,--export-dynamic -rdynamic CMakeFiles/swipl-ld.dir/swipl-ld.c.o -o swipl-ld  -Wl,-rpath,::::::::::::::::::::::::::::::::::::: 

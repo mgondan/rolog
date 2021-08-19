@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o prolog_stream.so CMakeFiles/plugin_prolog_stream.dir/prolog_stream.c.o 

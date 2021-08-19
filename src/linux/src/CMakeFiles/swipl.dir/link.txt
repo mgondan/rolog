@@ -1,0 +1,1 @@
+/usr/bin/cc -O2 -gdwarf-2 -g3 -Wl,--export-dynamic -rdynamic CMakeFiles/swipl.dir/pl-main.c.o -o swipl  -Wl,-rpath,::::::::::::::::::::::::::::::::::::: libswipl.a -lcurses /usr/lib/x86_64-linux-gnu/libform.so /usr/lib/x86_64-linux-gnu/libz.so -ldl -lm -lrt 

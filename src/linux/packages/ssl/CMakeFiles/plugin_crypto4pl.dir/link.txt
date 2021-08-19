@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o crypto4pl.so CMakeFiles/plugin_crypto4pl.dir/crypto4pl.c.o CMakeFiles/plugin_crypto4pl.dir/__/clib/error.c.o  /usr/lib/x86_64-linux-gnu/libcrypto.so 

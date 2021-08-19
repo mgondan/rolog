@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o readline4pl.so CMakeFiles/plugin_readline4pl.dir/readline4pl.c.o  /usr/lib/x86_64-linux-gnu/libreadline.so 

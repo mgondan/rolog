@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o protobufs.so CMakeFiles/plugin_protobufs.dir/protobufs.c.o 

@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/matthias/rolog/src/swipl-devel/src/defatom.c
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+direct.h
+-
+unistd.h
+-
+

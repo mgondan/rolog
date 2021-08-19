@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o cgi.so CMakeFiles/plugin_cgi.dir/error.c.o CMakeFiles/plugin_cgi.dir/form.c.o CMakeFiles/plugin_cgi.dir/cgi.c.o 

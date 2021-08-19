@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o isub.so CMakeFiles/plugin_isub.dir/isub.c.o CMakeFiles/plugin_isub.dir/pl-isub.c.o 

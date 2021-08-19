@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/matthias/rolog/src/swipl-devel/packages/clib/md5.c
+string.h
+-
+md5.h
+/home/matthias/rolog/src/swipl-devel/packages/clib/md5.h
+
+/home/matthias/rolog/src/swipl-devel/packages/clib/md5.h
+
+/home/matthias/rolog/src/swipl-devel/packages/clib/md54pl.c
+config.h
+-
+SWI-Prolog.h
+-
+md5.h
+/home/matthias/rolog/src/swipl-devel/packages/clib/md5.h
+string.h
+-
+
+/home/matthias/rolog/src/swipl-devel/src/SWI-Prolog.h
+stdarg.h
+-
+stdlib.h
+-
+stddef.h
+-
+inttypes.h
+-
+
+packages/clib/config.h
+

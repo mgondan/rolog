@@ -1,0 +1,1 @@
+/usr/bin/cc -O2 -gdwarf-2 -g3 -Wl,--export-dynamic -rdynamic CMakeFiles/wrap-gcc.dir/wrap-gcc.c.o -o wrap-gcc 

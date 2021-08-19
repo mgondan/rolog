@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o files.so CMakeFiles/plugin_files.dir/error.c.o CMakeFiles/plugin_files.dir/files.c.o 

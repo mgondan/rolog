@@ -1,0 +1,1 @@
+/usr/bin/cc -O2 -gdwarf-2 -g3 -Wl,--export-dynamic -rdynamic CMakeFiles/defatom.dir/defatom.c.o -o defatom 

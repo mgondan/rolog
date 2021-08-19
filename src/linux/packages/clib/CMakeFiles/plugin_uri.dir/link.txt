@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o uri.so CMakeFiles/plugin_uri.dir/uri.c.o 

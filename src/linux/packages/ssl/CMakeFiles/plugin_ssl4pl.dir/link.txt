@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o ssl4pl.so CMakeFiles/plugin_ssl4pl.dir/ssl4pl.c.o CMakeFiles/plugin_ssl4pl.dir/__/clib/error.c.o  /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so 

@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o hashstream.so CMakeFiles/plugin_hashstream.dir/hash_stream.c.o CMakeFiles/plugin_hashstream.dir/md5.c.o CMakeFiles/plugin_hashstream.dir/sha1/sha1.c.o CMakeFiles/plugin_hashstream.dir/sha1/sha2.c.o 

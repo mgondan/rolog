@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/matthias/rolog/src/swipl-devel/packages/protobufs/protobufs.c
+config.h
+-
+SWI-Prolog.h
+-
+
+/home/matthias/rolog/src/swipl-devel/src/SWI-Prolog.h
+stdarg.h
+-
+stdlib.h
+-
+stddef.h
+-
+inttypes.h
+-
+
+packages/protobufs/config.h
+

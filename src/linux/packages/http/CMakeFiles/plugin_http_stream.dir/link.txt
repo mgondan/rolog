@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC -O2 -gdwarf-2 -g3 -shared  -o http_stream.so CMakeFiles/plugin_http_stream.dir/http_stream.c.o 
