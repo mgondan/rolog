@@ -114,6 +114,7 @@ memfile:
 
 ssl:
 	mkdir -p ../inst/home/library/http
+	cp $(SWIDIR)/packages/ssl/ssl.pl ../inst/home/library
 	cp $(SWIDIR)/packages/ssl/http_ssl_plugin.pl ../inst/home/library/http
 
 lib: boot packages $(ROLOG)
