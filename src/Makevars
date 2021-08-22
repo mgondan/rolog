@@ -84,6 +84,6 @@ http:
 process:
 	$(CC) -I$(SWICONF)/packages/clib $(PKG_CPPFLAGS) -Dplugin_process_EXPORTS -I$(SWIDIR)/packages/clib -o $(SWIDIR)/packages/clib/process.o -c $(SWIDIR)/packages/clib/process.c
 	$(CC) -shared -Wl,--export-dynamic -rdynamic -o ../inst/home/lib/process.so $(SWIDIR)/packages/clib/process.o -lcurses -lform -lgmp -lz -ldl -lrt -lm -ledit -lpthread
-	cp -R $(SWIDIR)/packages/process/*.pl ../inst/home/library
+	cp -R $(SWIDIR)/packages/clib/*.pl ../inst/home/library
 
 lib: boot packages $(ROLOG)
