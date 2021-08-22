@@ -278,5 +278,5 @@ findall = function(query=call('member', expression(X), list(1, 2, 3)), options=N
 
 CFlags = function()
 {
-  sprintf("-I'%s'", system.file('include', package='rolog'))
+  cat(sprintf("-I'%s'", system.file('include', package='rolog')))
 }
