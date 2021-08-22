@@ -116,6 +116,9 @@ ssl:
 	$(CC) -I$(SWICONF)/packages/ssl $(PKG_CPPFLAGS) -Dplugin_ssl4pl_EXPORTS -I$(SWIDIR)/packages/clib -o $(SWIDIR)/packages/clib/error.o -c $(SWIDIR)/packages/clib/error.c
 	$(CC) -I$(SWICONF)/packages/ssl $(PKG_CPPFLAGS) -Dplugin_ssl4pl_EXPORTS -I$(SWIDIR)/packages/ssl -o $(SWIDIR)/packages/ssl/ssl4pl.o -c $(SWIDIR)/packages/ssl/ssl4pl.c
 	$(CC) -shared -Wl,--export-dynamic -rdynamic -o ../inst/home/lib/ssl4pl.so $(SWIDIR)/packages/clib/error.o $(SWIDIR)/packages/ssl/ssl4pl.o -lpthread -lssl -lcrypto
+	$(CC) -I$(SWICONF)/packages/ssl $(PKG_CPPFLAGS) -Dplugin_crypto4pl_EXPORTS -I$(SWIDIR)/packages/clib -o $(SWIDIR)/packages/clib/error.o -c $(SWIDIR)/packages/clib/error.c
+	$(CC) -I$(SWICONF)/packages/ssl $(PKG_CPPFLAGS) -Dplugin_crypto4pl_EXPORTS -I$(SWIDIR)/packages/ssl -o $(SWIDIR)/packages/ssl/crypto4pl.o -c $(SWIDIR)/packages/ssl/crypto4pl.c
+	$(CC) -shared -Wl,--export-dynamic -rdynamic -o ../inst/home/lib/crypto4pl.so $(SWIDIR)/packages/clib/error.o $(SWIDIR)/packages/ssl/crypto4pl.o -lpthread -lcrypto
 	mkdir -p ../inst/home/library/http
 	cp $(SWIDIR)/packages/ssl/ssl.pl ../inst/home/library
 	cp $(SWIDIR)/packages/ssl/crypto.pl ../inst/home/library
