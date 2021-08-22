@@ -67,7 +67,7 @@ boot: swipl
 	cp -R $(SWIDIR)/library ../inst/home
 	$(SWISRC)/swipl -f none --no-packs -t halt --home=../inst/home -q -g "make_library_index('../inst/home/library')"
 
-packages: sgml http process files uri socket memfile ssl
+packages: sgml http process files uri socket memfile ssl cpp
 
 sgml:
 	$(CC) $(PKG_CPPFLAGS) -Dplugin_sgml2pl_EXPORTS -I$(SWIDIR)/packages/sgml -o $(SWIDIR)/packages/sgml/sgml2pl.o -c $(SWIDIR)/packages/sgml/sgml2pl.c
@@ -123,5 +123,9 @@ ssl:
 	cp $(SWIDIR)/packages/ssl/ssl.pl ../inst/home/library
 	cp $(SWIDIR)/packages/ssl/crypto.pl ../inst/home/library
 	cp $(SWIDIR)/packages/ssl/http_ssl_plugin.pl ../inst/home/library/http
+
+cpp:
+	mkdir -p ../inst/include
+	cp $(SWIDIR)/packages/cpp/*.h ../inst/include
 
 lib: boot packages $(ROLOG)
