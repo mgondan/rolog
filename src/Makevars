@@ -79,6 +79,8 @@ sgml:
 	cp -R $(SWIDIR)/packages/sgml/*.pl ../inst/home/library
 
 http:
+	$(CC) $(PKG_CPPFLAGS) -Dplugin_json_EXPORTS -I$(SWIDIR)/packages/http -o $(SWIDIR)/packages/http/json.o -c $(SWIDIR)/packages/http/json.c
+	$(CC) -shared -Wl,--export-dynamic -rdynamic -o ../inst/home/lib/json.so $(SWIDIR)/packages/http/json.o
 	cp -R $(SWIDIR)/packages/http ../inst/home/library
 
 process:
