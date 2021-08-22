@@ -113,6 +113,9 @@ memfile:
 	cp -R $(SWIDIR)/packages/clib/memfile.pl ../inst/home/library
 
 ssl:
+	$(CC) -I$(SWICONF)/packages/clib $(PKG_CPPFLAGS) -Dplugin_ssl4pl_EXPORTS -I$(SWIDIR)/packages/clib -o $(SWIDIR)/packages/clib/error.o -c $(SWIDIR)/packages/clib/error.c
+	$(CC) -I$(SWICONF)/packages/clib $(PKG_CPPFLAGS) -Dplugin_ssl4pl_EXPORTS -I$(SWIDIR)/packages/ssl -o $(SWIDIR)/packages/ssl/ssl4pl.o -c $(SWIDIR)/packages/ssl/ssl4pl.c
+	$(CC) -shared -Wl,--export-dynamic -rdynamic -o ../inst/home/lib/ssl4pl.so $(SWIDIR)/packages/clib/error.o $(SWIDIR)/packages/ssl/ssl4pl.o -lpthread -lssl -lcrypto
 	mkdir -p ../inst/home/library/http
 	cp $(SWIDIR)/packages/ssl/ssl.pl ../inst/home/library
 	cp $(SWIDIR)/packages/ssl/crypto.pl ../inst/home/library
