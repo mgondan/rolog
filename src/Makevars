@@ -67,7 +67,7 @@ boot: swipl
 	cp -R $(SWIDIR)/library ../inst/home
 	$(SWISRC)/swipl -f none --no-packs -t halt --home=../inst/home -q -g "make_library_index('../inst/home/library')"
 
-packages: sgml http
+packages: sgml http process
 
 sgml:
 	$(CC) $(PKG_CPPFLAGS) -Dplugin_sgml2pl_EXPORTS -I$(SWIDIR)/packages/sgml -o $(SWIDIR)/packages/sgml/sgml2pl.o -c $(SWIDIR)/packages/sgml/sgml2pl.c
@@ -80,5 +80,10 @@ sgml:
 
 http:
 	cp -R $(SWIDIR)/packages/http ../inst/home/library
+
+process:
+	$(CC) $(PKG_CPPFLAGS) -Dplugin_process_EXPORTS -I$(SWIDIR)/packages/clib -o $(SWIDIR)/packages/process/process.o -c $(SWIDIR)/packages/clib/process.c
+	$(CC) -shared -Wl,--export-dynamic -rdynamic -o ../inst/home/lib/process.so $(SWIDIR)/packages/process/*.o -lcurses -lform -lgmp -lz -ldl -lrt -lm -ledit -lpthread
+	cp -R $(SWIDIR)/packages/process/*.pl ../inst/home/library
 
 lib: boot packages $(ROLOG)
