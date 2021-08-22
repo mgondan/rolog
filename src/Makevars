@@ -67,7 +67,7 @@ boot: swipl
 	cp -R $(SWIDIR)/library ../inst/home
 	$(SWISRC)/swipl -f none --no-packs -t halt --home=../inst/home -q -g "make_library_index('../inst/home/library')"
 
-packages: sgml http process files uri socket memfile
+packages: sgml http process files uri socket memfile ssl
 
 sgml:
 	$(CC) $(PKG_CPPFLAGS) -Dplugin_sgml2pl_EXPORTS -I$(SWIDIR)/packages/sgml -o $(SWIDIR)/packages/sgml/sgml2pl.o -c $(SWIDIR)/packages/sgml/sgml2pl.c
@@ -111,5 +111,9 @@ memfile:
 	$(CC) -I$(SWICONF)/packages/clib $(PKG_CPPFLAGS) -Dplugin_memfile_EXPORTS -I$(SWIDIR)/packages/clib -o $(SWIDIR)/packages/clib/error.o -c $(SWIDIR)/packages/clib/error.c
 	$(CC) -shared -Wl,--export-dynamic -rdynamic -o ../inst/home/lib/memfile.so $(SWIDIR)/packages/clib/memfile.o $(SWIDIR)/packages/clib/error.o -lpthread
 	cp -R $(SWIDIR)/packages/clib/memfile.pl ../inst/home/library
+
+ssl:
+	mkdir -p ../inst/home/library/http
+	cp $(SWIDIR)/packages/ssl/http_ssl_plugin.pl ../inst/home/library/http
 
 lib: boot packages $(ROLOG)
