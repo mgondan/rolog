@@ -1,0 +1,8 @@
+PKG_CPPFLAGS=-I../inst/swipl/home/include $(CXXPICFLAGS) -D_REENTRANT -D__SWI_PROLOG__ -D__SWI_EMBEDDED__
+PKG_LIBS=-L../inst/swipl/src -lswipl_static -Wl,-Bsymbolic-functions -lgmp
+
+all: swipl $(SHLIB)
+
+swipl:
+	mkdir -p ../inst/swipl
+	cd ../inst/swipl && cmake -DSWIPL_STATIC_LIB=ON ../../src/swipl-devel && make
