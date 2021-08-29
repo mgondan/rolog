@@ -45,8 +45,8 @@
 {
   if(.Platform$OS.type == "unix")
   {
-    Sys.setenv(SWI_HOME_DIR=file.path(libname, pkgname, 'home'))
-    if(!rolog_init(file.path(libname, pkgname, 'home')))
+    Sys.setenv(SWI_HOME_DIR=file.path(libname, pkgname, 'swipl', 'home'))
+    if(!rolog_init())
       stop('rolog: initialization of swipl failed.')  
   }
 

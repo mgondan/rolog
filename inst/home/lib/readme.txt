@@ -1,1 +1,0 @@
-for shared objects
