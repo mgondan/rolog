@@ -10,7 +10,7 @@ Some preparation is needed.
 ```{r}
 library(rolog)
 once(quote(use_module(library(rologpp))))
-consult(system.file('mathml.pl', package='rolog'))
+consult(system.file(file.path('pl', 'mathml.pl'), package='rolog'))
 
 html_print = function(term)
 {
