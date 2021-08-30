@@ -1,5 +1,5 @@
 PKG_CPPFLAGS=-I../inst/swipl/lib/swipl/include $(CXXPICFLAGS) -D_REENTRANT -D__SWI_PROLOG__ -D__SWI_EMBEDDED__
-PKG_LIBS=-Wl,-Bsymbolic-functions -L../inst/swipl/lib/swipl/lib/x86_64-linux -Wl,-rpath=../swipl/lib/swipl/lib/x86_64-linux -lswipl -lgmp
+PKG_LIBS=-Wl,-Bsymbolic-functions -L../inst/swipl/lib/swipl/lib/x86_64-linux -Wl,-rpath=../inst/swipl/lib/swipl/lib/x86_64-linux -lswipl -lgmp
 
 all: swipl $(SHLIB)
 
