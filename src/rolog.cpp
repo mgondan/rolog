@@ -842,7 +842,7 @@ RObject call_(RObject query)
   {
     char* s = ex ; // string is stored in a 16-ring-buffer
     PL_clear_exception() ;
-    stop("%s failed: %s", (char*) query(1), s) ;
+    stop("%s failed: %s", (const char*) query(1), s) ;
   }
   
   return LogicalVector::create(r == TRUE) ;
