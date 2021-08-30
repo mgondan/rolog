@@ -12,6 +12,7 @@
   if(.Platform$OS.type == 'unix')
   {
     Sys.setenv(LD_LIBRARY_PATH=file.path(libname, pkgname, 'swipl', 'lib', 'swipl', 'lib', 'x86_64-linux'))
+    print(file.path(libname, pkgname, 'swipl', 'lib', 'swipl', 'lib', 'x86_64-linux'))
     print(dir(file.path(libname, pkgname, 'swipl', 'lib', 'swipl', 'lib', 'x86_64-linux')))
   }
   
