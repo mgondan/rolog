@@ -810,7 +810,7 @@ RObject portray_(RObject query, List options)
   try
   {
     if(!q.next_solution())
-      return LogicalVector(false) ;
+      return LogicalVector::create(false) ;
   }
   
   catch(PlException& ex)
@@ -835,7 +835,7 @@ RObject call_(RObject query)
   bool r = false ;
   try
   {
-    r = PlCall q(as<String>(query)) ;
+    r = PlCall q((char*) query(1)) ;
   }
   
   catch(PlException& ex)
@@ -845,6 +845,6 @@ RObject call_(RObject query)
     stop("%s failed: %s", (char*) as<String>(query), s) ;
   }
   
-  return r ;
+  return LogicalVector::create(r) ;
 }
 
