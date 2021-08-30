@@ -835,7 +835,7 @@ RObject call_(String query)
   int r = false ;
   try
   {
-    r = PlCall q(query.get_cstring()) ;
+    r = PlCall(query.get_cstring()) ;
   }
   
   catch(PlException& ex)
