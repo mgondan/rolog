@@ -835,7 +835,7 @@ RObject call_(RObject query)
   int r = false ;
   try
   {
-    r = PlCall q((char*) query(1)) ;
+    r = PlCall q((const char*) query(1)) ;
   }
   
   catch(PlException& ex)
