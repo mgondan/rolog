@@ -17,41 +17,28 @@ Access SWI-Prolog from R
 
 `install.packages('remotes')`
 
-2. Please install SWI-Prolog from https://www.swi-prolog.org. You may wish to use the development version since this offers the new Picat-style syntax which is used in Example 2 below. Here's a way to install the current development version:
-
-`git clone https://github.com/SWI-Prolog/swipl-devel`
-
-`cd swipl-devel`
-
-`git submodule update --init`
-
-`mkdir build`
-
-`cd build`
-
-`cmake ..`
-
-`make`
-
-`sudo make install`
-
-More detailed installation instructions are found on the SWI-Prolog webpage.
-
-3. Please install the "rologpp" pack for SWI-prolog. This is needed for the reverse direction (e.g. Prolog asking R the name of a specific function argument).
-
-`swipl`
-
-`pack_install(rologpp).`
-
-`halt.`
-
-4. Please install the "rolog" pack for R
-
-`R`
+3. Please install the "rolog" pack for R
 
 `remotes::install_github('mgondan/rolog')`
 
-Then move on to the examples.
+This takes about 30 min on my computer.
+
+3. You do not need to install SWI-prolog anymore, it is included in the package.
+
+4. Please install the "rologpp" pack for SWI-prolog. This is needed for the reverse direction (e.g. Prolog asking R the name of a specific function 
+   argument). Let's do this from the R shell:
+
+`library(rolog)`
+
+`once("assert(prolog_pack:environment('R_HOME', H) :- getenv('R_HOME', H))")` # See https://www.swi-prolog.org/howto/ForeignPack.html, section "Build environment"
+
+`once("pack_install(rologpp)")`                                               # Compiles and installs the pack rologpp for R access from SWI-Prolog
+
+`once("use_module(library(rologpp))")`                                        # Use the pack
+
+`once(call("r_eval", quote(2+2), expression(X)))`                             # Invoke R from Prolog from R, evaluating 2+2. See Example 2 for something more meaningful :-)
+
+Now please move on to the examples.
 
 ## Installation instructions (Windows)
 
@@ -105,19 +92,19 @@ This is a hello(world).
 
 Load some facts and rules with 
 
-`consult(system.file("likes.pl", package="rolog"))`
+`consult(system.file("pl/likes.pl", package="rolog"))`
 
 Run a query such as likes(sam, X) with 
 
 `findall(call('likes', quote(sam), expression(X)))`
 
-Sorry for the cumbersome syntax. At the moment, expression(X) encapsulates variables.
+Sorry for the cumbersome syntax. At the moment, expression(X) encapsulates variables. The query returns bindings for X that satisfy likes(sam, X).
 
 ## Example 2
 
 The second example uses Prolog for rendering R expressions as MathML. This is a nice illustration of two-way communication between R and Prolog, because Prolog has to ask
 back for the name of the integration variable (the x in dx).
 
-`rmarkdown::render(system.file('mathml.Rmd', package='rolog'), output_file="mathml.html", output_dir=getwd())`
+`rmarkdown::render(system.file('pl/mathml.Rmd', package='rolog'), output_file="mathml.html", output_dir=getwd())`
 
 You should find an HTML page with nice equations in the file `mathml.html` of the current folder. Note that it uses MathML, which yields best results with the Firefox browser.
