@@ -830,19 +830,19 @@ RObject portray_(RObject query, List options)
 // once("use_module(library(http/html_write))")
 //
 // [[Rcpp::export(.call)]]
-RObject call_(RObject query)
+RObject call_(String query)
 {
   int r = false ;
   try
   {
-    r = PlCall q((const char*) query(1)) ;
+    r = PlCall q(query.get_cstring()) ;
   }
   
   catch(PlException& ex)
   {
     char* s = ex ; // string is stored in a 16-ring-buffer
     PL_clear_exception() ;
-    stop("%s failed: %s", (const char*) query(1), s) ;
+    stop("%s failed: %s", query.get_cstring(), s) ;
   }
   
   return LogicalVector::create(r == TRUE) ;
