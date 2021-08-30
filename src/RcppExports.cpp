@@ -79,12 +79,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // call_
-RObject call_(RObject query);
+RObject call_(String query);
 RcppExport SEXP _rolog_call_(SEXP querySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< RObject >::type query(querySEXP);
+    Rcpp::traits::input_parameter< String >::type query(querySEXP);
     rcpp_result_gen = Rcpp::wrap(call_(query));
     return rcpp_result_gen;
 END_RCPP
