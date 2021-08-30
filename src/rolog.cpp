@@ -832,7 +832,7 @@ RObject portray_(RObject query, List options)
 // [[Rcpp::export(.call)]]
 RObject call_(RObject query)
 {
-  bool r = false ;
+  int r = false ;
   try
   {
     r = PlCall q((char*) query(1)) ;
@@ -845,6 +845,6 @@ RObject call_(RObject query)
     stop("%s failed: %s", (char*) as<String>(query), s) ;
   }
   
-  return LogicalVector::create(r) ;
+  return LogicalVector::create(r == TRUE) ;
 }
 
