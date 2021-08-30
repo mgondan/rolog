@@ -10,6 +10,7 @@
 .onLoad = function(libname, pkgname)
 {
   Sys.setenv(LD_LIBRARY_PATH=file.path(libname, pkgname, 'swipl', 'lib', 'swipl', 'lib', 'x86_64-linux'))
+  print(dir(file.path(libname, pkgname, 'swipl', 'lib', 'swipl', 'lib', 'x86_64-linux')))
   library.dynam(chname='rolog', package=pkgname, lib.loc=libname, local=FALSE)
   
   op.rolog = list(
