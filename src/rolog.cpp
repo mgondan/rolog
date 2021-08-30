@@ -822,3 +822,29 @@ RObject portray_(RObject query, List options)
   
   return pl2r(pl[1], names, vars, options) ;
 }
+
+// Execute a query given as a string
+//
+// Examples:
+//
+// once("use_module(library(http/html_write))")
+//
+// [[Rcpp::export(.call)]]
+RObject call_(RObject query)
+{
+  bool r = false ;
+  try
+  {
+    r = PlCall q(as<String>(query)) ;
+  }
+  
+  catch(PlException& ex)
+  {
+    char* s = ex ; // string is stored in a 16-ring-buffer
+    PL_clear_exception() ;
+    stop("%s failed: %s", (char*) as<String>(query), s) ;
+  }
+  
+  return r ;
+}
+

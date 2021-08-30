@@ -172,14 +172,19 @@ portray = function(query=call('member', expression(X), list(1, 2, 3)),
 
 #' Invoke a query once
 #'
-#' @param query an R call, consisting of symbols (= prolog atoms), 
-#'   numbers (= prolog numbers), strings (= prolog strings), 
+#' @param query a string or an an R call. The R call consists of 
+#'   symbols (= prolog atoms), numbers (= prolog numbers),
+#'   strings (= prolog strings), 
 #'   boolean values (= prolog atoms true and false), 
-#'   expressions (= prolog variables) and lists (= prolog lists), and other
+#'   expressions (= prolog variables), lists (= prolog lists), and other
 #'   calls (= prolog compounds). Vectors of booleans, integers, floating point
 #'   numbers, and strings with length _N_ > 1 are translated to prolog 
 #'   compounds !/N, %/N, #/N and $/N, respectively. The names can be modified
 #'   with the options below.
+#'   
+#'   If _query_ is a string, it is handed over to term_string/2 and then 
+#'   called. This is a shortcut to enable simple commands such as 
+#'   use_module/2. Note that this requires prolog-style quoting.
 #'
 #' @param options list of options controlling translation from and to prolog: 
 #'   boolvec (see option rolog.boolvec, default is !) is the name of the
@@ -227,6 +232,9 @@ portray = function(query=call('member', expression(X), list(1, 2, 3)),
 #'
 once = function(query=call('member', expression(X), list(1, 2, 3)), options=NULL)
 {
+  if(is.character(query))
+    return(.call(query))
+  
   options = c(options, rolog_options())
   
   r = .once(query, options)

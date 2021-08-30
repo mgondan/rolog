@@ -78,6 +78,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// call_
+RObject call_(RObject query);
+RcppExport SEXP _rolog_call_(SEXP querySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< RObject >::type query(querySEXP);
+    rcpp_result_gen = Rcpp::wrap(call_(query));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rolog_init_", (DL_FUNC) &_rolog_init_, 1},
@@ -86,6 +97,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rolog_once_", (DL_FUNC) &_rolog_once_, 2},
     {"_rolog_findall_", (DL_FUNC) &_rolog_findall_, 2},
     {"_rolog_portray_", (DL_FUNC) &_rolog_portray_, 2},
+    {"_rolog_call_", (DL_FUNC) &_rolog_call_, 1},
     {NULL, NULL, 0}
 };
 
