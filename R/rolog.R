@@ -9,13 +9,6 @@
 #
 .onLoad = function(libname, pkgname)
 {
-  if(.Platform$OS.type == 'unix')
-  {
-    Sys.setenv(LD_LIBRARY_PATH=file.path(libname, pkgname, 'swipl', 'lib', 'swipl', 'lib', 'x86_64-linux'))
-    print(file.path(libname, pkgname, 'swipl', 'lib', 'swipl', 'lib', 'x86_64-linux'))
-    print(dir(file.path(libname, pkgname, 'swipl', 'lib', 'swipl', 'lib', 'x86_64-linux')))
-  }
-  
   library.dynam(chname='rolog', package=pkgname, lib.loc=libname, local=FALSE)
   
   op.rolog = list(
@@ -35,9 +28,6 @@
 
 .onUnload = function(libpath)
 {
-  if(.Platform$OS.type == 'unix')
-    Sys.unsetenv('LD_LIBRARY_PATH')
-  
   library.dynam.unload('rolog', libpath=libpath)
   invisible()
 }
