@@ -1,15 +1,93 @@
-PKG_CPPFLAGS=-I$(shell swipl --dump-runtime-variables | grep 'PLBASE=' | sed 's/^PLBASE=//' | sed 's/;$$//')/include \
-    $(CXXPICFLAGS) \
-    -D_REENTRANT \
-    -D__SWI_PROLOG__ \
-    -D__SWI_EMBEDDED__
+SWIDIR=swipl-devel
+SWISRC=$(SWIDIR)/src
+SWICONF=win64
 
-PKG_LIBS=-L$(shell swipl --dump-runtime-variables | grep 'PLLIBDIR=' | sed 's/^PLLIBDIR=\"//' | sed 's/\";$$//') \
-    $(shell swipl --dump-runtime-variables | grep 'PLLIB=' | sed 's/^PLLIB=\"//' | sed 's/\";$$//') \
-    -Wl,-Bsymbolic-functions \
-    -Wl,-rpath=$(shell swipl --dump-runtime-variables | grep 'PLLIBDIR=' | sed 's/^PLLIBDIR=\"//' | sed 's/\";$$//')
+PKG_INCLUDES=-I$(SWICONF)/src -I$(SWISRC) -I$(SWISRC)/os -I$(SWISRC)/libtai -I$(SWISRC)/minizip -I'C:/PROGRA~1/R/R-41~1.0/include' -I'C:/Users/matth/Documents/R/win-library/4.1/Rcpp/include' -I$(SWIDIR)/packages/cpp
+PKG_CPPFLAGS=-O2 -gdwarf-2 -g3 -Wall -fno-strict-aliasing -fpic -D__SWI_PROLOG__ -D__WINDOWS__ -D_WIN32_WINNT=0x0600 -DWIN64 $(PKG_INCLUDES)
+PKG_LIBS=-Wl,-Bsymbolic-functions -lgmp -lpthread -lgmp -lz -lm -lwinmm -lws2_32 -lpsapi
 
-all: $(SHLIB)
+ROLOG=rolog.o RcppExports.o
 
+SWIPL0=pl-atom.o pl-wam.o pl-arith.o pl-bag.o pl-error.o pl-comp.o pl-zip.o\
+  pl-dwim.o pl-ext.o pl-flag.o pl-funct.o pl-gc.o pl-privitf.o pl-list.o\
+  pl-string.o pl-load.o pl-modul.o pl-op.o pl-prims.o pl-pro.o pl-proc.o\
+  pl-prof.o pl-read.o pl-rec.o pl-setup.o pl-sys.o pl-trace.o pl-util.o\
+  pl-wic.o pl-write.o pl-term.o pl-thread.o pl-xterm.o pl-srcfile.o pl-beos.o\
+  pl-attvar.o pl-gvar.o pl-btree.o pl-init.o pl-gmp.o pl-segstack.o pl-hash.o\
+  pl-version.o pl-codetable.o pl-supervisor.o pl-dbref.o pl-termhash.o\
+  pl-variant.o pl-assert.o pl-copyterm.o pl-debug.o pl-cont.o\
+  pl-ressymbol.o pl-dict.o pl-trie.o pl-indirect.o pl-tabling.o pl-rsort.o\
+  pl-mutex.o pl-allocpool.o pl-wrap.o pl-event.o pl-transaction.o pl-undo.o\
+  pl-alloc.o pl-index.o pl-fli.o\
+  pl-nt.o pl-ntconsole.o pl-dde.o
+SWIPL=$(addprefix $(SWISRC)/, $(SWIPL0))
 
+OS0=pl-buffer.o pl-ctype.o pl-file.o pl-files.o pl-glob.o pl-os.o pl-stream.o\
+  pl-string.o pl-table.o pl-text.o pl-utf8.o pl-fmt.o pl-dtoa.o pl-option.o\
+  pl-cstack.o pl-codelist.o pl-prologflag.o pl-tai.o pl-locale.o\
+  windows/uxnt.o
+OS=$(addprefix $(SWISRC)/os/, $(OS0))
 
+LIBTAI0=caltime_utc.o caltime_tai.o leapsecs_sub.o\
+  leapsecs_add.o caldate_fmjd.o caldate_mjd.o\
+  leapsecs_init.o leapsecs_read.o tai_pack.o\
+  tai_unpack.o
+LIBTAI=$(addprefix $(SWISRC)/libtai/, $(LIBTAI0))
+
+MINIZIP0=zip.o unzip.o ioapi.o
+MINIZIP=$(addprefix $(SWISRC)/minizip/, $(MINIZIP0))
+
+ROLOBJ=rolog.o RcppExports.o
+
+SWIOBJ=$(SWIPL) $(OS) $(LIBTAI) $(MINIZIP)
+
+OBJECTS=$(SWIOBJ) $(ROLOBJ)
+
+$(SHLIB): lib
+
+vmi:
+	$(CC) $(PKG_CPPFLAGS) $(SWISRC)/mkvmi.c -o $(SWISRC)/mkvmi
+	cd $(SWISRC) && ./mkvmi
+
+defatom:
+	$(CC) $(PKG_CPPFLAGS) $(SWISRC)/defatom.c -o $(SWISRC)/defatom
+	cd $(SWISRC) && ./defatom
+
+version:
+	cd $(SWISRC) && ./mkversion.sh
+
+swipl: $(SWIOBJ)
+	$(CC) -O2 -gdwarf-2 -g3 -shared -o $(SWISRC)/libswipl.dll -Wl,--whole-archive $(SWIOBJ) -Wl,--no-whole-archive -lwinmm -lws2_32 -lpsapi -lgmp -lz -lm -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+	$(CC) -Wl,--stack,4000000 -Wl,--major-image-version,0,--minor-image-version,0 -municode -o $(SWISRC)/swipl $(SWISRC)/pl-main.c $(SWISRC)/libswipl.dll -lpthread -lgmp -lz -lm -lwinmm -lws2_32 -lpsapi -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+
+%.o: %.c vmi defatom version
+	$(CC) $(PKG_CPPFLAGS) -c $*.c -o $*.o
+
+boot: swipl
+	rm -f ../inst/home/boot.prc
+	cd $(SWISRC) && ./swipl.exe -q -O -o ../../../inst/home/boot.prc -b ../boot/init.pl
+	cp -R $(SWIDIR)/library ../inst/home
+	$(SWISRC)/swipl -f none --no-packs -t halt --home=../inst/home -q -g "make_library_index('../inst/home/library')"
+
+packages: sgml http
+
+sgml:
+	$(CC) $(PKG_CPPFLAGS) -Dplugin_sgml2pl_EXPORTS -I$(SWIDIR)/packages/sgml -o $(SWIDIR)/packages/sgml/xml_unicode.o -c $(SWIDIR)/packages/sgml/xml_unicode.c
+	$(CC) $(PKG_CPPFLAGS) -Dplugin_sgml2pl_EXPORTS -I$(SWIDIR)/packages/sgml -o $(SWIDIR)/packages/sgml/xmlns.o -c $(SWIDIR)/packages/sgml/xmlns.c
+	$(CC) $(PKG_CPPFLAGS) -Dplugin_sgml2pl_EXPORTS -I$(SWIDIR)/packages/sgml -o $(SWIDIR)/packages/sgml/sgml2pl.o -c $(SWIDIR)/packages/sgml/sgml2pl.c
+	$(CC) $(PKG_CPPFLAGS) -Dplugin_sgml2pl_EXPORTS -I$(SWIDIR)/packages/sgml -o $(SWIDIR)/packages/sgml/util.o -c $(SWIDIR)/packages/sgml/util.c
+	$(CC) $(PKG_CPPFLAGS) -Dplugin_sgml2pl_EXPORTS -I$(SWIDIR)/packages/sgml -o $(SWIDIR)/packages/sgml/quote.o -c $(SWIDIR)/packages/sgml/quote.c
+	$(CC) $(PKG_CPPFLAGS) -Dplugin_sgml2pl_EXPORTS -I$(SWIDIR)/packages/sgml -o $(SWIDIR)/packages/sgml/xsd.o -c $(SWIDIR)/packages/sgml/xsd.c
+	$(CC) $(PKG_CPPFLAGS) -Dplugin_sgml2pl_EXPORTS -I$(SWIDIR)/packages/sgml -o $(SWIDIR)/packages/sgml/catalog.o -c $(SWIDIR)/packages/sgml/catalog.c
+	$(CC) $(PKG_CPPFLAGS) -Dplugin_sgml2pl_EXPORTS -I$(SWIDIR)/packages/sgml -o $(SWIDIR)/packages/sgml/charmap.o -c $(SWIDIR)/packages/sgml/charmap.c
+	$(CC) $(PKG_CPPFLAGS) -Dplugin_sgml2pl_EXPORTS -I$(SWIDIR)/packages/sgml -o $(SWIDIR)/packages/sgml/error.o -c $(SWIDIR)/packages/sgml/error.c
+	$(CC) $(PKG_CPPFLAGS) -Dplugin_sgml2pl_EXPORTS -I$(SWIDIR)/packages/sgml -o $(SWIDIR)/packages/sgml/model.o -c $(SWIDIR)/packages/sgml/model.c
+	$(CC) $(PKG_CPPFLAGS) -Dplugin_sgml2pl_EXPORTS -I$(SWIDIR)/packages/sgml -o $(SWIDIR)/packages/sgml/utf8.o -c $(SWIDIR)/packages/sgml/utf8.c
+	$(CC) $(PKG_CPPFLAGS) -Dplugin_sgml2pl_EXPORTS -I$(SWIDIR)/packages/sgml -o $(SWIDIR)/packages/sgml/parser.o -c $(SWIDIR)/packages/sgml/parser.c
+	$(CC) -O2 -gdwarf-2 -g3 -shared -o ../inst/home/lib/sgml2pl.dll -Wl,--major-image-version,0,--minor-image-version,0 -Wl,--whole-archive $(SWIDIR)/packages/sgml/*.o -Wl,--no-whole-archive  $(SWISRC)/libswipl.dll -lpthread -lgmp -lz -lm -lwinmm -lws2_32 -lpsapi -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+	cp -R $(SWIDIR)/packages/sgml/*.pl ../inst/home/library
+
+http:
+	cp -R $(SWIDIR)/packages/http ../inst/home/library
+
+lib: boot packages $(ROLOG)
