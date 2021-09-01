@@ -4,5 +4,5 @@ PKG_LIBS=-Wl,-Bsymbolic-functions -L../inst/swipl/bin -lswipl -lgmp -lz -lm -lpt
 all: $(SHLIB)
 
 swipl:
-	mkdir -p ../ucrt64
-	cd ../ucrt64 && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DWIN32_DLLS="" -DSWIPL_PACKAGES_X=OFF -DINSTALL_DOCUMENTATION=OFF -DMINGW_ROOT=/ucrt64 -G "MSYS Makefiles" ../src/swipl-devel && make && make install
+	mkdir -p ../ucrt
+	cd ../ucrt && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DWIN32_DLLS="" -DSWIPL_PACKAGES_X=OFF -DINSTALL_DOCUMENTATION=OFF -DMINGW_ROOT=/ucrt64 -G "MSYS Makefiles" ../src/swipl-devel && make && make install
