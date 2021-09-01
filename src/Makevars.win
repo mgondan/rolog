@@ -5,4 +5,4 @@ all: $(SHLIB)
 
 swipl:
 	mkdir -p ../ucrt
-	cd ../ucrt && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DWIN32_DLLS="" -DSWIPL_SHARED_LIB=OFF -DSWIPL_PACKAGES_X=OFF -DINSTALL_DOCUMENTATION=OFF -DMINGW_ROOT=/ucrt64 -G "MSYS Makefiles" ../src/swipl-devel && make && make install
+	cd ../ucrt && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DWIN32_DLLS="" -DSWIPL_STATIC_LIB=ON -DSWIPL_PACKAGES_X=OFF -DINSTALL_DOCUMENTATION=OFF -DMINGW_ROOT=/ucrt64 -G "MSYS Makefiles" ../src/swipl-devel && make && make install
