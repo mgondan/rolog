@@ -60,7 +60,11 @@ In general, packages are installed below the user's documents folder, e.g., `C:\
 
 5. Start SWI-Prolog and install the `rologpp` library. This one enables invoking R from Prolog, i.e., the other way round.
 
-`assert(prolog_pack:environment('R_LIBS_USER', X) :- getenv('R_LIBS_USER', X)).` (This is needed to make R aware of the R packages installed at the user's home directory, see last step)
+The next two commands are needed to make swipl R aware of the R packages installed at the user's home directory.
+
+`assert(prolog_pack:environment('R_HOME', X) :- getenv('R_HOME', X)).`
+
+`assert(prolog_pack:environment('R_LIBS_USER', X) :- getenv('R_LIBS_USER', X)).` 
 
 `pack_install(rologpp).`
 
