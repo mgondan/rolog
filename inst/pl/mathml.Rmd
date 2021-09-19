@@ -40,14 +40,24 @@ name of the integration variable. It just takes the name of the first argument
 of the function, here it is $x$.
 
 ```{r, results='asis'}
-term = quote(integrate(sin, lower=0L, upper=2L*pi))
+term = quote(integrate(sin, 0L, 2L*pi))
 html_print(term)
 eval(term)
 ```
 
+Note that at the prolog end (see mathml.pl distributed in this folder), 
+integrate/3 is rather rigid, it accepts only these three arguments in that 
+particular order, and without, that is, integrate(sin, lower=0L, upper=2L * pi)
+would not print the desired result. 
+
+The problem can be dealt with on the R side using non-standard evaluation
+techniques. On the prolog side, dicts might be an option. I don't yet know which
+one to choose.
+
 # Example 3: self written function
 
-Nothing special, just to show that Infinity is rendered correctly.
+The third example is nothing special, just to show that Infinity is rendered 
+correctly.
 
 ```{r, results='asis'}
 f = function(u)
@@ -55,7 +65,7 @@ f = function(u)
   sin(u)
 }
 
-term = quote(integrate(f, lower=-Inf, upper=Inf))
+term = quote(integrate(f, -Inf, Inf))
 html_print(term)
 
 # It's a bit of a mystery that R knows the result of this integral.
