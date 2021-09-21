@@ -52,6 +52,7 @@
 
   if(.Platform$OS.type == 'windows')
   {
+    Sys.setenv(SWI_HOME_DIR=file.path(libname, pkgname, 'swipl'))
     if(!rolog_init() && !rolog_init())
       stop('rolog: initialization of swipl failed.')  
   }
