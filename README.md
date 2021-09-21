@@ -32,6 +32,8 @@ This takes about 30 min on my computer.
 
 `once("assert(prolog_pack:environment('R_HOME', H) :- getenv('R_HOME', H))")` # See https://www.swi-prolog.org/howto/ForeignPack.html, section "Build environment"
 
+`once("assert(prolog_pack:environment('R_LIBS_USER', H) :- getenv('R_LIBS_USER', H))")` # See https://www.swi-prolog.org/howto/ForeignPack.html, section "Build environment"
+
 `once("pack_install(rologpp)")`                                               # Compiles and installs the pack rologpp for R access from SWI-Prolog
 
 `once("use_module(library(rologpp))")`                                        # Use the pack
@@ -52,7 +54,7 @@ Now please move on to the examples.
 
 4. Start R or RStudio install the libraries `Rcpp`, `RInside` (please recompile it by setting type="source").
 
-`install.packages("Rcpp")`
+`install.packages("Rcpp", type="source")`
 
 `install.packages("RInside", type="source")`
 
@@ -64,7 +66,7 @@ The next two commands are needed to make swipl R aware of the R packages install
 
 `assert(prolog_pack:environment('R_HOME', X) :- getenv('R_HOME', X)).`
 
-`assert(prolog_pack:environment('R_LIBS_USER', X) :- getenv('R_LIBS_USER', X)).` 
+`assert(prolog_pack:environment('R_LIBS_USER', X) :- getenv('R_LIBS_USER', X)).`
 
 `pack_install(rologpp).`
 
