@@ -64,7 +64,10 @@
 
 .onDetach = function(libpath)
 {
-  if(.Platform$OS.type == "unix")
+  if(.Platform$OS.type == 'unix')
+    Sys.unsetenv('SWI_HOME_DIR')
+  
+  if(.Platform$OS.type == 'windows')
     Sys.unsetenv('SWI_HOME_DIR')
   
   if(!rolog_done())
