@@ -35,8 +35,9 @@ eval(term)
 # Example 2: integral
 
 This is a bit more tricky, because Prolog needs to call back R to obtain the 
-name of the integration variable. It just takes the name of the first argument
-of the function, here it is $x$.
+name of the integration variable. The packages provides a Prolog predicate
+r_eval/2 for this purpose. Here, it is used for something like
+r_eval(formalArgs(args(sin)), X) (see mathml.pl), which unifies X with $x$.
 
 ```{r, results='asis'}
 term = quote(integrate(sin, 0L, 2L*pi))
@@ -46,12 +47,8 @@ eval(term)
 
 Note that at the prolog end (see mathml.pl distributed in this folder), 
 integrate/3 is rather rigid, it accepts only these three arguments in that 
-particular order, and without, that is, integrate(sin, lower=0L, upper=2L * pi)
-would not print the desired result. 
-
-The problem can be dealt with on the R side using non-standard evaluation
-techniques. On the prolog side, dicts might be an option. I don't yet know which
-one to choose.
+particular order, and without names, that is, 
+integrate(sin, lower=0L, upper=2L * pi) would not print the desired result. 
 
 # Example 3: self written function
 
