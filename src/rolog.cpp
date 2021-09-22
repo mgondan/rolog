@@ -44,7 +44,7 @@ static foreign_t r_eval(PlTermv arg, int arity, void*)
 {
   CharacterVector names ;
   PlTerm vars ;
-  List options ;
+  List options = List::create(Named("realvec") = "#", Named("boolvec") = "!", Named("charvec") = "$", Named("intvec") = "%", Named("atomize") = false) ;
   
   RObject Expr = pl2r(arg[0], names, vars, options) ;
   RObject Res = Expr ;
