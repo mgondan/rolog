@@ -87,7 +87,6 @@ ml(Flags, integrate(Fn, From, To), M)
 
 paren(Flags, integrate(Fn, From, To), Paren)
  => r_eval('['(formalArgs(args(Fn)), 1), Arg1),
-    arg(1, Args, Arg1),
     atom_string(DX, Arg1),
     paren(Flags, integrate(fn(Fn, [DX]), From, To, DX), Paren).
 
