@@ -6,6 +6,20 @@ using namespace Rcpp ;
 // its status.
 bool pl_initialized = false ;
 
+static foreign_t atom_checksum(term_t a0, int arity, void* context)
+{
+  char* s ;
+  if(PL_get_atom_chars(a0, &s))
+  {
+    for(int sum=0; *s; s++)
+      sum += *s & 0xff ;
+
+    return PL_unify_integer(a0 + 1, sum & 0xff) ;
+  }
+
+  return false ;
+}
+
 // Initialize SWI-prolog. This needs a list of the command-line arguments of 
 // the calling program, the most important being the name of the main 
 // executable, argv[0]. I added "-q" to suppress SWI prolog's welcome message
@@ -23,6 +37,8 @@ LogicalVector init_(String argv0)
   const char* argv[argc] = {argv0.get_cstring(), "-q"} ;
   if(!PL_initialise(argc, (char**) argv))
     stop("rolog_init: initialization failed.") ;
+
+  PL_register_foreign("atom_checksum", 2, atom_checksum, PL_FA_VARARGS) ;
 
   pl_initialized = true ;  
   return true ;
