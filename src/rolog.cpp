@@ -29,8 +29,7 @@ LogicalVector init_(String argv0)
   if(!PL_initialise(argc, (char**) argv))
     stop("rolog_init: initialization failed.") ;
 
-  PL_register_foreign(NULL, "atom_checksum", 2, (void*) atom_checksum) ;
-
+  PL_register_foreign("atom_checksum", 2, (void*) atom_checksum, PL_FA_VARARGS) ;
   pl_initialized = true ;  
   return true ;
 }
