@@ -11,8 +11,6 @@ Access SWI-Prolog from R
 
 `install.packages('Rcpp')`
 
-`install.packages('RInside')`
-
 `install.packages('rmarkdown')`
 
 `install.packages('remotes')`
@@ -21,26 +19,7 @@ Access SWI-Prolog from R
 
 `remotes::install_github('mgondan/rolog')`
 
-This takes about 30 min on my computer.
-
-3. You do not need to install SWI-prolog anymore, it is included in the package.
-
-4. Please install the "rologpp" pack for SWI-prolog. This is needed for the reverse direction (e.g. Prolog asking R the name of a specific function 
-   argument). Let's do this from the R shell:
-
-`library(rolog)`
-
-`once("assert(prolog_pack:environment('R_HOME', H) :- getenv('R_HOME', H))")` # See https://www.swi-prolog.org/howto/ForeignPack.html, section "Build environment"
-
-`once("assert(prolog_pack:environment('R_LIBS_USER', H) :- getenv('R_LIBS_USER', H))")` # See https://www.swi-prolog.org/howto/ForeignPack.html, section "Build environment"
-
-`once("pack_install(rologpp)")`                                               # Compiles and installs the pack rologpp for R access from SWI-Prolog
-
-`once("use_module(library(rologpp))")`                                        # Use the pack
-
-`once(call("r_eval", quote(2+2), expression(X)))`                             # Invoke R from Prolog from R, evaluating 2+2. See Example 2 for something more meaningful :-)
-
-Now please move on to the examples.
+This takes about 30 min on my computer. Then please move on to the examples.
 
 ## Installation instructions (Windows)
 
