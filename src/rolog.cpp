@@ -63,7 +63,7 @@ static foreign_t r_eval(PlTermv arg, int arity, void*)
   PlTerm pl ;
   try
   {
-    pl = r2pl(Res) ;
+    pl = r2pl(Res, names, vars, options) ;
   }
   catch(std::exception& ex)
   {
