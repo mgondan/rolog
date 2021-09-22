@@ -2,20 +2,81 @@
 #include "Rcpp.h"
 using namespace Rcpp ;
 
+// Translate prolog expression to R
+//
+// [] -> NULL
+// real -> NumericVector
+// #(r1, r2, r3) -> NumericVector (# is a default, see option realvec)
+// integer -> IntegerVector
+// %(i1, i2, i3) -> IntegerVector (see option intvec for the name)
+// string -> CharacterVector
+// $(s1, s2, s3) CharacterVector
+// na (atom) -> NA
+// true, false (atoms) -> LogicalVector
+// !(l1, l2, l3) -> LogicalVector (see option boolvec)
+// other atoms -> symbol/name
+// variable -> expression(variable name)
+// compound -> call (aka. "language")
+// list -> list
+//
+RObject pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars, List options) ;
+
+// Translate R expression to prolog
+//
+// NULL -> []
+// numeric vector of length 1 -> real (unless rolog.scalar == FALSE)
+// numeric vector of length > 1 -> e.g., #(1.0, 2.0, 3.0) (see rolog.realvec)
+// integer vector of length 1 -> integer
+// integer vector of length > 1 -> %(1, 2, 3)
+// character vector of length 1 -> string
+// character vector of length > 1 -> $("a", "b", "c")
+// logical vector of length 1 -> the atoms true, false or na
+// logical vector of length > 1 -> $(true, false, na)
+// symbol/name -> atom
+// expression -> variable
+// call/language -> compound
+// list -> list
+//
+PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, List options) ;
+
+// Evaluate R expression from Prolog
+static foreign_t r_eval(PlTermv arg, int arity, void*)
+{
+  CharacterVector names ;
+  PlTerm vars ;
+  List options ;
+  
+  RObject Expr = pl2r(arg[0], names, vars, options) ;
+  RObject Res = Expr ;
+  try 
+  {
+    Language id("identity") ;
+    id.push_back(Expr) ;
+    Res = id.eval() ;
+  } 
+  catch(std::exception& ex)
+  {
+    throw PlException(PlTerm(ex.what())) ;
+    return false ;
+  }
+
+  PlTerm pl ;
+  try
+  {
+    pl = r2pl(Res) ;
+  }
+  catch(std::exception& ex)
+  {
+    throw PlException(PlTerm(ex.what())) ;
+    return false ;
+  }
+
+  return arg[1] = pl ;
+}
+
 // The SWI system should not be initialized twice; therefore, we keep track of
 // its status.
 bool pl_initialized = false ;
-
-static foreign_t atom_checksum(PlTermv arg, int arity, void*)
-{
-  char *s = (char*) arg[0] ;
-  
-  int sum ;
-  for(sum=0; *s; s++)
-     sum += *s & 0xff ;
-
-  return arg[1] = (int) (sum & 0xff) ;
-}
 
 // Initialize SWI-prolog. This needs a list of the command-line arguments of 
 // the calling program, the most important being the name of the main 
@@ -35,7 +96,8 @@ LogicalVector init_(String argv0)
   if(!PL_initialise(argc, (char**) argv))
     stop("rolog_init: initialization failed.") ;
 
-  PL_register_foreign("atom_checksum", 2, (void*) atom_checksum, PL_FA_VARARGS) ;
+  PL_register_foreign("r_eval", 2, (void*) r_eval, PL_FA_VARARGS) ;
+
   pl_initialized = true ;  
   return true ;
 }
@@ -84,25 +146,7 @@ LogicalVector consult_(CharacterVector files)
   return true ;
 }
 
-// Translate prolog expression to R
-//
-// [] -> NULL
-// real -> NumericVector
-// #(r1, r2, r3) -> NumericVector (# is a default, see option realvec)
-// integer -> IntegerVector
-// %(i1, i2, i3) -> IntegerVector (see option intvec for the name)
-// string -> CharacterVector
-// $(s1, s2, s3) CharacterVector
-// na (atom) -> NA
-// true, false (atoms) -> LogicalVector
-// !(l1, l2, l3) -> LogicalVector (see option boolvec)
-// other atoms -> symbol/name
-// variable -> expression(variable name)
-// compound -> call (aka. "language")
-// list -> list
-//
-RObject pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars, List options) ;
-
+// Prolog -> R
 RObject pl2r_null()
 {
   return R_NilValue ;
@@ -417,22 +461,6 @@ RObject pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars, List options)
 
 // Translate R expression to prolog
 //
-// NULL -> []
-// numeric vector of length 1 -> real (unless rolog.scalar == FALSE)
-// numeric vector of length > 1 -> e.g., #(1.0, 2.0, 3.0) (see rolog.realvec)
-// integer vector of length 1 -> integer
-// integer vector of length > 1 -> %(1, 2, 3)
-// character vector of length 1 -> string
-// character vector of length > 1 -> $("a", "b", "c")
-// logical vector of length 1 -> the atoms true, false or na
-// logical vector of length > 1 -> $(true, false, na)
-// symbol/name -> atom
-// expression -> variable
-// call/language -> compound
-// list -> list
-//
-PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, List options) ;
-
 // This returns an empty list
 PlTerm r2pl_null()
 {
@@ -859,4 +887,3 @@ RObject call_(String query)
   
   return LogicalVector::create(r == TRUE) ;
 }
-
