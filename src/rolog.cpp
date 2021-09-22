@@ -9,7 +9,8 @@ bool pl_initialized = false ;
 static foreign_t atom_checksum(PlTerm a1, PlTerm a2)
 {
   char* s = (char*) a1 ;
-  for(int sum=0; *s; s++)
+  int sum ;
+  for(sum=0; *s; s++)
     sum += *s ;
 
   return a2 = sum ;
