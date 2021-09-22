@@ -8,12 +8,7 @@ bool pl_initialized = false ;
 
 static foreign_t atom_checksum(PlTerm a1, PlTerm a2)
 {
-  char* s = (char*) a1 ;
-  int sum ;
-  for(sum=0; *s; s++)
-    sum += *s ;
-
-  return a2 = sum ;
+  return a2 = "sum" ;
 }
 
 // Initialize SWI-prolog. This needs a list of the command-line arguments of 
@@ -34,7 +29,7 @@ LogicalVector init_(String argv0)
   if(!PL_initialise(argc, (char**) argv))
     stop("rolog_init: initialization failed.") ;
 
-  PL_register_foreign("atom_checksum", 2, (void*) atom_checksum, PL_FA_VARARGS) ;
+  PL_register_foreign(NULL, "atom_checksum", 2, (void*) atom_checksum) ;
 
   pl_initialized = true ;  
   return true ;
