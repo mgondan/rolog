@@ -81,13 +81,12 @@ test :- test(sum(i, 1, 10, i)).
 % Integrate over range
 %
 ml(Flags, integrate(Fn, From, To), M)
- => r_eval(formalArgs(args(Fn)), Args),
-    arg(1, Args, Arg1),
+ => r_eval('['(formalArgs(args(Fn)), 1), Arg1),
     atom_string(DX, Arg1),
     ml(Flags, integrate(fn(Fn, [DX]), From, To, DX), M).
 
 paren(Flags, integrate(Fn, From, To), Paren)
- => r_eval(formalArgs(args(Fn)), Args),
+ => r_eval('['(formalArgs(args(Fn)), 1), Arg1),
     arg(1, Args, Arg1),
     atom_string(DX, Arg1),
     paren(Flags, integrate(fn(Fn, [DX]), From, To, DX), Paren).
