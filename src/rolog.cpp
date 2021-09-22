@@ -6,13 +6,13 @@ using namespace Rcpp ;
 // its status.
 bool pl_initialized = false ;
 
-PREDICATE(atom_checksum, 2)
+static foreign_t atom_checksum(PlTerm a1, PlTerm a2)
 {
-  char* s = (char*) A1 ;
+  char* s = (char*) a1 ;
   for(int sum=0; *s; s++)
     sum += *s & 0xff ;
 
-  return A2 = (long) (sum & 0xff) ;
+  return a2 = (int) (sum & 0xff) ;
 }
 
 // Initialize SWI-prolog. This needs a list of the command-line arguments of 
