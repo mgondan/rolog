@@ -12,7 +12,7 @@ PREDICATE(atom_checksum, 2)
   for(int sum=0; *s; s++)
     sum += *s & 0xff ;
 
-  return A2 = sum & 0xff ;
+  return A2 = (long) (sum & 0xff) ;
 }
 
 // Initialize SWI-prolog. This needs a list of the command-line arguments of 
