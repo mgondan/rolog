@@ -42,13 +42,13 @@ PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, List options) ;
 // Evaluate R expression from Prolog
 static foreign_t r_eval(PlTermv arg, int arity, void*)
 {
-  stop("r_eval0") ;
+  warning("r_eval0") ;
   
   CharacterVector names ;
   PlTerm vars ;
   List options = List::create(Named("realvec") = "#", Named("boolvec") = "!", Named("charvec") = "$", Named("intvec") = "%", Named("atomize") = false, Named("scalar") = true) ;
 
-  warning("r_eval1") ;
+  stop("r_eval1") ;
     
   RObject Expr = pl2r(arg[0], names, vars, options) ;
   RObject Res = Expr ;
