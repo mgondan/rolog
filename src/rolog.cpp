@@ -60,11 +60,10 @@ static foreign_t r_eval(PlTermv arg, int arity, void*)
   } 
   catch(std::exception& ex)
   {
-    throw PlException(PlTerm(ex.what())) ;
-    return false ;
+    stop(ex.what()) ;
   }
 
-  stop("r_eval2") ;
+  warning("r_eval2") ;
   
   PlTerm pl ;
   try
@@ -73,11 +72,10 @@ static foreign_t r_eval(PlTermv arg, int arity, void*)
   }
   catch(std::exception& ex)
   {
-    throw PlException(PlTerm(ex.what())) ;
-    return false ;
+    stop(ex.what()) ;
   }
 
-  warning("r_eval3") ;
+  stop("r_eval3: %s", (char*) pl) ;
   
   return arg[1] = pl ;
 }
