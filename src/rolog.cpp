@@ -42,8 +42,6 @@ PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, List options) ;
 // Evaluate R expression from Prolog
 static foreign_t r_eval(PlTermv arg, int arity, void* context)
 {
-  warning("r_eval0") ;
-  
   CharacterVector names ;
   PlTerm vars ;
   List options = List::create(Named("realvec") = "#", Named("boolvec") = "!", Named("charvec") = "$", Named("intvec") = "%", Named("atomize") = false, Named("scalar") = true) ;
@@ -61,9 +59,6 @@ static foreign_t r_eval(PlTermv arg, int arity, void* context)
     stop(ex.what()) ;
   }
 
-  warning("r_eval2") ;
-  return false ;
-  
   PlTerm pl ;
   try
   {
@@ -74,10 +69,7 @@ static foreign_t r_eval(PlTermv arg, int arity, void* context)
     stop(ex.what()) ;
   }
 
-  stop("r_eval3: %s", (char*) pl) ;
-  
-  arg[1] = pl ;
-  return true ;
+  return (arg[1] = pl) ;
 }
 
 // The SWI system should not be initialized twice; therefore, we keep track of
