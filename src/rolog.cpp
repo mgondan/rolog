@@ -49,8 +49,10 @@ static foreign_t r_eval(PlTermv arg, int arity, void*)
   List options = List::create(Named("realvec") = "#", Named("boolvec") = "!", Named("charvec") = "$", Named("intvec") = "%", Named("atomize") = false, Named("scalar") = true) ;
 
   warning("r_eval1") ;  
+  char* s = strdup(arg[0]) ;
+  warning("r_eval1: %s", s) ;
   return false ;
-  warning("r_eval1: %s", (char*) arg[0]) ;
+
 
   stop("r_eval1: %s %s", (char*) arg[0], (char*) arg[1]) ;
     
