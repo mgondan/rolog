@@ -47,15 +47,6 @@ static foreign_t r_eval(PlTermv arg, int arity, void*)
   CharacterVector names ;
   PlTerm vars ;
   List options = List::create(Named("realvec") = "#", Named("boolvec") = "!", Named("charvec") = "$", Named("intvec") = "%", Named("atomize") = false, Named("scalar") = true) ;
-
-  warning("r_eval1") ;  
-  char* s = strdup(arg[0]) ;
-  return false ;
-  
-  warning("r_eval1: %s", s) ;
-
-
-  stop("r_eval1: %s %s", (char*) arg[0], (char*) arg[1]) ;
     
   RObject Expr = pl2r(arg[0], names, vars, options) ;
   RObject Res = Expr ;
@@ -71,6 +62,7 @@ static foreign_t r_eval(PlTermv arg, int arity, void*)
   }
 
   warning("r_eval2") ;
+  return false ;
   
   PlTerm pl ;
   try
