@@ -56,7 +56,7 @@ static foreign_t r_eval(PlTermv arg, int arity, void* context)
   } 
   catch(std::exception& ex)
   {
-    stop(ex.what()) ;
+    throw PlException(PlCompound("r_eval", PlTermv(arg[0], PlTerm(ex.what()))) ;
   }
 
   PlTerm pl ;
@@ -66,7 +66,7 @@ static foreign_t r_eval(PlTermv arg, int arity, void* context)
   }
   catch(std::exception& ex)
   {
-    stop(ex.what()) ;
+    throw PlException(PlCompound("r_eval", PlTermv(arg[0], PlTerm(ex.what()))) ;
   }
 
   return (arg[1] = pl) ;
