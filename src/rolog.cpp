@@ -42,10 +42,12 @@ PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, List options) ;
 // Evaluate R expression from Prolog
 static foreign_t r_eval(PlTermv arg, int arity, void*)
 {
+  warning("r_eval0") ;
+  return false ;
+  
   // if anything, this should throw prolog exceptions
   throw PlException(PlTypeError("attempt to throw pl exception", arg[0])) ;
   
-  warning("r_eval0") ;
   
   CharacterVector names ;
   PlTerm vars ;
