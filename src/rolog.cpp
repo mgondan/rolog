@@ -40,7 +40,7 @@ RObject pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars, List options) ;
 PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, List options) ;
 
 // Evaluate R expression from Prolog
-static foreign_t r_eval(PlTerm expr, PlTerm res)
+static foreign_t r_eval(PlTermv arg, int arity, void* context)
 {
   warning("r_eval0") ;
   
@@ -48,7 +48,7 @@ static foreign_t r_eval(PlTerm expr, PlTerm res)
   PlTerm vars ;
   List options = List::create(Named("realvec") = "#", Named("boolvec") = "!", Named("charvec") = "$", Named("intvec") = "%", Named("atomize") = false, Named("scalar") = true) ;
     
-  RObject Expr = pl2r(expr, names, vars, options) ;
+  RObject Expr = pl2r(arg[0], names, vars, options) ;
   RObject Res = Expr ;
   try 
   {
@@ -76,7 +76,8 @@ static foreign_t r_eval(PlTerm expr, PlTerm res)
 
   stop("r_eval3: %s", (char*) pl) ;
   
-  return res = pl ;
+  arg[1] = pl ;
+  return true ;
 }
 
 // The SWI system should not be initialized twice; therefore, we keep track of
