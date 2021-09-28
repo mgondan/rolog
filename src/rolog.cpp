@@ -101,8 +101,6 @@ LogicalVector init_(String argv0)
   if(pl_initialized)
     warning("Please do not initialize SWI-prolog twice in the same session.") ;
   
-  PL_register_foreign("r_eval", 2, (void*) r_eval, PL_FA_VARARGS) ;
-
   // Prolog documentation requires that argv is accessible during the entire 
   // session. I assume that this pointer is valid during the whole R session,
   // and that I can safely cast it to const.
@@ -110,6 +108,8 @@ LogicalVector init_(String argv0)
   const char* argv[argc] = {argv0.get_cstring(), "-q"} ;
   if(!PL_initialise(argc, (char**) argv))
     stop("rolog_init: initialization failed.") ;
+
+  PL_register_foreign("r_eval", 2, (void*) r_eval, PL_FA_VARARGS) ;
 
   pl_initialized = true ;  
   return true ;
