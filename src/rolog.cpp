@@ -48,10 +48,10 @@ static foreign_t r_eval(PlTermv arg, int arity, void*)
   PlTerm vars ;
   List options = List::create(Named("realvec") = "#", Named("boolvec") = "!", Named("charvec") = "$", Named("intvec") = "%", Named("atomize") = false, Named("scalar") = true) ;
 
-  warning("r_eval1") ;
+  warning("r_eval1") ;  
+  warning("r_eval1: %s", (char*) arg[0]) ;
   return false ;
-  
-  stop("r_eval1: %s", (char*) arg[0]) ;
+
   stop("r_eval1: %s %s", (char*) arg[0], (char*) arg[1]) ;
     
   RObject Expr = pl2r(arg[0], names, vars, options) ;
