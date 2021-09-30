@@ -750,6 +750,7 @@ RObject once_(RObject query, List options)
   options("atomize") = false ; // do not translate variables to their names
   PlTerm pl = r2pl(query, names, vars, options) ;
 
+  PlFrame f ;
   PlQuery q("call", pl) ;
   try
   {
@@ -792,6 +793,7 @@ List findall_(RObject query, List options)
   options("atomize") = false ; // do not translate variables to their names
   PlTerm pl = r2pl(query, names, vars, options) ;
 
+  PlFrame f ;
   PlQuery q("call", pl) ;
   List results ;
   while(true)
@@ -844,6 +846,7 @@ RObject portray_(RObject query, List options)
   tail.append(PlCompound("spacing", PlTermv(PlAtom("next_argument")))) ;
   tail.close() ;
 
+  PlFrame f ;
   PlQuery q("term_string", pl) ;
   try
   {
