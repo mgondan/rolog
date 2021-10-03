@@ -40,7 +40,8 @@ RObject pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars, List options) ;
 PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, List options) ;
 
 // Evaluate R expression from Prolog
-static foreign_t r_eval(PlTermv arg, int arity, void* context)
+// static foreign_t r_eval(PlTermv arg, int arity, void* context)
+PREDICATE(r_eval, 2)
 {
   CharacterVector names ;
   PlTerm vars ;
@@ -94,7 +95,7 @@ LogicalVector init_(String argv0)
   if(!PL_initialise(argc, (char**) argv))
     stop("rolog_init: initialization failed.") ;
 
-  PL_register_foreign("r_eval", 2, (void*) r_eval, PL_FA_VARARGS) ;
+  // PL_register_foreign("r_eval", 2, (void*) r_eval, PL_FA_VARARGS) ;
 
   pl_initialized = true ;  
   return true ;
