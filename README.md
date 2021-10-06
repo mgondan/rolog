@@ -27,7 +27,7 @@ This takes about 30 min on my computer. Then please move on to the examples.
 
 1. Please install the new RTools 4.0 from https://cran.r-project.org/bin/windows/Rtools/. On that page they explain how to make `gcc` and `make` accessible to R and RStudio. I think this is not sufficient. You have to add something like `c:\rtools40\mingw64\bin` and `c:\rtools40\usr\bin` to the system `PATH`, e.g. by right-clicking on My Computer in the Windows explorer and then "Properties", "Extended system settings" and "Environment variables".
 
-2. You also need cmake and a fee more Rtools packages: `pacman -S i686-mingw64-w64-cmake` from the rtools shell
+2. You also need cmake and a fee more Rtools packages: `pacman -S mingw-w64-x86_64-cmake` from the rtools shell
 
 3. Please make sure you have a `git` client on your computer, the one recommended by RStudio is https://git-scm.com/download/win. As before, please allow the program to change the `PATH` so that `git.exe` is found.
 
