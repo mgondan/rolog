@@ -1,5 +1,5 @@
 PKG_CPPFLAGS=-I../inst/swipl/include $(CXXPICFLAGS) -D_REENTRANT -D__SWI_PROLOG__ -D__SWI_EMBEDDED__ -O2 -gdwarf-2 -g3 -Wall -fno-strict-aliasing -D__WINDOWS__ -D_WIN32_WINNT=0x0600 -DWIN64
-PKG_LIBS=-Wl,-Bsymbolic-functions -L../inst/swipl/bin -lswipl -lgmp -lz -lm -lpthread -lws2_32 -lpsapi -lwinmm -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+PKG_LIBS=-Wl,-Bsymbolic-functions -L../inst/swipl/bin -lswipl_static -lgmp -lz -lm -lpthread -lws2_32 -lpsapi -lwinmm -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
 
 # -DLibArchive_INCLUDE_DIRS="`pkg-config --cflags-only-I libarchive`" -DLibArchive_LIBRARIES="`pkg-config --libs --static libarchive`" 
 
@@ -7,4 +7,4 @@ all: swipl $(SHLIB)
 
 swipl:
 	mkdir -p ../mingw64
-	cd ../mingw64 && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DWIN32_DLLS="" -DCMAKE_C_FLAGS=-DPCRE_STATIC -DHAVE_EVP_MD_CTX_FREE=1 -DHAVE_X509_DIGEST=1 -DHAVE_X509_CRL_DIGEST=1 -DSWIPL_PACKAGES_X=OFF -DINSTALL_DOCUMENTATION=OFF -DMINGW_ROOT=/mingw64 -G "MSYS Makefiles" ../src/swipl-devel && make && make install
+	cd ../mingw64 && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DWIN32_DLLS="" -DSWIPL_STATIC_LIB=ON -DCMAKE_C_FLAGS=-DPCRE_STATIC -DHAVE_EVP_MD_CTX_FREE=1 -DHAVE_X509_DIGEST=1 -DHAVE_X509_CRL_DIGEST=1 -DSWIPL_PACKAGES_X=OFF -DINSTALL_DOCUMENTATION=OFF -DMINGW_ROOT=/mingw64 -G "MSYS Makefiles" ../src/swipl-devel && make && make install
