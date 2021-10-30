@@ -493,8 +493,9 @@ PlTerm r2pl_real(NumericVector r, List options)
   }
 
   // Translate to vector #(1.0, 2.0, 3.0)
-  PlTermv args(r.length()) ;
-  for(R_xlen_t i=0 ; i<r.length() ; i++)
+  size_t len = (size_t) r.length() ;
+  PlTermv args(len) ;
+  for(size_t i=0 ; i<len ; i++)
   {
     if(na[i] && !nan[i])
       args[i] = r2pl_na() ;
@@ -523,8 +524,9 @@ PlTerm r2pl_logical(LogicalVector r, List options)
   }
 
   // LogicalVector !(true, false, na)
-  PlTermv args(r.length()) ;
-  for(R_xlen_t i=0 ; i<r.length() ; i++)
+  size_t len = (size_t) r.length() ;
+  PlTermv args(len) ;
+  for(size_t i=0 ; i<len ; i++)
   {
     if(na[i])
       args[i] = r2pl_na() ;
@@ -553,8 +555,9 @@ PlTerm r2pl_integer(IntegerVector r, List options)
   }
   
   // IntegerVector %(1, 2, 3)
-  PlTermv args(r.length()) ;
-  for(R_xlen_t i=0 ; i<r.length() ; i++)
+  size_t len = (size_t) r.length() ;
+  PlTermv args(len) ;
+  for(size_t i=0 ; i<len ; i++)
   {
     if(na[i])
       args[i] = r2pl_na() ;
@@ -629,8 +632,9 @@ PlTerm r2pl_string(CharacterVector r, List options)
   }
 
   // compound like $("a", "b", "c")
-  PlTermv args(r.length()) ;
-  for(R_xlen_t i=0 ; i<r.length() ; i++)
+  size_t len = (size_t) r.length() ;
+  PlTermv args(len) ;
+  for(size_t i=0 ; i<len ; i++)
   {
     if(na[i])
       args[i] = r2pl_na() ;
@@ -654,8 +658,9 @@ PlTerm r2pl_compound(Language r, CharacterVector& names, PlTerm& vars, List opti
   if(TYPEOF(l.names()) == STRSXP)
     n = l.names() ;
   
-  PlTermv pl(l.size()) ;
-  for(R_xlen_t i=0 ; i<l.size() ; i++)
+  size_t len = (size_t) l.size() ;
+  PlTermv pl(len) ;
+  for(size_t i=0 ; i<len ; i++)
   {
     PlTerm arg = r2pl(l(i), names, vars, options) ;
     
