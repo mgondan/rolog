@@ -909,5 +909,5 @@ RObject query_()
 
   PL_put_atom_chars(a0, "me");
   query_id = PL_open_query(NULL, PL_Q_NORMAL, p, a0);
-  return LogicalVector::create(r == TRUE) ;
+  return LogicalVector::create(TRUE) ;
 }
