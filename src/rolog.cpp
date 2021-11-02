@@ -894,3 +894,20 @@ RObject call_(String query)
   
   return LogicalVector::create(r == TRUE) ;
 }
+
+static qid_t query_id ;
+
+// Same as findall_ above, but returns a handle to a query for later use.
+// [[Rcpp::export(.query)]]
+RObject query_(RObject query, List options)
+{
+  term_t a0 = PL_new_term_refs(2);
+  
+  static predicate_t p;
+  if(!p)
+    p = PL_predicate("member", 2, "user");
+
+  PL_put_atom_chars(a0, "me");
+  query_id = PL_open_query(NULL, PL_Q_NORMAL, p, a0);
+  return LogicalVector::create(r == TRUE) ;
+}
