@@ -899,7 +899,7 @@ static qid_t query_id ;
 
 // Same as findall_ above, but returns a handle to a query for later use.
 // [[Rcpp::export(.query)]]
-RObject query_(RObject query, List options)
+RObject query_()
 {
   term_t a0 = PL_new_term_refs(2);
   
