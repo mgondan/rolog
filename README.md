@@ -19,31 +19,29 @@ Access SWI-Prolog from R
 
 `remotes::install_github('mgondan/rolog')`
 
-This takes about 30 min on my computer. Then please move on to the examples.
+This takes about 20 min on my computer. Then please move on to the examples.
 
 ## Installation instructions (Windows)
 
 `rolog` is a source package, so a few things need to be done before you get started.
 
-1. Please install the new RTools 4.0 from https://cran.r-project.org/bin/windows/Rtools/. On that page they explain how to make `gcc` and `make` accessible to R and RStudio. I think this is not sufficient. You have to add something like `c:\rtools40\mingw64\bin` and `c:\rtools40\usr\bin` to the system `PATH`, e.g. by right-clicking on My Computer in the Windows explorer and then "Properties", "Extended system settings" and "Environment variables".
+1. Please install the new RTools 4.0 from https://cran.r-project.org/bin/windows/Rtools/. On that page they explain how to make `gcc` and `make` accessible to R and RStudio. I think this is not sufficient. You have to add something like `c:\rtools40\ucrt64\bin` and `c:\rtools40\usr\bin` to the system `PATH`, e.g. by right-clicking on My Computer in the Windows explorer and then "Properties", "Extended system settings" and "Environment variables".
 
-2. You also need cmake and a fee more Rtools packages: `pacman -S mingw-w64-x86_64-cmake` from the rtools shell
+2. You need the experimental R-devel with ucrt support. Say goodbye to RStudio and welcome to the "blue" R.
 
-3. Please make sure you have a `git` client on your computer, the one recommended by RStudio is https://git-scm.com/download/win. As before, please allow the program to change the `PATH` so that `git.exe` is found.
+3. You also need cmake and a fee more Rtools packages: `pacman -S mingw-w64-ucrt-x86_64-cmake` from the rtools shell (ucrt64)
 
-4. Start R or RStudio install the librariy `Rcpp`.
+4. Please make sure you have a `git` client on your computer, the one recommended by RStudio is https://git-scm.com/download/win. As before, please allow the program to change the `PATH` so that `git.exe` is found.
+
+5. Start R and install the library `Rcpp`.
 
 `install.packages("Rcpp", type="source")`
 
-In general, packages are installed below the user's documents folder, e.g., `C:\Users\username\Documents\R\win-library\4.1`. For Step 5, you might need to tell the R program the location of this folder, so please set the environment variable `R_LIBS_USER` accordingly.
+6. Then 
 
-5. Then 
+`install.packages("remotes", type="source")`
 
-`install.packages('remotes')`
-
-`remotes::install_github("mgondan/rolog", INSTALL_opts="--no-multiarch")`
-
-The --no-multiarch is needed to prevent R from compiling the 32-bit version of the package (which doesn't exist).
+`remotes::install_github("mgondan/rolog")`
 
 `library(rolog)`
 
