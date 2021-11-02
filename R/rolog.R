@@ -287,3 +287,20 @@ findall = function(query=call('member', expression(X), list(1, 2, 3)), options=N
     attr(r, 'query') = portray(query, options)
   return(r)
 }
+
+#' Create a query
+#'
+#' @return If the creation of the query succeeds, TRUE.
+#'   
+#' @md
+#'
+#' @seealso [once()] for a single query
+#' 
+#' @examples
+#' query()
+#' 
+query = function()
+{
+  r = .query()
+  return(r)
+}
