@@ -895,19 +895,37 @@ RObject call_(String query)
   return LogicalVector::create(r == TRUE) ;
 }
 
-static qid_t query_id ;
+static qid_t query_id = 0 ;
+static term_t a0 ;
+static predicate_t pred ;
 
-// Same as findall_ above, but returns a handle to a query for later use.
+// Same as findall_ above, but opens a handle to a query for later use.
 // [[Rcpp::export(.query)]]
 RObject query_()
 {
-  term_t a0 = PL_new_term_refs(2);
-  
-  static predicate_t p;
-  if(!p)
-    p = PL_predicate("member", 2, "user");
-
+  pred = PL_predicate("member", 2, "user");
+  a0 = PL_new_term_refs(2) ;
   PL_put_atom_chars(a0, "me");
-  query_id = PL_open_query(NULL, PL_Q_NORMAL, p, a0);
+  query_id = PL_open_query(NULL, PL_Q_NORMAL, pred, a0);
   return LogicalVector::create(TRUE) ;
+}
+
+// Submit query
+// [[Rcpp::export(.submit)]]
+RObject submit_()
+{
+  if(query_id == 0)
+    stop("query not initialized") ;
+
+  int r = PL_next_solution(query_id) ;
+  if(r)
+  {
+     warning("query succeeded") ;
+     warning((char*) PlTerm(a0)) ;
+     warning((char*) PlTerm(a0+1)) ;
+  }
+  else
+     warning("query failed") ;
+
+  return LogicalVector::create(r) ;
 }
