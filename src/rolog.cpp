@@ -901,11 +901,14 @@ static predicate_t pred ;
 
 // Same as findall_ above, but opens a handle to a query for later use.
 // [[Rcpp::export(.query)]]
-RObject query_()
+RObject query_(RObject query, List options)
 {
-  pred = PL_predicate("member", 2, "user");
-  a0 = PL_new_term_refs(2) ;
-  PL_put_atom_chars(a0, "me");
+  CharacterVector names ;
+  PlTerm vars ;
+  options("atomize") = false ; // do not translate variables to their names
+  a0 = r2pl(query, names, vars, options) ;
+
+  pred = PL_predicate("call", 1, "user");
   query_id = PL_open_query(NULL, PL_Q_NORMAL, pred, a0);
   return LogicalVector::create(TRUE) ;
 }

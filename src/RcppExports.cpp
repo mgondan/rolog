@@ -79,12 +79,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // query_
-RObject query_();
-RcppExport SEXP _rolog_query_() {
+RObject query_(RObject query, List options);
+RcppExport SEXP _rolog_query_(SEXP querySEXP, SEXP optionsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(query_());
+    Rcpp::traits::input_parameter< RObject >::type query(querySEXP);
+    Rcpp::traits::input_parameter< List >::type options(optionsSEXP);
+    rcpp_result_gen = Rcpp::wrap(query_(query, options));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -116,7 +118,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rolog_consult_", (DL_FUNC) &_rolog_consult_, 1},
     {"_rolog_once_", (DL_FUNC) &_rolog_once_, 2},
     {"_rolog_findall_", (DL_FUNC) &_rolog_findall_, 2},
-    {"_rolog_query_", (DL_FUNC) &_rolog_query_, 0},
+    {"_rolog_query_", (DL_FUNC) &_rolog_query_, 2},
     {"_rolog_submit_", (DL_FUNC) &_rolog_submit_, 0},
     {"_rolog_portray_", (DL_FUNC) &_rolog_portray_, 2},
     {"_rolog_call_", (DL_FUNC) &_rolog_call_, 1},
