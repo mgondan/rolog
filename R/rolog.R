@@ -304,3 +304,20 @@ query = function()
   r = .query()
   return(r)
 }
+
+#' Submit a query
+#'
+#' @return If a solution is found, TRUE.
+#'   
+#' @md
+#'
+#' @seealso [once()] for a single query
+#' 
+#' @examples
+#' submit()
+#' 
+submit = function()
+{
+  r = .submit()
+  return(r)
+}
