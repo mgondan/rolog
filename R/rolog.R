@@ -290,6 +290,23 @@ findall = function(query=call('member', expression(X), list(1, 2, 3)), options=N
 
 #' Create a query
 #'
+#' @param query an R call, consisting of symbols (= prolog atoms),
+#'   numbers (= prolog numbers), strings (= prolog strings),
+#'   boolean values (= prolog atoms true and false),
+#'   expressions (= prolog variables) and lists (= prolog lists), and other
+#'   calls (= prolog compounds). Vectors of booleans, integers, floating point
+#'   numbers, and strings with length _N_ > 1 are translated to prolog
+#'   compounds !/N, %/N, #/N and $/N, respectively. The names can be modified
+#'   with the options below.
+#'
+#' @param options list of options controlling translation from and to prolog:
+#'   boolvec (see option rolog.boolvec, default is !) is the name of the
+#'   prolog compound for boolean vectors. intvec, realvec and charvec define
+#'   the compound names for vectors of integers, doubles and strings,
+#'   respectively (defaults are %, # and $). If _scalar_ is TRUE (default),
+#'   vectors of length 1 are translated to scalar prolog elements. If _scalar_
+#'   is FALSE, even vectors of length 1 are translated to compounds.
+#'
 #' @return If the creation of the query succeeds, TRUE.
 #'   
 #' @md
@@ -299,9 +316,13 @@ findall = function(query=call('member', expression(X), list(1, 2, 3)), options=N
 #' @examples
 #' query()
 #' 
-query = function()
+query = function(query=call('member', expression(X), list(1, 2, 3)), options=NULL)
 {
-  r = .query()
+  options = c(options, rolog_options())
+
+  r = .query(query, options)
+  if(options$portray)
+    attr(r, 'query') = portray(query, options)
   return(r)
 }
 
