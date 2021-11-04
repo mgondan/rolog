@@ -896,20 +896,40 @@ RObject call_(String query)
 }
 
 static qid_t query_id = 0 ;
-static term_t a0 ;
-static predicate_t pred ;
+static term_t arguments ;
 
-// Same as findall_ above, but opens a handle to a query for later use.
-// [[Rcpp::export(.query)]]
-RObject query_(RObject query, List options)
+static CharacterVector* query_names ;
+static PlTerm* query_vars ;
+static List* query_options ;
+
+// Same as findall_ above, but opens the query for later use.
+// [[Rcpp::export(.query_open)]]
+RObject query_open_(RObject query, List options)
 {
-  CharacterVector names ;
-  PlTerm vars ;
-  options("atomize") = false ; // do not translate variables to their names
-  a0 = r2pl(query, names, vars, options) ;
+  if(query_id != 0)
+    stop("Cannot raise simultaneous queries. Please invoke query_close()") ;
 
-  pred = PL_predicate("call", 1, "user");
-  query_id = PL_open_query(NULL, PL_Q_NORMAL, pred, a0);
+  query_names = new CharacterVector ;
+  query_vars = new PlTerm ;
+  query_options = new List ;
+  query_options->operator=(options) ;
+  query_options->operator()("atomize") = false ;
+  PL_put_term(arguments, (term_t) r2pl(query, *query_names, *query_vars, *query_options)) ;
+
+  predicate_t pred = PL_predicate("call", 1, "user") ;
+  query_id = PL_open_query(NULL, PL_Q_NORMAL, pred, arguments);
+  return LogicalVector::create(TRUE) ;
+}
+
+// Close query (and invoke cleanup handlers, see PL_close_query)
+// [[Rcpp::export(.query_close)]]
+RObject query_close_()
+{
+  if(query_id == 0)
+    stop("No open query.") ;
+
+  PL_close_query(query_id) ;
+  query_id = 0 ;
   return LogicalVector::create(TRUE) ;
 }
 
@@ -918,17 +938,31 @@ RObject query_(RObject query, List options)
 RObject submit_()
 {
   if(query_id == 0)
-    stop("query not initialized") ;
+    stop("No open query.") ;
 
-  int r = PL_next_solution(query_id) ;
-  if(r)
+  if(PL_next_solution(query_id))
   {
-     warning("query succeeded") ;
-     warning((char*) PlTerm(a0)) ;
-     warning((char*) PlTerm(a0+1)) ;
-  }
-  else
-     warning("query failed") ;
+    warning("query succeeded") ;
+    warning((char*) PlTerm(arguments)) ;
 
-  return LogicalVector::create(r) ;
+    List l ;
+    PlTail tail(*query_vars) ;
+    PlTerm v ;
+    for(int i=0 ; i<query_names->length() ; i++)
+    {
+      tail.next(v) ;
+
+      RObject r = pl2r(v, *query_names, *query_vars, *query_options) ;
+      if(TYPEOF(r) == EXPRSXP
+          && query_names->operator[](i) == as<Symbol>(as<ExpressionVector>(r)[0]).c_str())
+      continue ;
+      l.push_back(r, (const char*) query_names->operator[](i)) ;
+    }
+
+    return l ;
+  }
+  
+  warning("query failed.") ;
+  query_close_() ;
+  return LogicalVector::create(false) ;
 }
