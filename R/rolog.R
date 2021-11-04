@@ -290,6 +290,8 @@ findall = function(query=call('member', expression(X), list(1, 2, 3)), options=N
 
 #' Create a query
 #'
+#' @return If the creation of the query succeeds, TRUE.
+#'   
 #' @param query an R call, consisting of symbols (= prolog atoms),
 #'   numbers (= prolog numbers), strings (= prolog strings),
 #'   boolean values (= prolog atoms true and false),
@@ -307,23 +309,43 @@ findall = function(query=call('member', expression(X), list(1, 2, 3)), options=N
 #'   vectors of length 1 are translated to scalar prolog elements. If _scalar_
 #'   is FALSE, even vectors of length 1 are translated to compounds.
 #'
-#' @return If the creation of the query succeeds, TRUE.
-#'   
 #' @md
 #'
 #' @seealso [once()] for a single query
 #' 
 #' @examples
-#' query()
+#' query_open(call("member", expression(X), list(1, 2, 3)))
+#' query_submit()
+#' query_submit()
+#' query_close()
 #' 
-query = function(query=call('member', expression(X), list(1, 2, 3)), options=NULL)
+query_open = function(query=call('member', expression(X), list(1, 2, 3)), options=NULL)
 {
   options = c(options, rolog_options())
 
-  r = .query(query, options)
-  if(options$portray)
-    attr(r, 'query') = portray(query, options)
+  r = .query_open(query, options)
+#  if(options$portray)
+#    attr(r, 'query') = portray(query, options)
   return(r)
+}
+
+#' Close current query
+#'
+#' @return If an open query was found, TRUE.
+#'
+#' @md
+#'
+#' @seealso [once()] for a single query
+#'
+#' @examples
+#' query_open()
+#' query_submit()
+#' query_submit()
+#' query_close()
+#'
+query_close = function()
+{
+  .query_close()
 }
 
 #' Submit a query
