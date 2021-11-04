@@ -240,10 +240,12 @@ once = function(query=call('member', expression(X), list(1, 2, 3)), options=NULL
     return(.call(query))
   
   options = c(options, rolog_options())
-  
+  if(options$portray)
+    q = portray(query, options)
+
   r = .once(query, options)
   if(options$portray)
-    attr(r, 'query') = portray(query, options)
+    attr(r, 'query') = q ;
   return(r)
 }
 
@@ -281,10 +283,12 @@ once = function(query=call('member', expression(X), list(1, 2, 3)), options=NULL
 findall = function(query=call('member', expression(X), list(1, 2, 3)), options=NULL)
 {
   options = c(options, rolog_options())
+  if(options$portray)
+    q = portray(query, options)
 
   r = .findall(query, options)
   if(options$portray)
-    attr(r, 'query') = portray(query, options)
+    attr(r, 'query') = q
   return(r)
 }
 
@@ -322,10 +326,12 @@ findall = function(query=call('member', expression(X), list(1, 2, 3)), options=N
 query_open = function(query=call('member', expression(X), list(1, 2, 3)), options=NULL)
 {
   options = c(options, rolog_options())
+  if(options$portray)
+    q = portray(query, options)
 
   r = .query_open(query, options)
-#  if(options$portray)
-#    attr(r, 'query') = portray(query, options)
+  if(options$portray)
+    attr(r, 'query') = q
   return(r)
 }
 
