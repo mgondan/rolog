@@ -21,8 +21,12 @@
     .Call('_rolog_findall_', PACKAGE = 'rolog', query, options)
 }
 
-.query <- function(query, options) {
-    .Call('_rolog_query_', PACKAGE = 'rolog', query, options)
+.query_open <- function(query, options) {
+    .Call('_rolog_query_open_', PACKAGE = 'rolog', query, options)
+}
+
+.query_close <- function() {
+    .Call('_rolog_query_close_', PACKAGE = 'rolog')
 }
 
 .submit <- function() {
@@ -36,4 +40,3 @@
 .call <- function(query) {
     .Call('_rolog_call_', PACKAGE = 'rolog', query)
 }
-
