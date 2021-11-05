@@ -735,17 +735,16 @@ PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, List options)
   return r2pl_na() ;
 }
 
-static qid_t query_id = 0 ;
 static term_t query_term ;
 static CharacterVector* query_names = NULL ;
 static PlTerm* query_vars = NULL ;
 static List* query_options = NULL ;
 
 // Open a query for later use.
-// [[Rcpp::export(.query_open)]]
-RObject query_open_(RObject query, List options)
+// [[Rcpp::export(.query)]]
+RObject query_(RObject query, List options)
 {
-  if(query_id != 0)
+  if(PL_current_query() != 0)
     stop("Cannot raise simultaneous queries. Please invoke query_close()") ;
 
   query_names = new CharacterVector ;
@@ -757,7 +756,10 @@ RObject query_open_(RObject query, List options)
     stop("Cannot create query.") ;
 
   predicate_t pred = PL_predicate("call", 1, "user") ;
-  query_id = PL_open_query(NULL, PL_Q_NORMAL, pred, query_term);
+  qid_t qid = PL_open_query(NULL, PL_Q_NORMAL, pred, query_term) ;
+  if(qid == 0)
+    stop("Could not create query.") ;
+  
   return LogicalVector::create(TRUE) ;
 }
 
@@ -765,14 +767,25 @@ RObject query_open_(RObject query, List options)
 // [[Rcpp::export(.query_close)]]
 RObject query_close_()
 {
-  if(query_id == 0)
-    stop("No open query.") ;
+  qid_t qid = PL_current_query() ;
+  if(qid == 0)
+    warning("No open query.") ;
+  else
+    PL_close_query(qid) ;
+  
+  if(query_names)
+    delete query_names ;
+  query_names = NULL ;
+  
+  if(query_vars)
+    delete query_vars ;
+  query_vars = NULL
+  
+  if(query_options)
+    delete query_options ;
+  query_options = NULL
 
-  PL_close_query(query_id) ;
-  query_id = 0 ;
-  delete query_names ;
-  delete query_vars ;
-  delete query_options ;
+  // invisible
   return LogicalVector::create(TRUE) ;
 }
 
@@ -780,10 +793,11 @@ RObject query_close_()
 // [[Rcpp::export(.submit)]]
 RObject submit_()
 {
-  if(query_id == 0)
+  qid_t qid = PL_current_query() ;
+  if(qid == 0)
     stop("No open query.") ;
 
-  if(PL_next_solution(query_id))
+  if(PL_next_solution(qid))
   {
     List l ;
     PlTail tail(*query_vars) ;
@@ -822,8 +836,12 @@ RObject submit_()
 // [[Rcpp::export(.once)]]
 RObject once_(RObject query, List options)
 {
-  if(query_id != 0)
-    stop("Please close the current query.") ;
+  qid_t qid = PL_current_query() ;
+  if(qid != 0)
+  {
+    warning("Closing the current query.") ;
+    query_close() ;
+  }
 
   CharacterVector names ;
   PlTerm vars ;
@@ -846,7 +864,6 @@ RObject once_(RObject query, List options)
   }
 
   List l ;
-
   PlTail tail(vars) ;
   PlTerm v ;
   for(int i=0 ; i<names.length() ; i++)
@@ -868,8 +885,12 @@ RObject once_(RObject query, List options)
 // [[Rcpp::export(.findall)]]
 List findall_(RObject query, List options)
 {
-  if(query_id != 0)
-    stop("Please close the current query.") ;
+  qid_t qid = PL_current_query() ;
+  if(qid != 0)
+  {
+    warning("Closing the current query.") ;
+    query_close() ;
+  }
 
   CharacterVector names ;
   PlTerm vars ;
@@ -919,8 +940,12 @@ List findall_(RObject query, List options)
 // [[Rcpp::export(.portray)]]
 RObject portray_(RObject query, List options)
 {
-  if(query_id != 0)
-    stop("Please close the current query.") ;
+  qid_t qid = PL_current_query() ;
+  if(qid != 0)
+  {
+    warning("Closing the current query.") ;
+    query_close() ;
+  }
 
   CharacterVector names ;
   PlTerm vars ;
@@ -959,8 +984,12 @@ RObject portray_(RObject query, List options)
 // [[Rcpp::export(.call)]]
 RObject call_(String query)
 {
-  if(query_id != 0)
-    stop("Please close the current query.") ;
+  qid_t qid = PL_current_query() ;
+  if(qid != 0)
+  {
+    warning("Closing the current query.") ;
+    query_close() ;
+  }
 
   int r = false ;
   try
@@ -977,4 +1006,3 @@ RObject call_(String query)
   
   return LogicalVector::create(r == TRUE) ;
 }
-
