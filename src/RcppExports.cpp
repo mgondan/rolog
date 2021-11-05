@@ -128,7 +128,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rolog_consult_", (DL_FUNC) &_rolog_consult_, 1},
     {"_rolog_once_", (DL_FUNC) &_rolog_once_, 2},
     {"_rolog_findall_", (DL_FUNC) &_rolog_findall_, 2},
-    {"_rolog_query_open_", (DL_FUNC) &_rolog_query_open_, 2},
+    {"_rolog_query_", (DL_FUNC) &_rolog_query_, 2},
     {"_rolog_query_close_", (DL_FUNC) &_rolog_query_close_, 0},
     {"_rolog_submit_", (DL_FUNC) &_rolog_submit_, 0},
     {"_rolog_portray_", (DL_FUNC) &_rolog_portray_, 2},
