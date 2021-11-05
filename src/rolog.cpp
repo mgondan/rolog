@@ -779,11 +779,11 @@ RObject query_close_()
   
   if(query_vars)
     delete query_vars ;
-  query_vars = NULL
+  query_vars = NULL ;
   
   if(query_options)
     delete query_options ;
-  query_options = NULL
+  query_options = NULL ;
 
   // invisible
   return LogicalVector::create(TRUE) ;
