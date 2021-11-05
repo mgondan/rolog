@@ -318,12 +318,14 @@ findall = function(query=call('member', expression(X), list(1, 2, 3)), options=N
 #' @seealso [once()] for a single query
 #' 
 #' @examples
-#' query_open(call("member", expression(X), list(1, 2, 3)))
-#' query_submit()
-#' query_submit()
+#' query(call('member', expression(X), list(1, 2, 3)))
+#' query_submit() # 1
+#' query_submit() # 2
+#' query_submit() # 3
+#' query_submit() # fails
 #' query_close()
 #' 
-query_open = function(query=call('member', expression(X), list(1, 2, 3)), options=NULL)
+query = function(query=call('member', expression(X), list(1, 2, 3)), options=NULL)
 {
   options = c(options, rolog_options())
   if(options$portray)
@@ -337,21 +339,23 @@ query_open = function(query=call('member', expression(X), list(1, 2, 3)), option
 
 #' Close current query
 #'
-#' @return If an open query was found, TRUE.
+#' @return TRUE (invisible)
 #'
 #' @md
 #'
 #' @seealso [once()] for a single query
 #'
 #' @examples
-#' query_open()
-#' query_submit()
-#' query_submit()
+#' query(call('member', expression(X), list(1, 2, 3)))
+#' query_submit() # 1
+#' query_submit() # 2
+#' query_submit() # 3
+#' query_submit() # fails
 #' query_close()
 #'
 query_close = function()
 {
-  .query_close()
+  invisible(.query_close())
 }
 
 #' Submit a query
