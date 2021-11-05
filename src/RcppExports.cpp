@@ -79,18 +79,18 @@ BEGIN_RCPP
 END_RCPP
 }
 // query_
-RObject query_open_(RObject query, List options);
-RcppExport SEXP _rolog_query_open_(SEXP querySEXP, SEXP optionsSEXP) {
+RObject query_(RObject query, List options);
+RcppExport SEXP _rolog_query_(SEXP querySEXP, SEXP optionsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< RObject >::type query(querySEXP);
     Rcpp::traits::input_parameter< List >::type options(optionsSEXP);
-    rcpp_result_gen = Rcpp::wrap(query_open_(query, options));
+    rcpp_result_gen = Rcpp::wrap(query_(query, options));
     return rcpp_result_gen;
 END_RCPP
 }
-// query_
+// query_close_
 RObject query_close_();
 RcppExport SEXP _rolog_query_close_() {
 BEGIN_RCPP
