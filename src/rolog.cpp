@@ -840,7 +840,7 @@ RObject once_(RObject query, List options)
   if(qid != 0)
   {
     warning("Closing the current query.") ;
-    query_close() ;
+    query_close_() ;
   }
 
   CharacterVector names ;
@@ -889,7 +889,7 @@ List findall_(RObject query, List options)
   if(qid != 0)
   {
     warning("Closing the current query.") ;
-    query_close() ;
+    query_close_() ;
   }
 
   CharacterVector names ;
@@ -944,7 +944,7 @@ RObject portray_(RObject query, List options)
   if(qid != 0)
   {
     warning("Closing the current query.") ;
-    query_close() ;
+    query_close_() ;
   }
 
   CharacterVector names ;
@@ -988,7 +988,7 @@ RObject call_(String query)
   if(qid != 0)
   {
     warning("Closing the current query.") ;
-    query_close() ;
+    query_close_() ;
   }
 
   int r = false ;
