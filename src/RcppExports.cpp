@@ -101,12 +101,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // submit_
-RObject submit_();
-RcppExport SEXP _rolog_submit_() {
+RObject submit_(List options);
+RcppExport SEXP _rolog_submit_(SEXP optionsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(submit_());
+    Rcpp::traits::input_parameter< List >::type options(optionsSEXP);
+    rcpp_result_gen = Rcpp::wrap(submit_(options));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -130,7 +131,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rolog_findall_", (DL_FUNC) &_rolog_findall_, 2},
     {"_rolog_query_", (DL_FUNC) &_rolog_query_, 2},
     {"_rolog_query_close_", (DL_FUNC) &_rolog_query_close_, 0},
-    {"_rolog_submit_", (DL_FUNC) &_rolog_submit_, 0},
+    {"_rolog_submit_", (DL_FUNC) &_rolog_submit_, 1},
     {"_rolog_portray_", (DL_FUNC) &_rolog_portray_, 2},
     {"_rolog_call_", (DL_FUNC) &_rolog_call_, 1},
     {NULL, NULL, 0}
