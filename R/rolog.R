@@ -70,6 +70,8 @@
   
   if(.Platform$OS.type == 'windows')
     Sys.unsetenv('SWI_HOME_DIR')
+
+  query_close()
   
   if(!rolog_done())
     stop('rolog: not initialized')
