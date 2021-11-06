@@ -335,7 +335,7 @@ query = function(query=call('member', expression(X), list(1, 2, 3)), options=NUL
   if(options$portray)
     q = portray(query, options)
 
-  r = .query_open(query, options)
+  r = .query(query, options)
   if(options$portray)
     attr(r, 'query') = q
   
