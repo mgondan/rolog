@@ -791,7 +791,7 @@ RObject submit_(List options)
     List l ;
     PlTail tail(*query_vars) ;
     PlTerm v ;
-    for(int i=0 ; i<query_names->length() ; i++)
+    for(int i=0 ; i<query_names.length() ; i++)
     {
       tail.next(v) ;
       RObject r = pl2r(v, query_names, *query_vars, options) ;
