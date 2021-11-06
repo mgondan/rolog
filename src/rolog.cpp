@@ -112,6 +112,9 @@ LogicalVector done_()
     return true ;
   }
 
+  // Just in case there are open queries
+  query_close() ;
+
   // Prolog documentation says that PL_cleanup is not fully functional, so this
   // code is preliminary. In particular, it is currently not possible to unload 
   // rolog and load it again in the same R session.
