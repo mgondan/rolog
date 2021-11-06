@@ -57,6 +57,10 @@
       stop('rolog: initialization of swipl failed.')  
   }
   
+  # Package global settings
+  pkg.env = new.env(parent = emptyenv())
+  
+  # SWI startup message
   W = once(call('message_to_string', quote(welcome), expression(W)))$W
   packageStartupMessage(W)
   invisible()
@@ -334,6 +338,8 @@ query = function(query=call('member', expression(X), list(1, 2, 3)), options=NUL
   r = .query_open(query, options)
   if(options$portray)
     attr(r, 'query') = q
+  
+  pkg.env$query_options = options
   return(r)
 }
 
@@ -371,6 +377,7 @@ query_close = function()
 #' 
 submit = function()
 {
-  r = .submit()
+  options = pkg.env$query_options
+  r = .submit(options)
   return(r)
 }
