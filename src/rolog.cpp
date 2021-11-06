@@ -736,7 +736,7 @@ PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, List options)
 }
 
 static CharacterVector query_names ;
-static PlTerm query_vars ;
+static PlTerm* query_vars = NULL ;
 static term_t query_term ;
 
 // Open a query for later use.
@@ -748,7 +748,8 @@ RObject query_(RObject query, List options)
 
   options("atomize") = false ;
   query_names = CharacterVector::create() ;
-  if(!PL_put_term(query_term, (term_t) r2pl(query, query_names, query_vars, options)))
+  query_vars = new PlTerm ;
+  if(!PL_put_term(query_term, (term_t) r2pl(query, query_names, *query_vars, options)))
     stop("Cannot create query.") ;
 
   predicate_t pred = PL_predicate("call", 1, "user") ;
@@ -771,7 +772,9 @@ RObject query_close_()
   }
 
   // Clear variable list
-  query_vars = PlTerm() ;
+  if(query_vars)
+    delete query_vars ;
+  query_vars = NULL ;
 
   // invisible
   PL_close_query(qid) ;
@@ -789,12 +792,12 @@ RObject submit_(List options)
   if(PL_next_solution(qid))
   {
     List l ;
-    PlTail tail(query_vars) ;
+    PlTail tail(*query_vars) ;
     PlTerm v ;
     for(int i=0 ; i<query_names.length() ; i++)
     {
       tail.next(v) ;
-      RObject r = pl2r(v, query_names, query_vars, options) ;
+      RObject r = pl2r(v, query_names, *query_vars, options) ;
       if(TYPEOF(r) == EXPRSXP && 
         query_names[i] == as<Symbol>(as<ExpressionVector>(r)[0]).c_str())
       continue ;
