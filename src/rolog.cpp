@@ -738,6 +738,7 @@ PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, List options)
 static CharacterVector query_names ;
 static PlTerm* query_vars = NULL ;
 static PlTerm* query_term ;
+static PlQuery* query_id ;
 
 // Open a query for later use.
 // [[Rcpp::export(.query)]]
@@ -751,24 +752,32 @@ RObject query_(RObject query, List options)
   query_vars = new PlTerm ;
   query_term = new PlTerm(r2pl(query, query_names, *query_vars, options)) ;
 
+  query_id = new PlQuery("call", *query_term) ;
+  /*
   predicate_t pred = PL_predicate("call", 1, "user") ;
   qid_t qid = PL_open_query(NULL, PL_Q_PASS_EXCEPTION, pred, *query_term) ;
   if(qid == 0)
     stop("Could not create query.") ;
-  
-  return LogicalVector::create(TRUE) ;
+  */
+  return LogicalVector::create(true) ;
 }
 
 // Close query (and invoke cleanup handlers, see PL_close_query)
 // [[Rcpp::export(.query_close)]]
 RObject query_close_()
 {
+  /*
   qid_t qid = PL_current_query() ;
   if(qid == 0)
   {
     warning("No open query.") ;
     return LogicalVector::create(false) ;
   }
+  */
+  
+  if(query_id)
+    delete query_id ;
+  query_id = NULL ;
 
   // Clear variable list
   if(query_vars)
@@ -780,7 +789,7 @@ RObject query_close_()
   query_term = NULL ;
 
   // invisible
-  PL_close_query(qid) ;
+  // PL_close_query(qid) ;
   return LogicalVector::create(true) ;
 }
 
@@ -792,7 +801,7 @@ RObject submit_(List options)
   if(qid == 0)
     stop("No open query.") ;
 
-  if(PL_next_solution(qid))
+  if(query_id->next_solution())
   {
     List l ;
     PlTail tail(*query_vars) ;
@@ -972,7 +981,7 @@ RObject portray_(RObject query, List options)
 
 // Execute a query given as a string
 //
-// Examples:
+// Example:
 //
 // once("use_module(library(http/html_write))")
 //
