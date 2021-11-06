@@ -736,7 +736,7 @@ PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, List options)
 }
 
 static term_t query_term ;
-static CharacterVector* query_names = NULL ;
+static CharacterVector query_names ;
 static PlTerm* query_vars = NULL ;
 
 // Open a query for later use.
@@ -746,11 +746,10 @@ RObject query_(RObject query, List options)
   if(PL_current_query() != 0)
     stop("Cannot raise simultaneous queries. Please invoke query_close()") ;
 
-  query_names = new CharacterVector ;
   query_vars = new PlTerm ;
   query_options = new List ;
   options("atomize") = false ;
-  if(!PL_put_term(query_term, (term_t) r2pl(query, *query_names, *query_vars, options)))
+  if(!PL_put_term(query_term, (term_t) r2pl(query, query_names, *query_vars, options)))
     stop("Cannot create query.") ;
 
   predicate_t pred = PL_predicate("call", 1, "user") ;
@@ -770,10 +769,6 @@ RObject query_close_()
     warning("No open query.") ;
   else
     PL_close_query(qid) ;
-  
-  if(query_names)
-    delete query_names ;
-  query_names = NULL ;
   
   if(query_vars)
     delete query_vars ;
@@ -799,12 +794,12 @@ RObject submit_(List options)
     for(int i=0 ; i<query_names->length() ; i++)
     {
       tail.next(v) ;
-      RObject r = pl2r(v, *query_names, *query_vars, options) ;
-      if(TYPEOF(r) == EXPRSXP && query_names->operator[](i) ==
-              as<Symbol>(as<ExpressionVector>(r)[0]).c_str())
+      RObject r = pl2r(v, query_names, *query_vars, options) ;
+      if(TYPEOF(r) == EXPRSXP && 
+        query_names[i] == as<Symbol>(as<ExpressionVector>(r)[0]).c_str())
       continue ;
 
-      l.push_back(r, (const char*) query_names->operator[](i)) ;
+      l.push_back(r, (const char*) query_names[i]) ;
     }
 
     return l ;
