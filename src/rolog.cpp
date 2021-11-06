@@ -737,7 +737,7 @@ PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, List options)
 
 static CharacterVector query_names ;
 static PlTerm* query_vars = NULL ;
-static term_t query_term ;
+static PlTerm* query_term ;
 
 // Open a query for later use.
 // [[Rcpp::export(.query)]]
@@ -749,11 +749,10 @@ RObject query_(RObject query, List options)
   options("atomize") = false ;
   query_names = CharacterVector::create() ;
   query_vars = new PlTerm ;
-  if(!PL_put_term(query_term, (term_t) r2pl(query, query_names, *query_vars, options)))
-    stop("Cannot create query.") ;
+  query_term = new PlTerm(r2pl(query, query_names, *query_vars, options)) ;
 
   predicate_t pred = PL_predicate("call", 1, "user") ;
-  qid_t qid = PL_open_query(NULL, PL_Q_PASS_EXCEPTION, pred, query_term) ;
+  qid_t qid = PL_open_query(NULL, PL_Q_PASS_EXCEPTION, pred, *query_term) ;
   if(qid == 0)
     stop("Could not create query.") ;
   
@@ -775,6 +774,10 @@ RObject query_close_()
   if(query_vars)
     delete query_vars ;
   query_vars = NULL ;
+
+  if(query_term)
+    delete query_term ;
+  query_term = NULL ;
 
   // invisible
   PL_close_query(qid) ;
