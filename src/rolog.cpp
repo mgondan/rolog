@@ -789,7 +789,7 @@ RObject submit_(List options)
   if(PL_next_solution(qid))
   {
     List l ;
-    PlTail tail(*query_vars) ;
+    PlTail tail(query_vars) ;
     PlTerm v ;
     for(int i=0 ; i<query_names.length() ; i++)
     {
