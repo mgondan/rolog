@@ -737,7 +737,7 @@ PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, List options)
 
 static CharacterVector query_names ;
 static PlTerm* query_vars = NULL ;
-static PlTerm* query_term ;
+static PlTerm* query_term = NULL ;
 static PlQuery* query_id ;
 
 // Open a query for later use.
@@ -750,15 +750,9 @@ RObject query_(RObject query, List options)
   options("atomize") = false ;
   query_names = CharacterVector::create() ;
   query_vars = new PlTerm ;
-  query_term = new PlTerm(r2pl(query, query_names, *query_vars, options)) ;
-
-  query_id = new PlQuery("call", *query_term) ;
-  /*
-  predicate_t pred = PL_predicate("call", 1, "user") ;
-  qid_t qid = PL_open_query(NULL, PL_Q_PASS_EXCEPTION, pred, *query_term) ;
-  if(qid == 0)
-    stop("Could not create query.") ;
-  */
+  // query_term = new PlTerm(r2pl(query, query_names, *query_vars, options)) ;
+  PlTerm query_t = r2pl(query, query_names, *query_vars, options) ;
+  query_id = new PlQuery("call", query_t) ;
   return LogicalVector::create(true) ;
 }
 
@@ -766,15 +760,6 @@ RObject query_(RObject query, List options)
 // [[Rcpp::export(.query_close)]]
 RObject query_close_()
 {
-  /*
-  qid_t qid = PL_current_query() ;
-  if(qid == 0)
-  {
-    warning("No open query.") ;
-    return LogicalVector::create(false) ;
-  }
-  */
-  
   if(query_id)
     delete query_id ;
   query_id = NULL ;
@@ -789,7 +774,6 @@ RObject query_close_()
   query_term = NULL ;
 
   // invisible
-  // PL_close_query(qid) ;
   return LogicalVector::create(true) ;
 }
 
