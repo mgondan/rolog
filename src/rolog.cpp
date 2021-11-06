@@ -738,7 +738,6 @@ PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, List options)
 static term_t query_term ;
 static CharacterVector* query_names = NULL ;
 static PlTerm* query_vars = NULL ;
-static List* query_options = NULL ;
 
 // Open a query for later use.
 // [[Rcpp::export(.query)]]
