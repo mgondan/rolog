@@ -737,8 +737,7 @@ PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, List options)
 
 static CharacterVector query_names ;
 static PlTerm* query_vars = NULL ;
-static PlTerm* query_term = NULL ;
-static PlQuery* query_id ;
+static PlQuery* query_id = NULL ;
 
 // Open a query for later use.
 // [[Rcpp::export(.query)]]
@@ -750,9 +749,8 @@ RObject query_(RObject query, List options)
   options("atomize") = false ;
   query_names = CharacterVector::create() ;
   query_vars = new PlTerm ;
-  // query_term = new PlTerm(r2pl(query, query_names, *query_vars, options)) ;
-  PlTerm query_t = r2pl(query, query_names, *query_vars, options) ;
-  query_id = new PlQuery("call", query_t) ;
+
+  query_id = new PlQuery("call", r2pl(query, query_names, *query_vars, options)) ;
   return LogicalVector::create(true) ;
 }
 
@@ -769,10 +767,6 @@ RObject query_close_()
     delete query_vars ;
   query_vars = NULL ;
 
-  if(query_term)
-    delete query_term ;
-  query_term = NULL ;
-
   // invisible
   return LogicalVector::create(true) ;
 }
@@ -781,31 +775,30 @@ RObject query_close_()
 // [[Rcpp::export(.submit)]]
 RObject submit_(List options)
 {
-  qid_t qid = PL_current_query() ;
-  if(qid == 0)
+  if(query_id == NULL)
     stop("No open query.") ;
 
-  if(query_id->next_solution())
+  if(!query_id->next_solution())
   {
-    List l ;
-    PlTail tail(*query_vars) ;
-    PlTerm v ;
-    for(int i=0 ; i<query_names.length() ; i++)
-    {
-      tail.next(v) ;
-      RObject r = pl2r(v, query_names, *query_vars, options) ;
-      if(TYPEOF(r) == EXPRSXP && 
-        query_names[i] == as<Symbol>(as<ExpressionVector>(r)[0]).c_str())
-      continue ;
-
-      l.push_back(r, (const char*) query_names[i]) ;
-    }
-
-    return l ;
+    query_close_() ;
+    return LogicalVector::create(false) ;
   }
 
-  query_close_() ;
-  return LogicalVector::create(false) ;
+  List l ;
+  PlTail tail(*query_vars) ;
+  PlTerm v ;
+  for(int i=0 ; i<query_names.length() ; i++)
+  {
+    tail.next(v) ;
+    RObject r = pl2r(v, query_names, *query_vars, options) ;
+    if(TYPEOF(r) == EXPRSXP && 
+      query_names[i] == as<Symbol>(as<ExpressionVector>(r)[0]).c_str())
+    continue ;
+
+    l.push_back(r, (const char*) query_names[i]) ;
+  }
+
+  return l ;
 }
 
 // Execute a query once and return conditions
@@ -824,8 +817,7 @@ RObject submit_(List options)
 // [[Rcpp::export(.once)]]
 RObject once_(RObject query, List options)
 {
-  qid_t qid = PL_current_query() ;
-  if(qid != 0)
+  if(PL_current_query() != 0)
   {
     warning("Closing the current query.") ;
     query_close_() ;
@@ -873,8 +865,7 @@ RObject once_(RObject query, List options)
 // [[Rcpp::export(.findall)]]
 List findall_(RObject query, List options)
 {
-  qid_t qid = PL_current_query() ;
-  if(qid != 0)
+  if(PL_current_query() != 0)
   {
     warning("Closing the current query.") ;
     query_close_() ;
@@ -928,8 +919,7 @@ List findall_(RObject query, List options)
 // [[Rcpp::export(.portray)]]
 RObject portray_(RObject query, List options)
 {
-  qid_t qid = PL_current_query() ;
-  if(qid != 0)
+  if(PL_current_query() != 0)
   {
     warning("Closing the current query.") ;
     query_close_() ;
@@ -972,8 +962,7 @@ RObject portray_(RObject query, List options)
 // [[Rcpp::export(.call)]]
 RObject call_(String query)
 {
-  qid_t qid = PL_current_query() ;
-  if(qid != 0)
+  if(PL_current_query() != 0)
   {
     warning("Closing the current query.") ;
     query_close_() ;
