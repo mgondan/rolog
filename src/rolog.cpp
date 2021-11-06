@@ -750,9 +750,8 @@ RObject query_(RObject query, List options)
   query_names = new CharacterVector ;
   query_vars = new PlTerm ;
   query_options = new List ;
-  query_options->operator=(options) ;
-  query_options->operator()("atomize") = false ;
-  if(!PL_put_term(query_term, (term_t) r2pl(query, *query_names, *query_vars, *query_options)))
+  options("atomize") = false ;
+  if(!PL_put_term(query_term, (term_t) r2pl(query, *query_names, *query_vars, options)))
     stop("Cannot create query.") ;
 
   predicate_t pred = PL_predicate("call", 1, "user") ;
@@ -781,17 +780,13 @@ RObject query_close_()
     delete query_vars ;
   query_vars = NULL ;
   
-  if(query_options)
-    delete query_options ;
-  query_options = NULL ;
-
   // invisible
   return LogicalVector::create(TRUE) ;
 }
 
 // Submit query
 // [[Rcpp::export(.submit)]]
-RObject submit_()
+RObject submit_(List options)
 {
   qid_t qid = PL_current_query() ;
   if(qid == 0)
@@ -805,7 +800,7 @@ RObject submit_()
     for(int i=0 ; i<query_names->length() ; i++)
     {
       tail.next(v) ;
-      RObject r = pl2r(v, *query_names, *query_vars, *query_options) ;
+      RObject r = pl2r(v, *query_names, *query_vars, options) ;
       if(TYPEOF(r) == EXPRSXP && query_names->operator[](i) ==
               as<Symbol>(as<ExpressionVector>(r)[0]).c_str())
       continue ;
