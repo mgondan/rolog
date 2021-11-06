@@ -57,9 +57,6 @@
       stop('rolog: initialization of swipl failed.')  
   }
   
-  # Package global settings
-  pkg.env = new.env(parent = emptyenv())
-  
   # SWI startup message
   W = once(call('message_to_string', quote(welcome), expression(W)))$W
   packageStartupMessage(W)
@@ -106,6 +103,9 @@ rolog_done = function()
 {
   .done()
 }
+
+# Package global settings
+pkg.env = new.env(parent = emptyenv())
 
 #' Consult a prolog database
 #' 
