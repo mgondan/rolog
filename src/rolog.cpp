@@ -39,93 +39,6 @@ RObject pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars, List options) ;
 //
 PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, List options) ;
 
-// Evaluate R expression from Prolog
-// static foreign_t r_eval(PlTermv arg, int arity, void* context)
-PREDICATE(r_eval, 2)
-{
-  CharacterVector names ;
-  PlTerm vars ;
-  List options = List::create(Named("realvec") = "#", Named("boolvec") = "!", Named("charvec") = "$", Named("intvec") = "%", Named("atomize") = false, Named("scalar") = true) ;
-    
-  RObject Expr = pl2r(A1, names, vars, options) ;
-  RObject Res = Expr ;
-  try 
-  {
-    Language id("identity") ;
-    id.push_back(Expr) ;
-    Res = id.eval() ;
-  }
-  
-  catch(std::exception& ex)
-  {
-    throw PlException(PlCompound("r_eval", PlTermv(A1, PlTerm(ex.what())))) ;
-  }
-
-  PlTerm pl ;
-  try
-  {
-    pl = r2pl(Res, names, vars, options) ;
-  }
-  
-  catch(std::exception& ex)
-  {
-    throw PlException(PlCompound("r_eval", PlTermv(A1, PlTerm(ex.what())))) ;
-  }
-
-  return (A2 = pl) ;
-}
-
-// The SWI system should not be initialized twice; therefore, we keep track of
-// its status.
-bool pl_initialized = false ;
-
-// Initialize SWI-prolog. This needs a list of the command-line arguments of 
-// the calling program, the most important being the name of the main 
-// executable, argv[0]. I added "-q" to suppress SWI prolog's welcome message
-// which is shown in .onAttach anyway.
-// [[Rcpp::export(.init)]]
-LogicalVector init_(String argv0)
-{
-  if(pl_initialized)
-    warning("Please do not initialize SWI-prolog twice in the same session.") ;
-  
-  // Prolog documentation requires that argv is accessible during the entire 
-  // session. I assume that this pointer is valid during the whole R session,
-  // and that I can safely cast it to const.
-  int argc = 2 ;
-  const char* argv[argc] = {argv0.get_cstring(), "-q"} ;
-  if(!PL_initialise(argc, (char**) argv))
-    stop("rolog_init: initialization failed.") ;
-
-  // PL_register_foreign("r_eval", 2, (void*) r_eval, PL_FA_VARARGS) ;
-
-  pl_initialized = true ;  
-  return true ;
-}
-
-// [[Rcpp::export(.done)]]
-LogicalVector done_()
-{
-  if(!pl_initialized)
-  {
-    warning("rolog_done: swipl has not been initialized") ;
-    return true ;
-  }
-
-  // Just in case there are open queries
-  query_close() ;
-
-  // Prolog documentation says that PL_cleanup is not fully functional, so this
-  // code is preliminary. In particular, it is currently not possible to unload 
-  // rolog and load it again in the same R session.
-  //
-  // For these reasons, the call to cleanup is currently suppressed.
-
-  // PL_cleanup(0) ;
-  // pl_initialized = false ;
-  return true ;
-}
-
 // Consult one or more files. If something fails, the procedure stops, and
 // will not try to consult the remaining files.
 //
@@ -999,4 +912,91 @@ RObject call_(String query)
   }
   
   return LogicalVector::create(r == TRUE) ;
+}
+
+// Evaluate R expression from Prolog
+// static foreign_t r_eval(PlTermv arg, int arity, void* context)
+PREDICATE(r_eval, 2)
+{
+  CharacterVector names ;
+  PlTerm vars ;
+  List options = List::create(Named("realvec") = "#", Named("boolvec") = "!", Named("charvec") = "$", Named("intvec") = "%", Named("atomize") = false, Named("scalar") = true) ;
+    
+  RObject Expr = pl2r(A1, names, vars, options) ;
+  RObject Res = Expr ;
+  try 
+  {
+    Language id("identity") ;
+    id.push_back(Expr) ;
+    Res = id.eval() ;
+  }
+  
+  catch(std::exception& ex)
+  {
+    throw PlException(PlCompound("r_eval", PlTermv(A1, PlTerm(ex.what())))) ;
+  }
+
+  PlTerm pl ;
+  try
+  {
+    pl = r2pl(Res, names, vars, options) ;
+  }
+  
+  catch(std::exception& ex)
+  {
+    throw PlException(PlCompound("r_eval", PlTermv(A1, PlTerm(ex.what())))) ;
+  }
+
+  return (A2 = pl) ;
+}
+
+// The SWI system should not be initialized twice; therefore, we keep track of
+// its status.
+bool pl_initialized = false ;
+
+// Initialize SWI-prolog. This needs a list of the command-line arguments of 
+// the calling program, the most important being the name of the main 
+// executable, argv[0]. I added "-q" to suppress SWI prolog's welcome message
+// which is shown in .onAttach anyway.
+// [[Rcpp::export(.init)]]
+LogicalVector init_(String argv0)
+{
+  if(pl_initialized)
+    warning("Please do not initialize SWI-prolog twice in the same session.") ;
+  
+  // Prolog documentation requires that argv is accessible during the entire 
+  // session. I assume that this pointer is valid during the whole R session,
+  // and that I can safely cast it to const.
+  int argc = 2 ;
+  const char* argv[argc] = {argv0.get_cstring(), "-q"} ;
+  if(!PL_initialise(argc, (char**) argv))
+    stop("rolog_init: initialization failed.") ;
+
+  // PL_register_foreign("r_eval", 2, (void*) r_eval, PL_FA_VARARGS) ;
+
+  pl_initialized = true ;  
+  return true ;
+}
+
+// [[Rcpp::export(.done)]]
+LogicalVector done_()
+{
+  if(!pl_initialized)
+  {
+    warning("rolog_done: swipl has not been initialized") ;
+    return true ;
+  }
+
+  // Just in case there are open queries
+  query_close() ;
+
+  // Prolog documentation says that PL_cleanup is not fully functional, so this
+  // code is preliminary. In particular, it is currently not possible to unload 
+  // rolog and load it again in the same R session.
+  //
+  // For these reasons, the call to cleanup is currently suppressed.
+
+  // PL_cleanup(0) ;
+  // pl_initialized = false ;
+  return true ;
 }
