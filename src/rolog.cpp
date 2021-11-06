@@ -576,7 +576,7 @@ PlTerm r2pl_integer(IntegerVector r, List options)
 // variables, and it is unified with it if the name is found. Otherwise, a new
 // variable is created.
 //
-// options("atomize") is true, no variable is created, but an atom is created 
+// If options("atomize") is true, no variable is created, but an atom is created 
 // with the variable name from R. This is only used for pretty printing.
 PlTerm r2pl_var(ExpressionVector r, CharacterVector& names, PlTerm& vars, List options)
 {
@@ -735,9 +735,9 @@ PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, List options)
   return r2pl_na() ;
 }
 
-static term_t query_term ;
 static CharacterVector query_names ;
-static PlTerm* query_vars = NULL ;
+static PlTerm query_vars ;
+static term_t query_term ;
 
 // Open a query for later use.
 // [[Rcpp::export(.query)]]
@@ -746,10 +746,9 @@ RObject query_(RObject query, List options)
   if(PL_current_query() != 0)
     stop("Cannot raise simultaneous queries. Please invoke query_close()") ;
 
-  query_vars = new PlTerm ;
   options("atomize") = false ;
   query_names = CharacterVector::create() ;
-  if(!PL_put_term(query_term, (term_t) r2pl(query, query_names, *query_vars, options)))
+  if(!PL_put_term(query_term, (term_t) r2pl(query, query_names, query_vars, options)))
     stop("Cannot create query.") ;
 
   predicate_t pred = PL_predicate("call", 1, "user") ;
@@ -764,18 +763,19 @@ RObject query_(RObject query, List options)
 // [[Rcpp::export(.query_close)]]
 RObject query_close_()
 {
-  qid_t qid = PL_current_query() ;
+  if(qid_t qid = PL_current_query())
   if(qid == 0)
+  {
     warning("No open query.") ;
-  else
-    PL_close_query(qid) ;
-  
-  if(query_vars)
-    delete query_vars ;
-  query_vars = NULL ;
-  
+    return LogicalVector::create(false) ;
+  }
+
+  // Clear variable list
+  query_vars = PlTerm ;
+
   // invisible
-  return LogicalVector::create(TRUE) ;
+  PL_close_query(qid) ;
+  return LogicalVector::create(true) ;
 }
 
 // Submit query
@@ -794,7 +794,7 @@ RObject submit_(List options)
     for(int i=0 ; i<query_names.length() ; i++)
     {
       tail.next(v) ;
-      RObject r = pl2r(v, query_names, *query_vars, options) ;
+      RObject r = pl2r(v, query_names, query_vars, options) ;
       if(TYPEOF(r) == EXPRSXP && 
         query_names[i] == as<Symbol>(as<ExpressionVector>(r)[0]).c_str())
       continue ;
