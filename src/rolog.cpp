@@ -54,7 +54,8 @@ PREDICATE(r_eval, 2)
     Language id("identity") ;
     id.push_back(Expr) ;
     Res = id.eval() ;
-  } 
+  }
+  
   catch(std::exception& ex)
   {
     throw PlException(PlCompound("r_eval", PlTermv(A1, PlTerm(ex.what())))) ;
@@ -65,6 +66,7 @@ PREDICATE(r_eval, 2)
   {
     pl = r2pl(Res, names, vars, options) ;
   }
+  
   catch(std::exception& ex)
   {
     throw PlException(PlCompound("r_eval", PlTermv(A1, PlTerm(ex.what())))) ;
@@ -306,7 +308,6 @@ RObject pl2r_variable(PlTerm pl, CharacterVector& names, PlTerm& vars)
   for(int i=0 ; i<names.length() ; i++)
   {
     tail.next(v) ;
-
     if(!strcmp(v, pl))
       return ExpressionVector::create(Symbol(names(i))) ;
   }
@@ -778,12 +779,25 @@ RObject submit_(List options)
   if(query_id == NULL)
     stop("No open query.") ;
 
-  if(!query_id->next_solution())
+  int q ;
+  try
+  {
+    q = query_id->next_solution() ;
+  }
+
+  catch(std::exception& ex)
+  {
+    char* s = ex ; // string is stored in a 16-ring-buffer
+    PL_clear_exception() ;
+    stop("%s failed: %s", (char*) pl, s) ;
+  }
+
+  if(!q)
   {
     query_close_() ;
     return LogicalVector::create(false) ;
   }
-
+  
   List l ;
   PlTail tail(*query_vars) ;
   PlTerm v ;
