@@ -748,7 +748,7 @@ RObject query_(RObject query, List options)
 
   query_vars = new PlTerm ;
   options("atomize") = false ;
-  query_names = List::create() ;
+  query_names = CharacterVector::create() ;
   if(!PL_put_term(query_term, (term_t) r2pl(query, query_names, *query_vars, options)))
     stop("Cannot create query.") ;
 
