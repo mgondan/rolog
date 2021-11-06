@@ -747,8 +747,8 @@ RObject query_(RObject query, List options)
     stop("Cannot raise simultaneous queries. Please invoke query_close()") ;
 
   query_vars = new PlTerm ;
-  query_options = new List ;
   options("atomize") = false ;
+  query_names = List::create() ;
   if(!PL_put_term(query_term, (term_t) r2pl(query, query_names, *query_vars, options)))
     stop("Cannot create query.") ;
 
