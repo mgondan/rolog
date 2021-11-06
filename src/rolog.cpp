@@ -785,7 +785,7 @@ RObject submit_(List options)
     q = query_id->next_solution() ;
   }
 
-  catch(std::exception& ex)
+  catch(PlException& ex)
   {
     char* s = ex ; // string is stored in a 16-ring-buffer
     PL_clear_exception() ;
