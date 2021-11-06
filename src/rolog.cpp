@@ -752,7 +752,7 @@ RObject query_(RObject query, List options)
     stop("Cannot create query.") ;
 
   predicate_t pred = PL_predicate("call", 1, "user") ;
-  qid_t qid = PL_open_query(NULL, PL_Q_NORMAL, pred, query_term) ;
+  qid_t qid = PL_open_query(NULL, PL_Q_PASS_EXCEPTION, pred, query_term) ;
   if(qid == 0)
     stop("Could not create query.") ;
   
@@ -763,7 +763,7 @@ RObject query_(RObject query, List options)
 // [[Rcpp::export(.query_close)]]
 RObject query_close_()
 {
-  if(qid_t qid = PL_current_query())
+  qid_t qid = PL_current_query() ;
   if(qid == 0)
   {
     warning("No open query.") ;
@@ -771,7 +771,7 @@ RObject query_close_()
   }
 
   // Clear variable list
-  query_vars = PlTerm ;
+  query_vars = PlTerm() ;
 
   // invisible
   PL_close_query(qid) ;
