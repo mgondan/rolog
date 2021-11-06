@@ -988,7 +988,7 @@ LogicalVector done_()
   }
 
   // Just in case there are open queries
-  query_close() ;
+  query_close_() ;
 
   // Prolog documentation says that PL_cleanup is not fully functional, so this
   // code is preliminary. In particular, it is currently not possible to unload 
