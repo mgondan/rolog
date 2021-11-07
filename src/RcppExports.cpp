@@ -101,13 +101,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // submit_
-RObject submit_(List options);
-RcppExport SEXP _rolog_submit_(SEXP optionsSEXP) {
+RObject submit_();
+RcppExport SEXP _rolog_submit_() {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< List >::type options(optionsSEXP);
-    rcpp_result_gen = Rcpp::wrap(submit_(options));
+    rcpp_result_gen = Rcpp::wrap(submit_());
     return rcpp_result_gen;
 END_RCPP
 }
