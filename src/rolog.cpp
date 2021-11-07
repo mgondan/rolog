@@ -944,7 +944,7 @@ PREDICATE(r_eval, 2)
   
   catch(std::exception& ex)
   {
-    throw PlException(PlCompound("r_eval", PlTerm(A1, PlTerm(ex.what())))) ;
+    throw PlException(PlCompound("r_eval", PlTermv(A1), PlTerm(ex.what()))) ;
   }
 
   return (A2 = pl) ;
