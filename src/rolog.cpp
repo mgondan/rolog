@@ -827,8 +827,8 @@ RObject portray_(RObject query, List options)
   PlTermv pl(3) ;
   pl[0] = r2pl(query, names, vars, options) ;
   PlTail tail(pl[2]) ;
-  tail.append(PlCompound("quoted", PlTermv(PlAtom("false")))) ;
-  tail.append(PlCompound("spacing", PlTermv(PlAtom("next_argument")))) ;
+  tail.append(PlCompound("quoted", PlTerm("false"))) ;
+  tail.append(PlCompound("spacing", PlTerm("next_argument"))) ;
   tail.close() ;
 
   PlFrame f ;
