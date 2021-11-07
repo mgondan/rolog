@@ -29,8 +29,8 @@
     .Call('_rolog_query_close_', PACKAGE = 'rolog')
 }
 
-.submit <- function(options) {
-    .Call('_rolog_submit_', PACKAGE = 'rolog', options)
+.submit <- function() {
+    .Call('_rolog_submit_', PACKAGE = 'rolog')
 }
 
 .portray <- function(query, options) {
