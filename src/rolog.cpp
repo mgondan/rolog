@@ -652,7 +652,7 @@ PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, List options)
   return r2pl_na() ;
 }
 
-RlQuery  
+class RlQuery  
 {
   CharacterVector names ;
   PlTerm vars ;
