@@ -782,8 +782,8 @@ RObject once_(RObject query, List options)
   if(!query_(query, options))
     return LogicalVector(false) ;
     
-  RObject l = submit() ;
-  query_close() ;
+  RObject l = submit_() ;
+  query_close_() ;
   return l ;
 }
 
