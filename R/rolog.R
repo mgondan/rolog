@@ -173,10 +173,9 @@ rolog_options = function()
 portray = function(query=call('member', expression(X), list(1, 2, 3)), 
   options=NULL)
 {
-  options$atomize=TRUE
-  r = once(call("term_string", query, expression(QUERY), 
-            list(quote(quoted(false)), quote(spacing(next_argument)))), 
-       options)
+  options = c(atomize=TRUE, portray=FALSE, options, rolog_options())
+  format = list(quote(quoted(false)), quote(spacing(next_argument)))
+  r = once(call("term_string", query, expression(QUERY), format), options)
   r$QUERY
 }
 
