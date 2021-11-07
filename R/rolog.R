@@ -106,9 +106,6 @@ rolog_done = function()
   .done()
 }
 
-# Package global settings
-pkg.env = new.env(parent = emptyenv())
-
 #' Consult a prolog database
 #' 
 #' @param fname file name of database
@@ -341,7 +338,6 @@ query = function(query=call('member', expression(X), list(1, 2, 3)), options=NUL
   if(options$portray)
     attr(r, 'query') = q
   
-  pkg.env$query_options = options
   return(r)
 }
 
@@ -379,7 +375,6 @@ query_close = function()
 #' 
 submit = function()
 {
-  options = pkg.env$query_options
-  r = .submit(options)
+  r = .submit()
   return(r)
 }
