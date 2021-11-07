@@ -924,8 +924,9 @@ PREDICATE(r_eval, 2)
   List options = List::create(Named("realvec") = "#", Named("boolvec") = "!", Named("charvec") = "$", Named("intvec") = "%", Named("atomize") = false, Named("scalar") = true) ;
     
   RObject Expr = pl2r(A1, names, vars, options) ;
+  throw PlException(PlCompound("r_evalxx", PlTermv(A1, A2))) ;
   RObject Res = Expr ;
-  try 
+  try
   {
     Language id("identity") ;
     id.push_back(Expr) ;
