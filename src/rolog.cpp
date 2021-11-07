@@ -682,8 +682,6 @@ RlQuery::~RlQuery()
 {
   if(qid)
     delete qid ;
-
-  stop("No open query.") ;
 }
 
 int RlQuery::next_solution()
@@ -703,7 +701,7 @@ int RlQuery::next_solution()
     PL_clear_exception() ;
     stop("Query failed: %s", s) ;
   }
-      
+
   return q ;
 }
 
@@ -759,10 +757,7 @@ RObject submit_()
     stop("submit: no open query.") ;
 
   if(!query_id->next_solution())
-  {
-    query_close_() ;
     return LogicalVector::create(false) ;
-  }
   
   return query_id->bindings() ;
 }
