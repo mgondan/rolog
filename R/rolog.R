@@ -170,13 +170,10 @@ rolog_options = function()
 #'
 #' @seealso [rolog_options()] for options controlling R to prolog translation
 #' 
-portray = function(query=call('member', expression(X), list(1, 2, 3)), 
-  options=NULL)
+portray = function(query=call('member', expression(X), list(1, 2, 3)), options=NULL)
 {
-  options = c(atomize=TRUE, portray=FALSE, options, rolog_options())
-  format = list(quote(quoted(false)), quote(spacing(next_argument)))
-  r = once(call("term_string", query, expression(QUERY), format), options)
-  r$QUERY
+  options = c(options, rolog_options())
+  .portray(query, options)
 }
 
 #' Invoke a query once
