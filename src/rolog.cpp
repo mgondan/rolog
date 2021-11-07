@@ -694,7 +694,7 @@ int RlQuery::next_solution()
   int q ;
   try
   {
-    q = query_id->next_solution() ;
+    q = qid->next_solution() ;
   }
 
   catch(PlException& ex)
