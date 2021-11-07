@@ -916,10 +916,10 @@ RObject call_(String query)
 }
 
 // Evaluate R expression from Prolog
-// static foreign_t r_eval(PlTermv arg, int arity, void* context)
-PREDICATE(r_eval, 2)
+static foreign_t r_eval(PlTermv arg, int arity, void* context)
+// PREDICATE(r_eval, 2)
 {
-  throw PlException(PlCompound("r_evalxx", PlTermv(A1, A2))) ;
+  // throw PlException(PlCompound("r_evalxx", PlTermv(A1, A2))) ;
 
   CharacterVector names ;
   PlTerm vars ;
@@ -975,7 +975,7 @@ LogicalVector init_(String argv0)
   if(!PL_initialise(argc, (char**) argv))
     stop("rolog_init: initialization failed.") ;
 
-  // PL_register_foreign("r_eval", 2, (void*) r_eval, PL_FA_VARARGS) ;
+  PL_register_foreign("r_eval", 2, (void*) r_eval, PL_FA_VARARGS) ;
 
   pl_initialized = true ;  
   return true ;
