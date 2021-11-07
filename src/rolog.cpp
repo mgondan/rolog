@@ -689,7 +689,7 @@ RlQuery::~RlQuery()
 int RlQuery::next_solution()
 {
   if(qid == NULL)
-    stop("No open query.") ;
+    stop("next_solution: no open query.") ;
     
   int q ;
   try
