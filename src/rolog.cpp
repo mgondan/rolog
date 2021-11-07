@@ -780,7 +780,7 @@ RObject once_(RObject query, List options)
 {
   PlFrame f ;
   if(!query_(query, options))
-    return LogicalVector(false) ;
+    stop("Could not create query.") ;
     
   RObject l = submit_() ;
   query_close_() ;
@@ -791,52 +791,22 @@ RObject once_(RObject query, List options)
 // [[Rcpp::export(.findall)]]
 List findall_(RObject query, List options)
 {
-  if(PL_current_query() != 0)
-  {
-    warning("Closing the current query.") ;
-    query_close_() ;
-  }
-
-  CharacterVector names ;
-  PlTerm vars ;
-  options("atomize") = false ; // do not translate variables to their names
-  PlTerm pl = r2pl(query, names, vars, options) ;
-
   PlFrame f ;
-  PlQuery q("call", pl) ;
+  if(!query_(query, options))
+    stop("Could not create query.") ;
+    
   List results ;
   while(true)
   {
-    try
-    {
-      if(!q.next_solution())
-        return results ;
-    }
-    
-    catch(PlException& ex)
-    {
-      char* s = ex ;
-      PL_clear_exception() ;
-      stop("%s failed: %s", (char*) pl, s) ;
-    }
-    
-    List l ;
-    PlTail tail(vars) ;
-    PlTerm v ;
-    for(int i=0 ; i<names.length() ; i++)
-    {
-      tail.next(v) ;
-
-      RObject r = pl2r(v, names, vars, options) ;
-      if(TYPEOF(r) == EXPRSXP 
-           && names[i] == as<Symbol>(as<ExpressionVector>(r)[0]).c_str())
-        continue ;
-        
-      l.push_back(r, (const char*) names[i]) ;
-    }
+    RObject l = submit_() ;
+    if(TYPEOF(l) == LGLSXP)
+      break ;
     
     results.push_back(l) ;
   }
+  
+  query_close_() ;
+  return results ;
 }
 
 // Pretty print query. Maybe simplify to something like this:
