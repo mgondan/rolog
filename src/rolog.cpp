@@ -705,6 +705,7 @@ RObject submit_(List options)
   {
     char* s = ex ; // string is stored in a 16-ring-buffer
     PL_clear_exception() ;
+    query_close_() ;
     stop("Query failed: %s", s) ;
   }
 
