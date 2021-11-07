@@ -916,16 +916,13 @@ RObject call_(String query)
 }
 
 // Evaluate R expression from Prolog
-static foreign_t r_eval(PlTermv arg, int arity, void* context)
-// PREDICATE(r_eval, 2)
+PREDICATE(r_eval, 2)
 {
-  // throw PlException(PlCompound("r_evalxx", PlTermv(A1, A2))) ;
-
   CharacterVector names ;
   PlTerm vars ;
   List options = List::create(Named("realvec") = "#", Named("boolvec") = "!", Named("charvec") = "$", Named("intvec") = "%", Named("atomize") = false, Named("scalar") = true) ;
     
-  RObject Expr = pl2r(/*A1*/ arg[0], names, vars, options) ;
+  RObject Expr = pl2r(A1, names, vars, options) ;
   RObject Res = Expr ;
   try
   {
@@ -936,7 +933,7 @@ static foreign_t r_eval(PlTermv arg, int arity, void* context)
   
   catch(std::exception& ex)
   {
-    throw PlException(PlCompound("r_eval", PlTermv(/*A1*/ arg[0], PlTerm(ex.what())))) ;
+    throw PlException(PlCompound("r_eval", PlTermv(A1, PlTerm(ex.what())))) ;
   }
 
   PlTerm pl ;
@@ -947,10 +944,10 @@ static foreign_t r_eval(PlTermv arg, int arity, void* context)
   
   catch(std::exception& ex)
   {
-    throw PlException(PlCompound("r_eval", PlTermv(/*A1*/ arg[0], PlTerm(ex.what())))) ;
+    throw PlException(PlCompound("r_eval", PlTerm(A1, PlTerm(ex.what())))) ;
   }
 
-  return (/*A2*/ arg[1] = pl) ;
+  return (A2 = pl) ;
 }
 
 // The SWI system should not be initialized twice; therefore, we keep track of
@@ -974,8 +971,6 @@ LogicalVector init_(String argv0)
   const char* argv[argc] = {argv0.get_cstring(), "-q"} ;
   if(!PL_initialise(argc, (char**) argv))
     stop("rolog_init: initialization failed.") ;
-
-  PL_register_foreign("r_eval", 2, (void*) r_eval, PL_FA_VARARGS) ;
 
   pl_initialized = true ;  
   return true ;
