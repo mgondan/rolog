@@ -925,7 +925,7 @@ static foreign_t r_eval(PlTermv arg, int arity, void* context)
   PlTerm vars ;
   List options = List::create(Named("realvec") = "#", Named("boolvec") = "!", Named("charvec") = "$", Named("intvec") = "%", Named("atomize") = false, Named("scalar") = true) ;
     
-  RObject Expr = pl2r(A1, names, vars, options) ;
+  RObject Expr = pl2r(/*A1*/ arg[0], names, vars, options) ;
   RObject Res = Expr ;
   try
   {
@@ -936,7 +936,7 @@ static foreign_t r_eval(PlTermv arg, int arity, void* context)
   
   catch(std::exception& ex)
   {
-    throw PlException(PlCompound("r_eval", PlTermv(A1, PlTerm(ex.what())))) ;
+    throw PlException(PlCompound("r_eval", PlTermv(/*A1*/ arg[0], PlTerm(ex.what())))) ;
   }
 
   PlTerm pl ;
@@ -947,10 +947,10 @@ static foreign_t r_eval(PlTermv arg, int arity, void* context)
   
   catch(std::exception& ex)
   {
-    throw PlException(PlCompound("r_eval", PlTermv(A1, PlTerm(ex.what())))) ;
+    throw PlException(PlCompound("r_eval", PlTermv(/*A1*/ arg[0], PlTerm(ex.what())))) ;
   }
 
-  return (A2 = pl) ;
+  return (/*A2*/ arg[1] = pl) ;
 }
 
 // The SWI system should not be initialized twice; therefore, we keep track of
