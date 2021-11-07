@@ -756,7 +756,7 @@ RObject query_close_()
 RObject submit_()
 {
   if(query_id == NULL)
-    stop("No open query.") ;
+    stop("submit: no open query.") ;
 
   if(!query_id->next_solution())
   {
