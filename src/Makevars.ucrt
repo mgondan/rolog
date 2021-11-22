@@ -5,6 +5,6 @@ all: swipl $(SHLIB)
 
 swipl:
 	mkdir -p ../mingw64
-	cd ../mingw64 && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DWIN32_DLLS="" -DLibArchive_INCLUDE_DIRS="`pkg-config --cflags-only-I libarchive`" -DLibArchive_LIBRARIES="`pkg-config --libs --static libarchive`" -DSWIPL_STATIC_LIB=OFF -DCMAKE_C_FLAGS=-DPCRE_STATIC -DHAVE_EVP_MD_CTX_FREE=1 -DHAVE_X509_DIGEST=1 -DHAVE_X509_CRL_DIGEST=1 -DSWIPL_PACKAGES_X=OFF -DINSTALL_DOCUMENTATION=OFF -DMINGW_ROOT=/ucrt64 -G "MSYS Makefiles" ../src/swipl-devel && make && make install
+	cd ../mingw64 && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DWIN32_DLLS="" -DLibArchive_INCLUDE_DIRS="`pkg-config --cflags-only-I libarchive`" -DLibArchive_LIBRARIES="`pkg-config --libs --static libarchive`" -DSWIPL_STATIC_LIB=OFF -DCMAKE_C_FLAGS="-DPCRE_STATIC -DPCRE2_STATIC" -DHAVE_EVP_MD_CTX_FREE=1 -DHAVE_X509_DIGEST=1 -DHAVE_X509_CRL_DIGEST=1 -DSWIPL_PACKAGES_X=OFF -DINSTALL_DOCUMENTATION=OFF -DMINGW_ROOT=/ucrt64 -G "MSYS Makefiles" ../src/swipl-devel && make && make install
 	mkdir -p ../inst/libs/x64
 	cp ../inst/swipl/bin/libswipl.dll ../inst/libs/x64
