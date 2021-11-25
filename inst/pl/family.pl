@@ -13,8 +13,6 @@ parent(tom, liz).
 parent(bob, ann).
 parent(bob, pat).
 parent(pat, jim).
-parent(bob, peter).
-parent(peter, jim).
 
 mother(X, Y) :-
     parent(X, Y),
