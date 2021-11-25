@@ -35,8 +35,8 @@ eval(term)
 # Example 2: integral
 
 This is a bit more tricky, because Prolog needs to call back R to obtain the 
-name of the integration variable. The packages provides a Prolog predicate
-r_eval/2 for this purpose. Here, it is used for something like
+name of the integration variable. The _Rolog_ package provides a Prolog
+predicate r_eval/2 for this purpose. Here, it is used for something like
 r_eval(formalArgs(args(sin)), X) (see mathml.pl), which unifies X with $x$.
 
 ```{r, results='asis'}
