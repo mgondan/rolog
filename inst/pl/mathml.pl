@@ -7,9 +7,10 @@
 r2mathml(A, X) :-
     r2mathml([], A, X).
 
-r2mathml(Flags, A, X) :-
+r2mathml(Flags, A, S) :-
     mathml(Flags, A, M),
-    html(M, X, []).
+    html(M, X, []),
+    maplist(term_string, X, S).
 
 mathml(Flags, A, X) :-
     ml(Flags, A, M),
