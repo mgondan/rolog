@@ -7,7 +7,7 @@ output: html_document
 
 ```{r}
 library(rolog)
-consult(system.file("pl/mathml.pl"), package="rolog"))
+consult(system.file("pl/mathml.pl", package="rolog"))
 
 mathml = function(term)
 {
