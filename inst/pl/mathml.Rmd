@@ -11,7 +11,7 @@ consult(system.file("pl/mathml.pl", package="rolog"))
 
 mathml = function(term)
 {
-  t = once(call("r_mathml", term, expression(X)))
+  t = once(call("r2mathml", term, expression(X)))
   cat(sapply(t$X, as.character), sep="")
 }
 ```
