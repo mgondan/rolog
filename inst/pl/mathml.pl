@@ -165,7 +165,7 @@ denoting(_Flags, boolean(_), Den)
 %
 math(Flags, space, New, X)
  => New = Flags,
-    X = space(thickmathspace).
+    X = space(thinmathspace).
 
 ml(_Flags, space(Width), M)
  => M = mspace(width(Width), []).
