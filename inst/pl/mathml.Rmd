@@ -5,34 +5,34 @@ date: "7 7 2021"
 output: html_document
 ---
 
-Some preparation is needed.
-
 ```{r}
 library(rolog)
-consult(system.file(file.path('pl', 'mathml.pl'), package='rolog'))
+consult(system.file("pl/mathml.pl"), package="rolog"))
 
-html_print = function(term)
+mathml = function(term)
 {
-  t = call('rml', term, expression(X))
-  cat(sapply(once(t)$X, as.character), sep='')
+  t = once(call("r_mathml", term, expression(X)))
+  cat(sapply(t$X, as.character), sep="")
 }
 ```
 
-# Example 1: dbinom
+# Binomial probability
 
-Easy...
+```{r, results="asis"}
+term = quote(pbinom(k, N, p))
 
-```{r, results='asis'}
-term = quote(dbinom(k, N, p))
-html_print(term)
+# Pretty-print as MathML
+mathml(term)
 
-k = 10
-N = 14
-p = 0.4
+k <- 10
+N <- 14
+p <- 0.4
+
+# Calculate result
 eval(term)
 ```
 
-# Example 2: integral
+# An integral
 
 This is a bit more tricky, because Prolog needs to call back R to obtain the 
 name of the integration variable. The _Rolog_ package provides a Prolog
@@ -41,7 +41,7 @@ r_eval(formalArgs(args(sin)), X) (see mathml.pl), which unifies X with $x$.
 
 ```{r, results='asis'}
 term = quote(integrate(sin, 0L, 2L*pi))
-html_print(term)
+mathml(term)
 eval(term)
 ```
 
@@ -50,10 +50,7 @@ integrate/3 is rather rigid, it accepts only these three arguments in that
 particular order, and without names, that is, 
 integrate(sin, lower=0L, upper=2L * pi) would not print the desired result. 
 
-# Example 3: self written function
-
-The third example is nothing special, just to show that Infinity is rendered 
-correctly.
+# A self-written function
 
 ```{r, results='asis'}
 f = function(u)
@@ -62,7 +59,7 @@ f = function(u)
 }
 
 term = quote(integrate(f, -Inf, Inf))
-html_print(term)
+mathml(term)
 
 # It's a bit of a mystery that R knows the result of this integral.
 eval(term)
