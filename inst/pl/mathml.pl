@@ -4,10 +4,10 @@
 %
 % R interface
 %
-rml(A, X) :-
-    rml([], A, X).
+r2mathml(A, X) :-
+    r2mathml([], A, X).
 
-rml(Flags, A, X) :-
+r2mathml(Flags, A, X) :-
     mathml(Flags, A, M),
     html(M, X, []).
 
