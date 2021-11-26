@@ -10,7 +10,7 @@ myq = function(x)
 		n = substr(as.character(x), 1, 1)
 		
 		# Variable
-		if(n == toupper(n))
+		if(n == toupper(n) & n != tolower(n))
 			return(as.expression(x))
 
 		if(n == "_")
