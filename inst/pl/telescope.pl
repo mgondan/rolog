@@ -1,27 +1,27 @@
-% Simple grammar with sentences, noun/verb/participle phrases
-s(s(NP,VP)) --> np(NP, Num), vp(VP, Num).
+:- use_module(library(dcg/basics)).
 
-np(NP, Num) --> pn(NP, Num).
-np(np(Det, N), Num) --> det(Det, Num), n(N, Num).
-np(np(Det, N, PP), Num) --> det(Det, Num), n(N, Num), pp(PP).
+% R-friendly user interface
+sentence(Tree, Sentence) :-
+    string_codes(Sentence, Codes),
+    phrase(s(Tree), Codes).
 
-vp(vp(V, NP), Num) --> v(V, Num), np(NP, _).
-vp(vp(V, NP, PP), Num) --> v(V, Num), np(NP, _), pp(PP).
-
-pp(pp(P, NP)) --> p(P), np(NP, _).
+% Simple grammar with sentences, noun, verb and participle phrases
+s(s(NP, VP)) --> np(NP, C), blank, vp(VP, C).
+np(NP, C) --> pn(NP, C).
+np(np(Det, N), C) --> det(Det, C), blank, n(N, C).
+np(np(Det, N, PP), C) --> det(Det, C), blank, n(N, C), blank, pp(PP).
+vp(vp(V, NP), C) --> v(V, C), blank, np(NP, _).
+vp(vp(V, NP, PP), C) --> v(V, C), blank, np(NP, _), blank, pp(PP).
+pp(pp(P, NP)) --> p(P), blank, np(NP, _).
 
 % Determiners, personal nouns, nouns, verbs and participles
-det(det(a), sg) --> ["a"].
-det(det(the), _) --> ["the"].
-
-pn(pn(john), sg) --> ["john"].
-
-n(n(man), sg) --> ["man"].
-n(n(men), pl) --> ["men"].
-n(n(telescope), sg) --> ["telescope"].
-
-v(v(sees), sg) --> ["sees"].
-v(v(see), pl) --> ["see"].
-v(v(saw), _) --> ["saw"].
-
-p(p(with)) --> ["with"].
+det(det(a), sg) --> "a".
+det(det(the), _) --> "the".
+pn(pn(john), sg) --> "john".
+n(n(man), sg) --> "man".
+n(n(men), pl) --> "men".
+n(n(telescope), sg) --> "telescope".
+v(v(sees), sg) --> "sees".
+v(v(see), pl) --> "see".
+v(v(saw), _) --> "saw".
+p(p(with)) --> "with".
