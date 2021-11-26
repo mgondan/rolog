@@ -17,6 +17,12 @@ myq = function(x)
 			return(as.expression(x))
 	}
 
+	if(is.call(x) & x[[1]] == "list")
+	{
+		args = as.list(x)
+		return(lapply(args[-1], FUN=myq))
+	}
+	
 	if(is.call(x))
 	{
 		args = as.list(x)
