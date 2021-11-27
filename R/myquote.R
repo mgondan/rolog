@@ -17,16 +17,15 @@ myq = function(x)
 			return(as.expression(x))
 	}
 
-	if(is.call(x) & x[[1]] == "list")
-	{
-		args = as.list(x)
-		return(lapply(args[-1], FUN=myq))
-	}
-	
 	if(is.call(x))
 	{
 		args = as.list(x)
 		args[-1] = lapply(args[-1], FUN=myq)
+		
+		# list(1, 2, 3) is a list not a call
+		if(args[[1]] == "list")
+			return(args[-1])
+
 		return(as.call(args))
 	}
 	
