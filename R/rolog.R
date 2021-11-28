@@ -378,9 +378,6 @@ findall = function(query=member(X, list(a, "b", 3L, 4, TRUE, Y)), options=NULL)
 
 #' Create a query
 #'
-#' @return
-#' If the creation of the query succeeds, `TRUE`.
-#'   
 #' @param query
 #' an R call. The R call consists of symbols, integers and real numbers, 
 #' character strings, boolean values, expressions, lists, and other calls.
@@ -400,6 +397,9 @@ findall = function(query=member(X, list(a, "b", 3L, 4, TRUE, Y)), options=NULL)
 #'   scalar prolog elements. If _scalar_ is `FALSE`, vectors of length 1 are
 #'   also translated to compounds.
 #'
+#' @return
+#' If the creation of the query succeeds, `TRUE`.
+#'   
 #' @details
 #' SWI-Prolog does not allow multiple open queries. If another query is open, it
 #' it is closed and a warning is shown.
@@ -515,8 +515,60 @@ clear <- function()
 #' submit() # X = "b"
 #' clear()
 #' 
-submit = function()
+submit <- function()
 {
-  r = .submit()
+  r <- .submit()
   return(r)
+}
+
+#' Translate simplified to canonical representation
+#'
+#' @param query
+#' an R call representing a prolog query with prolog-like syntax, e.g.,
+#' `member(X, list(a, b, Y))` that is used in [query()], [once()], and [findall()].
+#' This is query is translated to Rolog's canonical representation, with
+#' R calls and prolog variables enclosed in an R expression, in this example,
+#' `call("member", expression(X), list(a, b, expression(Y))))`.
+#'
+#' @seealso [query()], [once()], [findall()]
+#' which use this function if `options$quote` is `TRUE`.
+#'
+#' @seealso [rolog_options()]
+#' option _quote_ controls whether this function is used.
+#'
+#' @examples
+#' query(member(X, list(a, "b", 3L, 4, TRUE, Y)))
+#'
+rolog_quote <- function(query)
+{
+	.quote(substitute(query))
+}
+
+.quote <- function(x)
+{
+	if(is.symbol(x))
+	{
+		n <- substr(as.character(x), 1, 1)
+		
+		# Variable
+		if(n == toupper(n) & n != tolower(n))
+			return(as.expression(x))
+
+		if(n == "_")
+			return(as.expression(x))
+	}
+
+	if(is.call(x))
+	{
+		args = as.list(x)
+		args[-1] = lapply(args[-1], FUN=.quote)
+		
+		# list(1, 2, 3) is a list not a call
+		if(args[[1]] == "list")
+			return(args[-1])
+
+		return(as.call(args))
+	}
+	
+	return(x)
 }
