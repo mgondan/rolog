@@ -737,9 +737,9 @@ RObject query_(RObject query, List options)
   return LogicalVector::create(true) ;
 }
 
-// Close query (and invoke cleanup handlers, see PL_close_query)
-// [[Rcpp::export(.query_close)]]
-RObject query_close_()
+// Clear query (and invoke cleanup handlers, see PL_close_query)
+// [[Rcpp::export(.clear)]]
+RObject clear_()
 {
   if(query_id)
     delete query_id ;
@@ -783,7 +783,7 @@ RObject once_(RObject query, List options)
     stop("Could not create query.") ;
     
   RObject l = submit_() ;
-  query_close_() ;
+  clear_() ;
   return l ;
 }
 
@@ -805,7 +805,7 @@ List findall_(RObject query, List options)
     results.push_back(l) ;
   }
   
-  query_close_() ;
+  clear_() ;
   return results ;
 }
 
@@ -818,7 +818,7 @@ RObject portray_(RObject query, List options)
   if(PL_current_query() != 0)
   {
     warning("Closing the current query.") ;
-    query_close_() ;
+    clear_() ;
   }
 
   CharacterVector names ;
@@ -861,7 +861,7 @@ RObject call_(String query)
   if(PL_current_query() != 0)
   {
     warning("Closing the current query.") ;
-    query_close_() ;
+    clear_() ;
   }
 
   int r = false ;
@@ -951,7 +951,7 @@ LogicalVector done_()
   }
 
   // Just in case there are open queries
-  query_close_() ;
+  clear_() ;
 
   // Prolog documentation says that PL_cleanup is not fully functional, so this
   // code is preliminary. In particular, it is currently not possible to unload 
