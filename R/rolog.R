@@ -3,15 +3,16 @@
 # This cannot be delegated to a useDynLib directive in NAMESPACE (at least not
 # under linux). The reason is that rolog.so itself is able to load other 
 # packages (i.e. prolog libraries), and therefore exports a number of 
-# prolog-specific symbols. The additional option "local=FALSE" makes sure these
+# prolog-specific symbols. The additional option local=FALSE makes sure these
 # symbols are imported on startup. This option is not available in if we use
 # useDynLib in NAMESPACE.
 #
-.onLoad = function(libname, pkgname)
+.onLoad <- function(libname, pkgname)
 {
   library.dynam(chname='rolog', package=pkgname, lib.loc=libname, local=FALSE)
   
-  op.rolog = list(
+  op.rolog <- list(
+    rolog.quote = TRUE,   # accept simplified syntax, use rolog_quote
     rolog.realvec = '#',  # prolog representation of R numeric vectors
     rolog.intvec = '%',   # prolog representation of R integer vectors
     rolog.boolvec = '!',  # prolog representation of R boolean vectors
@@ -19,14 +20,14 @@
     rolog.portray = TRUE, # return prolog call, nicely formatted
     rolog.scalar = TRUE)  # convert R vectors of size 1 to scalars in Prolog
 
-  set = !(names(op.rolog) %in% names(options()))
+  set <- !(names(op.rolog) %in% names(options()))
   if(any(set))
     options(op.rolog[set])
 
   invisible()
 }
 
-.onUnload = function(libpath)
+.onUnload <- function(libpath)
 {
   library.dynam.unload('rolog', libpath=libpath)
   invisible()
@@ -34,36 +35,36 @@
 
 # This is a bit of a mystery.
 #
-# Initialization of the rolog system works fine under linux, under Windows using
+# Initialization of the SWI-Prolog works fine under linux, under Windows using
 # RStudio.exe, under Windows using RTerm.exe, but fails under RGui.exe (aka. 
 # "blue R"). Even stranger, it works in the second attempt. 
 #
 # For this reason, I invoke rolog_init twice here. Any hint to a cleaner
 # solution is highly appreciated.
 #
-.onAttach = function(libname, pkgname)
+.onAttach <- function(libname, pkgname)
 {
   if(.Platform$OS.type == 'unix')
   {
     Sys.setenv(SWI_HOME_DIR=file.path(libname, pkgname, 'swipl', 'lib', 'swipl'))
     if(!rolog_init())
-      stop('rolog: initialization of swipl failed.')  
+      stop('Rolog: initialization of swipl failed.')  
   }
 
   if(.Platform$OS.type == 'windows')
   {
     Sys.setenv(SWI_HOME_DIR=file.path(libname, pkgname, 'swipl'))
     if(!rolog_init() && !rolog_init())
-      stop('rolog: initialization of swipl failed.')  
+      stop('Rolog: initialization of swipl failed.')  
   }
   
   # SWI startup message
-  W = once(call('message_to_string', quote(welcome), expression(W)))$W
-  packageStartupMessage(W)
+  W <- once(message_to_string(welcome), W))
+  packageStartupMessage(W$W)
   invisible()
 }
 
-.onDetach = function(libpath)
+.onDetach <- function(libpath)
 {
   if(.Platform$OS.type == 'unix')
     Sys.unsetenv('SWI_HOME_DIR')
@@ -71,35 +72,41 @@
   if(.Platform$OS.type == 'windows')
     Sys.unsetenv('SWI_HOME_DIR')
 
-  query_close()
+  # In case there are open queries, clear them
+  clear()
   
   if(!rolog_done())
-    stop('rolog: not initialized')
+    stop('Rolog: not initialized')
 }
 
 #' Start prolog
 #'
-#' @param argv1 file name of the R executable
-#' @return TRUE on success
+#' @param argv1
+#' file name of the R executable
+#'
+#' @return
+#' `TRUE` on success
 #' 
 #' @details 
 #' SWI-prolog is automatically initialized when the rolog library is loaded, so
 #' this function is normally not directly invoked.
 #'
-rolog_init = function(argv1=commandArgs()[1])
+rolog_init <- function(argv1=commandArgs()[1])
 {
   .init(argv1)
 }
 
 #' Clean up when detaching the library
 #' 
-#' @return `TRUE` on success
+#' @return
+#' `TRUE` on success
+#'
 #' @md
 #' 
 #' @details
-#' At this stage, this function is of
-#' little practical use, since it is not yet possible to initialize prolog
-#' twice in the same R session. See the source file rolog.cpp for details.
+#' At this stage, this function is of little practical use, since it is not yet
+#' possible to initialize prolog twice in the same R session. See the source file
+#' rolog.cpp for details.
 #' 
 rolog_done = function()
 {
@@ -108,156 +115,203 @@ rolog_done = function()
 
 #' Consult a prolog database
 #' 
-#' @param fname file name of database
-#' @return `TRUE` on success
+#' @param fname
+#' file name of database
+#'
+#' @return
+#' `TRUE` on success
+#'
 #' @md
 #'
-#' @seealso [once()] and [findall()] for executing queries
+#' @seealso
+#' [once()], [findall()], and [query()]/[submit()]/[clear()] for executing queries
 #' 
 #' @examples
-#' consult(fname=system.file("likes.pl", package="rolog"))
-#' findall(call("likes", quote(sam), expression(X)))
+#' consult(fname=system.file('likes.pl', package='rolog'))
+#' findall(likes(sam, X))
 #' 
 consult = function(fname=system.file('likes.pl', package='rolog'))
 {
   .consult(fname)
 }
 
-#' Quick access to rolog's own options
+#' Quick access to Rolog's own options
 #' 
-#' @return list with some options for translating R expressions to Prolog 
+#' @return
+#' list with some options for translating R expressions to prolog 
+#'
 #' @md
 # 
 #' @details
 #' Translation of R to Prolog
 #' 
-#' * numeric vector of size N -> $realvec/N (default is #)
-#' * integer vector of size N -> $intvec/N (default is %)
-#' * boolean vector of size N -> $boolvec/n (default is !)
-#' * character vector of size N -> $charvec/N (default is $)
-#' * $scalar: if TRUE (default), translate R vectors of size 1 to scalars in
-#'   Prolog
-#' * $portray: whether to return the prolog translation as an attribute to 
-#'   once and findall (default is TRUE)
+#' * `quote`: if TRUE (default), use simplified syntax (see [query()])
+#' * numeric vector of size _N_ -> `realvec`/N (default is #)
+#' * integer vector of size _N_ -> `intvec`/N (default is %)
+#' * boolean vector of size _N_ -> `boolvec`/N (default is !)
+#' * character vector of size _N_ -> `charvec`/N (default is $$)
+#' * `scalar`: if TRUE (default), translate R vectors of length 1 to scalars
+#' * `portray`: whether to return the prolog translation as an attribute to 
+#'   the return value of once, query and findall (default is TRUE)
+#'
 rolog_options = function()
 {
   list(
+    quote=getOption('rolog.quote', default=TRUE),
     realvec=getOption('rolog.realvec', default='#'),
     intvec=getOption('rolog.intvec', default='%'),
     boolvec=getOption('rolog.boolvec', default='!'),
-    charvec=getOption('rolog.charvec', default='$'),
+    charvec=getOption('rolog.charvec', default='$$'),
     portray=getOption('rolog.portray', default=TRUE),
     scalar=getOption('rolog.scalar', default=TRUE))
 }
 
 #' Translate an R call to a prolog compound and pretty print it
 #' 
-#' @param query an R call
-#' @param options boolean. See rolog_options
-#' @return a character string with the prolog version of the call
+#' @param query 
+#' an R call. The R call consists of symbols, integers and real numbers, 
+#' character strings, boolean values, expressions and lists, and other calls.
+#' Vectors of booleans, integers, floating point numbers, and strings with
+#' length _N_ > 1 are translated to prolog compounds !/N, %/N, #/N and $$/N,
+#' respectively. The names can be modified with the options below.
+#'
+#' @param options
+#' This is a list of options controlling translation from and to prolog.
+#' * if _quote_ is `TRUE` (default), the query is translated to its
+#'   canonical form using `rolog_quote`.
+#' * _boolvec_ (see option rolog.boolvec, default is !) is the name of the
+#'   prolog compound for vectors of booleans.
+#' * _intvec_, _realvec_, _charvec_ define the compound names for vectors of
+#'   integers, doubles and strings, respectively (defaults are %, # and $$).
+#' * If _scalar_ is `TRUE` (default), vectors of length 1 are translated to 
+#'   scalar prolog elements. If _scalar_ is `FALSE`, vectors of length 1 are
+#'   also translated to compounds.
+#'
+#' @return
+#' character string with the prolog syntax of the call
+#'
 #' @md
 #'
 #' @details
-#' R to prolog
+#' If `options$quote` is `TRUE` (default), then R elements are translated
+#' to the following prolog citizens:
+#' 
+#' * numeric -> real (vectors of size _N_ -> #/N)
+#' * integer -> integer (vectors -> %/N)
+#' * character -> string (vectors -> $$/N)
+#' * symbol/name starting with lowercase -> atom
+#' * symbol/name starting with uppercase or _ -> variable
+#' * call/language -> compound
+#' * boolean -> true, false (vectors -> !/N)
+#' * list -> list
+#' * call/language with the name "list" -> list
+#'
+#' If `options$quote` is `FALSE`, the following rules apply:
 #' 
 #' * numeric -> real
-#' * integer -> integer
-#' * character -> string
+#' * integer -> integer (vectors of size _N_ -> %/N)
+#' * character -> string (vectors -> $$/N)
 #' * symbol/name -> atom
-#' * call/language -> compound
 #' * expression -> variable
+#' * call/language -> compound
 #' * boolean -> true, false (atoms)
+#' * list -> list
 #'
-#' @seealso [rolog_options()] for options controlling R to prolog translation
+#' @seealso [rolog_options()] for fine-grained control over the translation
 #' 
-portray = function(query=call('member', expression(X), list(1, 2, 3)), options=NULL)
+portray = function(query=member(X, list(a, "b", 3L, 4, TRUE, Y)), options=NULL)
 {
   options = c(options, rolog_options())
+  
+  # Check if simplified syntax is used
+  if(options$quote)
+    query = rolog_quote(query)
+
   .portray(query, options)
 }
 
 #' Invoke a query once
 #'
-#' @param query a string or an an R call. The R call consists of 
-#'   symbols (= prolog atoms), numbers (= prolog numbers),
-#'   strings (= prolog strings), 
-#'   boolean values (= prolog atoms true and false), 
-#'   expressions (= prolog variables), lists (= prolog lists), and other
-#'   calls (= prolog compounds). Vectors of booleans, integers, floating point
-#'   numbers, and strings with length _N_ > 1 are translated to prolog 
-#'   compounds !/N, %/N, #/N and $/N, respectively. The names can be modified
-#'   with the options below.
+#' @param query 
+#' an R call. The R call consists of symbols, integers and real numbers, 
+#' character strings, boolean values, expressions, lists, and other calls.
+#' Vectors of booleans, integers, floating point numbers, and strings with
+#' length _N_ > 1 are translated to prolog compounds !/N, %/N, #/N and $$/N,
+#' respectively. The names can be modified with the options below.
 #'   
-#'   If _query_ is a string, it is handed over to term_string/2 and then 
-#'   called. This is a shortcut to enable simple commands such as 
-#'   use_module/2. Note that this requires prolog-style quoting.
-#'
-#' @param quote (default is TRUE, unless expr is a "call"): translate
-#'   expr to a prolog query using non-standard evaluation. This is best
-#'   illustrated by an example.
-#'
-#'   This is an example of a query to prolog in canonical form:
-#'   once(call("member", expression(X), list(a, b, c)), quote=FALSE)
-#'
-#'   This is the convenient version of it:
-#'   once(member(X, list(a, b, c)))
+#' @param options
+#' This is a list of options controlling translation from and to prolog.
+#' * if _quote_ is `TRUE` (default), the query is translated to its
+#'   canonical form using `rolog_quote`.
+#' * _boolvec_ (see option rolog.boolvec, default is !) is the name of the
+#'   prolog compound for vectors of booleans.
+#' * _intvec_, _realvec_, _charvec_ define the compound names for vectors of
+#'   integers, doubles and strings, respectively (defaults are %, # and $$).
+#' * If _scalar_ is `TRUE` (default), vectors of length 1 are translated to 
+#'   scalar prolog elements. If _scalar_ is `FALSE`, vectors of length 1 are
+#'   also translated to compounds.
 #'   
-#' @param options list of options controlling translation from and to prolog: 
-#'   boolvec (see option rolog.boolvec, default is !) is the name of the
-#'   prolog compound for boolean vectors. intvec, realvec and charvec define
-#'   the compound names for vectors of integers, doubles and strings, 
-#'   respectively (defaults are %, # and $). If _scalar_ is TRUE (default), 
-#'   vectors of length 1 are translated to scalar prolog elements. If _scalar_
-#'   is FALSE, even vectors of length 1 are translated to compounds.
-#'   
-#' @return If the query fails, an empty list is returned. If the query 
-#'   succeeds _N_ >= 1 times, a list of length _N_ is returned, each element
-#'   being a list of conditions for each solution.
+#' @return
+#' If the query fails, `FALSE` is returned. If the query succeeds, a
+#' (possibly empty) list is returned that includes the bindings required to
+#' satisfy the query.
 #'
-#' @return `FALSE` if the query fails; otherwise, a list with conditions.
-#' 
 #' @md
 #' 
-#' @seealso [findall()] for querying all solutions
-#' @seealso [rolog_options()] for options controlling R to prolog translation
+#' @seealso [findall()]
+#' for querying all solutions
+#' 
+#' @seealso [query()], [submit()], and [clear()] for fine-grained control over
+#' non-deterministic queryies
+#' 
+#' @seealso [rolog_options()]
+#' for options controlling R to prolog translation
 #'
 #' @examples
 #' 
 #' # This query returns FALSE
-#' once(call("=", 1, 2))
+#' once(1 = 2)
 #' 
 #' # This query returns an empty list meaning yes, it works
-#' once(call("=", 1, 1))
+#' once(1 = 1)
 #' 
 #' # This query returns a list stating that it works if X = 1
-#' once(call("member", 1, list(2, expression(X))))
+#' once(member(1, list(a, X))
 #' 
-#' # This query returns a list stating that X = 1 and Z = Y
-#' once(call("=", list(expression(X), expression(Y)), list(1, expression(Z))))
+#' # Same query in canonical form, without intermediate call to prolog_quote()
+#' once(call("member", 1, list(a, expression(X))), options=list(quote=FALSE))
 #' 
-#' # works for X = [1 | _]; i.e. something like [|](1, expression(_6330))
-#' once(call("member", 1, expression(X)))
+#' # This query returns a list stating that X = 1 and Z = expression(Y)
+#' once(list(X, Y) = list(1, Z))
+#' 
+#' # This works for X = [1 | _]; i.e. something like [|](1, expression(_6330))
+#' once(member(1, X))
 #'
-#' # This works for S = '1.0' (scalar)
-#' once(call("format", call("string", expression(S)), quote(`~w`), list(1)), 
-#'   options=list(scalar=TRUE))
+#' # This returns S = '1.0' (scalar)
+#' once(format(string(S), "~w", list(1)), options=list(scalar=TRUE))
 #'   
-#' # This works for S = '#(1.0)' (vector)
-#' once(call("format", call("string", expression(S)), quote(`~w`), list(1)), 
-#'   options=list(scalar=FALSE))
+#' # This returns S = '#(1.0)' (vector)
+#' once(format(string(S), "~w", list(1)), options=list(scalar=FALSE))
 #'
-once = function(query=call('member', expression(X), list(1, 2, 3)), options=NULL)
+once = function(query=member(X, list(a, "b", 3L, 4, TRUE, Y)), options=NULL)
 {
-  if(is.character(query))
-    return(.call(query))
-  
   options = c(options, rolog_options())
+  
+  # Translate to canonical form
+  # member(X, list(1, 2, 3)) => call("member", expression(X), list(1, 2, 3))
+  if(options$quote)
+    query = rolog_quote(query)
+  
+  # Decorate result with the prolog syntax of the query
   if(options$portray)
     q = portray(query, options)
 
+  # Invoke C++ function that calls prolog
   r = .once(query, options)
+  
   if(options$portray)
-    attr(r, 'query') = q ;
+    attr(r, 'query') = q
+
   return(r)
 }
 
