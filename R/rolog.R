@@ -59,7 +59,8 @@
   }
   
   # SWI startup message
-  W <- once(message_to_string(welcome), W))
+  welcome <- call("message_to_string", as.symbol("welcome"), expression(W))
+  W <- once(welcome, options=list(quote=FALSE))
   packageStartupMessage(W$W)
   invisible()
 }
@@ -108,7 +109,7 @@ rolog_init <- function(argv1=commandArgs()[1])
 #' possible to initialize prolog twice in the same R session. See the source file
 #' rolog.cpp for details.
 #' 
-rolog_done = function()
+rolog_done <- function()
 {
   .done()
 }
@@ -130,7 +131,7 @@ rolog_done = function()
 #' consult(fname=system.file('likes.pl', package='rolog'))
 #' findall(likes(sam, X))
 #' 
-consult = function(fname=system.file('likes.pl', package='rolog'))
+consult <- function(fname=system.file('likes.pl', package='rolog'))
 {
   .consult(fname)
 }
@@ -154,7 +155,7 @@ consult = function(fname=system.file('likes.pl', package='rolog'))
 #' * _portray_: if `TRUE` (default) whether to return the prolog translation 
 #'   as an attribute to the return value of [once()], [query()] and [findall()] 
 #'
-rolog_options = function()
+rolog_options <- function()
 {
   list(
     quote=getOption('rolog.quote', default=TRUE),
@@ -219,7 +220,7 @@ rolog_options = function()
 #'
 #' @seealso [rolog_options()] for fine-grained control over the translation
 #' 
-portray = function(query=member(X, list(a, "b", 3L, 4, TRUE, Y)), options=NULL)
+portray <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), options=NULL)
 {
   options = c(options, rolog_options())
   
@@ -270,46 +271,46 @@ portray = function(query=member(X, list(a, "b", 3L, 4, TRUE, Y)), options=NULL)
 #' @examples
 #' 
 #' # This query returns FALSE
-#' once(1 = 2)
+#' once(quote(1 = 2))
 #' 
 #' # This query returns an empty list meaning yes, it works
-#' once(1 = 1)
+#' once(quote(1 = 1))
 #' 
 #' # This query returns a list stating that it works if X = 1
-#' once(member(1, list(a, X))
+#' once(quote(member(1, list(a, X)))
 #' 
 #' # Same query in canonical form, without intermediate call to prolog_quote()
 #' once(call("member", 1, list(a, expression(X))), options=list(quote=FALSE))
 #' 
 #' # This query returns a list stating that X = 1 and Z = expression(Y)
-#' once(list(X, Y) = list(1, Z))
+#' once(quote(list(X, Y) = list(1, Z)))
 #' 
 #' # This works for X = [1 | _]; i.e. something like [|](1, expression(_6330))
-#' once(member(1, X))
+#' once(quote(member(1, X)))
 #'
 #' # This returns S = '1.0' (scalar)
-#' once(format(string(S), "~w", list(1)), options=list(scalar=TRUE))
+#' once(quote(format(string(S), "~w", list(1)), options=list(scalar=TRUE)))
 #'   
 #' # This returns S = '#(1.0)' (vector)
-#' once(format(string(S), "~w", list(1)), options=list(scalar=FALSE))
+#' once(quote(format(string(S), "~w", list(1)), options=list(scalar=FALSE)))
 #'
-once = function(query=member(X, list(a, "b", 3L, 4, TRUE, Y)), options=NULL)
+once <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), options=NULL)
 {
-  options = c(options, rolog_options())
+  options <- c(options, rolog_options())
   
   # Check if simplified syntax is used
   if(options$quote)
-    query = rolog_quote(query)
+    query <- rolog_quote(query)
   
   # Decorate result with the prolog syntax of the query
   if(options$portray)
-    q = portray(query, options)
+    q <- portray(query, options)
 
   # Invoke C++ function that calls prolog
-  r = .once(query, options)
+  r <- .once(query, options)
   
   if(options$portray)
-    attr(r, 'query') = q
+    attr(r, 'query') <- q
 
   return(r)
 }
@@ -353,25 +354,25 @@ once = function(query=member(X, list(a, "b", 3L, 4, TRUE, Y)), options=NULL)
 #' @examples
 #' # This query returns a list stating that it works if X = a, "b", ...
 #' # or X = Y
-#' findall(member(X, list(a, "b", 3L, 4, TRUE, sin(pi/2), Y))
+#' findall(quote(member(X, list(a, "b", 3L, 4, TRUE, sin(pi/2), Y)))
 #' 
-findall = function(query=member(X, list(a, "b", 3L, 4, TRUE, Y)), options=NULL)
+findall <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), options=NULL)
 {
-  options = c(options, rolog_options())
+  options <- c(options, rolog_options())
   
   # Check if simplified syntax is used
   if(options$quote)
-    query = rolog_quote(query)
+    query <- rolog_quote(query)
   
   # Decorate result with the prolog syntax of the query
   if(options$portray)
-    q = portray(query, options)
+    q <- portray(query, options)
 
   # Invoke C++ function that calls prolog
-  r = .findall(query, options)
+  r <- .findall(query, options)
   
   if(options$portray)
-    attr(r, 'query') = q
+    attr(r, 'query') <- q
   
   return(r)
 }
@@ -411,13 +412,13 @@ findall = function(query=member(X, list(a, "b", 3L, 4, TRUE, Y)), options=NULL)
 #' @seealso [findall()] for a query that is submitted until it fails.
 #' 
 #' @examples
-#' query(member(X, list(a, "b", 3L, 4, TRUE, Y)))
+#' query(quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
 #' submit() # X = a
 #' submit() # X = "b"
 #' clear()
 #'
 #' @examples
-#' query(member(X, list(a, "b", 3L, 4, TRUE, Y)))
+#' query(quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
 #' submit() # X = 3L
 #' submit() # X = 4.0
 #' submit() # X = TRUE
@@ -426,26 +427,26 @@ findall = function(query=member(X, list(a, "b", 3L, 4, TRUE, Y)), options=NULL)
 #' submit() # warning that no query is open
 #' 
 #' @examples
-#' query(member(X, list(a, "b", 3L)))
-#' query(member(X, list(4, TRUE, Y))) # warning that another query is open
+#' query(quote(member(X, list(a, "b", 3L))))
+#' query(quote(member(X, list(4, TRUE, Y)))) # warning that another query is open
 #' clear()
 #' 
-query = function(query=member(X, list(a, "b", 3L, 4, TRUE, Y)), options=NULL)
+query = function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), options=NULL)
 {
-  options = c(options, rolog_options())
+  options <- c(options, rolog_options())
   
   # Check if simplified syntax is used
   if(options$quote)
-    query = rolog_quote(query)
+    query <- rolog_quote(query)
   
   # Decorate result with the prolog syntax of the query
   if(options$portray)
-    q = portray(query, options)
+    q <- portray(query, options)
 
-  r = .query(query, options)
+  r <- .query(query, options)
   
   if(options$portray)
-    attr(r, 'query') = q
+    attr(r, 'query') <- q
   
   return(r)
 }
@@ -470,7 +471,7 @@ query = function(query=member(X, list(a, "b", 3L, 4, TRUE, Y)), options=NULL)
 #' for a opening a query, collecting all solutions, and clearing it again.
 #'
 #' @examples
-#' query(member(X, list(a, "b", 3L, 4, TRUE, Y)))
+#' query(quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
 #' submit() # X = a
 #' submit() # X = "b"
 #' clear()
@@ -502,7 +503,7 @@ clear <- function()
 #' for a opening a query, collecting all solutions, and clearing it again.
 #' 
 #' @examples
-#' query(member(X, list(a, "b", 3L, 4, TRUE, Y)))
+#' query(quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
 #' submit() # X = 3L
 #' submit() # X = 4.0
 #' submit() # X = TRUE
@@ -510,7 +511,7 @@ clear <- function()
 #' submit() # FALSE
 #' submit() # warning that no query is open
 #'
-#' query(member(X, list(a, "b", 3L, 4, TRUE, Y)))
+#' query(quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
 #' submit() # X = a
 #' submit() # X = "b"
 #' clear()
@@ -537,38 +538,33 @@ submit <- function()
 #' option _quote_ controls whether this function is used.
 #'
 #' @examples
-#' query(member(X, list(a, "b", 3L, 4, TRUE, Y)))
+#' query(quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
 #'
-rolog_quote <- function(query)
+rolog_quote <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
 {
-	.quote(substitute(query))
-}
-
-.quote <- function(x)
-{
-	if(is.symbol(x))
-	{
-		n <- substr(as.character(x), 1, 1)
-		
-		# Variable
-		if(n == toupper(n) & n != tolower(n))
-			return(as.expression(x))
-
-		if(n == "_")
-			return(as.expression(x))
-	}
-
-	if(is.call(x))
-	{
-		args = as.list(x)
-		args[-1] = lapply(args[-1], FUN=.quote)
-		
-		# list(1, 2, 3) is a list not a call
-		if(args[[1]] == "list")
-			return(args[-1])
-
-		return(as.call(args))
-	}
+  if(is.symbol(x))
+  {
+    n <- substr(as.character(x), 1, 1)
 	
-	return(x)
+    # Variable
+    if(n == toupper(n) & n != tolower(n))
+      return(as.expression(x))
+
+    if(n == "_")
+      return(as.expression(x))
+  }
+
+  if(is.call(x))
+  {
+    args <- as.list(x)
+    args[-1] <- lapply(args[-1], FUN=rolog_quote)
+	
+    # list(1, 2, 3) is a list not a call
+    if(args[[1]] == "list")
+      return(args[-1])
+
+    return(as.call(args))
+  }
+	
+  return(x)
 }
