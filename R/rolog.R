@@ -540,7 +540,7 @@ submit <- function()
 #' @examples
 #' query(quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
 #'
-rolog_quote <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
+rolog_quote <- function(x=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
 {
   if(is.symbol(x))
   {
