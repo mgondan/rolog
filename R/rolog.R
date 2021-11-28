@@ -192,6 +192,16 @@ portray = function(query=call('member', expression(X), list(1, 2, 3)), options=N
 #'   called. This is a shortcut to enable simple commands such as 
 #'   use_module/2. Note that this requires prolog-style quoting.
 #'
+#' @param quote (default is TRUE, unless expr is a "call"): translate
+#'   expr to a prolog query using non-standard evaluation. This is best
+#'   illustrated by an example.
+#'
+#'   This is an example of a query to prolog in canonical form:
+#'   once(call("member", expression(X), list(a, b, c)), quote=FALSE)
+#'
+#'   This is the convenient version of it:
+#'   once(member(X, list(a, b, c)))
+#'   
 #' @param options list of options controlling translation from and to prolog: 
 #'   boolvec (see option rolog.boolvec, default is !) is the name of the
 #'   prolog compound for boolean vectors. intvec, realvec and charvec define
