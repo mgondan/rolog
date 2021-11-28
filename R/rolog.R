@@ -59,7 +59,8 @@
   }
   
   # SWI startup message
-  W <- once(call("message_to_string", welcome, expression(W)), options=list(quote=FALSE))
+  welcome <- call("message_to_string", as.symbol("welcome"), expression(W))
+  W <- once(welcome, options=list(quote=FALSE))
   packageStartupMessage(W$W)
   invisible()
 }
