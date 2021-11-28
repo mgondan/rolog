@@ -226,7 +226,7 @@ portray = function(query=member(X, list(a, "b", 3L, 4, TRUE, Y)), options=NULL)
   
   # Check if simplified syntax is used
   if(options$quote)
-    query = rolog_quote(query)
+    query = rolog_quote(substitute(query))
 
   .portray(query, options)
 }
@@ -542,34 +542,34 @@ submit <- function()
 #'
 rolog_quote <- function(query)
 {
-	.quote(substitute(query))
+  .quote(substitute(query))
 }
 
 .quote <- function(x)
 {
-	if(is.symbol(x))
-	{
-		n <- substr(as.character(x), 1, 1)
-		
-		# Variable
-		if(n == toupper(n) & n != tolower(n))
-			return(as.expression(x))
-
-		if(n == "_")
-			return(as.expression(x))
-	}
-
-	if(is.call(x))
-	{
-		args = as.list(x)
-		args[-1] = lapply(args[-1], FUN=.quote)
-		
-		# list(1, 2, 3) is a list not a call
-		if(args[[1]] == "list")
-			return(args[-1])
-
-		return(as.call(args))
-	}
+  if(is.symbol(x))
+  {
+    n <- substr(as.character(x), 1, 1)
 	
-	return(x)
+    # Variable
+    if(n == toupper(n) & n != tolower(n))
+      return(as.expression(x))
+
+    if(n == "_")
+      return(as.expression(x))
+  }
+
+  if(is.call(x))
+  {
+    args = as.list(x)
+    args[-1] = lapply(args[-1], FUN=.quote)
+	
+    # list(1, 2, 3) is a list not a call
+    if(args[[1]] == "list")
+      return(args[-1])
+
+    return(as.call(args))
+  }
+	
+  return(x)
 }
