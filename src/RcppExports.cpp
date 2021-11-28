@@ -90,13 +90,13 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// query_close_
-RObject query_close_();
-RcppExport SEXP _rolog_query_close_() {
+// clear_
+RObject clear_();
+RcppExport SEXP _rolog_clear_() {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(query_close_());
+    rcpp_result_gen = Rcpp::wrap(clear_());
     return rcpp_result_gen;
 END_RCPP
 }
@@ -110,17 +110,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// call_
-RObject call_(String query);
-RcppExport SEXP _rolog_call_(SEXP querySEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< String >::type query(querySEXP);
-    rcpp_result_gen = Rcpp::wrap(call_(query));
-    return rcpp_result_gen;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rolog_init_", (DL_FUNC) &_rolog_init_, 1},
@@ -129,10 +118,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rolog_once_", (DL_FUNC) &_rolog_once_, 2},
     {"_rolog_findall_", (DL_FUNC) &_rolog_findall_, 2},
     {"_rolog_query_", (DL_FUNC) &_rolog_query_, 2},
-    {"_rolog_query_close_", (DL_FUNC) &_rolog_query_close_, 0},
+    {"_rolog_clear_", (DL_FUNC) &_rolog_query_close_, 0},
     {"_rolog_submit_", (DL_FUNC) &_rolog_submit_, 0},
     {"_rolog_portray_", (DL_FUNC) &_rolog_portray_, 2},
-    {"_rolog_call_", (DL_FUNC) &_rolog_call_, 1},
     {NULL, NULL, 0}
 };
 
