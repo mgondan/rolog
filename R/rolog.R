@@ -59,7 +59,7 @@
   }
   
   # SWI startup message
-  W <- once(message_to_string(welcome), W)
+  W <- once(message_to_string(welcome, W))
   packageStartupMessage(W$W)
   invisible()
 }
