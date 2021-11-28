@@ -145,14 +145,14 @@ consult = function(fname=system.file('likes.pl', package='rolog'))
 #' @details
 #' Translation of R to Prolog
 #' 
-#' * `quote`: if TRUE (default), use simplified syntax (see [query()])
-#' * numeric vector of size _N_ -> `realvec`/N (default is #)
-#' * integer vector of size _N_ -> `intvec`/N (default is %)
-#' * boolean vector of size _N_ -> `boolvec`/N (default is !)
-#' * character vector of size _N_ -> `charvec`/N (default is $$)
-#' * `scalar`: if TRUE (default), translate R vectors of length 1 to scalars
-#' * `portray`: whether to return the prolog translation as an attribute to 
-#'   the return value of once, query and findall (default is TRUE)
+#' * _quote_: if `TRUE` (default), use simplified syntax (see [query()])
+#' * numeric vector of size N -> _realvec_/N (default is #)
+#' * integer vector of size N -> _intvec_/N (default is %)
+#' * boolean vector of size N -> _boolvec_/N (default is !)
+#' * character vector of size N -> _charvec_/N (default is $$)
+#' * _scalar_: if `TRUE` (default), translate R vectors of length 1 to scalars
+#' * _portray_: if `TRUE` (default) whether to return the prolog translation 
+#'   as an attribute to the return value of [once()], [query()] and [findall()] 
 #'
 rolog_options = function()
 {
@@ -178,8 +178,8 @@ rolog_options = function()
 #' @param options
 #' This is a list of options controlling translation from and to prolog.
 #' * if _quote_ is `TRUE` (default), the query is translated to its
-#'   canonical form using `rolog_quote`.
-#' * _boolvec_ (see option rolog.boolvec, default is !) is the name of the
+#'   canonical form using [rolog_quote()].
+#' * _boolvec_ (see option `rolog.boolvec`, default is !) is the name of the
 #'   prolog compound for vectors of booleans.
 #' * _intvec_, _realvec_, _charvec_ define the compound names for vectors of
 #'   integers, doubles and strings, respectively (defaults are %, # and $$).
@@ -260,7 +260,7 @@ portray = function(query=member(X, list(a, "b", 3L, 4, TRUE, Y)), options=NULL)
 #' 
 #' @seealso [findall()]
 #' for querying all solutions
-#' 
+#'
 #' @seealso [query()], [submit()], and [clear()] for fine-grained control over
 #' non-deterministic queryies
 #' 
@@ -297,8 +297,7 @@ once = function(query=member(X, list(a, "b", 3L, 4, TRUE, Y)), options=NULL)
 {
   options = c(options, rolog_options())
   
-  # Translate to canonical form
-  # member(X, list(1, 2, 3)) => call("member", expression(X), list(1, 2, 3))
+  # Check if simplified syntax is used
   if(options$quote)
     query = rolog_quote(query)
   
@@ -317,124 +316,204 @@ once = function(query=member(X, list(a, "b", 3L, 4, TRUE, Y)), options=NULL)
 
 #' Invoke a query several times
 #'
-#' @param query an R call, consisting of symbols (= prolog atoms), 
-#'   numbers (= prolog numbers), strings (= prolog strings), 
-#'   boolean values (= prolog atoms true and false), 
-#'   expressions (= prolog variables) and lists (= prolog lists), and other
-#'   calls (= prolog compounds). Vectors of booleans, integers, floating point
-#'   numbers, and strings with length _N_ > 1 are translated to prolog 
-#'   compounds !/N, %/N, #/N and $/N, respectively. The names can be modified
-#'   with the options below.
+#' @param query 
+#' an R call. The R call consists of symbols, integers and real numbers, 
+#' character strings, boolean values, expressions, lists, and other calls.
+#' Vectors of booleans, integers, floating point numbers, and strings with
+#' length _N_ > 1 are translated to prolog compounds !/N, %/N, #/N and $$/N,
+#' respectively. The names can be modified with the options below.
 #'   
-#' @param options list of options controlling translation from and to prolog: 
-#'   boolvec (see option rolog.boolvec, default is !) is the name of the
-#'   prolog compound for boolean vectors. intvec, realvec and charvec define
-#'   the compound names for vectors of integers, doubles and strings, 
-#'   respectively (defaults are %, # and $). If _scalar_ is TRUE (default), 
-#'   vectors of length 1 are translated to scalar prolog elements. If _scalar_
-#'   is FALSE, even vectors of length 1 are translated to compounds.
+#' @param options
+#' This is a list of options controlling translation from and to prolog.
+#' * if _quote_ is `TRUE` (default), the query is translated to its
+#'   canonical form using `rolog_quote`.
+#' * _boolvec_ (see option rolog.boolvec, default is !) is the name of the
+#'   prolog compound for vectors of booleans.
+#' * _intvec_, _realvec_, _charvec_ define the compound names for vectors of
+#'   integers, doubles and strings, respectively (defaults are %, # and $$).
+#' * If _scalar_ is `TRUE` (default), vectors of length 1 are translated to 
+#'   scalar prolog elements. If _scalar_ is `FALSE`, vectors of length 1 are
+#'   also translated to compounds.
 #'   
-#' @return If the query fails, an empty list is returned. If the query 
-#'   succeeds _N_ >= 1 times, a list of length _N_ is returned, each element
-#'   being a list of conditions for each solution.
+#' @return
+#' If the query fails, an empty list is returned. If the query 
+#' succeeds _N_ >= 1 times, a list of length _N_ is returned, each element
+#' being a list of conditions for each solution, see [once()].
 #'   
 #' @md
 #'
-#' @seealso [once()] for a single query
+#' @seealso [once()]
+#' for a single query
+#'
+#' @seealso [query()], [submit()], and [clear()] for fine-grained control over
+#' non-deterministic queryies
+#'
 #' @seealso [rolog_options()]
 #' 
 #' @examples
-#' findall(call("member", expression(X), list(1, 2, 3)))
+#' # This query returns a list stating that it works if X = a, "b", ...
+#' # or X = Y
+#' findall(member(X, list(a, "b", 3L, 4, TRUE, sin(pi/2), Y))
 #' 
-findall = function(query=call('member', expression(X), list(1, 2, 3)), options=NULL)
+findall = function(query=member(X, list(a, "b", 3L, 4, TRUE, Y)), options=NULL)
 {
   options = c(options, rolog_options())
+  
+  # Check if simplified syntax is used
+  if(options$quote)
+    query = rolog_quote(query)
+  
+  # Decorate result with the prolog syntax of the query
   if(options$portray)
     q = portray(query, options)
 
+  # Invoke C++ function that calls prolog
   r = .findall(query, options)
-  if(options$portray)
-    attr(r, 'query') = q
-  return(r)
-}
-
-#' Create a query
-#'
-#' @return If the creation of the query succeeds, TRUE.
-#'   
-#' @param query an R call, consisting of symbols (= prolog atoms),
-#'   numbers (= prolog numbers), strings (= prolog strings),
-#'   boolean values (= prolog atoms true and false),
-#'   expressions (= prolog variables) and lists (= prolog lists), and other
-#'   calls (= prolog compounds). Vectors of booleans, integers, floating point
-#'   numbers, and strings with length _N_ > 1 are translated to prolog
-#'   compounds !/N, %/N, #/N and $/N, respectively. The names can be modified
-#'   with the options below.
-#'
-#' @param options list of options controlling translation from and to prolog:
-#'   boolvec (see option rolog.boolvec, default is !) is the name of the
-#'   prolog compound for boolean vectors. intvec, realvec and charvec define
-#'   the compound names for vectors of integers, doubles and strings,
-#'   respectively (defaults are %, # and $). If _scalar_ is TRUE (default),
-#'   vectors of length 1 are translated to scalar prolog elements. If _scalar_
-#'   is FALSE, even vectors of length 1 are translated to compounds.
-#'
-#' @md
-#'
-#' @seealso [once()] for a single query
-#' 
-#' @examples
-#' query(call('member', expression(X), list(1, 2, 3)))
-#' query_submit() # 1
-#' query_submit() # 2
-#' query_submit() # 3
-#' query_submit() # fails
-#' query_close()
-#' 
-query = function(query=call('member', expression(X), list(1, 2, 3)), options=NULL)
-{
-  options = c(options, rolog_options())
-  if(options$portray)
-    q = portray(query, options)
-
-  r = .query(query, options)
+  
   if(options$portray)
     attr(r, 'query') = q
   
   return(r)
 }
 
-#' Close current query
+#' Create a query
 #'
-#' @return TRUE (invisible)
+#' @return
+#' If the creation of the query succeeds, `TRUE`.
+#'   
+#' @param query
+#' an R call. The R call consists of symbols, integers and real numbers, 
+#' character strings, boolean values, expressions, lists, and other calls.
+#' Vectors of booleans, integers, floating point numbers, and strings with
+#' length _N_ > 1 are translated to prolog compounds !/N, %/N, #/N and $$/N,
+#' respectively. The names can be modified with the options below.
+#'
+#' @param options
+#' This is a list of options controlling translation from and to prolog.
+#' * if _quote_ is `TRUE` (default), the query is translated to its
+#'   canonical form using `rolog_quote`.
+#' * _boolvec_ (see option rolog.boolvec, default is !) is the name of the
+#'   prolog compound for vectors of booleans.
+#' * _intvec_, _realvec_, _charvec_ define the compound names for vectors of
+#'   integers, doubles and strings, respectively (defaults are %, # and $$).
+#' * If _scalar_ is `TRUE` (default), vectors of length 1 are translated to 
+#'   scalar prolog elements. If _scalar_ is `FALSE`, vectors of length 1 are
+#'   also translated to compounds.
+#'
+#' @details
+#' SWI-Prolog does not allow multiple open queries. If another query is open, it
+#' it is closed and a warning is shown.
+#' 
+#' @md
+#'
+#' @seealso [once()] for a query that is submitted only a single time.
+#' 
+#' @seealso [findall()] for a query that is submitted until it fails.
+#' 
+#' @examples
+#' query(member(X, list(a, "b", 3L, 4, TRUE, Y)))
+#' submit() # X = a
+#' submit() # X = "b"
+#' clear()
+#'
+#' @examples
+#' query(member(X, list(a, "b", 3L, 4, TRUE, Y)))
+#' submit() # X = 3L
+#' submit() # X = 4.0
+#' submit() # X = TRUE
+#' submit() # X = expression(Y) or Y = expression(X)
+#' submit() # FALSE
+#' submit() # warning that no query is open
+#' 
+#' @examples
+#' query(member(X, list(a, "b", 3L)))
+#' query(member(X, list(4, TRUE, Y))) # warning that another query is open
+#' clear()
+#' 
+query = function(query=member(X, list(a, "b", 3L, 4, TRUE, Y)), options=NULL)
+{
+  options = c(options, rolog_options())
+  
+  # Check if simplified syntax is used
+  if(options$quote)
+    query = rolog_quote(query)
+  
+  # Decorate result with the prolog syntax of the query
+  if(options$portray)
+    q = portray(query, options)
+
+  r = .query(query, options)
+  
+  if(options$portray)
+    attr(r, 'query') = q
+  
+  return(r)
+}
+
+#' Clear current query
+#'
+#' @return
+#' TRUE (invisible)
 #'
 #' @md
 #'
-#' @seealso [once()] for a single query
+#' @seealso [query()]
+#' for a opening a query.
+#'
+#' @seealso [submit()]
+#' for a submitting a query.
+#'
+#' @seealso [once()]
+#' for a opening a query, submitting it, and clearing it again.
+#'
+#' @seealso [findall()]
+#' for a opening a query, collecting all solutions, and clearing it again.
 #'
 #' @examples
-#' query(call('member', expression(X), list(1, 2, 3)))
-#' query_submit() # 1
-#' query_submit() # 2
-#' query_submit() # 3
-#' query_submit() # fails
-#' query_close()
+#' query(member(X, list(a, "b", 3L, 4, TRUE, Y)))
+#' submit() # X = a
+#' submit() # X = "b"
+#' clear()
 #'
-query_close = function()
+clear <- function()
 {
-  invisible(.query_close())
+  invisible(.clear())
 }
 
-#' Submit a query
+#' Submit a query that has been opened with [query()] before.
 #'
-#' @return If a solution is found, TRUE.
+#' @return
+#' If the query fails, `FALSE` is returned. If the query succeeds, a
+#' (possibly empty) list is returned that includes the bindings required to
+#' satisfy the query.
 #'   
 #' @md
 #'
-#' @seealso [once()] for a single query
+#' @seealso [query()]
+#' for a opening a query.
+#' 
+#' @seealso [clear()]
+#' for a clearing a query.
+#' 
+#' @seealso [once()]
+#' for a opening a query, submitting it, and clearing it again.
+#'
+#' @seealso [findall()]
+#' for a opening a query, collecting all solutions, and clearing it again.
 #' 
 #' @examples
-#' submit()
+#' query(member(X, list(a, "b", 3L, 4, TRUE, Y)))
+#' submit() # X = 3L
+#' submit() # X = 4.0
+#' submit() # X = TRUE
+#' submit() # X = expression(Y) or Y = expression(X)
+#' submit() # FALSE
+#' submit() # warning that no query is open
+#'
+#' query(member(X, list(a, "b", 3L, 4, TRUE, Y)))
+#' submit() # X = a
+#' submit() # X = "b"
+#' clear()
 #' 
 submit = function()
 {
