@@ -16,7 +16,7 @@
     rolog.realvec = '#',  # prolog representation of R numeric vectors
     rolog.intvec = '%',   # prolog representation of R integer vectors
     rolog.boolvec = '!',  # prolog representation of R boolean vectors
-    rolog.charvec = '$',  # prolog representation of R character vectors
+    rolog.charvec = '$$', # prolog representation of R character vectors
     rolog.portray = TRUE, # return prolog call, nicely formatted
     rolog.scalar = TRUE)  # convert R vectors of size 1 to scalars in Prolog
 
@@ -296,8 +296,9 @@ portray <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), option
 #' # This returns S = '1.0' (scalar)
 #' once(quote(format(string(S), "~w", list(1))), options=list(scalar=TRUE))
 #'   
-#' # This returns S = '#(1.0)' (vector)
-#' once(quote(format(string(S), "~w", list(1))), options=list(scalar=FALSE))
+#' # This returns S = '#(1.0)' (vector). To prevent "~w" from being translated to
+#' # $$("~w), it is given as an atom.
+#' once(quote(format(string(S), as.symbol("~w"), list(1))), options=list(scalar=FALSE))
 #'
 once <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), options=NULL)
 {
