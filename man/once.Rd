@@ -46,7 +46,7 @@ once(quote(member(3, list(1, 2, 3))))
 once(quote(member(1, list(a, X))))
 
 # Same query in canonical form, without intermediate call to prolog_quote()
-once(call("member", 1, list(a, expression(X))), options=list(quote=FALSE))
+once(call("member", 1, list(as.symbol("a"), expression(X))), options=list(quote=FALSE))
 
 # This does not work: once(quote(X = 1)) because the X is interpreted as
 # the name of the argument of quote. Instead, please use
