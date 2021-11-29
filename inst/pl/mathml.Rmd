@@ -25,7 +25,7 @@ term = quote(pbinom(k, n, p))
 mathml(term)
 
 k <- 10
-N <- 14
+n <- 14
 p <- 0.4
 
 # Calculate result
