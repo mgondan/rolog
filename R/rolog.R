@@ -129,7 +129,7 @@ rolog_done <- function()
 #' 
 #' @examples
 #' consult(fname=system.file('pl/likes.pl', package='rolog'))
-#' findall(likes(sam, X))
+#' findall(quote(likes(sam, X)))
 #' 
 consult <- function(fname=system.file('pl/likes.pl', package='rolog'))
 {
@@ -277,7 +277,7 @@ portray <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), option
 #' once(quote(member(3, list(1, 2, 3))))
 #'
 #' # This query returns a list stating that it works if X = 1
-#' once(quote(member(1, list(a, X)))
+#' once(quote(member(1, list(a, X))))
 #' 
 #' # Same query in canonical form, without intermediate call to prolog_quote()
 #' once(call("member", 1, list(a, expression(X))), options=list(quote=FALSE))
@@ -358,7 +358,7 @@ once <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), options=N
 #' 
 #' @examples
 #' # This query returns a list stating that it works if X = a, "b", ..., or X = Y
-#' findall(quote(member(X, list(a, "b", 3L, 4, TRUE, sin(pi/2), Y)))
+#' findall(quote(member(X, list(a, "b", 3L, 4, TRUE, sin(pi/2), Y))))
 #' 
 findall <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), options=NULL)
 {
