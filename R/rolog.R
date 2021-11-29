@@ -128,10 +128,10 @@ rolog_done <- function()
 #' [once()], [findall()], and [query()]/[submit()]/[clear()] for executing queries
 #' 
 #' @examples
-#' consult(fname=system.file('likes.pl', package='rolog'))
+#' consult(fname=system.file('pl/likes.pl', package='rolog'))
 #' findall(likes(sam, X))
 #' 
-consult <- function(fname=system.file('likes.pl', package='rolog'))
+consult <- function(fname=system.file('pl/likes.pl', package='rolog'))
 {
   .consult(fname)
 }
