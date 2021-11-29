@@ -294,10 +294,10 @@ portray <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), option
 #' once(quote(member(1, X)))
 #'
 #' # This returns S = '1.0' (scalar)
-#' once(quote(format(string(S), "~w", list(1)), options=list(scalar=TRUE)))
+#' once(quote(format(string(S), "~w", list(1))), options=list(scalar=TRUE))
 #'   
 #' # This returns S = '#(1.0)' (vector)
-#' once(quote(format(string(S), "~w", list(1)), options=list(scalar=FALSE)))
+#' once(quote(format(string(S), "~w", list(1))), options=list(scalar=FALSE))
 #'
 once <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), options=NULL)
 {
