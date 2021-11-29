@@ -128,10 +128,10 @@ rolog_done <- function()
 #' [once()], [findall()], and [query()]/[submit()]/[clear()] for executing queries
 #' 
 #' @examples
-#' consult(fname=system.file('likes.pl', package='rolog'))
+#' consult(fname=system.file('pl/likes.pl', package='rolog'))
 #' findall(likes(sam, X))
 #' 
-consult <- function(fname=system.file('likes.pl', package='rolog'))
+consult <- function(fname=system.file('pl/likes.pl', package='rolog'))
 {
   .consult(fname)
 }
@@ -271,16 +271,21 @@ portray <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), option
 #' @examples
 #' 
 #' # This query returns FALSE
-#' once(quote(1 = 2))
+#' once(quote(member(1, list(a, b, c))))
 #' 
 #' # This query returns an empty list meaning yes, it works
-#' once(quote(1 = 1))
-#' 
+#' once(quote(member(3, list(1, 2, 3))))
+#'
 #' # This query returns a list stating that it works if X = 1
 #' once(quote(member(1, list(a, X)))
 #' 
 #' # Same query in canonical form, without intermediate call to prolog_quote()
 #' once(call("member", 1, list(a, expression(X))), options=list(quote=FALSE))
+#' 
+#' # This does not work: once(quote(X = 1)) because the X is interpreted as
+#' # the name of the argument of quote. Instead, please use
+#' once(call("=", quote(X), 1))
+#' once(call("=", expression(X), 1), options=list(quote=FALSE))
 #' 
 #' # This query returns a list stating that X = 1 and Z = expression(Y)
 #' once(quote(list(X, Y) = list(1, Z)))
@@ -352,8 +357,7 @@ once <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), options=N
 #' @seealso [rolog_options()]
 #' 
 #' @examples
-#' # This query returns a list stating that it works if X = a, "b", ...
-#' # or X = Y
+#' # This query returns a list stating that it works if X = a, "b", ..., or X = Y
 #' findall(quote(member(X, list(a, "b", 3L, 4, TRUE, sin(pi/2), Y)))
 #' 
 findall <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), options=NULL)
@@ -540,7 +544,7 @@ submit <- function()
 #' @examples
 #' query(quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
 #'
-rolog_quote <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
+rolog_quote <- function(x=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
 {
   if(is.symbol(x))
   {
