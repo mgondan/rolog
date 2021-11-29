@@ -17,7 +17,7 @@ Consult a prolog database
 }
 \examples{
 consult(fname=system.file('pl/likes.pl', package='rolog'))
-findall(likes(sam, X))
+findall(quote(likes(sam, X)))
 
 }
 \seealso{
