@@ -19,7 +19,7 @@ mathml = function(term)
 # Binomial probability
 
 ```{r, results="asis"}
-term = quote(pbinom(k, N, p))
+term = quote(pbinom(k, n, p))
 
 # Pretty-print as MathML
 mathml(term)
