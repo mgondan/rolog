@@ -4,32 +4,32 @@
 \alias{once}
 \title{Invoke a query once}
 \usage{
-once(query = call("member", expression(X), list(1, 2, 3)), options = NULL)
+once(query = quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), options = NULL)
 }
 \arguments{
-\item{query}{an R call, consisting of symbols (= prolog atoms),
-numbers (= prolog numbers), strings (= prolog strings),
-boolean values (= prolog atoms true and false),
-expressions (= prolog variables) and lists (= prolog lists), and other
-calls (= prolog compounds). Vectors of booleans, integers, floating point
-numbers, and strings with length \emph{N} > 1 are translated to prolog
-compounds !/N, \%/N, #/N and $/N, respectively. The names can be modified
-with the options below.}
+\item{query}{an R call. The R call consists of symbols, integers and real numbers,
+character strings, boolean values, expressions, lists, and other calls.
+Vectors of booleans, integers, floating point numbers, and strings with
+length \emph{N} > 1 are translated to prolog compounds !/N, \%/N, #/N and $$/N,
+respectively. The names can be modified with the options below.}
 
-\item{options}{list of options controlling translation from and to prolog:
-boolvec (see option rolog.boolvec, default is !) is the name of the
-prolog compound for boolean vectors. intvec, realvec and charvec define
-the compound names for vectors of integers, doubles and strings,
-respectively (defaults are \%, # and $). If \emph{scalar} is TRUE (default),
-vectors of length 1 are translated to scalar prolog elements. If \emph{scalar}
-is FALSE, even vectors of length 1 are translated to compounds.}
+\item{options}{This is a list of options controlling translation from and to prolog.
+\itemize{
+\item if \emph{quote} is \code{TRUE} (default), the query is translated to its
+canonical form using \code{rolog_quote}.
+\item \emph{boolvec} (see option rolog.boolvec, default is !) is the name of the
+prolog compound for vectors of booleans.
+\item \emph{intvec}, \emph{realvec}, \emph{charvec} define the compound names for vectors of
+integers, doubles and strings, respectively (defaults are \%, # and $$).
+\item If \emph{scalar} is \code{TRUE} (default), vectors of length 1 are translated to
+scalar prolog elements. If \emph{scalar} is \code{FALSE}, vectors of length 1 are
+also translated to compounds.
+}}
 }
 \value{
-If the query fails, an empty list is returned. If the query
-succeeds \emph{N} >= 1 times, a list of length \emph{N} is returned, each element
-being a list of conditions for each solution.
-
-\code{FALSE} if the query fails; otherwise, a list with conditions.
+If the query fails, \code{FALSE} is returned. If the query succeeds, a
+(possibly empty) list is returned that includes the bindings required to
+satisfy the query.
 }
 \description{
 Invoke a query once
@@ -37,31 +37,42 @@ Invoke a query once
 \examples{
 
 # This query returns FALSE
-once(call("=", 1, 2))
+once(quote(member(1, list(a, b, c))))
 
 # This query returns an empty list meaning yes, it works
-once(call("=", 1, 1))
+once(quote(member(3, list(1, 2, 3))))
 
 # This query returns a list stating that it works if X = 1
-once(call("member", 1, list(2, expression(X))))
+once(quote(member(1, list(a, X)))
 
-# This query returns a list stating that X = 1 and Z = Y
-once(call("=", list(expression(X), expression(Y)), list(1, expression(Z))))
+# Same query in canonical form, without intermediate call to prolog_quote()
+once(call("member", 1, list(a, expression(X))), options=list(quote=FALSE))
 
-# works for X = [1 | _]; i.e. something like [|](1, expression(_6330))
-once(call("member", 1, expression(X)))
+# This does not work: once(quote(X = 1)) because the X is interpreted as
+# the name of the argument of quote. Instead, please use
+once(call("=", quote(X), 1))
+once(call("=", expression(X), 1), options=list(quote=FALSE))
 
-# This works for S = '1.0' (scalar)
-once(call("format", call("string", expression(S)), quote(`~w`), list(1)), 
-  options=list(scalar=TRUE))
+# This query returns a list stating that X = 1 and Z = expression(Y)
+once(quote(list(X, Y) = list(1, Z)))
+
+# This works for X = [1 | _]; i.e. something like [|](1, expression(_6330))
+once(quote(member(1, X)))
+
+# This returns S = '1.0' (scalar)
+once(quote(format(string(S), "~w", list(1)), options=list(scalar=TRUE)))
   
-# This works for S = '#(1.0)' (vector)
-once(call("format", call("string", expression(S)), quote(`~w`), list(1)), 
-  options=list(scalar=FALSE))
-  
+# This returns S = '#(1.0)' (vector)
+once(quote(format(string(S), "~w", list(1)), options=list(scalar=FALSE)))
+
 }
 \seealso{
-\code{\link[=findall]{findall()}} for querying all solutions
+\code{\link[=findall]{findall()}}
+for querying all solutions
 
-\code{\link[=rolog_options]{rolog_options()}} for options controlling R to prolog translation
+\code{\link[=query]{query()}}, \code{\link[=submit]{submit()}}, and \code{\link[=clear]{clear()}} for fine-grained control over
+non-deterministic queryies
+
+\code{\link[=rolog_options]{rolog_options()}}
+for options controlling R to prolog translation
 }

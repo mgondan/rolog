@@ -2,26 +2,26 @@
 % Please edit documentation in R/rolog.R
 \name{rolog_options}
 \alias{rolog_options}
-\title{Quick access to rolog's own options}
+\title{Quick access to Rolog's own options}
 \usage{
 rolog_options()
 }
 \value{
-list with some options for translating R expressions to Prolog
+list with some options for translating R expressions to prolog
 }
 \description{
-Quick access to rolog's own options
+Quick access to Rolog's own options
 }
 \details{
 Translation of R to Prolog
 \itemize{
-\item numeric vector of size N -> $realvec/N (default is #)
-\item integer vector of size N -> $intvec/N (default is \%)
-\item boolean vector of size N -> $boolvec/n (default is !)
-\item character vector of size N -> $charvec/N (default is $)
-\item $scalar: if TRUE (default), translate R vectors of size 1 to scalars in
-Prolog
-\item $portray: whether to return the prolog translation as an attribute to
-once and findall (default is TRUE)
+\item \emph{quote}: if \code{TRUE} (default), use simplified syntax (see \code{\link[=query]{query()}})
+\item numeric vector of size N -> \emph{realvec}/N (default is #)
+\item integer vector of size N -> \emph{intvec}/N (default is \%)
+\item boolean vector of size N -> \emph{boolvec}/N (default is !)
+\item character vector of size N -> \emph{charvec}/N (default is $$)
+\item \emph{scalar}: if \code{TRUE} (default), translate R vectors of length 1 to scalars
+\item \emph{portray}: if \code{TRUE} (default) whether to return the prolog translation
+as an attribute to the return value of \code{\link[=once]{once()}}, \code{\link[=query]{query()}} and \code{\link[=findall]{findall()}}
 }
 }

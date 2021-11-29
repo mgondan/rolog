@@ -10,7 +10,7 @@ rolog_init(argv1 = commandArgs()[1])
 \item{argv1}{file name of the R executable}
 }
 \value{
-TRUE on success
+`TRUE` on success
 }
 \description{
 Start prolog
