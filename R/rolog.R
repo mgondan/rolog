@@ -545,23 +545,23 @@ submit <- function()
 #' @examples
 #' query(quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
 #'
-rolog_quote <- function(x=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
+rolog_quote <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
 {
-  if(is.symbol(x))
+  if(is.symbol(query))
   {
-    n <- substr(as.character(x), 1, 1)
+    n <- substr(as.character(query), 1, 1)
 	
     # Variable
     if(n == toupper(n) & n != tolower(n))
-      return(as.expression(x))
+      return(as.expression(query))
 
     if(n == "_")
-      return(as.expression(x))
+      return(as.expression(query))
   }
 
-  if(is.call(x))
+  if(is.call(query))
   {
-    args <- as.list(x)
+    args <- as.list(query)
     args[-1] <- lapply(args[-1], FUN=rolog_quote)
 	
     # list(1, 2, 3) is a list not a call
@@ -571,5 +571,5 @@ rolog_quote <- function(x=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
     return(as.call(args))
   }
 	
-  return(x)
+  return(query)
 }

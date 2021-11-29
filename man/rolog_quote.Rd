@@ -4,7 +4,7 @@
 \alias{rolog_quote}
 \title{Translate simplified to canonical representation}
 \usage{
-rolog_quote(x = quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
+rolog_quote(query = quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
 }
 \arguments{
 \item{query}{an R call representing a prolog query with prolog-like syntax, e.g.,
