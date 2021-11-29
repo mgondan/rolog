@@ -10,27 +10,6 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// init_
-LogicalVector init_(String argv0);
-RcppExport SEXP _rolog_init_(SEXP argv0SEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< String >::type argv0(argv0SEXP);
-    rcpp_result_gen = Rcpp::wrap(init_(argv0));
-    return rcpp_result_gen;
-END_RCPP
-}
-// done_
-LogicalVector done_();
-RcppExport SEXP _rolog_done_() {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(done_());
-    return rcpp_result_gen;
-END_RCPP
-}
 // consult_
 LogicalVector consult_(CharacterVector files);
 RcppExport SEXP _rolog_consult_(SEXP filesSEXP) {
@@ -39,6 +18,38 @@ BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< CharacterVector >::type files(filesSEXP);
     rcpp_result_gen = Rcpp::wrap(consult_(files));
+    return rcpp_result_gen;
+END_RCPP
+}
+// query_
+RObject query_(RObject query, List options);
+RcppExport SEXP _rolog_query_(SEXP querySEXP, SEXP optionsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< RObject >::type query(querySEXP);
+    Rcpp::traits::input_parameter< List >::type options(optionsSEXP);
+    rcpp_result_gen = Rcpp::wrap(query_(query, options));
+    return rcpp_result_gen;
+END_RCPP
+}
+// clear_
+RObject clear_();
+RcppExport SEXP _rolog_clear_() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(clear_());
+    return rcpp_result_gen;
+END_RCPP
+}
+// submit_
+RObject submit_();
+RcppExport SEXP _rolog_submit_() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(submit_());
     return rcpp_result_gen;
 END_RCPP
 }
@@ -78,49 +89,50 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// query_
-RObject query_(RObject query, List options);
-RcppExport SEXP _rolog_query_(SEXP querySEXP, SEXP optionsSEXP) {
+// call_
+RObject call_(String query);
+RcppExport SEXP _rolog_call_(SEXP querySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< RObject >::type query(querySEXP);
-    Rcpp::traits::input_parameter< List >::type options(optionsSEXP);
-    rcpp_result_gen = Rcpp::wrap(query_(query, options));
+    Rcpp::traits::input_parameter< String >::type query(querySEXP);
+    rcpp_result_gen = Rcpp::wrap(call_(query));
     return rcpp_result_gen;
 END_RCPP
 }
-// clear_
-RObject clear_();
-RcppExport SEXP _rolog_clear_() {
+// init_
+LogicalVector init_(String argv0);
+RcppExport SEXP _rolog_init_(SEXP argv0SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(clear_());
+    Rcpp::traits::input_parameter< String >::type argv0(argv0SEXP);
+    rcpp_result_gen = Rcpp::wrap(init_(argv0));
     return rcpp_result_gen;
 END_RCPP
 }
-// submit_
-RObject submit_();
-RcppExport SEXP _rolog_submit_() {
+// done_
+LogicalVector done_();
+RcppExport SEXP _rolog_done_() {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(submit_());
+    rcpp_result_gen = Rcpp::wrap(done_());
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_rolog_init_", (DL_FUNC) &_rolog_init_, 1},
-    {"_rolog_done_", (DL_FUNC) &_rolog_done_, 0},
     {"_rolog_consult_", (DL_FUNC) &_rolog_consult_, 1},
-    {"_rolog_once_", (DL_FUNC) &_rolog_once_, 2},
-    {"_rolog_findall_", (DL_FUNC) &_rolog_findall_, 2},
     {"_rolog_query_", (DL_FUNC) &_rolog_query_, 2},
     {"_rolog_clear_", (DL_FUNC) &_rolog_clear_, 0},
     {"_rolog_submit_", (DL_FUNC) &_rolog_submit_, 0},
+    {"_rolog_once_", (DL_FUNC) &_rolog_once_, 2},
+    {"_rolog_findall_", (DL_FUNC) &_rolog_findall_, 2},
     {"_rolog_portray_", (DL_FUNC) &_rolog_portray_, 2},
+    {"_rolog_call_", (DL_FUNC) &_rolog_call_, 1},
+    {"_rolog_init_", (DL_FUNC) &_rolog_init_, 1},
+    {"_rolog_done_", (DL_FUNC) &_rolog_done_, 0},
     {NULL, NULL, 0}
 };
 
