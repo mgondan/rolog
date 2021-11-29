@@ -36,7 +36,7 @@ Invoke a query several times
 }
 \examples{
 # This query returns a list stating that it works if X = a, "b", ..., or X = Y
-findall(quote(member(X, list(a, "b", 3L, 4, TRUE, sin(pi/2), Y)))
+findall(quote(member(X, list(a, "b", 3L, 4, TRUE, sin(pi/2), Y))))
 
 }
 \seealso{
