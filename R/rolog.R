@@ -9,6 +9,9 @@
 #
 .onLoad <- function(libname, pkgname)
 {
+  if(.Platform$OS.type == 'unix')
+    dyn.load(file.path(libname, pkgname, 'swipl', 'lib', 'swipl', 'lib', 'x86_64-linux', 'libswipl.so'))
+
   library.dynam(chname='rolog', package=pkgname, lib.loc=libname, local=FALSE)
   
   op.rolog <- list(
@@ -30,6 +33,9 @@
 .onUnload <- function(libpath)
 {
   library.dynam.unload('rolog', libpath=libpath)
+  if(.Platform$OS.type == 'unix')
+    dyn.unload(file.path(libpath, 'swipl', 'lib', 'swipl', 'lib', 'x86_64-linux', 'libswipl.so'))
+
   invisible()
 }
 
