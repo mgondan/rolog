@@ -64,7 +64,7 @@ once(quote(format(string(S), "~w", list(1))), options=list(scalar=TRUE))
   
 # This returns S = '#(1.0)' (vector). To prevent "~w" from being translated to
 # $$("~w), it is given as an atom.
-once(quote(format(string(S), as.symbol("~w"), list(1))), options=list(scalar=FALSE))
+once(quote(format(string(S), `~w`, list(1))), options=list(scalar=FALSE))
 
 }
 \seealso{
