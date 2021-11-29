@@ -288,7 +288,7 @@ portray <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), option
 #' once(call("=", expression(X), 1), options=list(quote=FALSE))
 #' 
 #' # This query returns a list stating that X = 1 and Z = expression(Y)
-#' once(quote(list(X, Y) = list(1, Z)))
+#' once(call("=", quote(list(X, Y)), quote(list(1, Z))))
 #' 
 #' # This works for X = [1 | _]; i.e. something like [|](1, expression(_6330))
 #' once(quote(member(1, X)))
