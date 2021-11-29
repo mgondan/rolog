@@ -5,4 +5,4 @@ all: swipl $(SHLIB)
 
 swipl:
 	mkdir -p ../linux
-	cd ../linux && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DSWIPL_STATIC_LIB=ON ../src/swipl-devel && make && make install
+	cd ../linux && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DSWIPL_STATIC_LIB=ON -DINSTALL_DOCUMENTATION=OFF ../src/swipl-devel && make && make install
