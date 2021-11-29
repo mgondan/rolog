@@ -932,8 +932,10 @@ LogicalVector init_(String argv0)
   // Prolog documentation requires that argv is accessible during the entire 
   // session. I assume that this pointer is valid during the whole R session,
   // and that I can safely cast it to const.
-  int argc = 2 ;
-  const char* argv[argc] = {argv0.get_cstring(), "-q"} ;
+  const int argc = 2 ;
+  const char* argv[argc] ;
+  argv[0] = argv0.get_cstring() ;
+  argv[1] = "-q" ;
   if(!PL_initialise(argc, (char**) argv))
     stop("rolog_init: initialization failed.") ;
 
