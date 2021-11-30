@@ -13,7 +13,7 @@
   {
     folder <- dir(file.path(libname, pkgname, 'swipl', 'lib', 'swipl', 'lib'), 
 		 pattern=R.version$arch, full.names=TRUE)
-    dyn.load(file.path(folder, 'libswipl', .Platform$dynlib.ext))
+    dyn.load(file.path(folder, paste('libswipl', .Platform$dynlib.ext, sep='')))
   }
 
   library.dynam(chname='rolog', package=pkgname, lib.loc=libname, local=FALSE)
@@ -41,7 +41,7 @@
   {
     folder = dir(file.path(libname, pkgname, 'swipl', 'lib', 'swipl', 'lib'), 
 		 pattern=R.version$arch, full.names=TRUE)
-    dyn.load(file.path(folder, 'libswipl', .Platform$dynlib.ext))
+    dyn.unload(file.path(folder, paste('libswipl', .Platform$dynlib.ext, sep='')))
   }
 
   invisible()
