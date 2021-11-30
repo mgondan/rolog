@@ -1,5 +1,5 @@
 PKG_CPPFLAGS=-I../inst/swipl/lib/swipl/include $(CXXPICFLAGS) -D_REENTRANT -D__SWI_PROLOG__ -D__SWI_EMBEDDED__
-PKG_LIBS=-L../inst/swipl/lib/swipl/lib/x86_64-linux -lswipl -lgmp
+PKG_LIBS=$(shell pkg-config ../inst/swipl/share/pkgconfig/swipl.pc --libs)
 
 all: swipl $(SHLIB)
 
