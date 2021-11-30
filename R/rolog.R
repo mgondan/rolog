@@ -41,8 +41,7 @@
   {
     folder = dir(file.path(libname, pkgname, 'swipl', 'lib', 'swipl', 'lib'), 
 		 pattern=R.version$arch, full.names=TRUE)
-    libswipl = dir(folder, pattern="libswipl", full.names=TRUE)
-    dyn.unload(libswipl)
+    dyn.load(file.path(folder, 'libswipl', .Platform$dynlib.ext))
   }
 
   invisible()
