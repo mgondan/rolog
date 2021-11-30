@@ -10,7 +10,12 @@
 .onLoad <- function(libname, pkgname)
 {
   if(.Platform$OS.type == 'unix')
-    dyn.load(file.path(libname, pkgname, 'swipl', 'lib', 'swipl', 'lib', 'x86_64-linux', 'libswipl.so'))
+  {
+    folder = dir(file.path(libname, pkgname, 'swipl', 'lib', 'swipl', 'lib'), 
+		 pattern=R.version$arch, full.names=TRUE)
+    libswipl = dir(folder, pattern="libswipl", full.names=TRUE)
+    dyn.load(libswipl)
+  }
 
   library.dynam(chname='rolog', package=pkgname, lib.loc=libname, local=FALSE)
   
@@ -34,7 +39,12 @@
 {
   library.dynam.unload('rolog', libpath=libpath)
   if(.Platform$OS.type == 'unix')
-    dyn.unload(file.path(libpath, 'swipl', 'lib', 'swipl', 'lib', 'x86_64-linux', 'libswipl.so'))
+  {
+    folder = dir(file.path(libname, pkgname, 'swipl', 'lib', 'swipl', 'lib'), 
+		 pattern=R.version$arch, full.names=TRUE)
+    libswipl = dir(folder, pattern="libswipl", full.names=TRUE)
+    dyn.unload(libswipl)
+  }
 
   invisible()
 }
