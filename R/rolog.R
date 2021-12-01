@@ -294,16 +294,13 @@ portray <- function(
 #' @examples
 #' 
 #' # This query returns FALSE
-#' once(quote(member(1, list(a, b, c))))
+#' once(call("member", 1, list(quote(a), quote(b), quote(c))))
 #' 
 #' # This query returns an empty list meaning yes, it works
-#' once(quote(member(3, list(1, 2, 3))))
+#' once(call("member", 3, list(1, 2, 3)))
 #'
 #' # This query returns a list stating that it works if X = 1
-#' once(quote(member(1, list(a, X))))
-#' 
-#' # Same query in canonical form, without intermediate call to prolog_quote()
-#' once(call("member", 1, list(as.symbol("a"), expression(X))), options=list(quote=FALSE))
+#' once(call("member", 1, list(quote(a), expression(X))))
 #' 
 #' # This does not work: once(quote(X = 1)) because the X is interpreted as
 #' # the name of the argument of quote. Instead, please use
