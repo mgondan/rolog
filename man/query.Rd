@@ -52,7 +52,7 @@ submit() # X = expression(Y) or Y = expression(X)
 submit() # FALSE
 submit() # warning that no query is open
 
-query(call("member", expression(X), list(quote(a), "b", 3L, 4))
+query(call("member", expression(X), list(quote(a), "b", 3L, 4)))
 query(call("member", expression(X), list(TRUE, expression(Y)))) # warning that another query is open
 clear()
 

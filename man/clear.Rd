@@ -13,7 +13,7 @@ TRUE (invisible)
 Clear current query
 }
 \examples{
-query(call("member", expression(X), list(quote(a), "b", 3L, 4))
+query(call("member", expression(X), list(quote(a), "b", 3L, 4)))
 submit() # X = a
 submit() # X = "b"
 clear()
