@@ -528,8 +528,12 @@ as.rolog <- function(query=quote(member(.X, list(a, "b", 3L, 4, TRUE, .Y))))
   if(is.symbol(query))
   {
     # Variable
-    if(substr(as.character(query), 1, 1) == ".")
-      return(as.expression(query))
+    s = as.character(query)
+    if(s == ".")
+      return(expression(`_`))
+
+    if(substr(s, 1, 1) == ".")
+      return(as.expression(as.symbol(substr(s, 2, nchar(s)))))
   }
 
   if(is.call(query))
