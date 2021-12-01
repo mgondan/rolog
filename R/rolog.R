@@ -13,9 +13,20 @@
   if(.Platform$OS.type == "unix")
   {
     # Find folder like x86_64-linux
-    folder <- dir(file.path(libname, pkgname, "swipl", "lib", "swipl", "lib"), 
+    folder <- dir(file.path(libname, pkgname, "swipl", "lib", "swipl", "lib"),
       pattern=R.version$arch, full.names=TRUE)
-    print(folder)
+
+    # Are we in roxygenize mode?
+    if(length(folder) == 0)
+    {
+      inst <- dir(file.path(libname, pkgname), pattern="inst", full.names=FALSE)
+      if("inst" %in% inst)
+        folder <- dir(file.path(libname, pkgname, "inst", "swipl", "lib", "swipl", "lib"),
+                      pattern=R.version$arch, full.names=TRUE)
+
+      if(length(folder) == 0)
+        stop("Rolog: could not load libswipl.dll/so/dylib")
+    }
 
     if(R.version$os == "linux-gnu")
       dyn.load(file.path(folder, paste("libswipl", .Platform$dynlib.ext, sep="")))
