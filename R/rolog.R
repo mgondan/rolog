@@ -472,7 +472,7 @@ query = function(
 #' for a opening a query, collecting all solutions, and clearing it again.
 #'
 #' @examples
-#' query(call("member", expression(X), list(quote(a), "b", 3L, 4))
+#' query(call("member", expression(X), list(quote(a), "b", 3L, 4)))
 #' submit() # X = a
 #' submit() # X = "b"
 #' clear()
@@ -504,7 +504,7 @@ clear <- function()
 #' for a opening a query, collecting all solutions, and clearing it again.
 #' 
 #' @examples
-#' query(query(call("member", expression(X), list(quote(a), "b", 3L, 4, expression(Y))))
+#' query(call("member", expression(X), list(quote(a), "b", 3L, 4, expression(Y))))
 #' submit() # X = 3L
 #' submit() # X = 4.0
 #' submit() # X = TRUE
@@ -512,7 +512,7 @@ clear <- function()
 #' submit() # FALSE
 #' submit() # warning that no query is open
 #'
-#' query(query(call("member", expression(X), list(quote(a), "b", 3L, 4)))
+#' query(call("member", expression(X), list(quote(a), "b", 3L, 4)))
 #' submit() # X = a
 #' submit() # X = "b"
 #' clear()
