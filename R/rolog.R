@@ -42,11 +42,14 @@
 
 .onUnload <- function(libpath)
 {
+  print(libpath)
+
   # See .onLoad for details
   library.dynam.unload("rolog", libpath=libpath)
+
   if(.Platform$OS.type == "unix")
   {
-    folder = dir(file.path(libname, pkgname, "swipl", "lib", "swipl", "lib"), 
+    folder = dir(file.path(libpath, "swipl", "lib", "swipl", "lib"), 
 		 pattern=R.version$arch, full.names=TRUE)
 
     if(R.version$os == "linux-gnu")
