@@ -4,7 +4,11 @@
 \alias{once}
 \title{Invoke a query once}
 \usage{
-once(query = quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), options = NULL)
+once(
+  query = call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE,
+    expression(Y))),
+  options = NULL
+)
 }
 \arguments{
 \item{query}{an R call. The R call consists of symbols, integers and real numbers,
@@ -15,8 +19,6 @@ respectively. The names can be modified with the options below.}
 
 \item{options}{This is a list of options controlling translation from and to prolog.
 \itemize{
-\item if \emph{quote} is \code{TRUE} (default), the query is translated to its
-canonical form using \code{rolog_quote}.
 \item \emph{boolvec} (see option rolog.boolvec, default is !) is the name of the
 prolog compound for vectors of booleans.
 \item \emph{intvec}, \emph{realvec}, \emph{charvec} define the compound names for vectors of
@@ -37,34 +39,27 @@ Invoke a query once
 \examples{
 
 # This query returns FALSE
-once(quote(member(1, list(a, b, c))))
+once(call("member", 1, list(quote(a), quote(b), quote(c))))
 
 # This query returns an empty list meaning yes, it works
-once(quote(member(3, list(1, 2, 3))))
+once(call("member", 3, list(1, 2, 3)))
 
 # This query returns a list stating that it works if X = 1
-once(quote(member(1, list(a, X))))
-
-# Same query in canonical form, without intermediate call to prolog_quote()
-once(call("member", 1, list(as.symbol("a"), expression(X))), options=list(quote=FALSE))
-
-# This does not work: once(quote(X = 1)) because the X is interpreted as
-# the name of the argument of quote. Instead, please use
-once(call("=", quote(X), 1))
-once(call("=", expression(X), 1), options=list(quote=FALSE))
+once(call("member", 1, list(quote(a), expression(X))))
 
 # This query returns a list stating that X = 1 and Z = expression(Y)
-once(call("=", quote(list(X, Y)), quote(list(1, Z))))
+once(call("=", list(expression(X), expression(Y)), list(1, expression(Z))))
 
 # This works for X = [1 | _]; i.e. something like [|](1, expression(_6330))
-once(quote(member(1, X)))
+once(call("member", 1, expression(X)))
 
 # This returns S = '1.0' (scalar)
-once(quote(format(string(S), "~w", list(1))), options=list(scalar=TRUE))
+once(call("format", call("string", expression(S)), "~w", list(1)), options=list(scalar=TRUE))
   
-# This returns S = '#(1.0)' (vector). To prevent "~w" from being translated to
-# $$("~w), it is given as an atom.
-once(quote(format(string(S), `~w`, list(1))), options=list(scalar=FALSE))
+# This returns S = '#(1.0)' (vector), because the 1 is translated to #(1.0). 
+# To prevent "~w" from being translated to $$("~w"), it is given as an atom.
+once(call("format", call("string", expression(S)), as.symbol("~w"), list(1)), 
+  options=list(scalar=FALSE))
 
 }
 \seealso{

@@ -15,7 +15,7 @@ satisfy the query.
 Submit a query that has been opened with \code{\link[=query]{query()}} before.
 }
 \examples{
-query(quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
+query(query(call("member", expression(X), list(quote(a), "b", 3L, 4, expression(Y))))
 submit() # X = 3L
 submit() # X = 4.0
 submit() # X = TRUE
@@ -23,7 +23,7 @@ submit() # X = expression(Y) or Y = expression(X)
 submit() # FALSE
 submit() # warning that no query is open
 
-query(quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
+query(query(call("member", expression(X), list(quote(a), "b", 3L, 4)))
 submit() # X = a
 submit() # X = "b"
 clear()

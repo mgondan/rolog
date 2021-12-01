@@ -4,7 +4,11 @@
 \alias{portray}
 \title{Translate an R call to a prolog compound and pretty print it}
 \usage{
-portray(query = quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), options = NULL)
+portray(
+  query = call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE,
+    expression(Y))),
+  options = NULL
+)
 }
 \arguments{
 \item{query}{an R call. The R call consists of symbols, integers and real numbers,
@@ -15,8 +19,6 @@ respectively. The names can be modified with the options below.}
 
 \item{options}{This is a list of options controlling translation from and to prolog.
 \itemize{
-\item if \emph{quote} is \code{TRUE} (default), the query is translated to its
-canonical form using \code{\link[=rolog_quote]{rolog_quote()}}.
 \item \emph{boolvec} (see option \code{rolog.boolvec}, default is !) is the name of the
 prolog compound for vectors of booleans.
 \item \emph{intvec}, \emph{realvec}, \emph{charvec} define the compound names for vectors of
@@ -33,24 +35,10 @@ character string with the prolog syntax of the call
 Translate an R call to a prolog compound and pretty print it
 }
 \details{
-If \code{options$quote} is \code{TRUE} (default), then R elements are translated
-to the following prolog citizens:
+The R elements are translated to the following prolog citizens:
 \itemize{
 \item numeric -> real (vectors of size \emph{N} -> #/N)
 \item integer -> integer (vectors -> \%/N)
-\item character -> string (vectors -> $$/N)
-\item symbol/name starting with lowercase -> atom
-\item symbol/name starting with uppercase or _ -> variable
-\item call/language -> compound
-\item boolean -> true, false (vectors -> !/N)
-\item list -> list
-\item call/language with the name "list" -> list
-}
-
-If \code{options$quote} is \code{FALSE}, the following rules apply:
-\itemize{
-\item numeric -> real
-\item integer -> integer (vectors of size \emph{N} -> \%/N)
 \item character -> string (vectors -> $$/N)
 \item symbol/name -> atom
 \item expression -> variable

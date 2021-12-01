@@ -4,7 +4,11 @@
 \alias{findall}
 \title{Invoke a query several times}
 \usage{
-findall(query = quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), options = NULL)
+findall(
+  query = call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE,
+    expression(Y))),
+  options = NULL
+)
 }
 \arguments{
 \item{query}{an R call. The R call consists of symbols, integers and real numbers,
@@ -15,8 +19,6 @@ respectively. The names can be modified with the options below.}
 
 \item{options}{This is a list of options controlling translation from and to prolog.
 \itemize{
-\item if \emph{quote} is \code{TRUE} (default), the query is translated to its
-canonical form using \code{rolog_quote}.
 \item \emph{boolvec} (see option rolog.boolvec, default is !) is the name of the
 prolog compound for vectors of booleans.
 \item \emph{intvec}, \emph{realvec}, \emph{charvec} define the compound names for vectors of
@@ -36,7 +38,7 @@ Invoke a query several times
 }
 \examples{
 # This query returns a list stating that it works if X = a, "b", ..., or X = Y
-findall(quote(member(X, list(a, "b", 3L, 4, TRUE, sin(pi/2), Y))))
+findall(call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, call("sin", call("/", quote(pi), 2)), expression(Y))))
 
 }
 \seealso{

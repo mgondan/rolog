@@ -4,7 +4,11 @@
 \alias{query}
 \title{Create a query}
 \usage{
-query(query = quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), options = NULL)
+query(
+  query = call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE,
+    expression(Y))),
+  options = NULL
+)
 }
 \arguments{
 \item{query}{an R call. The R call consists of symbols, integers and real numbers,
@@ -15,8 +19,6 @@ respectively. The names can be modified with the options below.}
 
 \item{options}{This is a list of options controlling translation from and to prolog.
 \itemize{
-\item if \emph{quote} is \code{TRUE} (default), the query is translated to its
-canonical form using \code{rolog_quote}.
 \item \emph{boolvec} (see option rolog.boolvec, default is !) is the name of the
 prolog compound for vectors of booleans.
 \item \emph{intvec}, \emph{realvec}, \emph{charvec} define the compound names for vectors of
@@ -37,12 +39,12 @@ SWI-Prolog does not allow multiple open queries. If another query is open, it
 it is closed and a warning is shown.
 }
 \examples{
-query(quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
+query(call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))))
 submit() # X = a
 submit() # X = "b"
 clear()
 
-query(quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
+query(call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))))
 submit() # X = 3L
 submit() # X = 4.0
 submit() # X = TRUE
@@ -50,8 +52,8 @@ submit() # X = expression(Y) or Y = expression(X)
 submit() # FALSE
 submit() # warning that no query is open
 
-query(quote(member(X, list(a, "b", 3L))))
-query(quote(member(X, list(4, TRUE, Y)))) # warning that another query is open
+query(call("member", expression(X), list(quote(a), "b", 3L, 4))
+query(call("member", expression(X), list(TRUE, expression(Y)))) # warning that another query is open
 clear()
 
 }
