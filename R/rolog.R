@@ -43,16 +43,17 @@
 
 .onUnload <- function(libpath)
 {
-  library.dynam.unload('rolog', libpath=libpath)
-  if(.Platform$OS.type == 'unix')
+  # See .onLoad for details
+  library.dynam.unload("rolog", libpath=libpath)
+  if(.Platform$OS.type == "unix")
   {
-    folder = dir(file.path(libname, pkgname, 'swipl', 'lib', 'swipl', 'lib'), 
+    folder = dir(file.path(libname, pkgname, "swipl", "lib", "swipl", "lib"), 
 		 pattern=R.version$arch, full.names=TRUE)
 
     if(R.version$os == "linux-gnu")
-      dyn.load(file.path(folder, paste('libswipl', .Platform$dynlib.ext, sep='')))
+      dyn.unload(file.path(folder, paste("libswipl", .Platform$dynlib.ext, sep="")))
     else
-      dyn.load(file.path(folder, 'libswipl.dylib'))
+      dyn.unload(file.path(folder, "libswipl.dylib"))
   }
 
   invisible()
