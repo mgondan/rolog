@@ -457,7 +457,7 @@ query = function(
 #' for a opening a query, collecting all solutions, and clearing it again.
 #'
 #' @examples
-#' query(quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
+#' query(call("member", expression(X), list(quote(a), "b", 3L, 4))
 #' submit() # X = a
 #' submit() # X = "b"
 #' clear()
@@ -489,7 +489,7 @@ clear <- function()
 #' for a opening a query, collecting all solutions, and clearing it again.
 #' 
 #' @examples
-#' query(quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
+#' query(query(call("member", expression(X), list(quote(a), "b", 3L, 4, expression(Y))))
 #' submit() # X = 3L
 #' submit() # X = 4.0
 #' submit() # X = TRUE
@@ -497,7 +497,7 @@ clear <- function()
 #' submit() # FALSE
 #' submit() # warning that no query is open
 #'
-#' query(quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
+#' query(query(call("member", expression(X), list(quote(a), "b", 3L, 4)))
 #' submit() # X = a
 #' submit() # X = "b"
 #' clear()
@@ -512,34 +512,30 @@ submit <- function()
 #'
 #' @param query
 #' an R call representing a prolog query with prolog-like syntax, e.g.,
-#' `member(X, list(a, b, Y))` that is used in [query()], [once()], and [findall()].
-#' This query is translated to Rolog's canonical representation, with
-#' R calls and prolog variables enclosed in an R expression, in this example,
-#' `call("member", expression(X), list(a, b, expression(Y))))`.
+#' `member(.X, list(a, b, .Y))` that is used in [query()], [once()], and
+#' [findall()]. This query is translated to Rolog's canonical representation, 
+#' with R calls and prolog variables enclosed in an R expression, in this 
+#' example, `call("member", expression(X), list(a, b, expression(Y))))`.
 #'
 #' @seealso [query()], [once()], [findall()]
 #'
 #' @examples
-#' query(quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
+#' q = quote(member(.X, list(a, "b", 3L, 4, TRUE, .Y)))
+#' findall(as.rolog(q))
 #'
-rolog_quote <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
+as.rolog <- function(query=quote(member(.X, list(a, "b", 3L, 4, TRUE, .Y))))
 {
   if(is.symbol(query))
   {
-    n <- substr(as.character(query), 1, 1)
-	
     # Variable
-    if(n == toupper(n) & n != tolower(n))
-      return(as.expression(query))
-
-    if(n == "_")
+    if(substr(as.character(query), 1, 1) == ".")
       return(as.expression(query))
   }
 
   if(is.call(query))
   {
     args <- as.list(query)
-    args[-1] <- lapply(args[-1], FUN=rolog_quote)
+    args[-1] <- lapply(args[-1], FUN=as.rolog)
 	
     # list(1, 2, 3) is a list not a call
     if(args[[1]] == "list")
