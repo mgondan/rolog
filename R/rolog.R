@@ -9,27 +9,30 @@
 #
 .onLoad <- function(libname, pkgname)
 {
-  if(.Platform$OS.type == 'unix')
+  # Load libswipl.so
+  if(.Platform$OS.type == "unix")
   {
-    folder <- dir(file.path(libname, pkgname, 'swipl', 'lib', 'swipl', 'lib'), 
-		 pattern=R.version$arch, full.names=TRUE)
+    # Find folder like x86_64-linux
+    folder <- dir(file.path(libname, pkgname, "swipl", "lib", "swipl", "lib"), 
+      pattern=R.version$arch, full.names=TRUE)
 
     if(R.version$os == "linux-gnu")
-      dyn.load(file.path(folder, paste('libswipl', .Platform$dynlib.ext, sep='')))
+      dyn.load(file.path(folder, paste("libswipl", .Platform$dynlib.ext, sep="")))
     else
-      dyn.load(file.path(folder, 'libswipl.dylib'))
+      dyn.load(file.path(folder, "libswipl.dylib")) # macOS
   }
 
-  library.dynam(chname='rolog', package=pkgname, lib.loc=libname, local=FALSE)
+  # Load rolog.so
+  library.dynam(chname="rolog", package=pkgname, lib.loc=libname, local=FALSE)
   
   op.rolog <- list(
-    rolog.quote = TRUE,   # accept simplified syntax, use rolog_quote
-    rolog.realvec = '#',  # prolog representation of R numeric vectors
-    rolog.intvec = '%',   # prolog representation of R integer vectors
-    rolog.boolvec = '!',  # prolog representation of R boolean vectors
-    rolog.charvec = '$$', # prolog representation of R character vectors
+    rolog.quote   = TRUE, # accept simplified syntax, see rolog_quote
+    rolog.realvec = "#",  # prolog representation of R numeric vectors
+    rolog.intvec  = "%",  # prolog representation of R integer vectors
+    rolog.boolvec = "!",  # prolog representation of R boolean vectors
+    rolog.charvec = "$$", # prolog representation of R character vectors
     rolog.portray = TRUE, # return prolog call, nicely formatted
-    rolog.scalar = TRUE)  # convert R vectors of size 1 to scalars in Prolog
+    rolog.scalar = TRUE)  # convert R vectors of size 1 to scalars in prolog
 
   set <- !(names(op.rolog) %in% names(options()))
   if(any(set))
