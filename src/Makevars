@@ -1,8 +1,12 @@
 PKG_CPPFLAGS=-I../inst/swipl/lib/swipl/include $(CXXPICFLAGS) -D_REENTRANT -D__SWI_PROLOG__ -D__SWI_EMBEDDED__
 PKG_LIBS=$(shell pkg-config ../inst/swipl/share/pkgconfig/swipl.pc --libs)
 
-all: swipl $(SHLIB)
+all: swipl $(SHLIB) libinst
 
 swipl:
 	mkdir -p ../linux
 	cd ../linux && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DINSTALL_DOCUMENTATION=OFF -DSWIPL_PACKAGES_JAVA=OFF ../src/swipl-devel && make && make install
+
+libinst:
+	mkdir -p ../libs
+	cp rolog.so ../libs
