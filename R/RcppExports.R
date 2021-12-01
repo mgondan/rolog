@@ -40,4 +40,3 @@
 .done <- function() {
     .Call('_rolog_done_', PACKAGE = 'rolog')
 }
-
