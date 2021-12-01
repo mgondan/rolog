@@ -26,7 +26,6 @@
   library.dynam(chname="rolog", package=pkgname, lib.loc=libname, local=FALSE)
   
   op.rolog <- list(
-    rolog.quote   = TRUE, # accept simplified syntax, see rolog_quote
     rolog.realvec = "#",  # prolog representation of R numeric vectors
     rolog.intvec  = "%",  # prolog representation of R integer vectors
     rolog.boolvec = "!",  # prolog representation of R boolean vectors
@@ -179,7 +178,6 @@ consult <- function(fname=system.file(file.path("pl", "likes.pl"), package="rolo
 rolog_options <- function()
 {
   list(
-    quote=getOption("rolog.quote", default=TRUE),
     realvec=getOption("rolog.realvec", default="#"),
     intvec=getOption("rolog.intvec", default="%"),
     boolvec=getOption("rolog.boolvec", default="!"),
@@ -199,8 +197,6 @@ rolog_options <- function()
 #'
 #' @param options
 #' This is a list of options controlling translation from and to prolog.
-#' * if _quote_ is `TRUE` (default), the query is translated to its
-#'   canonical form using [rolog_quote()].
 #' * _boolvec_ (see option `rolog.boolvec`, default is !) is the name of the
 #'   prolog compound for vectors of booleans.
 #' * _intvec_, _realvec_, _charvec_ define the compound names for vectors of
@@ -215,23 +211,10 @@ rolog_options <- function()
 #' @md
 #'
 #' @details
-#' If `options$quote` is `TRUE` (default), then R elements are translated
-#' to the following prolog citizens:
+#' The R elements are translated to the following prolog citizens:
 #' 
 #' * numeric -> real (vectors of size _N_ -> #/N)
 #' * integer -> integer (vectors -> %/N)
-#' * character -> string (vectors -> $$/N)
-#' * symbol/name starting with lowercase -> atom
-#' * symbol/name starting with uppercase or _ -> variable
-#' * call/language -> compound
-#' * boolean -> true, false (vectors -> !/N)
-#' * list -> list
-#' * call/language with the name "list" -> list
-#'
-#' If `options$quote` is `FALSE`, the following rules apply:
-#' 
-#' * numeric -> real
-#' * integer -> integer (vectors of size _N_ -> %/N)
 #' * character -> string (vectors -> $$/N)
 #' * symbol/name -> atom
 #' * expression -> variable
@@ -246,11 +229,6 @@ portray <- function(
   options=NULL)
 {
   options = c(options, rolog_options())
-  
-  # Check if simplified syntax is used
-  if(options$quote)
-    query = rolog_quote(query)
-
   .portray(query, options)
 }
 
@@ -265,8 +243,6 @@ portray <- function(
 #'   
 #' @param options
 #' This is a list of options controlling translation from and to prolog.
-#' * if _quote_ is `TRUE` (default), the query is translated to its
-#'   canonical form using `rolog_quote`.
 #' * _boolvec_ (see option rolog.boolvec, default is !) is the name of the
 #'   prolog compound for vectors of booleans.
 #' * _intvec_, _realvec_, _charvec_ define the compound names for vectors of
@@ -302,31 +278,25 @@ portray <- function(
 #' # This query returns a list stating that it works if X = 1
 #' once(call("member", 1, list(quote(a), expression(X))))
 #' 
-#' # This does not work: once(quote(X = 1)) because the X is interpreted as
-#' # the name of the argument of quote. Instead, please use
-#' once(call("=", quote(X), 1))
-#' once(call("=", expression(X), 1), options=list(quote=FALSE))
-#' 
 #' # This query returns a list stating that X = 1 and Z = expression(Y)
-#' once(call("=", quote(list(X, Y)), quote(list(1, Z))))
+#' once(call("=", list(expression(X), expression(Y)), list(1, expression(Z))))
 #' 
 #' # This works for X = [1 | _]; i.e. something like [|](1, expression(_6330))
-#' once(quote(member(1, X)))
+#' once(call("member", 1, expression(X)))
 #'
 #' # This returns S = '1.0' (scalar)
-#' once(quote(format(string(S), "~w", list(1))), options=list(scalar=TRUE))
+#' once(call("format", call("string", expression(S)), "~w", list(1)), options=list(scalar=TRUE))
 #'   
-#' # This returns S = '#(1.0)' (vector). To prevent "~w" from being translated to
-#' # $$("~w), it is given as an atom.
-#' once(quote(format(string(S), `~w`, list(1))), options=list(scalar=FALSE))
+#' # This returns S = '#(1.0)' (vector), because the 1 is translated to #(1.0). 
+#' # To prevent "~w" from being translated to $$("~w"), it is given as an atom.
+#' once(call("format", call("string", expression(S)), as.symbol("~w"), list(1)), 
+#'   options=list(scalar=FALSE))
 #'
-once <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), options=NULL)
+once <- function(
+  query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))),
+  options=NULL)
 {
   options <- c(options, rolog_options())
-  
-  # Check if simplified syntax is used
-  if(options$quote)
-    query <- rolog_quote(query)
   
   # Decorate result with the prolog syntax of the query
   if(options$portray)
@@ -336,7 +306,7 @@ once <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), options=N
   r <- .once(query, options)
   
   if(options$portray)
-    attr(r, 'query') <- q
+    attr(r, "query") <- q
 
   return(r)
 }
@@ -352,8 +322,6 @@ once <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), options=N
 #'   
 #' @param options
 #' This is a list of options controlling translation from and to prolog.
-#' * if _quote_ is `TRUE` (default), the query is translated to its
-#'   canonical form using `rolog_quote`.
 #' * _boolvec_ (see option rolog.boolvec, default is !) is the name of the
 #'   prolog compound for vectors of booleans.
 #' * _intvec_, _realvec_, _charvec_ define the compound names for vectors of
@@ -379,15 +347,12 @@ once <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), options=N
 #' 
 #' @examples
 #' # This query returns a list stating that it works if X = a, "b", ..., or X = Y
-#' findall(quote(member(X, list(a, "b", 3L, 4, TRUE, sin(pi/2), Y))))
+#' findall(call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, call("sin", call("/", quote(pi), 2)), expression(Y))))
 #' 
-findall <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), options=NULL)
+findall <- function(
+  query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))), options=NULL)
 {
   options <- c(options, rolog_options())
-  
-  # Check if simplified syntax is used
-  if(options$quote)
-    query <- rolog_quote(query)
   
   # Decorate result with the prolog syntax of the query
   if(options$portray)
@@ -413,8 +378,6 @@ findall <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), option
 #'
 #' @param options
 #' This is a list of options controlling translation from and to prolog.
-#' * if _quote_ is `TRUE` (default), the query is translated to its
-#'   canonical form using `rolog_quote`.
 #' * _boolvec_ (see option rolog.boolvec, default is !) is the name of the
 #'   prolog compound for vectors of booleans.
 #' * _intvec_, _realvec_, _charvec_ define the compound names for vectors of
@@ -437,13 +400,13 @@ findall <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), option
 #' @seealso [findall()] for a query that is submitted until it fails.
 #' 
 #' @examples
-#' query(quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
+#' query(call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))))
 #' submit() # X = a
 #' submit() # X = "b"
 #' clear()
 #'
 #' @examples
-#' query(quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
+#' query(call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))))
 #' submit() # X = 3L
 #' submit() # X = 4.0
 #' submit() # X = TRUE
@@ -452,17 +415,15 @@ findall <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), option
 #' submit() # warning that no query is open
 #' 
 #' @examples
-#' query(quote(member(X, list(a, "b", 3L))))
-#' query(quote(member(X, list(4, TRUE, Y)))) # warning that another query is open
+#' query(call("member", expression(X), list(quote(a), "b", 3L, 4))
+#' query(call("member", expression(X), list(TRUE, expression(Y)))) # warning that another query is open
 #' clear()
 #' 
-query = function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), options=NULL)
+query = function(
+  query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))),
+  options=NULL)
 {
   options <- c(options, rolog_options())
-  
-  # Check if simplified syntax is used
-  if(options$quote)
-    query <- rolog_quote(query)
   
   # Decorate result with the prolog syntax of the query
   if(options$portray)
@@ -471,7 +432,7 @@ query = function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), options=N
   r <- .query(query, options)
   
   if(options$portray)
-    attr(r, 'query') <- q
+    attr(r, "query") <- q
   
   return(r)
 }
@@ -552,15 +513,11 @@ submit <- function()
 #' @param query
 #' an R call representing a prolog query with prolog-like syntax, e.g.,
 #' `member(X, list(a, b, Y))` that is used in [query()], [once()], and [findall()].
-#' This is query is translated to Rolog's canonical representation, with
+#' This query is translated to Rolog's canonical representation, with
 #' R calls and prolog variables enclosed in an R expression, in this example,
 #' `call("member", expression(X), list(a, b, expression(Y))))`.
 #'
 #' @seealso [query()], [once()], [findall()]
-#' which use this function if `options$quote` is `TRUE`.
-#'
-#' @seealso [rolog_options()]
-#' option _quote_ controls whether this function is used.
 #'
 #' @examples
 #' query(quote(member(X, list(a, "b", 3L, 4, TRUE, Y))))
