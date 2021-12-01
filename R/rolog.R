@@ -149,10 +149,10 @@ rolog_done <- function()
 #' [once()], [findall()], and [query()]/[submit()]/[clear()] for executing queries
 #' 
 #' @examples
-#' consult(fname=system.file('pl/likes.pl', package='rolog'))
-#' findall(quote(likes(sam, X)))
+#' consult(fname=system.file(file.path("pl", "likes.pl"), package="rolog"))
+#' findall(call("likes", quote(sam), expression(X)))
 #' 
-consult <- function(fname=system.file('pl/likes.pl', package='rolog'))
+consult <- function(fname=system.file(file.path("pl", "likes.pl"), package="rolog"))
 {
   .consult(fname)
 }
@@ -179,13 +179,13 @@ consult <- function(fname=system.file('pl/likes.pl', package='rolog'))
 rolog_options <- function()
 {
   list(
-    quote=getOption('rolog.quote', default=TRUE),
-    realvec=getOption('rolog.realvec', default='#'),
-    intvec=getOption('rolog.intvec', default='%'),
-    boolvec=getOption('rolog.boolvec', default='!'),
-    charvec=getOption('rolog.charvec', default='$$'),
-    portray=getOption('rolog.portray', default=TRUE),
-    scalar=getOption('rolog.scalar', default=TRUE))
+    quote=getOption("rolog.quote", default=TRUE),
+    realvec=getOption("rolog.realvec", default="#"),
+    intvec=getOption("rolog.intvec", default="%"),
+    boolvec=getOption("rolog.boolvec", default="!"),
+    charvec=getOption("rolog.charvec", default="$$"),
+    portray=getOption("rolog.portray", default=TRUE),
+    scalar=getOption("rolog.scalar", default=TRUE))
 }
 
 #' Translate an R call to a prolog compound and pretty print it
@@ -241,7 +241,9 @@ rolog_options <- function()
 #'
 #' @seealso [rolog_options()] for fine-grained control over the translation
 #' 
-portray <- function(query=quote(member(X, list(a, "b", 3L, 4, TRUE, Y))), options=NULL)
+portray <- function(
+  query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))), 
+  options=NULL)
 {
   options = c(options, rolog_options())
   
