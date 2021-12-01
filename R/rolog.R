@@ -15,6 +15,7 @@
     # Find folder like x86_64-linux
     folder <- dir(file.path(libname, pkgname, "swipl", "lib", "swipl", "lib"), 
       pattern=R.version$arch, full.names=TRUE)
+    print(folder)
 
     if(R.version$os == "linux-gnu")
       dyn.load(file.path(folder, paste("libswipl", .Platform$dynlib.ext, sep="")))
