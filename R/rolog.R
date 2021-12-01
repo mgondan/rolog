@@ -32,7 +32,7 @@
     rolog.boolvec = "!",  # prolog representation of R boolean vectors
     rolog.charvec = "$$", # prolog representation of R character vectors
     rolog.portray = TRUE, # return prolog call, nicely formatted
-    rolog.scalar = TRUE)  # convert R vectors of size 1 to scalars in prolog
+    rolog.scalar  = TRUE) # convert R vectors of size 1 to scalars in prolog
 
   set <- !(names(op.rolog) %in% names(options()))
   if(any(set))
@@ -59,33 +59,33 @@
   invisible()
 }
 
-# This is a bit of a mystery.
-#
-# Initialization of the SWI-Prolog works fine under linux, under Windows using
-# RStudio.exe, under Windows using RTerm.exe, but fails under RGui.exe (aka. 
-# "blue R"). Even stranger, it works in the second attempt. 
-#
-# For this reason, I invoke rolog_init twice here. Any hint to a cleaner
-# solution is highly appreciated.
-#
 .onAttach <- function(libname, pkgname)
 {
-  if(.Platform$OS.type == 'unix')
+  if(.Platform$OS.type == "unix")
   {
-    Sys.setenv(SWI_HOME_DIR=file.path(libname, pkgname, 'swipl', 'lib', 'swipl'))
+    Sys.setenv(SWI_HOME_DIR=file.path(libname, pkgname, "swipl", "lib", "swipl"))
     if(!rolog_init())
-      stop('Rolog: initialization of swipl failed.')  
+      stop("Rolog: initialization of swipl failed.")  
   }
 
-  if(.Platform$OS.type == 'windows')
+  # This is a bit of a mystery.
+  #
+  # Initialization of the SWI-Prolog works fine under linux, under Windows using
+  # RStudio.exe, under Windows using RTerm.exe, but fails under RGui.exe (aka. 
+  # "blue R"). Even stranger, it works in the second attempt. 
+  #
+  # For this reason, I invoke rolog_init twice here. Any hint to a cleaner
+  # solution is highly appreciated.
+  #
+  if(.Platform$OS.type == "windows")
   {
-    Sys.setenv(SWI_HOME_DIR=file.path(libname, pkgname, 'swipl'))
+    Sys.setenv(SWI_HOME_DIR=file.path(libname, pkgname, "swipl"))
     if(!rolog_init() && !rolog_init())
-      stop('Rolog: initialization of swipl failed.')  
+      stop("Rolog: initialization of swipl failed.")  
   }
   
   # SWI startup message
-  welcome <- call("message_to_string", as.symbol("welcome"), expression(W))
+  welcome <- call("message_to_string", quote(welcome), expression(W))
   W <- once(welcome, options=list(quote=FALSE))
   packageStartupMessage(W$W)
   invisible()
@@ -93,17 +93,12 @@
 
 .onDetach <- function(libpath)
 {
-  if(.Platform$OS.type == 'unix')
-    Sys.unsetenv('SWI_HOME_DIR')
-  
-  if(.Platform$OS.type == 'windows')
-    Sys.unsetenv('SWI_HOME_DIR')
-
-  # In case there are open queries, clear them
-  clear()
-  
+  # Clear any open queries
+  clear() 
   if(!rolog_done())
-    stop('Rolog: not initialized')
+    stop("Rolog: not initialized.")
+
+  Sys.unsetenv("SWI_HOME_DIR")
 }
 
 #' Start prolog
