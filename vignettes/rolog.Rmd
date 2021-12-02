@@ -119,16 +119,23 @@ findall(call("ancestor", expression(X), quote(jim)))
 
 As stated above, `consult()` loads the facts and rules of Listing\ 1 into the
 database. `findall(expr)` searches for all solutions of the query `expr`, and
-returns the conditions under which the query succeeds. If we are just interested
-in the first solution, we can invoke the query with `once(…)` instead of
-`findall(…)`. 
+returns the conditions under which the query succeeds. In this example, the query 
+succeeds if _X_ is either `pat`, `pam`, `tom` or `bob`, as indicated by the four 
+bindings for _X_ in the resulting list. If we are just interested in the first 
+solution, we can invoke the query with `once(…)` instead of `findall(…)`. 
 
 A rather cumbersome aspect of Rolog is the construction of prolog
 terms and queries. `expression(X)` encapsulates the variable `X`, R symbols from
 `quote(jim)` or `as.symbol("jim")` are translated to prolog atoms, and prolog
-compounds such as `ancestor/2` are generated using `call("ancestor", …)`. In
-this example, the query succeeds if _X_ is either `pat`, `pam`, `tom` or `bob`,
-as indicated by the four bindings for _X_ in the resulting list.
+compounds such as `ancestor/2` are generated using `call("ancestor", …)`. A 
+simplified syntax is provided by `as.rolog()` that accepts quoted expressions
+with dots indicating prolog variables:
+
+```r
+# Same query in simplified syntax
+q = quote(ancestor(.X, jim))
+findall(as.rolog(q))
+```
 
 ## Non-deterministic queries
 
