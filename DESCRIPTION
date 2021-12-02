@@ -13,5 +13,8 @@ RoxygenNote: 7.1.2.9000
 Encoding: UTF-8
 SystemRequirements: GNU make
 Suggests: 
+    rmarkdown,
+    knitr,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+VignetteBuilder: knitr
