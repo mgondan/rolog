@@ -4,7 +4,7 @@ author: "Matthias Gondan"
 date: "Department of Psychology, University of Innsbruck, Austria"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Rolog: prolog queries from R}
+  %\VignetteIndexEntry{Rolog}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
