@@ -4,7 +4,7 @@ author: "Matthias Gondan"
 date: "Department of Psychology, University of Innsbruck, Austria"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{rolog}
+  %\VignetteIndexEntry{Rolog: prolog queries from R}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -99,7 +99,8 @@ ancestor(X, Z) :-
     ancestor(Y, Z).
 ```
 
-Listing\ 1. A family tree in prolog.
+Listing\ 1.
+: A family tree in prolog.
 
 The listing is included in the package and can be accessed from R using the
 function `system.file(…)`. Within prolog, the normal workflow is to consult the
@@ -204,8 +205,8 @@ v(v(saw), _) --> "saw".
 p(p(with)) --> "with".
 ```
 
-Listing\ 2. Simple grammar and lexicon. The `sentence/2` predicate simplifies
-the R call.
+Listing\ 2.
+: Simple grammar and lexicon. The `sentence/2` predicate simplifies the R call.
 
 As in the first example, we first consult a little prolog program with a
 minimalistic grammar and lexicon (Listing\ 2), and then raise a query asking for
@@ -213,7 +214,7 @@ the syntactic structure of “john saw a man with a telescope”. Closer inspect
 of the two results reveals the two possible meanings, “john saw a man _who
 carries_ a telescope” versus “john saw a man _through_ a telescope”. More prolog
 examples of natural language processing are found in Blackburn and Bos (2005),
-including resolution of anaphoric references and the extraction of semantic
+including the resolution of anaphoric references and the extraction of semantic
 meaning.
 
 ```{r}
@@ -243,15 +244,18 @@ library(rolog)
 consult(system.file(file.path("pl", "mathml.pl"), package="rolog"))
 
 # R interface to prolog predicate r2mathml/2
-mathml = function(term)
+mathml = function(term, simplified=TRUE)
 {
+	if(simplified)
+		term = as.rolog(term)
+	
   t = once(call("r2mathml", term, expression(X)))
   cat(paste(t$X, collapse=""))
 }
 ```
 
 ```{r, results="asis"}
-term = call("pbinom", quote(k), quote(N), quote(p))
+term = quote(pbinom(k, N, p))
 mathml(term)
 
 k = 10
@@ -259,12 +263,13 @@ N = 22
 p = 0.4
 eval(term)
 
-term = call("integrate", quote(sin), 0L, call("*", 2L, quote(pi)))
+term = quote(integrate(sin, 0L, 2L*pi))
 mathml(term)
 eval(term)
 ```
 
-Listing 3. R markdown file that autogenerates pretty MathML from R expressions.
+Listing 3.
+: R markdown file that autogenerates pretty MathML from R expressions in simplified rolog syntax.
 
 The integral example is interesting because prolog needs find out the name of
 the integration variable. For that purpose, Rolog provides a 
@@ -305,33 +310,38 @@ found in `pl/interval.pl`; two calls from R are shown below.
 consult(system.file(file.path("pl", "interval.pl"), package="rolog"))
 
 # findall(1 ... 2 / -3 ... 3, Res).
-x = call("...", 1, 2)
-y = call("...", -3, 3)
-findall(call("int", call("/", x, y), expression(Res)))
+query = quote(int(`...`(1, 2) / `...`(-3, 3), .Res))
+findall(as.rolog(query))
 
 # t-ratio
-D  = call("...", 5.7, 5.8)
+D  = quote(`...`(5.7, 5.8))
 mu = 4
-s  = call("...", 3.8, 3.9)
+s  = quote(`...`(3.8, 3.9))
 N  = 24L
-findall(call("int", call("/", call("-", D, mu), call("/", s, call("sqrt", N))),
-						 expression(Res)))
+tratio = call("/", call("-", D, mu), call("/", s, call("sqrt", N)))
+findall(call("int", tratio, expression(Res)))
 ```
 
-The slightly cumbersome syntax for entering an interval l…u is due to the fact
-that the ellipsis is a reserved symbol in R and cannot be used as an infix
-operator. A way more powerful and comprehensive system for constraint logic
-programming over intervals is available as a prolog pack (Workman, 2021) and
-can easily be connected to R using the present package.
+The slightly cumbersome syntax for entering an interval $\langle \ell, u\rangle$
+is due to the fact that the ellipsis is a reserved symbol in R and cannot be
+used as an infix operator. A way more powerful and comprehensive system for
+constraint logic programming over intervals is available as a prolog 
+pack (Workman, 2021) and can easily be connected to R using the present package.
 
-# Literaturverzeichnis
+# References
 
-Blackburn, P., & Bos, J. (2005). Representation and Inference for Natural Language. A First Course in Computational Semantics. Stanford: CLSI.
+Blackburn, P., & Bos, J. (2005). Representation and Inference for Natural
+Language. A First Course in Computational Semantics. Stanford: CLSI.
 
-Dahl, V. (1981). Translating Spanish into logic through logic. Americal Journal of Computational Linguistics, 149-164.
+Dahl, V. (1981). Translating Spanish into logic through logic. Americal Journal
+of Computational Linguistics, 149-164.
 
-Hickey, T., Ju, Q., & van Emden, M. H. (2001). Interval arithmetic: from principles to implementation. Journal of the ACM, 48, 1038-1068.
+Hickey, T., Ju, Q., & van Emden, M. H. (2001). Interval arithmetic: from
+principles to implementation. Journal of the ACM, 48, 1038-1068.
 
-Workman, R. (2021). clpBNR. Von CLP over reals using interval arithmetic - includes rational, integer and Boolean domains as subsets: https://github.com/ridgeworks/clpBNR abgerufen
+Workman, R. (2021). clpBNR. Von CLP over reals using interval
+arithmetic - includes rational, integer and Boolean domains as
+subsets: https://github.com/ridgeworks/clpBNR
 
-Xie, Y., Dervieux, C., & Riederer, E. (2020). R Markdown Cookbook. Cambridge: Chapman and Hall/CRC.
+Xie, Y., Dervieux, C., & Riederer, E. (2020). R Markdown Cookbook.
+Cambridge: Chapman and Hall/CRC.
