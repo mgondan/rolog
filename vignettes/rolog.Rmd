@@ -2,6 +2,7 @@
 title: "Rolog: prolog queries from R"
 author: "Matthias Gondan"
 date: "Department of Psychology, University of Innsbruck, Austria"
+bibliography: bibliography.bibtex
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Rolog}
@@ -11,6 +12,7 @@ vignette: >
 
 ```{r, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+options(rmarkdown.html_vignette.check_title = FALSE)
 ```
 
   Matthias Gondan\
@@ -120,10 +122,11 @@ findall(call("ancestor", expression(X), quote(jim)))
 
 As stated above, `consult()` loads the facts and rules of Listing\ 1 into the
 database. `findall(expr)` searches for all solutions of the query `expr`, and
-returns the conditions under which the query succeeds. In this example, the query 
-succeeds if _X_ is either `pat`, `pam`, `tom` or `bob`, as indicated by the four 
-bindings for _X_ in the resulting list. If we are just interested in the first 
-solution, we can invoke the query with `once(…)` instead of `findall(…)`. 
+returns the conditions under which the query succeeds. In this example, the
+query succeeds if _X_ is either `pat`, `pam`, `tom` or `bob`, as indicated by
+the four bindings for _X_ in the resulting list. If we are just interested in
+the first solution, we can invoke the query with `once(…)` instead
+of `findall(…)`. 
 
 A rather cumbersome aspect of Rolog is the construction of prolog
 terms and queries. `expression(X)` encapsulates the variable `X`, R symbols from
@@ -138,30 +141,32 @@ q = quote(ancestor(.X, jim))
 findall(as.rolog(q))
 ```
 
+Note that the dot is removed from the variable name.
+
 ## Non-deterministic queries
 
 As an alternative to `once(…)` and `findall(…)`, we can create a query with
 `query(…)` and `submit()` the query as often as needed or until it fails, as is
-shown below for a query like `member(X, [1.0, 2.0, Y])`, which succeeds if _X_
-is either 1, 2 or the same as _Y_.
+shown below for a query like `member(X, [1, 2, Y])`, which succeeds if _X_ is
+either 1, 2 or the same as _Y_.
 
 ```{r}
 # member(X, [1, 2, Y]).
-query(call("member", expression(X), list(1, 2, expression(Y))))
+query(call("member", expression(X), list(1L, 2L, expression(Y))))
 
-# first solution for X
+# first solution for X: 1
 submit()
 
-# next solution
+# next solution: 2
 submit()
 
-# next solution
+# next solution: Y
 submit()
 
 # no more results
 submit()
 
-# warning
+# warning that no query is open
 submit()
 ```
 
@@ -169,10 +174,81 @@ Note that in SWI-Prolog, it is generally not possible to open two queries
 simultaneously, so opening a second query while another one is still open will
 raise a warning.
 
+## Term manipulation
+
+Prolog is homoiconic, that is, code is data. In this example, we make use of
+prolog's ability to match expressions against given patterns and modify these
+expressions according to a few predefined "buggy rules" [@Brown1978], inspired
+by recurrent mistakes in student exams of statistics. Consider the standard
+$t$-ratio for comparing an observed group average to a population mean:
+
+$$
+T = \frac{\overline{X} - \mu}{s / \sqrt{N}}
+$$
+
+Some mistakes may occur in this calculation, for example, omission of the
+implicit parentheses around the numerator and the denominator when typing the
+numbers into a calculator, resulting
+to $\overline{X} - \frac{\mu}{s} \div \sqrt{N}$, or forgetting the square root
+around $N$, or both. Prolog code for the two buggy rules is given in Listing\ 2.
+
+```prolog
+% Correct step from task to solution
+expert(tratio(X, Mu, S, N), frac(X - Mu, S / sqrt(N))).
+
+% Mistakes
+buggy(frac(X - Mu, S / SQRTN), X - frac(Mu, S) / SQRTN).
+buggy(sqrt(N), N).
+
+% Apply expert and buggy rules
+step(X, Y) :-
+    expert(X, Y).
+
+step(X, Y) :-
+    buggy(X, Y).
+
+% Enter expressions
+step(X, Y) :-
+    compound(X),
+    mapargs(search, X, Y),
+    dif(X, Y).
+
+% Search through problem space
+search(X, X).
+
+search(X, Z) :-
+    step(X, Y),
+    search(Y, Z).
+```
+
+Listing\ 2.
+: Manipulating terms in prolog.
+
+The little e-learning system shown in Listing\ 2 (`buggy.pl`) is invoked using
+the R script below.
+
+```{r}
+library(rolog)
+consult(system.file(file.path("pl", "buggy.pl"), package="rolog"))
+
+q = quote(search(tratio(x, mu, s, n), .S))
+findall(as.rolog(q))
+```
+
+The fourth and the sixth result are the combination of the two buggy 
+rules (parenthesis, then square root, and the other way round). Some additional
+filters would be needed to eliminate trivial and redundant solutions [see, e.g.,
+the chapter on generate-and-test in @Sterling1994].
+
+It should be mentioned that R is homoiconic, too, and the prolog code above can,
+in principle, be rewritten in R using non-standard evaluation 
+techniques [@Wickham2019]. Prolog's inbuilt pattern matching algorithm 
+simplifies things a lot, though.
+
 ## Definite clause grammars
 
 One of the main driving forces of prolog development was natural language 
-processing (Dahl, 1981). Therefore, the next example is an illustration of 
+processing [@Dahl1981]. Therefore, the next example is an illustration of 
 sentence parsing using so-called definite clause grammars.
 
 ```prolog
@@ -205,17 +281,17 @@ v(v(saw), _) --> "saw".
 p(p(with)) --> "with".
 ```
 
-Listing\ 2.
+Listing\ 3.
 : Simple grammar and lexicon. The `sentence/2` predicate simplifies the R call.
 
 As in the first example, we first consult a little prolog program with a
-minimalistic grammar and lexicon (Listing\ 2), and then raise a query asking for
+minimalistic grammar and lexicon (Listing\ 3), and then raise a query asking for
 the syntactic structure of “john saw a man with a telescope”. Closer inspection
 of the two results reveals the two possible meanings, “john saw a man _who
 carries_ a telescope” versus “john saw a man _through_ a telescope”. More prolog
-examples of natural language processing are found in Blackburn and Bos (2005),
-including the resolution of anaphoric references and the extraction of semantic
-meaning.
+examples of natural language processing are found 
+in Blackburn and Bos [@Blackburn2005], including the resolution of anaphoric
+references and the extraction of semantic meaning.
 
 ```{r}
 # [telescope].
@@ -227,17 +303,17 @@ findall(call("sentence", expression(Tree), "john saw a man with a telescope"))
 
 ## Rendering of mathematical expressions
 
-The R extension of the markdown language (Xie, Dervieux, & Riederer, 2020) 
-enables reproducible statistical reports with nice typesetting in HTML, 
-Microsoft Word, and Latex. However, so far, R expressions such
-as `pbinom(k, N, p)` are typeset as-is; mathematical expressions like
-$P_\mathrm{Bi}(X \le k; N, p)$ require Latex commands such 
-as `P_\mathrm{Bi}\left(X \le k; N, p\right)`, which are cumbersome and 
-unreadable even for simple expressions. Here we make use of prolog’s grammar
-rules for the automatic translation of R expressions to MathML. The result can
-then be rendered on a web page. A limited set of rules for translation from R
-to MathML is found in `pl/mathml.pl` of the Rolog package, as well as an example
-file `mathml.Rmd`. The relevant code snippets are shown in Listing 3. 
+The R extension of the markdown language [@Xie2020] enables reproducible
+statistical reports with nice typesetting in HTML, Microsoft Word, and Latex.
+However, so far, R expressions such as `pbinom(k, N, p)` are typeset as-is; 
+prettier mathematical expressions such as $P_\mathrm{Bi}(X \le k; N, p)$ require
+Latex commands like `P_\mathrm{Bi}\left(X \le k; N, p\right)`, which are
+cumbersome to type in and hardly readable even for simple expressions. Below we
+make use of prolog’s grammar rules for the automatic translation of R
+expressions to MathML. The result can then be rendered on a web page. A limited
+set of rules for translation from R to MathML is found in `pl/mathml.pl` of the
+Rolog package, as well as an example file `mathml.Rmd`. The relevant code
+snippets are shown in Listing\ 4, along with their output.
 
 ```{r}
 library(rolog)
@@ -268,42 +344,44 @@ mathml(term)
 eval(term)
 ```
 
-Listing 3.
-: R markdown file that autogenerates pretty MathML from R expressions in simplified rolog syntax.
+Listing 4.
+: R markdown file that uses Rolog to generates MathML from R expressions.
 
-The integral example is interesting because prolog needs find out the name of
-the integration variable. For that purpose, Rolog provides a 
+The integrate example is interesting because prolog needs find out the name of
+the integration variable for `sin`. For that purpose, Rolog provides a 
 predicate `r_eval/2` that calls R from prolog (i.e., the reverse direction).
 Here, the predicate is used for the R function `formalArgs(args(sin))`, which
-returns the name of the function argument of `sin`, that is, `x`. Note that at
-the prolog end, `integrate(Fun, Lower, Upper)` is rather rigid, accepting only
-these three arguments in that particular order, and without names. In other
-words, something like `integrate(sin, lower=0L, upper=2L * pi)` would not print
-the desired result. A third example in `mathml.Rmd` illustrates the rendering of
-self-written functions (not shown here).
+returns the name of the function argument of `sin`, that is, `x`.
+
+Note that at the prolog end, `integrate(Fun, Lower, Upper)` is rather rigid,
+accepting only these three arguments in that particular order, and without
+names. In other words, something like `integrate(sin, lower=0L, upper=2L * pi)`
+would not print the desired result. A third example in `mathml.Rmd` illustrates
+rendering of self-written functions (not shown here).
 
 ## Interval arithmetic
 
-Let $\langle \ell,u\rangle$ denote a number 
-between $\ell$ and $u$, $\ell \le u$. It is easily verified that the 
-difference $\langle \ell_1, u_1\rangle - \langle \ell_2, u_2\rangle$ is 
-somewhere in the interval $\langle \ell_1 - u_2, u_1 - \ell_2\rangle$, and a
-number of rules exist for basic arithmetic operations and (piecewise) 
-monotonically behaving functions (Hickey, Ju, & van Emden, 2001). For ratios,
-denominators with mixed sign yield two possible intervals, for example,
+Let $\langle\ell, u\rangle$ denote a number between $\ell$ and $u$, $\ell\le u$.
+It is easily verified that the result of the
+difference $\langle\ell_1, u_1\rangle - \langle\ell_2, u_2\rangle$ is somewhere
+in the interval $\langle \ell_1 - u_2, u_1 - \ell_2\rangle$, and a number of
+rules exist for basic arithmetic operations and (piecewise) monotonically
+behaving functions [@Hickey2001]. For ratios, denominators with mixed sign yield
+two possible intervals, for example,
 $\langle 1, 2\rangle / \langle -3, 3\rangle = \langle -\infty, 3\rangle \cup \langle 3, \infty\rangle$, 
-as shown in Figure 4 in Hickey et al. (2001). The number of possible candidates
-increases if more complicated functions are involved, and unions of intervals
-are, themselves, used as arguments (e.g., if $I_1 \cup I_2$ is added 
+as shown in Figure 4 in Hickey et al.. The number of possible candidates
+increases if more complicated functions are involved, as unions of intervals
+themselves appear as arguments (e.g., if $I_1 \cup I_2$ is added
 to $I_3 \cup I_4$, the result
 is $I_1 + I_3 \cup I_1 + I_4 \cup I_2 + I_3 \cup I_2 + I_4$). Thus, calculations
 in interval arithmetic are non-deterministic in nature, with a non-foreseeable
-number of results (and cannot, in general, be vectorized). Use cases for
-interval arithmetic are the limitations of floating-point representations in
-computer hardware, but intervals can also be used to represent the result of a
-measurement with limited precision, or a truncated intermediate result of a
-student doing hand calculations. A few rules for basic interval arithmetic are
-found in `pl/interval.pl`; two calls from R are shown below.
+number of results and cannot, in general, be vectorized as is often done in R.
+Use cases for interval arithmetic are the limitations of floating-point
+representations in computer hardware, but intervals can also be used to
+represent the result of a measurement with limited precision, or a truncated
+intermediate result of a student doing hand calculations. A few rules for basic
+interval arithmetic are found in `pl/interval.pl`; two calls from R are shown
+below.
 
 ```{r}
 # [interval].
@@ -326,22 +404,6 @@ The slightly cumbersome syntax for entering an interval $\langle \ell, u\rangle$
 is due to the fact that the ellipsis is a reserved symbol in R and cannot be
 used as an infix operator. A way more powerful and comprehensive system for
 constraint logic programming over intervals is available as a prolog 
-pack (Workman, 2021) and can easily be connected to R using the present package.
+pack [@Workman2021] and can easily be connected to R using the present package.
 
 # References
-
-Blackburn, P., & Bos, J. (2005). Representation and Inference for Natural
-Language. A First Course in Computational Semantics. Stanford: CLSI.
-
-Dahl, V. (1981). Translating Spanish into logic through logic. Americal Journal
-of Computational Linguistics, 149-164.
-
-Hickey, T., Ju, Q., & van Emden, M. H. (2001). Interval arithmetic: from
-principles to implementation. Journal of the ACM, 48, 1038-1068.
-
-Workman, R. (2021). clpBNR. Von CLP over reals using interval
-arithmetic - includes rational, integer and Boolean domains as
-subsets: https://github.com/ridgeworks/clpBNR
-
-Xie, Y., Dervieux, C., & Riederer, E. (2020). R Markdown Cookbook.
-Cambridge: Chapman and Hall/CRC.
