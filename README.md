@@ -58,28 +58,9 @@ Please tell me if anything is misssing.
 
 6. `pacman -S mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-libjpeg mingw-w64-ucrt-x86_64-libyaml mingw-w64-ucrt-x86_64-pcre mingw-w64-ucrt-x86_64-libarchive mingw-w64-ucrt-x86_64-db`
 
-7. `git clone https://github.com/mgondan/rolog`
+7. Invoke `/c/Program\ Files/R/R-devel/bin/R.exe`
 
-8. `/c/Program\ Files/R/R-devel/bin/R.exe CMD INSTALL rolog`
-
-9. Reinstall your current R, preferably R-4.1, so that RStudio is working again. 
-
-10. In RStudio, type `library(rolog)`. Does this message and warning appear? The warning will disappear as soon as R-4.2 will become available.
-
-````
-Welcome to SWI-Prolog (threaded, 64 bits, version 8.5.3-28-g85fd90216-DIRTY)
-SWI-Prolog comes with ABSOLUTELY NO WARRANTY. This is free software.
-Please run ?- license. for legal details.
-
-For online help and background, visit https://www.swi-prolog.org
-For built-in help, use ?- help(Topic). or ?- apropos(Word).
-Warning message:
-package ‘rolog’ was built under R version 4.2.0 
-````
-
-11. In RStudio, type `once(call("check_installation"))`. Does this output appear?
-
-old stuff
+In R, call:
 
 `install.packages("Rcpp", type="source")`
 
@@ -88,6 +69,44 @@ old stuff
 `install.packages("rmarkdown", type="source")`
 
 `remotes::install_github("mgondan/rolog")`
+
+8. You can check the installation like this:
+
+`library(rolog)`
+
+Does this message appear?
+
+````
+Welcome to SWI-Prolog (threaded, 64 bits, version 8.5.3-28-g85fd90216-DIRTY)
+SWI-Prolog comes with ABSOLUTELY NO WARRANTY. This is free software.
+Please run ?- license. for legal details.
+
+For online help and background, visit https://www.swi-prolog.org
+For built-in help, use ?- help(Topic). or ?- apropos(Word).
+````
+
+`once(call("check_installation"))`
+
+Does this output appear?
+
+````
+................................................ not present
+Warning: See http://www.swi-prolog.org/build/issues/tcmalloc.html
+Warning: library(jpl) .......................... NOT FOUND
+Warning: See http://www.swi-prolog.org/build/issues/jpl.html
+Warning: library(pce) .......................... NOT FOUND
+Warning: See http://www.swi-prolog.org/build/issues/xpce.html
+Warning: Found 3 issues.
+list()
+attr(,"query")
+[1] "check_installation"
+````
+
+I can't tell why the upper part of the output is cropped, but it looks good. The three issues are expected, since tcmalloc, jpl and xpce are not part of this installation.
+
+9. Reinstall your current R, preferably R-4.1, so that RStudio is working again. You
+   can now use library(rolog). It issues a warning with a version mismatch, this warning 
+   will disappear if R-4.2 is available.
 
 ## Example 1
 
