@@ -11,5 +11,6 @@ swipl:
 	# cp -n `objdump -p libswipl.dll | grep 'DLL Name:' | sed -e "s?\t*DLL Name: ?/ucrt64/bin/?g"` .
 	cp /ucrt64/bin/libgmp-10.dll ../inst/libs/x64
 	cp /ucrt64/bin/zlib1.dll ../inst/libs/x64
-	cp `ldd ../inst/swipl/bin/archive4pl.dll |grep -o "/ucrt64/bin/.*\\.dll"` ../inst/libs/x64
-	cp `ldd ../inst/swipl/bin/bdb4pl.dll |grep -o "/ucrt64/bin/.*\\.dll"` ../inst/libs/x64
+	echo `pwd`
+	cp `ldd ../inst/swipl/bin/archive4pl.dll | grep -o '/ucrt64/bin/.*\\.dll'` ../inst/libs/x64
+	cp `ldd ../inst/swipl/bin/bdb4pl.dll | grep -o '/ucrt64/bin/.*\\.dll'` ../inst/libs/x64
