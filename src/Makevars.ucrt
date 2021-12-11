@@ -12,5 +12,8 @@ swipl:
 	cp /ucrt64/bin/libgmp-10.dll ../inst/libs/x64
 	cp /ucrt64/bin/zlib1.dll ../inst/libs/x64
 	echo `pwd`
+	echo `ls`
+	echo `ldd ../inst/swipl/bin/archive4pl.dll`
+	echo `ldd ../inst/swipl/bin/archive4pl.dll | grep -o '/ucrt64/bin/.*\\.dll'`
 	cp `ldd ../inst/swipl/bin/archive4pl.dll | grep -o '/ucrt64/bin/.*\\.dll'` ../inst/libs/x64
 	cp `ldd ../inst/swipl/bin/bdb4pl.dll | grep -o '/ucrt64/bin/.*\\.dll'` ../inst/libs/x64
