@@ -17,7 +17,7 @@ Consult a prolog database
 }
 \examples{
 consult(fname=system.file(file.path("pl", "family.pl"), package="rolog"))
-findall(call("likes", quote(sam), expression(X)))
+findall(call("ancestor", quote(pam), expression(X)))
 
 }
 \seealso{
