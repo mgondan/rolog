@@ -59,7 +59,7 @@ Please tell me if anything is misssing.
 
 6. A shell appears, type `pacman -Syu`
 
-7. `pacman -S mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-libjpeg mingw-w64-ucrt-x86_64-libyaml mingw-w64-ucrt-x86_64-pcre mingw-w64-ucrt-x86_64-libarchive mingw-w64-ucrt-x86_64-db`
+7. `pacman -S mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-libjpeg mingw-w64-ucrt-x86_64-libyaml mingw-w64-ucrt-x86_64-pcre mingw-w64-ucrt-x86_64-libarchive mingw-w64-ucrt-x86_64-db` `mingw-w64-ucrt-x86_64-texlive-latex-recommended`
 
 8. Invoke `/c/Program\ Files/R/R-devel/bin/R.exe`
 
