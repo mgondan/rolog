@@ -163,10 +163,10 @@ rolog_done <- function()
 #' [once()], [findall()], and [query()]/[submit()]/[clear()] for executing queries
 #' 
 #' @examples
-#' consult(fname=system.file(file.path("pl", "likes.pl"), package="rolog"))
-#' findall(call("likes", quote(sam), expression(X)))
+#' consult(fname=system.file(file.path("pl", "family.pl"), package="rolog"))
+#' findall(call("ancestor_of", quote(sam), expression(X)))
 #' 
-consult <- function(fname=system.file(file.path("pl", "likes.pl"), package="rolog"))
+consult <- function(fname=system.file(file.path("pl", "family.pl"), package="rolog"))
 {
   .consult(fname)
 }
