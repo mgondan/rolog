@@ -137,6 +137,6 @@ because Prolog has to ask back for the name of the integration variable (the x i
 You should find an HTML page with nice equations in the file `mathml.html` of the current folder. Note that it uses MathML, which yields best
 results with the Firefox browser.
 
-# More examples
+## More examples
 
 Please have a look at the vignette of the package.
