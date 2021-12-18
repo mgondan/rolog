@@ -9,3 +9,5 @@
 ^.*\.github$
 ^.*\.clang-format$
 ^.*\.travis.yml$
+^.*\.so$
+^.*\.obj$
