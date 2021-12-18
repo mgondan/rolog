@@ -10,3 +10,7 @@ swipl:
 libinst:
 	mkdir -p ../libs
 	cp rolog.so ../libs
+	rm ../inst/swipl/bin/swipl
+	rm ../inst/swipl/bin/swipl-ld
+	rm ../inst/swipl/lib/swipl/bin/x86_64-linux/swipl
+	rm ../inst/swipl/lib/swipl/bin/x86_64-linux/swipl-ld
