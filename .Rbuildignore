@@ -1,3 +1,11 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^linux/
+^.*\.git$
+^.*\.plrc$
+^.*\.fileheader$
+^.*\.ranlib$
+^.*\.indent.pro$
+^.*\.github$
+^.*\.clang-format$
+^.*\.travis.yml$
