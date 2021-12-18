@@ -1,6 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^linux/
+^mingw64/
 ^.*\.git$
 ^.*\.plrc$
 ^.*\.fileheader$
