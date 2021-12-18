@@ -121,10 +121,6 @@ This is a hello(world).
 
 `library(rolog)`
 
-Load some facts and rules with 
-
-`consult(system.file("pl/likes.pl", package="rolog"))`
-
 Run a query such as member(X, [1, 2, 3]) with 
 
 `findall(call('member', expression(X), list(1L, 2L, 3L)))`
@@ -140,3 +136,7 @@ because Prolog has to ask back for the name of the integration variable (the x i
 
 You should find an HTML page with nice equations in the file `mathml.html` of the current folder. Note that it uses MathML, which yields best
 results with the Firefox browser.
+
+# More examples
+
+Please have a look at the vignette of the package.
