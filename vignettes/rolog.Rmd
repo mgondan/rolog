@@ -1,5 +1,5 @@
 ---
-title: "Rolog: prolog queries from R"
+title: "Rolog: Prolog queries from R"
 author: "Matthias Gondan"
 date: "Department of Psychology, University of Innsbruck, Austria"
 bibliography: bibliography.bibtex
@@ -38,26 +38,124 @@ core library, a lot of packages have been developed for all kinds of statistical
 problems, including new-style artificial intelligence tools such as neural
 networks for machine learning and deep learning. Whereas Prolog is weak in
 statistical computation, but strong in symbolic manipulation, the converse may
-be said for the R language. SWI-Prolog is a widely used prolog system that
+be said for the R language. SWI-Prolog is a widely used Prolog system that
 offers a wide range of extensions for real world applications, and there already
-exist two so-called prolog packs to invoke R (rserve-client, Real) from
+exist two so-called Prolog packs to invoke R (rserve-client, Real) from
 SWI-Prolog. However, given the large user community of R, there may also be a
-need for a connection in the reverse direction that allows R programmers to
-embed prolog queries in their computations. The R package Rolog embeds the
-SWI-Prolog system into an R package, thus enabling R communicate with prolog in
-both directions, so that deterministic and non-deterministic queries can be sent
-to the prolog interpreter. Usage of the Rolog library is illustrated by a few
-examples.
+need for a connection in the reverse direction that allows invoking Prolog
+queries in R computations. The R package Rolog embeds the SWI-Prolog system into
+an R package, thus enabling deterministic and non-deterministic queries to the
+Prolog interpreter. Usage of the Rolog library is illustrated by a few examples.
 
 ## Keywords
 
-Statistics; Logical Programming; Artificial Intelligence
+Statistics; Logic Programming; Artificial Intelligence
 
-# Rolog: prolog queries from R
+# 1. Rolog: Prolog queries from R
 
-etc.
+The R [@R] programming language and environment is a widely used open source
+software for statistical data analysis. The basic language provides a lot of
+functions for storage and manipulation of different data types, with a strong
+emphasis on operations involving vectors and arrays. Moreover, a huge number of
+R packages (e.g., CRAN, https://cran.r-project.org/) have been contributed that
+cover problems from diverse areas such as bioinformatics, machine learning,
+specialized statistical methods, web programming and connections to other
+programming languages. To my knowledge, an interface to Prolog is lacking so
+far.
 
-# Examples
+The logic programming language Prolog was invented in the 1970ies by 
+Colmerauer [@Colmerauer1996], mostly for the purpose of natural language 
+processing. Since then, logic programming has become an important driving force
+in research on artificial intelligence, natural language processing, program
+analysis, knowledge representation and theorem
+proving [@Shoham1994;@Lally2011;@Carro2004;@Hsiang1987]. Unlike R, Prolog is a
+declarative programming language consisting of facts and rules defining
+relations in e.g. a problem space. Its main strength is its builtin query-driven
+search engine that efficiently deals with complex structured data, but this data
+is not necessarily numerical. In fact, Prolog only provides the typical
+collection of arithmetic calculations via a purely functional interface `is/2`.
+More complex calculations such as matrix algebra, statistical models or machine
+learning need help from other systems, for example, from
+R [@Angelopoulos2013;@Rserve].
+
+SWI-Prolog [@Wielemaker2012] is an open-source implementation of Prolog that
+mainly targets developers of applications, with many users in academia, research
+and industry. SWI-Prolog includes a large number of libraries for "the real
+world", for example, a web server, encryption, interfaces to C/C++ and other
+programming languages, as well as a development environment and debugger. In 
+addition, pluggable extensions (so-called packs) are available for specific
+tasks to enhance Prolog’s capabilities. The above-mentioned interfaces to the R
+system are examples of such packs.
+
++++ 
+
+A further motivation for integrating R with logic programming stems from the observation
+that traditionally, work on logic programming has focused in representing
+crisp knowledge.More recent work on the interplay between knowledge representation
+and statistical inference has attracted substantial interest in recent years. Work in this
+area includes the PRISM system and its EM-based parameter algorithm [16], Stochastic
+logic programs with an MCMC structure learning system [2] and the FAM algorithm
+[9], the ProbLog language and system [12] with a variety of learning algorithms
+and CLP(BN) [6], with EM learning and an interface to Aleph [18]. The interface to
+R allows the integrated statistical-logic inference systems access to a wide range of tools
+from random number generators to sophisticated algorithms for probabilistic inference.
+
+Nicos Angelopoulos and James Cussens. Bayesian learning of Bayesian networks with informative
+priors. Journal of Annals of Mathematics and Artificial Intelligence, 54(1-3):53–98,
+2008.
+
+Taisuke Sato and Yoshitaka Kameya. Parameter learning of logic programs for symbolicstatistical
+modeling. Journal of AI Research, 15:391–454, 2001.
+
+James Cussens. Stochastic logic programs: Sampling, inference and applications. In Six-
+teenth Annual Conference on Uncertainty in Artificial Intelligence (UAI’00), pages 115–122,
+San Francisco, CA, 2000.
+
+Angelika Kimmig, Bart Demoen, Luc De Raedt, V´ıtor Santos Costa, and Ricardo Rocha. On
+the implementation of the probabilistic logic programming language ProbLog. Theory and
+Practice of Logic Programming, 11:235–26, 2011.
+
+V´ıtor Santos Costa, David Page, Maleeha Qazi, and James Cussens. CLP(BN): Constraint
+logic programming for probabilistic knowledge. In In Proceedings of the 19th Conference
+on Uncertainty in Artificial Intelligence (UAI’03), pages 517–524, 2003.
+
+Ashwin Srinivasan. The Aleph Manual. University of Oxford, 2004.
+
++++
+
+Earlier approaches to connect Prolog and R have been published as SWI-Prolog 
+packs [r..eal, Rserve_client, @Angelopoulos2013;@Rserve] and as a YAP 
+module [YapR, @YapR]. Whereas r..eal establishes a direct link to an embedded
+instance of R, Rserve_client communicates with a local or remote R 
+service [@Urbanek2021]. The former emphasises speed, the latter might be 
+preferred from a security perspective, especially in systems such as 
+SWISH [@SWISH] that accepts commands for both systems. All these packages
+provide an interface for R calls from Prolog, but not the other way round, that
+is, querying Prolog from R. 
+
+Rolog is an attempt to fill this gap and offer the possibilty to raise Prolog
+queries in R scripts, for example, to perform efficient symbolic computations,
+searches in complex graphs, parsing natural language and definite clause
+grammars. Similar to r..real, tight communication between the two systems is
+established by linking to a shared library that embeds the current version of
+SWI-Prolog. The exchange of data is facilitated by the C++ interfaces of the two
+languages [@Edelbuettel2018;@Wielemaker2021]. A less tight connection might be
+established using the recently developed machine query interface [@Zinda2021]
+that allows socket-based communication between foreign languages and SWI-Prolog.
+
+A bidirectional bridge between R and Prolog might overcome the limitations of 
+both languages, thereby combining the extensive numerical and statistical power
+of the R system with Prolog’s skills in the representation of knowledge and
+reasoning. In addition to the nice little tools shown in the examples below, I
+hope I can contribute to progress at the intersection of traditional artificial
+intelligence and contemporary statistical programming.
+
+The next section presents the interface of Rolog in detail. Section\ 3 presents
+possible extensions of the R as well as the Prolog end. Section\ 4 shows a 
+number of illustrative examples that offer useful extensions to the R system.
+Conclusions and further perspectives are summarised in Section 5.
+
+# 4. Examples
 
 In the last section I present a few usage examples for the Rolog package in
 increasing complexity. Although the code snippets are mostly self-explanatory,
@@ -102,10 +200,10 @@ ancestor(X, Z) :-
 ```
 
 Listing\ 1.
-: A family tree in prolog.
+: A family tree in Prolog.
 
 The listing is included in the package and can be accessed from R using the
-function `system.file(…)`. Within prolog, the normal workflow is to consult the
+function `system.file(…)`. Within Prolog, the normal workflow is to consult the
 code with `[family]` and then to raise queries such as `ancestor(X, jim)`, which
 returns, one by one, four solutions for the variable _X_. In R, we obtain the
 following results:
@@ -128,12 +226,12 @@ the four bindings for _X_ in the resulting list. If we are just interested in
 the first solution, we can invoke the query with `once(…)` instead
 of `findall(…)`. 
 
-A rather cumbersome aspect of Rolog is the construction of prolog
+A rather cumbersome aspect of Rolog is the construction of Prolog
 terms and queries. `expression(X)` encapsulates the variable `X`, R symbols from
-`quote(jim)` or `as.symbol("jim")` are translated to prolog atoms, and prolog
+`quote(jim)` or `as.symbol("jim")` are translated to Prolog atoms, and Prolog
 compounds such as `ancestor/2` are generated using `call("ancestor", …)`. A 
 simplified syntax is provided by `as.rolog()` that accepts quoted expressions
-with dots indicating prolog variables:
+with dots indicating Prolog variables:
 
 ```r
 # Same query in simplified syntax
@@ -177,7 +275,7 @@ raise a warning.
 ## Term manipulation
 
 Prolog is homoiconic, that is, code is data. In this example, we make use of
-prolog's ability to match expressions against given patterns and modify these
+Prolog's ability to match expressions against given patterns and modify these
 expressions according to a few predefined "buggy rules" [@Brown1978], inspired
 by recurrent mistakes in student exams of statistics. Consider the standard
 $t$-ratio for comparing an observed group average to a population mean:
@@ -192,7 +290,7 @@ numbers into a calculator, resulting
 to $\overline{X} - \frac{\mu}{s} \div \sqrt{N}$, or forgetting the square root
 around $N$, or both. Prolog code for the two buggy rules is given in Listing\ 2.
 
-```prolog
+```Prolog
 % Correct step from task to solution
 expert(tratio(X, Mu, S, N), frac(X - Mu, S / sqrt(N))).
 
@@ -222,7 +320,7 @@ search(X, Z) :-
 ```
 
 Listing\ 2.
-: Manipulating terms in prolog.
+: Manipulating terms in Prolog.
 
 The little e-learning system shown in Listing\ 2 (`buggy.pl`) is invoked using
 the R script below.
@@ -240,14 +338,14 @@ rules (parenthesis, then square root, and the other way round). Some additional
 filters would be needed to eliminate trivial and redundant solutions [see, e.g.,
 the chapter on generate-and-test in @Sterling1994].
 
-It should be mentioned that R is homoiconic, too, and the prolog code above can,
+It should be mentioned that R is homoiconic, too, and the Prolog code above can,
 in principle, be rewritten in R using non-standard evaluation 
 techniques [@Wickham2019]. Prolog's inbuilt pattern matching algorithm 
 simplifies things a lot, though.
 
 ## Definite clause grammars
 
-One of the main driving forces of prolog development was natural language 
+One of the main driving forces of Prolog development was natural language 
 processing [@Dahl1981]. Therefore, the next example is an illustration of 
 sentence parsing using so-called definite clause grammars.
 
@@ -284,11 +382,11 @@ p(p(with)) --> "with".
 Listing\ 3.
 : Simple grammar and lexicon. The `sentence/2` predicate simplifies the R call.
 
-As in the first example, we first consult a little prolog program with a
+As in the first example, we first consult a little Prolog program with a
 minimalistic grammar and lexicon (Listing\ 3), and then raise a query asking for
 the syntactic structure of “john saw a man with a telescope”. Closer inspection
 of the two results reveals the two possible meanings, “john saw a man _who
-carries_ a telescope” versus “john saw a man _through_ a telescope”. More prolog
+carries_ a telescope” versus “john saw a man _through_ a telescope”. More Prolog
 examples of natural language processing are found 
 in Blackburn and Bos [@Blackburn2005], including the resolution of anaphoric
 references and the extraction of semantic meaning.
@@ -309,7 +407,7 @@ However, so far, R expressions such as `pbinom(k, N, p)` are typeset as-is;
 prettier mathematical expressions such as $P_\mathrm{Bi}(X \le k; N, p)$ require
 Latex commands like `P_\mathrm{Bi}\left(X \le k; N, p\right)`, which are
 cumbersome to type in and hardly readable even for simple expressions. Below we
-make use of prolog’s grammar rules for the automatic translation of R
+make use of Prolog’s grammar rules for the automatic translation of R
 expressions to MathML. The result can then be rendered on a web page. A limited
 set of rules for translation from R to MathML is found in `pl/mathml.pl` of the
 Rolog package, as well as an example file `mathml.Rmd`. The relevant code
@@ -319,7 +417,7 @@ snippets are shown in Listing\ 4, along with their output.
 library(rolog)
 consult(system.file(file.path("pl", "mathml.pl"), package="rolog"))
 
-# R interface to prolog predicate r2mathml/2
+# R interface to Prolog predicate r2mathml/2
 mathml = function(term, simplified=TRUE)
 {
 	if(simplified)
@@ -347,17 +445,55 @@ eval(term)
 Listing 4.
 : R markdown file that uses Rolog to generates MathML from R expressions.
 
-The integrate example is interesting because prolog needs find out the name of
+The integrate example is interesting because Prolog needs find out the name of
 the integration variable for `sin`. For that purpose, Rolog provides a 
-predicate `r_eval/2` that calls R from prolog (i.e., the reverse direction).
-Here, the predicate is used for the R function `formalArgs(args(sin))`, which
-returns the name of the function argument of `sin`, that is, `x`.
+predicate `r_eval/2` that calls R from Prolog (i.e., the reverse direction, see
+next example). Here, the predicate is used for the 
+R\ function `formalArgs(args(sin))`, which returns the name of the function
+argument of `sin`, that is, `x`.
 
-Note that at the prolog end, `integrate(Fun, Lower, Upper)` is rather rigid,
+Note that at the Prolog end, `integrate(Fun, Lower, Upper)` is rather rigid,
 accepting only these three arguments in that particular order, and without
 names. In other words, something like `integrate(sin, lower=0L, upper=2L * pi)`
-would not print the desired result. A third example in `mathml.Rmd` illustrates
+will not print the desired result. A third example in `mathml.Rmd` illustrates
 rendering of self-written functions (not shown here).
+
+## Calling Prolog from R
+
+The basic workflow of the bridge from R to Prolog is to (A)\ translate an 
+R\ expression into a Prolog term (i.e., a predicate), (B)\ query the predicate,
+and then, (C)\ translate the result (i.e., the bindings of the variables) back
+to R. The reverse direction is straightforward, we start by translating a
+Prolog term to an R expression (i.e. Step\ C), call the R expression, and then
+translate the result back to a Prolog term (Step A). Rolog provides two
+Prolog predicates for this purpose, `r_eval(Expr)` and `r_eval(Expr, Res)`. The
+former is used to invoke an R expression *Expr* for its side effects (e.g.,
+initializing a random number generator); it does not return a result. The latter
+is used to evaluate the R expression *Expr* and return the result *Res*. The
+code snippet in Listing\ 5 (`r_eval.pl`) illustrates this behavior.
+
+```prolog
+r_norm(N, L) :-
+    r_eval('set.seed'(123)),
+    r_eval(rnorm(N), L).
+```
+
+```{r}
+# [r_eval].
+consult(system.file(file.path("pl", "r_eval.pl"), package="rolog"))
+
+# rnorm(3)
+once(call("r_norm", 3, expression(L)))
+```
+
+Listing\ 5.
+: Calling Prolog from R using `r_eval/1` and `r_eval/2`.
+
+The example in Listing\ 5 is a bit trivial, basically illustrating the syntax
+and the workflow. More serious applications of `r_eval/1,2` are illustrated in
+the example on mathematical expressions where `r_eval/2` is used to obtain
+a names of a function argument, as well as in the next example on interval
+arithmetic, where `r_eval/2` is used with monototonically behaving R functions.
 
 ## Interval arithmetic
 
@@ -368,20 +504,20 @@ in the interval $\langle \ell_1 - u_2, u_1 - \ell_2\rangle$, and a number of
 rules exist for basic arithmetic operations and (piecewise) monotonically
 behaving functions [@Hickey2001]. For ratios, denominators with mixed sign yield
 two possible intervals, for example,
-$\langle 1, 2\rangle / \langle -3, 3\rangle = \langle -\infty, 3\rangle \cup \langle 3, \infty\rangle$, 
+$\langle 1, 2\rangle / \langle -3, 3\rangle = \langle -\infty, 3\rangle \cup \langle 3, \infty\rangle$,
 as shown in Figure 4 in Hickey et al.. The number of possible candidates
 increases if more complicated functions are involved, as unions of intervals
 themselves appear as arguments (e.g., if $I_1 \cup I_2$ is added
 to $I_3 \cup I_4$, the result
 is $I_1 + I_3 \cup I_1 + I_4 \cup I_2 + I_3 \cup I_2 + I_4$). Thus, calculations
-in interval arithmetic are non-deterministic in nature, with a non-foreseeable
-number of results and cannot, in general, be vectorized as is often done in R.
-Use cases for interval arithmetic are the limitations of floating-point
-representations in computer hardware, but intervals can also be used to
-represent the result of a measurement with limited precision, or a truncated
-intermediate result of a student doing hand calculations. A few rules for basic
-interval arithmetic are found in `pl/interval.pl`; two calls from R are shown
-below.
+in interval arithmetic are non-deterministic in nature, and the number of
+possible results is not foreseeable and cannot, in general, be vectorized as is
+often done in R. Use cases for interval arithmetic are the limitations of
+floating-point representations in computer hardware, but intervals can also be
+used to represent the result of a measurement with limited precision, or a
+truncated intermediate result of a student doing hand calculations. A few rules
+for basic interval arithmetic are found in `pl/interval.pl`; two calls from R
+are shown below.
 
 ```{r}
 # [interval].
@@ -403,7 +539,49 @@ findall(call("int", tratio, expression(Res)))
 The slightly cumbersome syntax for entering an interval $\langle \ell, u\rangle$
 is due to the fact that the ellipsis is a reserved symbol in R and cannot be
 used as an infix operator. A way more powerful and comprehensive system for
-constraint logic programming over intervals is available as a prolog 
+constraint logic programming over intervals is available as a Prolog 
 pack [@Workman2021] and can easily be connected to R using the present package.
+
+# 5. Conclusions
+
++++
+
+The library presented here achieves a tight integration of the R statistical software system
+with two open source Prolog implementations. Our designing principles have been
+those of simplicity and transparency across the systems. This has been accomplished by
+(a) keeping to a minimum the transformations the user needs to be aware of, and by (b)
+providing intuitive, mnemonic syntax to the inconsistencies between the two languages.
+As a result, r..eal programs are clear and easy to follow. The functional inheritance of
+R corresponds well with the logical underpinning of Prolog. R..eal provides a productive
+environment for building highly effective pipelines and interactive, query-based
+data exploration.
+
+Interfacing the R environmentwith Prolog widens the range of applications for logic
+programming and inductive logic programming. It has the potential to facilitate the
+development of systems combining logic and probabilistic reasoning and will significantly
+improve the development of ILP applications requiring statistical and numerical
+computations. We also hope that this interface will encourage logic programming researchers
+to engage in areas of research where a synergy of knowledge representation
+and statistical prowess is needed such as in bioinformatics and computational biology.
+Symmetrically, our library increases the tools available to R researchers and programmers
+who wish to exploit Prolog’s advanced AI capabilities.
+
+Possible extensions to the library include tighter integration with backtracking, although
+this has not been a limitation to the current applications. One specific aspect of
+such closer integration that might be of immediate value is the re-use of hidden variables
+(Section 3.3). An even tighter integration might be possible by allowing hidden
+and other R variables to be available for garbage collection. Finally, it would be interesting
+to investigate an even tighter syntactic integration by means of extensions to the
+syntax admitted by Prolog.
+
+R..eal was originally designed, developed and tested on YAP 6.3.1 under the Linux
+operating system. It has also been compiled for, and known to be working onMS operating
+systems and Mac OS. It was later ported [19] to the SWI [21] engine via a complete
+re-write of the C code. This has become the main development code as YAP provides a
+comprehensive compatibility layer to SWI’s C interface [20]. The library and examples
+presented here can be downloaded from our website (http://bioinformatics.
+nki.nl/˜nicos/sware/r..eal/).
+
++++
 
 # References
