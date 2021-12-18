@@ -431,7 +431,7 @@ interval(A ... B / C ... D, Res) :-
     Res = L ... U.
 
 %
-% Fraction
+% A simple macro for fractions that just invokes '/'/2
 %
 int(frac(X, Y), Res)
  => int(X / Y, Res).
@@ -440,54 +440,72 @@ int(dfrac(Num, Den), Res)
  => int(frac(Num, Den), Res).
 
 %
-% Square root. This declaration should be dropped because it
-% only applies the sqrt function to the two bounds of the
-% interval, which is the default.
+% Binomial density and distribution. This illustrates the use of R functions
+% that behave monotonically in their arguments.
 %
-int(sqrt(X), Res)
- => int(X, ResX),
-    interval(sqrt(ResX), Res).
+% If lower.tail=TRUE, pbinom is monotonically decreasing in Prob
+int(pbinom(Q, Size, Prob, Tail, Log), Res),
+    r_eval(Tail, true)
+ => int(Prob, ProbL ... ProbU),
+    r_eval(pbinom(Q, Size, #(ProbU, ProbL), Tail, Log), #(L, U)),
+    Res = L ... U.
 
-interval(sqrt(A ... B), Res) :-
-    (   zero(A, B) ;
-        positive(A, B)
+int(pbinom(Q, Size, Prob, Tail, Log), Res)
+ => int(Prob, ProbL ... ProbU),
+    r_eval(pbinom(Q, Size, #(ProbL, ProbU), Tail, Log), #(L, U)),
+    Res = L ... U.
+
+% For X < Prob*Size, dbinom is monotonically decreasing in Prob, above that
+% value, it is monotonically increasing.
+int(dbinom(X, Size, Prob, Log), Res)
+ => r_eval(Size, SizeR),
+    int(Prob, ProbL ... ProbU),
+    (   X < ProbL*SizeR
+     -> r_eval(dbinom(X, Size, #(ProbU, ProbL), Log), #(L, U))
+      ; X > ProbU*SizeR
+     -> r_eval(dbinom(X, Size, #(ProbL, ProbU), Log), #(L, U))
+      ; r_eval(X/Size, ProbM),
+        r_eval(dbinom(X, Size, #(ProbL, ProbM, ProbU), Log), #(B1, B2, B3)),
+        min_list([B1, B2, B3], L),
+        max_list([B1, B2, B3], U)
     ),
-    !,
-    L is sqrt(A),
-    U is sqrt(B),
     Res = L ... U.
 
 %
-% Handle lists
+% Helper functions
 %
-int(X, Res),
-    is_list(X)
- => maplist(int, X, Res).
+bound(L ... _, B)
+ => B = L.
+
+bound(_ ... U, B)
+ => B = U.
+
+bound(X, B)
+ => B = X.
 
 %
 % General functions that do not account for intervals.
 %
 % Examples
-% * int(sin(0.1 ... 0.2), X)
-% * int(sin(0.1), X)
+% * int(sqrt(0.1 ... 0.2), X)
+% * int(sqrt(0.1), X)
 %
 % Evaluate interval for the arguments first, and then (blindly) apply the
 % function to the lower and upper bound. Obviously, this only works for
-% functions that behave monotonically in all their arguments (sine is not among
-% these functions).
+% functions that behave monotonically in all their arguments.
 %
 int(X, Res),
     compound(X)
  => compound_name_arguments(X, Name, Arguments),
     maplist(int, Arguments, Results),
     findall(R,
-        (   maplist(bound, Results, Bounds),
-            compound_name_arguments(New, Name, Bounds),
-            R is New
-        ), List),
+      ( maplist(bound, Results, Bounds),
+        compound_name_arguments(New, Name, Bounds),
+        R is New
+      ), List),
     min_list(List, L),
     max_list(List, U),
-    (   length(List, 1)
+    ( length(List, 1)
      -> [Res] = List
      ;  Res = L ... U
     ).

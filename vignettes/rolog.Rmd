@@ -483,11 +483,11 @@ r_norm(N, L) :-
 consult(system.file(file.path("pl", "r_eval.pl"), package="rolog"))
 
 # rnorm(3)
-once(call("r_norm", 3, expression(L)))
+once(call("r_norm", 3L, expression(X)))
 ```
 
 Listing\ 5.
-: Calling Prolog from R using `r_eval/1` and `r_eval/2`.
+: Calling Prolog from R using `r_eval/1` and `r_eval/2`. The R\ call `set.seed` is quoted because the dot is an operator in Prolog.
 
 The example in Listing\ 5 is a bit trivial, basically illustrating the syntax
 and the workflow. More serious applications of `r_eval/1,2` are illustrated in
@@ -516,8 +516,9 @@ often done in R. Use cases for interval arithmetic are the limitations of
 floating-point representations in computer hardware, but intervals can also be
 used to represent the result of a measurement with limited precision, or a
 truncated intermediate result of a student doing hand calculations. A few rules
-for basic interval arithmetic are found in `pl/interval.pl`; two calls from R
-are shown below.
+for basic interval arithmetic are found in `pl/interval.pl`; a few examples are
+shown below. Again, Prolog rings back to R via `r_eval/2` to determine the
+result of `dbinom(X, Size, Prob, Log)`.
 
 ```{r}
 # [interval].
@@ -534,6 +535,16 @@ s  = quote(`...`(3.8, 3.9))
 N  = 24L
 tratio = call("/", call("-", D, mu), call("/", s, call("sqrt", N)))
 findall(call("int", tratio, expression(Res)))
+
+# Binomial density
+prob = quote(`...`(0.2, 0.3))
+once(call("int", call("dbinom", 4L, 10L, prob, FALSE), expression(Res)))
+
+prob = quote(`...`(0.5, 0.6))
+once(call("int", call("dbinom", 4L, 10L, prob, FALSE), expression(Res)))
+
+prob = quote(`...`(0.2, 0.6))
+once(call("int", call("dbinom", 4L, 10L, prob, FALSE), expression(Res)))
 ```
 
 The slightly cumbersome syntax for entering an interval $\langle \ell, u\rangle$
