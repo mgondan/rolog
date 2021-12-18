@@ -164,7 +164,7 @@ rolog_done <- function()
 #' 
 #' @examples
 #' consult(fname=system.file(file.path("pl", "family.pl"), package="rolog"))
-#' findall(call("ancestor_of", quote(sam), expression(X)))
+#' findall(call("ancestor", quote(pam), expression(X)))
 #' 
 consult <- function(fname=system.file(file.path("pl", "family.pl"), package="rolog"))
 {
