@@ -5,7 +5,7 @@ Access SWI-Prolog from R
 
 1. You obviously need R and a few packages on your computer, maybe also rmarkdown and pandoc to render Rmd files to html (see Example 2). Please use R version 4.1.
 
-`sudo apt install r-base pandoc`
+`sudo apt install r-base pandoc pandoc-citeproc`
 
 `R`
 
@@ -17,7 +17,7 @@ Access SWI-Prolog from R
 
 2. Please install the "rolog" pack for R
 
-`remotes::install_github('mgondan/rolog')`
+`remotes::install_github('mgondan/rolog', build_vignettes=TRUE)`
 
 This takes about 20 min on my computer. Then please move on to the examples.
 
@@ -25,7 +25,7 @@ This takes about 20 min on my computer. Then please move on to the examples.
 
 1. You obviously need R and a few packages on your computer, maybe also rmarkdown and pandoc to render Rmd files to html (see Example 2). Please use R version 4.1.
 
-`brew install r-base pandoc cmake`
+`brew install r-base pandoc pandoc-citeproc cmake`
 
 `R`
 
@@ -37,7 +37,7 @@ This takes about 20 min on my computer. Then please move on to the examples.
 
 2. Please install the "rolog" pack for R
 
-`remotes::install_github('mgondan/rolog')`
+`remotes::install_github('mgondan/rolog', build_vignettes=TRUE)`
 
 Please tell me if anything is misssing.
 
@@ -68,7 +68,7 @@ In R, call:
 
 `install.packages("rmarkdown", type="source")`
 
-`remotes::install_github("mgondan/rolog")`
+`remotes::install_github("mgondan/rolog", build_vignettes=TRUE)`
 
 8. You can check the installation like this:
 
@@ -118,11 +118,11 @@ Load some facts and rules with
 
 `consult(system.file("pl/likes.pl", package="rolog"))`
 
-Run a query such as likes(sam, X) with 
+Run a query such as member(X, [1, 2, 3]) with 
 
-`findall(call('likes', quote(sam), expression(X)))`
+`findall(call('member', expression(X), list(1L, 2L, 3L)))`
 
-Sorry for the cumbersome syntax. At the moment, expression(X) encapsulates variables. The query returns bindings for X that satisfy likes(sam, X).
+Sorry for the cumbersome syntax. At the moment, expression(X) encapsulates variables. The query returns bindings for X that satisfy member(X, [1, 2, 3]).
 
 ## Example 2
 
