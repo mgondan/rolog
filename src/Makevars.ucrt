@@ -15,3 +15,6 @@ swipl:
 	cp /ucrt64/bin/zlib1.dll ../inst/libs/x64
 	cp `ldd ../inst/swipl/bin/archive4pl.dll | grep -o ' /ucrt64/bin/.*\\.dll'` ../inst/swipl/bin
 	cp `ldd ../inst/swipl/bin/bdb4pl.dll | grep -o ' /ucrt64/bin/.*\\.dll'` ../inst/swipl/bin
+	rm ../inst/swipl/bin/swipl.exe
+	rm ../inst/swipl/bin/swipl-win.exe
+	rm ../inst/swipl/bin/swipl-ld.exe
