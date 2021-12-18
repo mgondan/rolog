@@ -880,6 +880,30 @@ RObject call_(String query)
   return LogicalVector::create(r == TRUE) ;
 }
 
+// Call R expression from Prolog
+PREDICATE(r_eval, 1)
+{
+  CharacterVector names ;
+  PlTerm vars ;
+  List options = List::create(Named("realvec") = "#", Named("boolvec") = "!", Named("charvec") = "$", Named("intvec") = "%", Named("atomize") = false, Named("scalar") = true) ;
+
+  RObject Expr = pl2r(A1, names, vars, options) ;
+  RObject Res = Expr ;
+  try
+  {
+    Language id("identity") ;
+    id.push_back(Expr) ;
+    Res = id.eval() ;
+  }
+
+  catch(std::exception& ex)
+  {
+    throw PlException(PlCompound("r_eval", PlTermv(A1, PlTerm(ex.what())))) ;
+  }
+
+  return true ;
+}
+
 // Evaluate R expression from Prolog
 PREDICATE(r_eval, 2)
 {
