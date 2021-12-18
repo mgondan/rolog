@@ -48,17 +48,20 @@ Please tell me if anything is misssing.
 1. Please make sure you have a `git` client on your computer, the one recommended by RStudio is https://git-scm.com/download/win. As
    before, please allow the program to change the `PATH` so that `git.exe` is found.
 
-2. Download and install R-devel from https://www.r-project.org/nosvn/winutf8/ucrt3. Note that this is not yet compatible to RStudio, so please say hello again to the "blue R", RGui.exe.
+2. For the vignette, pandoc is needed. Please do not use the most recent version, as they have changed the way they handle references. Version 2.9.2.1 is found here,
+   https://github.com/jgm/pandoc/releases/tag/2.9.2.1 I assume you install it into C:/Program Files/Pandoc, which is the default.
 
-3. Download and install RTools4.2 from the same directory, https://cran.r-project.org/bin/windows/Rtools/.
+3. Download and install R-devel from https://www.r-project.org/nosvn/winutf8/ucrt3. Note that this is not yet compatible to RStudio, so please say hello again to the "blue R", RGui.exe.
 
-4. Invoke c:\rtools42\ucrt64.exe
+4. Download and install RTools4.2 from the same directory, https://cran.r-project.org/bin/windows/Rtools/.
 
-5. A shell appears, type `pacman -Syu`
+5. Invoke c:\rtools42\ucrt64.exe
 
-6. `pacman -S mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-libjpeg mingw-w64-ucrt-x86_64-libyaml mingw-w64-ucrt-x86_64-pcre mingw-w64-ucrt-x86_64-libarchive mingw-w64-ucrt-x86_64-db`
+6. A shell appears, type `pacman -Syu`
 
-7. Invoke `/c/Program\ Files/R/R-devel/bin/R.exe`
+7. `pacman -S mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-libjpeg mingw-w64-ucrt-x86_64-libyaml mingw-w64-ucrt-x86_64-pcre mingw-w64-ucrt-x86_64-libarchive mingw-w64-ucrt-x86_64-db`
+
+8. Invoke `/c/Program\ Files/R/R-devel/bin/R.exe`
 
 In R, call:
 
@@ -68,9 +71,13 @@ In R, call:
 
 `install.packages("rmarkdown", type="source")`
 
-`remotes::install_github("mgondan/rolog")`
+`install.packages("devtools", type="source")`
 
-8. You can check the installation like this:
+`Sys.setenv(RSTUDIO_PANDOC='c:/program files/pandoc')`
+
+`remotes::install_github("mgondan/rolog", build_vignettes=TRUE)`
+
+9. You can check the installation like this:
 
 `library(rolog)`
 
@@ -104,16 +111,9 @@ attr(,"query")
 
 I can't tell why the upper part of the output is cropped, but it looks good. The three issues are expected, since tcmalloc, jpl and xpce are not part of this installation.
 
-9. Reinstall your current R, preferably R-4.1, so that RStudio is working again. You
+10. Reinstall your current R, preferably R-4.1, so that RStudio is working again. You
    can now use library(rolog). It issues a warning with a version mismatch, this warning 
-   will disappear if R-4.2 is available. As a last step, you might wish to build the
-   vignette for the package:
-
-`library(rolog)`
-
-`library(devtools)`
-
-`build_vignettes("rolog")`
+   will disappear if R-4.2 is available.
 
 ## Example 1
 
