@@ -4,7 +4,7 @@
 \alias{consult}
 \title{Consult a prolog database}
 \usage{
-consult(fname = system.file(file.path("pl", "likes.pl"), package = "rolog"))
+consult(fname = system.file(file.path("pl", "family.pl"), package = "rolog"))
 }
 \arguments{
 \item{fname}{file name of database}
@@ -16,7 +16,7 @@ consult(fname = system.file(file.path("pl", "likes.pl"), package = "rolog"))
 Consult a prolog database
 }
 \examples{
-consult(fname=system.file(file.path("pl", "likes.pl"), package="rolog"))
+consult(fname=system.file(file.path("pl", "family.pl"), package="rolog"))
 findall(call("likes", quote(sam), expression(X)))
 
 }
