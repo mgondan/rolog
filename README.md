@@ -68,7 +68,7 @@ In R, call:
 
 `install.packages("rmarkdown", type="source")`
 
-`remotes::install_github("mgondan/rolog", build_vignettes=TRUE)`
+`remotes::install_github("mgondan/rolog")`
 
 8. You can check the installation like this:
 
@@ -106,7 +106,14 @@ I can't tell why the upper part of the output is cropped, but it looks good. The
 
 9. Reinstall your current R, preferably R-4.1, so that RStudio is working again. You
    can now use library(rolog). It issues a warning with a version mismatch, this warning 
-   will disappear if R-4.2 is available.
+   will disappear if R-4.2 is available. As a last step, you might wish to build the
+   vignette for the package:
+
+`library(rolog)`
+
+`library(devtools)`
+
+`build_vignettes("rolog")`
 
 ## Example 1
 
