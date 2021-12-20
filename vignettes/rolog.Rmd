@@ -1,11 +1,11 @@
 ---
-title: "Rolog: Prolog queries from R"
+title: "rolog: Prolog queries from R"
 author: "Matthias Gondan"
 date: "Department of Psychology, University of Innsbruck, Austria"
 bibliography: bibliography.bibtex
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Rolog}
+  %\VignetteIndexEntry{rolog}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -54,106 +54,84 @@ Statistics; Logic Programming; Artificial Intelligence
 # 1. Rolog: Prolog queries from R
 
 The R [@R] programming language and environment is a widely used open source
-software for statistical data analysis. The basic language provides a lot of
-functions for storage and manipulation of different data types, with a strong
-emphasis on operations involving vectors and arrays. Moreover, a huge number of
-R packages (e.g., CRAN, https://cran.r-project.org/) have been contributed that
-cover problems from diverse areas such as bioinformatics, machine learning,
-specialized statistical methods, web programming and connections to other
-programming languages. To my knowledge, an interface to Prolog is lacking so
-far.
+software for statistical data analysis. The basic R is a functional language 
+with lots of support for storage and manipulation of different data types,
+and a strong emphasis on operations involving vectors and arrays. Moreover, a
+huge number of R packages (e.g., CRAN, https://cran.r-project.org/) have been
+contributed that cover problems from diverse areas such as bioinformatics,
+machine learning, specialized statistical methods, web programming and
+connections to other programming languages. To my knowledge, an interface to
+Prolog is lacking so far.
 
 The logic programming language Prolog was invented in the 1970ies by 
 Colmerauer [@Colmerauer1996], mostly for the purpose of natural language 
 processing. Since then, logic programming has become an important driving force
 in research on artificial intelligence, natural language processing, program
 analysis, knowledge representation and theorem
-proving [@Shoham1994;@Lally2011;@Carro2004;@Hsiang1987]. Unlike R, Prolog is a
-declarative programming language consisting of facts and rules defining
-relations in e.g. a problem space. Its main strength is its builtin query-driven
-search engine that efficiently deals with complex structured data, but this data
-is not necessarily numerical. In fact, Prolog only provides the typical
-collection of arithmetic calculations via a purely functional interface `is/2`.
-More complex calculations such as matrix algebra, statistical models or machine
-learning need help from other systems, for example, from
-R [@Angelopoulos2013;@Rserve].
-
+proving [@Shoham1994;@Lally2011;@Carro2004;@Hsiang1987]. 
 SWI-Prolog [@Wielemaker2012] is an open-source implementation of Prolog that
 mainly targets developers of applications, with many users in academia, research
 and industry. SWI-Prolog includes a large number of libraries for "the real
 world", for example, a web server, encryption, interfaces to C/C++ and other
 programming languages, as well as a development environment and debugger. In 
 addition, pluggable extensions (so-called packs) are available for specific
-tasks to enhance Prolog’s capabilities. The above-mentioned interfaces to the R
-system are examples of such packs.
+tasks to enhance its capabilities.
 
-+++ 
+Unlike R, Prolog is a declarative programming language consisting of facts and
+rules that define relations, for example, in a problem space. Prolog’s major
+strength is its builtin query-driven search engine that efficiently deals with
+complex structured data, but this data is not necessarily numerical. In fact,
+Prolog only provides a basic collection of arithmetic calculations via a purely
+functional interface `is/2`. More complex calculations such as matrix algebra,
+statistical models or machine learning need help from other systems, for
+example, from R.
 
-A further motivation for integrating R with logic programming stems from the observation
-that traditionally, work on logic programming has focused in representing
-crisp knowledge.More recent work on the interplay between knowledge representation
-and statistical inference has attracted substantial interest in recent years. Work in this
-area includes the PRISM system and its EM-based parameter algorithm [16], Stochastic
-logic programs with an MCMC structure learning system [2] and the FAM algorithm
-[9], the ProbLog language and system [12] with a variety of learning algorithms
-and CLP(BN) [6], with EM learning and an interface to Aleph [18]. The interface to
-R allows the integrated statistical-logic inference systems access to a wide range of tools
-from random number generators to sophisticated algorithms for probabilistic inference.
-
-Nicos Angelopoulos and James Cussens. Bayesian learning of Bayesian networks with informative
-priors. Journal of Annals of Mathematics and Artificial Intelligence, 54(1-3):53–98,
-2008.
-
-Taisuke Sato and Yoshitaka Kameya. Parameter learning of logic programs for symbolicstatistical
-modeling. Journal of AI Research, 15:391–454, 2001.
-
-James Cussens. Stochastic logic programs: Sampling, inference and applications. In Six-
-teenth Annual Conference on Uncertainty in Artificial Intelligence (UAI’00), pages 115–122,
-San Francisco, CA, 2000.
-
-Angelika Kimmig, Bart Demoen, Luc De Raedt, V´ıtor Santos Costa, and Ricardo Rocha. On
-the implementation of the probabilistic logic programming language ProbLog. Theory and
-Practice of Logic Programming, 11:235–26, 2011.
-
-V´ıtor Santos Costa, David Page, Maleeha Qazi, and James Cussens. CLP(BN): Constraint
-logic programming for probabilistic knowledge. In In Proceedings of the 19th Conference
-on Uncertainty in Artificial Intelligence (UAI’03), pages 517–524, 2003.
-
-Ashwin Srinivasan. The Aleph Manual. University of Oxford, 2004.
-
-+++
+Angelopoulos et al. [@Angelopoulos2013] summarize work at the intersection of
+symbolic knowledge representation and statistical interence, especially in the
+area of model fits [EM algoritms, MCMC, @Sato2001;@Angelopoulos2008] and
+stochastic logic programs [@Cussens2000;@Kimmig2011]. One of the major strengths
+of logic programming is handling constraints; and a number of systems for
+constraint satisfaction tools have been developed (constraint logic programming
+on booleans, finite domains, reals, and intervals) for that 
+purpose [e.g., @Fruehwirth1998;@Triska2018]. Some constraint handlers exist in
+R (see the CRAN task view for optimization problems), but more of them would be
+available via a bridge between R and Prolog. 
 
 Earlier approaches to connect Prolog and R have been published as SWI-Prolog 
 packs [r..eal, Rserve_client, @Angelopoulos2013;@Rserve] and as a YAP 
 module [YapR, @YapR]. Whereas r..eal establishes a direct link to an embedded
 instance of R, Rserve_client communicates with a local or remote R 
-service [@Urbanek2021]. The former emphasises speed, the latter might be 
-preferred from a security perspective, especially in systems such as 
-SWISH [@SWISH] that accepts commands for both systems. All these packages
+service [@Urbanek2021]. The former approach emphasises speed, the latter might
+be preferred from a security perspective, especially in systems such as 
+SWISH [@SWISH] that accept only a set of sandboxed commands for Prolog, but do
+not impose restrictions on R. A common feature of the two packages is that they
 provide an interface for R calls from Prolog, but not the other way round, that
-is, querying Prolog from R. 
+is, querying Prolog from R is not possible so far.
 
-Rolog is an attempt to fill this gap and offer the possibilty to raise Prolog
-queries in R scripts, for example, to perform efficient symbolic computations,
-searches in complex graphs, parsing natural language and definite clause
-grammars. Similar to r..real, tight communication between the two systems is
-established by linking to a shared library that embeds the current version of
-SWI-Prolog. The exchange of data is facilitated by the C++ interfaces of the two
+Rolog is an attempt to fill this gap, and to offer the possibilty to raise
+Prolog queries in R scripts, for example, to perform efficient symbolic
+computations, searches in complex graphs, parsing natural language and definite
+clause grammars. In addition, two Prolog predicates are provided that enable
+Prolog to ring back to the R system for bidirectional communication. Similar
+to r..real, tight communication between the two systems is established by
+linking to a shared library that embeds the current version of SWI-Prolog. The
+exchange of data is facilitated by the C++ interfaces of the two
 languages [@Edelbuettel2018;@Wielemaker2021]. A less tight connection might be
 established using the recently developed machine query interface [@Zinda2021]
-that allows socket-based communication between foreign languages and SWI-Prolog.
+that allows socket-based communication between foreign languages and 
+SWI-Prolog (and, in fact, the MQI documentation includes an R call).
 
 A bidirectional bridge between R and Prolog might overcome the limitations of 
 both languages, thereby combining the extensive numerical and statistical power
 of the R system with Prolog’s skills in the representation of knowledge and
-reasoning. In addition to the nice little tools shown in the examples below, I
-hope I can contribute to progress at the intersection of traditional artificial
-intelligence and contemporary statistical programming.
+reasoning. In addition to the useful little tools shown in the examples below, 
+Rolog can therefore contribute to progress at the intersection of traditional
+artificial intelligence and contemporary statistical programming.
 
 The next section presents the interface of Rolog in detail. Section\ 3 presents
 possible extensions of the R as well as the Prolog end. Section\ 4 shows a 
 number of illustrative examples that offer useful extensions to the R system.
-Conclusions and further perspectives are summarised in Section 5.
+Conclusions and further perspectives are summarized in Section 5.
 
 # 4. Examples
 
