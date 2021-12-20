@@ -2,6 +2,7 @@
 ^\.Rproj\.user$
 ^linux/
 ^mingw64/
+^inst/swipl
 ^.*\.git$
 ^.*\.plrc$
 ^.*\.fileheader$
@@ -10,5 +11,5 @@
 ^.*\.github$
 ^.*\.clang-format$
 ^.*\.travis.yml$
-^.*\.so$
+^.*\.so\..*$
 ^.*\.obj$
