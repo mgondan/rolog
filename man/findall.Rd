@@ -38,8 +38,10 @@ Invoke a query several times
 }
 \examples{
 # This query returns a list stating that it works if X = a, "b", ..., or X = Y
-findall(call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, call("sin", call("/", quote(pi), 2)), expression(Y))))
+findall(call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, NULL, NA)))
 
+# Continued
+findall(call("member", expression(X), list(call("sin", call("/", quote(pi), 2)), expression(Y))))
 }
 \seealso{
 \code{\link[=once]{once()}}
