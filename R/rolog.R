@@ -364,7 +364,6 @@ once <- function(
 #' # This query returns a list stating that it works if X = a, "b", ...
 #' findall(call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, NULL, NA)))
 #'
-#' @examples
 #' # Continued
 #' findall(call("member", expression(X), list(call("sin", call("/", quote(pi), 2)), expression(Y))))
 #' 
