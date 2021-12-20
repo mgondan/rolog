@@ -12,4 +12,5 @@
 ^.*\.clang-format$
 ^.*\.travis.yml$
 ^.*\.so\..*$
+^.*\.so$
 ^.*\.obj$
