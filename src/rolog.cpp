@@ -14,6 +14,7 @@ using namespace Rcpp ;
 // na (atom) -> NA
 // true, false (atoms) -> LogicalVector
 // !(l1, l2, l3) -> LogicalVector (see option boolvec)
+// the empty atom -> ""
 // other atoms -> symbol/name
 // variable -> expression(variable name)
 // compound -> call (aka. "language")
@@ -32,7 +33,7 @@ RObject pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars, List options) ;
 // character vector of length > 1 -> $("a", "b", "c")
 // logical vector of length 1 -> the atoms true, false or na
 // logical vector of length > 1 -> $(true, false, na)
-// symbol/name -> atom
+// other symbols/name -> atom
 // expression -> variable
 // call/language -> compound
 // list -> list
@@ -172,7 +173,10 @@ RObject pl2r_symbol(PlTerm pl)
   
   if(pl == "false")
     return LogicalVector::create(0) ;
-  
+
+  if(pl == "")
+    return as<RObject>(CharacterVector(0)) ;
+
   return as<RObject>(Symbol((char*) pl)) ;
 }
 
