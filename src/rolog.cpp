@@ -573,13 +573,23 @@ PlTerm r2pl_compound(Language r, CharacterVector& names, PlTerm& vars, List opti
   // For convenience, collect arguments in a list
   List l = as<List>(CDR(r)) ;
 
+  // R functions with no arguments are translated to compounds (not atoms)
+  size_t len = (size_t) l.size() ;
+  if(len == 0)
+  {
+    PlTermv pl(3) ;
+    pl[1] = as<Symbol>(CAR(r)).c_str() ;
+    pl[2] = 0 ;
+    PlCall("compound_name_arity", pl) ;
+    return pl[0] ;
+  }
+
   // Extract names of arguments
   CharacterVector n ;
   // if there are no names, l.names() returns NULL and n has length 0
   if(TYPEOF(l.names()) == STRSXP)
     n = l.names() ;
   
-  size_t len = (size_t) l.size() ;
   PlTermv pl(len) ;
   for(size_t i=0 ; i<len ; i++)
   {
