@@ -58,7 +58,7 @@ f = function(u)
   sin(u)
 }
 
-term = quote(integrate(f, -Inf, Inf))
+term = quote(integrate(f=f, lower=-Inf, upper=Inf))
 mathml(term)
 
 # It's a bit of a mystery that R knows the result of this integral.

@@ -13,21 +13,24 @@
   if(.Platform$OS.type == "unix")
   {
     # Find folder like x86_64-linux
-    folder <- dir(file.path(libname, pkgname, "swipl", "lib", "swipl", "lib"),
-      pattern=R.version$arch, full.names=TRUE)
+    fp <- file.path(libname, pkgname, "swipl", "lib", "swipl", "lib")
+    folder <- dir(fp, pattern=R.version$arch, full.names=TRUE)
 
     # Are we in roxygenize mode?
-    if(length(folder) == 0)
+    if(length(folder) == 0L)
     {
       inst <- dir(file.path(libname, pkgname), pattern="inst", full.names=FALSE)
       if("inst" %in% inst)
-        folder <- dir(file.path(libname, pkgname, "inst", "swipl", "lib", "swipl", "lib"),
-                      pattern=R.version$arch, full.names=TRUE)
+      {
+        fp <- file.path(libname, pkgname, "inst", "swipl", "lib", "swipl", "lib")
+        folder <- dir(fp, pattern=R.version$arch, full.names=TRUE)
+      }
 
-      if(length(folder) == 0)
+      if(length(folder) == 0L)
         stop("Rolog: could not load libswipl.dll/so/dylib")
     }
 
+    # Preload libswipl.dll
     if(R.version$os == "linux-gnu")
       dyn.load(file.path(folder, paste("libswipl", .Platform$dynlib.ext, sep="")))
     else
@@ -61,8 +64,8 @@
 
   if(.Platform$OS.type == "unix")
   {
-    folder = dir(file.path(libpath, "swipl", "lib", "swipl", "lib"), 
-		 pattern=R.version$arch, full.names=TRUE)
+    fp <- file.path(libpath, "swipl", "lib", "swipl", "lib")
+    folder <- dir(fp, pattern=R.version$arch, full.names=TRUE)
 
     if(R.version$os == "linux-gnu")
       dyn.unload(file.path(folder, paste("libswipl", .Platform$dynlib.ext, sep="")))
@@ -85,12 +88,11 @@
   # This is a bit of a mystery.
   #
   # Initialization of the SWI-Prolog works fine under linux, under Windows using
-  # RStudio.exe, under Windows using RTerm.exe, but fails under RGui.exe (aka. 
+  # RStudio.exe, under Windows using RTerm.exe, but fails under RGui.exe (aka.
   # "blue R"). Even stranger, it works in the second attempt. 
   #
-  # For this reason, I invoke rolog_init twice here. Any hint to a cleaner
-  # solution is highly appreciated.
-  #
+  # For this reason, I invoke rolog_init twice here if needed. Any hint to a
+  # cleaner solution is appreciated.
   if(.Platform$OS.type == "windows")
   {
     Sys.setenv(SWI_HOME_DIR=file.path(libname, pkgname, "swipl"))
@@ -99,8 +101,7 @@
   }
   
   # SWI startup message
-  welcome <- call("message_to_string", quote(welcome), expression(W))
-  W <- once(welcome, options=list(quote=FALSE))
+  W <- once(message_to_string(welcome, .W), as.rolog=TRUE)
   packageStartupMessage(W$W)
   invisible()
 }
@@ -181,7 +182,6 @@ consult <- function(fname=system.file(file.path("pl", "family.pl"), package="rol
 #' @details
 #' Translation of R to Prolog
 #' 
-#' * _quote_: if `TRUE` (default), use simplified syntax (see [query()])
 #' * numeric vector of size N -> _realvec_/N (default is #)
 #' * integer vector of size N -> _intvec_/N (default is %)
 #' * boolean vector of size N -> _boolvec_/N (default is !)
@@ -255,7 +255,12 @@ portray <- function(
 #' Vectors of booleans, integers, floating point numbers, and strings with
 #' length _N_ > 1 are translated to prolog compounds !/N, %/N, #/N and $$/N,
 #' respectively. The names can be modified with the options below.
-#'   
+#'
+#' @param as.rolog
+#' logical, default is FALSE. If TRUE, the query is left unevaluated and
+#' forwared to the function [as.rolog()]. This allows using simplified syntax
+#' that looks a bit more Prolog-like. See examples below.
+#'
 #' @param options
 #' This is a list of options controlling translation from and to prolog.
 #' * _boolvec_ (see option rolog.boolvec, default is !) is the name of the
@@ -293,6 +298,9 @@ portray <- function(
 #' # This query returns a list stating that it works if X = 1
 #' once(call("member", 1, list(quote(a), expression(X))))
 #' 
+#' # The same query using simplified syntax
+#' once(member(1, ""[a, .X]), as.rolog=TRUE)
+#' 
 #' # This query returns a list stating that X = 1 and Z = expression(Y)
 #' once(call("=", list(expression(X), expression(Y)), list(1, expression(Z))))
 #' 
@@ -309,10 +317,15 @@ portray <- function(
 #'
 once <- function(
   query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))),
+  as.rolog=FALSE,
   options=NULL)
 {
   options <- c(options, rolog_options())
   
+  # Translate from simplified syntax
+  if(as.rolog)
+    query <- as.rolog(substitute(query))
+
   # Decorate result with the prolog syntax of the query
   if(options$portray)
     q <- portray(query, options)
@@ -334,7 +347,12 @@ once <- function(
 #' Vectors of booleans, integers, floating point numbers, and strings with
 #' length _N_ > 1 are translated to prolog compounds !/N, %/N, #/N and $$/N,
 #' respectively. The names can be modified with the options below.
-#'   
+#'
+#' @param as.rolog
+#' logical, default is FALSE. If TRUE, the query is left unevaluated and
+#' forwared to the function [as.rolog()]. This allows using simplified syntax
+#' that looks a bit more Prolog-like. See examples below.
+#' 
 #' @param options
 #' This is a list of options controlling translation from and to prolog.
 #' * _boolvec_ (see option rolog.boolvec, default is !) is the name of the
@@ -367,10 +385,19 @@ once <- function(
 #' # Continued
 #' findall(call("member", expression(X), list(call("sin", call("/", quote(pi), 2)), expression(Y))))
 #' 
+#' # The same using simplified syntax
+#' findall(member(.X, ""[a, "b", 3L, 4, TRUE, NULL, NA, sin(pi/2), .Y]), as.rolog=TRUE)
+#' 
 findall <- function(
-  query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))), options=NULL)
+  query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))),
+  as.rolog=FALSE,
+  options=NULL)
 {
   options <- c(options, rolog_options())
+  
+  # Translate from simplified syntax
+  if(as.rolog)
+    query <- as.rolog(substitute(query))
   
   # Decorate result with the prolog syntax of the query
   if(options$portray)
@@ -394,6 +421,11 @@ findall <- function(
 #' length _N_ > 1 are translated to prolog compounds !/N, %/N, #/N and $$/N,
 #' respectively. The names can be modified with the options below.
 #'
+#' @param as.rolog
+#' logical, default is FALSE. If TRUE, the query is left unevaluated and
+#' forwared to the function [as.rolog()]. This allows using simplified syntax
+#' that looks a bit more Prolog-like. See examples below.
+#' 
 #' @param options
 #' This is a list of options controlling translation from and to prolog.
 #' * _boolvec_ (see option rolog.boolvec, default is !) is the name of the
@@ -424,6 +456,13 @@ findall <- function(
 #' clear()
 #'
 #' @examples
+#' # The same in simplified syntax
+#' query(member(.X, ""[a, "b", 3L, 4, TRUE, .Y))
+#' submit() # X = a
+#' submit() # X = "b"
+#' clear()
+#'
+#' @examples
 #' query(call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))))
 #' submit() # X = 3L
 #' submit() # X = 4.0
@@ -437,12 +476,17 @@ findall <- function(
 #' query(call("member", expression(X), list(TRUE, expression(Y)))) # warning that another query is open
 #' clear()
 #' 
-query = function(
+query <- function(
   query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))),
+  as.rolog=FALSE,
   options=NULL)
 {
   options <- c(options, rolog_options())
-  
+
+  # Translate from simplified syntax
+  if(as.rolog)
+    query <- as.rolog(substitute(query))
+
   # Decorate result with the prolog syntax of the query
   if(options$portray)
     q <- portray(query, options)
@@ -522,26 +566,25 @@ clear <- function()
 #' 
 submit <- function()
 {
-  r <- .submit()
-  return(r)
+  .submit()
 }
 
 #' Translate simplified to canonical representation
 #'
 #' @param query
 #' an R call representing a prolog query with prolog-like syntax, e.g.,
-#' `member(.X, list(a, b, .Y))` that is used in [query()], [once()], and
-#' [findall()]. This query is translated to Rolog's canonical representation, 
-#' with R calls and prolog variables enclosed in an R expression, in this 
-#' example, `call("member", expression(X), list(a, b, expression(Y))))`.
+#' `member(.X, ""[a, b, .Y])` that is used in [query()], [once()], and
+#' [findall()]. The argument is translated to Rolog's canonical representation, 
+#' with R calls corresponding to Prolog terms and R expressions corresponding to
+#' Prolog variables. Variables and expressions in parentheses are evaluated.
 #'
 #' @seealso [query()], [once()], [findall()]
 #'
 #' @examples
-#' q = quote(member(.X, list(a, "b", 3L, 4, TRUE, .Y)))
+#' q = quote(member(.X, ""[a, "b", 3L, 4, pi, (pi), TRUE, .Y]))
 #' findall(as.rolog(q))
 #'
-as.rolog <- function(query=quote(member(.X, list(a, "b", 3L, 4, TRUE, .Y))))
+as.rolog <- function(query=quote(member(.X, ""[a, "b", 3L, 4, (pi), TRUE, .Y])))
 {
   if(is.symbol(query))
   {
@@ -557,14 +600,22 @@ as.rolog <- function(query=quote(member(.X, list(a, "b", 3L, 4, TRUE, .Y))))
   if(is.call(query))
   {
     args <- as.list(query)
-    args[-1] <- lapply(args[-1], FUN=as.rolog)
-	
+    
+    # Things like (2 + 3) or (a) are evaluated
+    if(args[[1]] == "(")
+      return(as.rolog(eval(args[[2]])))
+
+    # `[`("", 1, 2, 3), aka. ""[1, 2, 3] is a list
+    if(args[[1]] == "[" & length(args[[2]]) == 1 & args[[2]] == "")
+      return(lapply(args[c(-1, -2)], FUN=as.rolog))
+
     # list(1, 2, 3) is a list not a call
     if(args[[1]] == "list")
-      return(args[-1])
+      return(lapply(args[-1], FUN=as.rolog))
 
+    args[-1] <- lapply(args[-1], FUN=as.rolog)
     return(as.call(args))
   }
-	
+
   return(query)
 }

@@ -59,9 +59,6 @@ denoting(_Flags, greek(_), Den)
 test :- test(epsilon).
 
 %
-% Dominik + Kaitlan homework
-%
-% %
 % Sum over index
 %
 ml(Flags, sum(I, From, To, A), M)

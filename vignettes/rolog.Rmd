@@ -129,13 +129,235 @@ Rolog can therefore contribute to progress at the intersection of traditional
 artificial intelligence and contemporary statistical programming.
 
 The next section presents the interface of Rolog in detail. Section\ 3 presents
-possible extensions of the R as well as the Prolog end. Section\ 4 shows a 
-number of illustrative examples that offer useful extensions to the R system.
+possible extensions of the package at both ends, in R and Prolog. Section\ 4 is
+a list of illustrative examples that offer useful extensions to the R system.
 Conclusions and further perspectives are summarized in Section 5.
+
+# 2. Basic syntax
+
+Rolog has a rather minimalistic syntax, providing only some basic ingredients
+to establish communication with an embedded SWI-Prolog. Some ways to extend the 
+interface are described in Section\ 3.
+
+After installation (for now, with `remotes::install_github("mgondan/rolog")`,
+later, with `install.packages("rolog")`), the package is loaded in the standard
+way using R's `library`-command.
+
+```{r}
+library(rolog)
+```
+
+We can see SWI-Prolog's typical welcome message.
+
+## R interface
+
+Most of the work can done using the three R functions `query`, `submit`,
+and `clear`. The functions `consult`, `once`, and `findall` are provided for
+convenience.
+
+*consult*. In most applications, a number of Prolog facts and rules will be 
+loaded into the system. To facilitate this recurrent task, the prolog
+directive `consult/1` has been mirrored into R, `consult(filename)`, 
+with _filename_ given as a string (or a list of strings if multiple files are to
+be consulted). Note that the full filename should be given, including the
+extension (e.g., ".pl"). The function returns `TRUE` on success, 
+otherwise `FALSE` and an error message is shown.
+
+*query*. The function `query(call, options)` is used to create a Prolog 
+query (without invoking it yet). The first argument _call_ is a regular R call
+that is created using R's function `call(name, ...)`. This call represents the
+Prolog predicate which will be queried in the later course. The creation of such
+predicates and Prolog terms is described below and can become quite 
+cumbersome (see the examples in Section\ 4). The second argument, _options_, may
+be used for ad hoc modifications of the translation between R and Prolog, see
+the section below. The function returns `TRUE` on success. Note that the
+function does not check if the corresponding Prolog predicate exists (but see
+`submit()` below).
+
+Only a single query can be opened at a given time. If a new query is created
+while another query is still open, a warning is shown and the other query is
+closed.
+
+*submit*. Once a query has been created, it can be submitted using `submit()`.
+If the query fails, the return value is `FALSE`. If the query succeeds, a list
+of constraints is returned, with bindings for the variables that satisfy the
+query. Repeated calls to submit are possible, returning the different solutions
+of a query (until it eventually fails). Programmatically distinguishing between
+the different types of return values for success and failure (list vs. `FALSE`)
+is facilitated by the R function `isFALSE(x)`.
+
+*clear*. Closes the query. The name of the function is chosen to avoid name
+clashes with R's own built-in function close. The function returns an invisible
+`TRUE`, even if there is no open query.
+
+The following short R program illustrates a query to Prolog's `member/2` using 
+Rolog's syntax rules.
+
+```{r}
+# member(1, [1, 2.0, a, "b", X])
+query(call("member", 1L, list(1L, 2.0, quote(a), "b", expression(X), TRUE)))
+
+# query satisfied
+submit()
+
+# returns a list, stating that the query is satisfied if X = 1
+submit()
+
+# returns FALSE, no more solutions
+submit()
+
+# close query
+clear()
+```
+
+Listing\ 1.
+: A query to Prolog's `member/2` predicate.
+
+*once* and *findall*. The function `once(call, options)` is a convenience
+function that acts as a shortcut for `query(call, options)`, `submit()`, 
+and `clear()`. Similarly, `findall(call, options)` abbreviates the 
+commands `query(call, options)`, repetition of `submit()` until failure,
+and `clear()`, returning a list collecting the the return value of the 
+individual calls to submit.
+
+## Creating Prolog terms in R
+
+Table\ 1 summarizes the rules for the translation from R to Prolog. Most rules
+work in both directions, but a few exceptions exist. For example, there is an
+empty atom in Prolog, but no empty symbol in R, so the empty atom is translated
+to a character string in R. 
+
+Table\ 1.
+: Creating Prolog terms from R.
+
+|R                       |Prolog                   |Note/Alternatives        |
+|:-----------------------|:------------------------|:------------------------|
+|`expression(X)`         |Variable X               |not necessarily uppercase|
+|`as.symbol(abc)`        |Atom abc                 |`as.name`, `quote`       |
+|`TRUE`, `FALSE`, `NULL` |Atoms true, false, null  |                         |
+|`"abc"`                 |String \"abc\"           |                         |
+|`3L`                    |Integer 3                |                         |
+|`3`                     |Float 3.0                |                         |
+|`call("term", 1L, 2L)`  |term(1, 2)               |                         |
+|`list(1L, 2L, 3L)`      |List [1, 2, 3]           |                         |
+|`list(a=1, b=2, c=3)`   |List [a-1, b-2, c-3]     |oneway                   |
+|`c(1, 2, 3)`            |#(1.0, 2.0, 3.0)         |vectors of length > 1    |
+|`c(1L, 2L, 3L)` or `1:3`|\'%\'(1, 2, 3)           |                         |
+|`c("a", "b", "c")`      |\$\$(\"a\", \"b\", \"c\")|                         |
+|`c(TRUE, FALSE, NA)`    |!(true, false, na)       |                         |
+
+Moreover, R is mostly vectorized, lacking support for scalar entities, that is,
+scalar entities are treated as vectors of length\ 1. Conversely, Prolog does not
+natively support vectors or matrices. The problem is solved in the following
+way: 
+
+* R vectors of length 0 are translated to Prolog's empty list.
+* R vectors of length 1 are translated to Prolog scalars.
+* R vectors of length _N_ > 1 are translated to Prolog 
+  terms `#/N`, `%/N`, `$$/N`, and `!/N` for floating points, integers, strings
+  and logicals, respectively.
+
+In the reverse direction, Prolog terms like `#/N` are translated back to R
+vectors of length _N_. This including the terms `#/0` and `#/1` that normally
+don't occur. To summarize, the rules for translation are not fully symmetrical.
+A quick check for symmetry of the representation is obtained by a query to
+`r_eval/2` (see also below, subsection Prolog interface):
+
+```{r}
+once(call("r_eval", c(1, 2, NA, NaN, Inf), expression(X)))
+```
+
+## Rolog options
+
+A few package-specific options have been defined to allow some finetuning of
+the rules for translation between R and Prolog.
+
+* realvec (string): Name of the prolog term for vectors of floats (default is #)
+* intvec (string): same for vectors of integers (default is %)
+* boolvec (string): same for vectors of logicals (default is !)
+* charvec (string): same for vectors of character strings (default is \$\$). The
+  single dollar cannot be used because it is the list operator in R.
+* scalar (logical): if `TRUE` (default), R vectors of length 1 are translated to
+  scalars in Prolog. If `FALSE`, R vectors are always translated to `#/N` etc.,
+  depending on the type.
+* portray (logical): if `TRUE (default)`, the result of `query`, `once` and 
+  `findall` includes an attribute with a representation of the query in Prolog.
+
+The command `rolog_options()` returns a list with all the options. The options
+can be globally modified like e.g. this:
+
+```r
+options(rolog.intvec="%%")
+```
+
+In a given query, the options can be set in the optional argument, e.g.
+
+```r
+query(call("member", expression(X), list(1:3, 4:6)), list(intvec="%%"))
+```
+
+## Prolog interface
+
+Rolog offers some basic support to call R from Prolog, that is, connecting the
+two systems in the reverse direction. Two predicates can be used for this 
+purpose, `r_eval(Call)` and `r_eval(Function, Result)`. The former just invokes
+R with the command _Call_ (ignoring the result); the latter evaluates _Function_
+and unifies the result with _Result_. Note that proper quoting of R functions
+is needed at the Prolog end, especially with R functions that start with
+uppercase letters or contain a dot in their name.
+
+Two use cases for `r_eval/2` are shown in Section\ 4 below.
+
+# 3. Extending the package
+
+The package is intentionally kept minimalistic, but can easily be extended by
+convenience functions on both ends, Prolog and R, to facilitate recurrent tasks
+and/or avoid cumbersome syntax. R is a functional language, whereas Prolog is
+declarative. Obviously, there cannot be a perfect one-to-one correspondence
+between the syntactic components of two programming languages that follow
+completely different paradigms. Whereas symbols, functions, numbers and
+character strings are easily mapped between R and Prolog, there are loose ends 
+at both sides. In particular, Prolog variables are translated from and to 
+R _expressions_ (not to be confused with R symbols), and R vectors are
+translated to the Prolog terms `#/N`, `%/N`, `!/N`, and `$$/N`, as mentioned
+above. This leads to cumbersome syntax such as 
+
+```r
+query(call("member", expression(X), list(1, 2, 3, quote(a), quote(b)))
+```
+
+for simple everyday expressions like `member(X, [1, 2, 3, a, b])` on the Prolog
+side. The R function `as.rolog(expr)` is meant to simplify this a bit by
+translating symbols starting with a dot to Prolog variables, and calls
+like `""[1, 2, 3, a, b]` to lists. The argument _expr_ is typically a quoted
+expression; in this example, we would have 
+
+```r
+q <- quote(member(.X, ""[1, 2, 3, a, b]))
+query(as.rolog(q))
+```
+
+which is not _much_ shorter, but maybe a bit easier to read. An even shorter
+version is `query(member(.X, ""[1, 2, 3, a, b]), as.rolog=TRUE)`. Note that the
+name of the variable is still _X_, not "dot-X". A bit flexibility is lost 
+because `quote()` treats the arguments `a`, `b` as symbols; to evaluate them,
+they can be put in parentheses:
+
+```r
+a <- 4
+b <- 5
+query(member(.X, ""[1, 2, 3, a, (b)]), as.rolog=TRUE)
+```
+
+resulting in `member(X, [1, 2, 3, a, 5])`.
+
+* rearrange named arguments in R and pipe them into prolog in the right 
+  direction
+* translating R classes to Prolog dicts
 
 # 4. Examples
 
-In the last section I present a few usage examples for the Rolog package in
+In this section I present a few usage examples for the Rolog package in
 increasing complexity. Although the code snippets are mostly self-explanatory,
 some familiarity with the Prolog language is helpful.
 
