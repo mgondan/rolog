@@ -457,7 +457,7 @@ findall <- function(
 #'
 #' @examples
 #' # The same in simplified syntax
-#' query(member(.X, ""[a, "b", 3L, 4, TRUE, .Y]))
+#' query(member(.X, ""[a, "b", 3L, 4, TRUE, .Y]), as.rolog=TRUE)
 #' submit() # X = a
 #' submit() # X = "b"
 #' clear()
