@@ -4,20 +4,20 @@
 \alias{as.rolog}
 \title{Translate simplified to canonical representation}
 \usage{
-as.rolog(query = quote(member(.X, list(a, "b", 3L, 4, TRUE, .Y))))
+as.rolog(query = quote(member(.X, ""[a, "b", 3L, 4, (pi), TRUE, .Y])))
 }
 \arguments{
 \item{query}{an R call representing a prolog query with prolog-like syntax, e.g.,
-`member(.X, list(a, b, .Y))` that is used in [query()], [once()], and
-[findall()]. This query is translated to Rolog's canonical representation, 
-with R calls and prolog variables enclosed in an R expression, in this 
-example, `call("member", expression(X), list(a, b, expression(Y))))`.}
+`member(.X, ""[a, b, .Y])` that is used in [query()], [once()], and
+[findall()]. The argument is translated to Rolog's canonical representation, 
+with R calls corresponding to Prolog terms and R expressions corresponding to
+Prolog variables. Variables and expressions in parentheses are evaluated.}
 }
 \description{
 Translate simplified to canonical representation
 }
 \examples{
-q = quote(member(.X, list(a, "b", 3L, 4, TRUE, .Y)))
+q = quote(member(.X, ""[a, "b", 3L, 4, pi, (pi), TRUE, .Y]))
 findall(as.rolog(q))
 
 }

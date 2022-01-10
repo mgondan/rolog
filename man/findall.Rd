@@ -7,6 +7,7 @@
 findall(
   query = call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE,
     expression(Y))),
+  as.rolog = FALSE,
   options = NULL
 )
 }
@@ -16,6 +17,10 @@ character strings, boolean values, expressions, lists, and other calls.
 Vectors of booleans, integers, floating point numbers, and strings with
 length \emph{N} > 1 are translated to prolog compounds !/N, \%/N, #/N and $$/N,
 respectively. The names can be modified with the options below.}
+
+\item{as.rolog}{logical, default is FALSE. If TRUE, the query is left unevaluated and
+forwared to the function \code{\link[=as.rolog]{as.rolog()}}. This allows using simplified syntax
+that looks a bit more Prolog-like. See examples below.}
 
 \item{options}{This is a list of options controlling translation from and to prolog.
 \itemize{
@@ -37,11 +42,15 @@ being a list of conditions for each solution, see \code{\link[=once]{once()}}.
 Invoke a query several times
 }
 \examples{
-# This query returns a list stating that it works if X = a, "b", ..., or X = Y
+# This query returns a list stating that it works if X = a, "b", ...
 findall(call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, NULL, NA)))
 
 # Continued
 findall(call("member", expression(X), list(call("sin", call("/", quote(pi), 2)), expression(Y))))
+
+# The same using simplified syntax
+findall(member(.X, ""[a, "b", 3L, 4, TRUE, NULL, NA, sin(pi/2), .Y]), as.rolog=TRUE)
+
 }
 \seealso{
 \code{\link[=once]{once()}}

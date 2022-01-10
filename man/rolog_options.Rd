@@ -15,7 +15,6 @@ Quick access to Rolog's own options
 \details{
 Translation of R to Prolog
 \itemize{
-\item \emph{quote}: if \code{TRUE} (default), use simplified syntax (see \code{\link[=query]{query()}})
 \item numeric vector of size N -> \emph{realvec}/N (default is #)
 \item integer vector of size N -> \emph{intvec}/N (default is \%)
 \item boolean vector of size N -> \emph{boolvec}/N (default is !)

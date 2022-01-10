@@ -7,6 +7,7 @@
 query(
   query = call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE,
     expression(Y))),
+  as.rolog = FALSE,
   options = NULL
 )
 }
@@ -16,6 +17,10 @@ character strings, boolean values, expressions, lists, and other calls.
 Vectors of booleans, integers, floating point numbers, and strings with
 length \emph{N} > 1 are translated to prolog compounds !/N, \%/N, #/N and $$/N,
 respectively. The names can be modified with the options below.}
+
+\item{as.rolog}{logical, default is FALSE. If TRUE, the query is left unevaluated and
+forwared to the function \code{\link[=as.rolog]{as.rolog()}}. This allows using simplified syntax
+that looks a bit more Prolog-like. See examples below.}
 
 \item{options}{This is a list of options controlling translation from and to prolog.
 \itemize{
@@ -40,6 +45,12 @@ it is closed and a warning is shown.
 }
 \examples{
 query(call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))))
+submit() # X = a
+submit() # X = "b"
+clear()
+
+# The same in simplified syntax
+query(member(.X, ""[a, "b", 3L, 4, TRUE, .Y))
 submit() # X = a
 submit() # X = "b"
 clear()
