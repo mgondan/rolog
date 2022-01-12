@@ -924,7 +924,7 @@ PREDICATE(r_eval, 2)
   CharacterVector names ;
   PlTerm vars ;
   List options = List::create(Named("realvec") = "#", Named("boolvec") = "!", Named("charvec") = "$", Named("intvec") = "%", Named("atomize") = false, Named("scalar") = true) ;
-    
+ 
   RObject Expr = pl2r(A1, names, vars, options) ;
   RObject Res = Expr ;
   try
