@@ -18,9 +18,9 @@ Vectors of booleans, integers, floating point numbers, and strings with
 length \emph{N} > 1 are translated to prolog compounds !/N, \%/N, #/N and $$/N,
 respectively. The names can be modified with the options below.}
 
-\item{as.rolog}{logical, default is FALSE. If TRUE, the query is left unevaluated and
-forwared to the function \code{\link[=as.rolog]{as.rolog()}}. This allows using simplified syntax
-that looks a bit more Prolog-like. See examples below.}
+\item{as.rolog}{logical, default is FALSE. If TRUE, the query is forwarded to the
+function \code{\link[=as.rolog]{as.rolog()}} before it is raised. This allows using
+simplified syntax that looks a bit more Prolog-like. See examples below.}
 
 \item{options}{This is a list of options controlling translation from and to prolog.
 \itemize{
