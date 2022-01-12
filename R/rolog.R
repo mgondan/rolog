@@ -103,6 +103,10 @@
   # SWI startup message
   W <- once(call("message_to_string", quote(welcome), expression(W)))
   packageStartupMessage(W$W)
+
+  # Initialize Prolog side (r2pl, pl2r)
+  consult(fname=system.file(file.path("pl", "rolog.pl"), package="rolog"))
+
   invisible()
 }
 
