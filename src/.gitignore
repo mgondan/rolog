@@ -2,3 +2,4 @@ rolog.dll
 RcppExports.o
 rolog.o
 swipl-devel
+symbols.rds

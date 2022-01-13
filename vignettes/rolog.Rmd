@@ -12,7 +12,10 @@ vignette: >
 
 ```{r, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-options(rmarkdown.html_vignette.check_title = FALSE)
+options(rmarkdown.html_vignette.check_title=FALSE)
+library(DiagrammeR)
+library(DiagrammeRsvg)
+library(svglite)
 ```
 
   Matthias Gondan\
@@ -78,7 +81,7 @@ addition, pluggable extensions (so-called packs) are available for specific
 tasks to enhance its capabilities.
 
 Unlike R, Prolog is a declarative programming language consisting of facts and
-rules that define relations, for example, in a problem space. Prolog’s major
+rules that define relations, for example, in a problem space. Prolog's major
 strength is its builtin query-driven search engine that efficiently deals with
 complex structured data, but this data is not necessarily numerical. In fact,
 Prolog only provides a basic collection of arithmetic calculations via a purely
@@ -123,7 +126,7 @@ SWI-Prolog (and, in fact, the MQI documentation includes an R call).
 
 A bidirectional bridge between R and Prolog might overcome the limitations of 
 both languages, thereby combining the extensive numerical and statistical power
-of the R system with Prolog’s skills in the representation of knowledge and
+of the R system with Prolog's skills in the representation of knowledge and
 reasoning. In addition to the useful little tools shown in the examples below, 
 Rolog can therefore contribute to progress at the intersection of traditional
 artificial intelligence and contemporary statistical programming.
@@ -327,7 +330,68 @@ query(call("member", expression(X), list(1, 2, 3, quote(a), quote(b)))
 ```
 
 for simple everyday expressions like `member(X, [1, 2, 3, a, b])` on the Prolog
-side. The R function `as.rolog(expr)` is meant to simplify this a bit by
+side.
+
+For this reason, the translation between R and Prolog can be intercepted at
+several stages of the process, using the following hooks:
+
+* an R function `r2rolog(expr)` that may be used to preprocess specific R
+  elements before they are translated into Prolog.
+* a Prolog predicate `rolog_pl/2` that may be used to manipulate a term before
+  the predicate is called.
+* a Prolog predicate `pl_rolog/2` that may be used to manipulate a term
+  after the predicate has been called. Default is again the identity function.
+* an R function `rolog2r(expr)` that can be used to postprocess the result of
+  the query.
+
+The process is illustrated in Figure\ 1. For all hooks, the default is not to do
+anything, that is, the identity function.
+
+```{r, echo=FALSE, fig.width=6, fig.height=2}
+grViz(
+  'digraph G {
+    rankdir=LR;
+    Query Result;
+
+    subgraph cluster_0 {
+      style=filled;
+      color=lightgrey;
+      node [style=filled,color=white];
+      r2rolog -> forth -> rolog_pl;
+    }
+
+    subgraph cluster_1 {
+      style=filled;
+      color=lightgrey;
+      node [style=filled,color=white];
+      rolog2r -> back [dir=back];
+      back -> pl_rolog [dir=back];
+    }
+  
+    Query -> r2rolog;
+    rolog_pl:e -> Prolog;
+    pl_rolog:e -> Prolog [dir=back];
+    Result -> rolog2r [dir=back];
+
+    Query [shape=Mdiamond;width=0.7;height=0.7];
+    r2rolog [shape=rect,label="r2rolog(expr)"];
+    forth [label="(rolog)"];
+    rolog_pl [shape=rect,label="rolog_pl/2"];
+    Prolog [shape=Mcircle];
+    pl_rolog [shape=rect,label="pl_rolog/2"];
+    rolog2r [shape=rect,label="rolog2r(expr)"];
+    back [label="(rolog)"];
+    Result [shape=Msquare];
+}')
+```
+
+Figure\ 1.
+: Workflow in Rolog.
+
+
+## Convenience functions in R
+
+The R function `as.rolog(expr)` is meant to simplify this a bit by
 translating symbols starting with a dot to Prolog variables, and calls
 like `""[1, 2, 3, a, b]` to lists. The argument _expr_ is typically a quoted
 expression; in this example, we would have 
@@ -349,11 +413,67 @@ b <- 5
 query(member(.X, ""[1, 2, 3, a, (b)]), as.rolog=TRUE)
 ```
 
-resulting in `member(X, [1, 2, 3, a, 5])`.
+resulting in the query `member(X, [1, 2, 3, a, 5])`.
+
+## Convenience functions in Prolog
+
+Recent versions of SWI-Prolog support so-called dictionaries of the 
+form `Tag{Key1:Value1, Key2:Value2, ...}`. The tag is typically an 
+atom (but can be a variable, as well), the keys are unique atom or integers;
+the values can be anything. Suppose we have a Prolog predicate that does
+something with dicts, and we would like to query it from R. The simplest
+solution is a wrapper in Prolog that translates key-value 
+pairs `[Key1-Value1, Key2-Value2, ...]` back and forth to dicts:
+
+```prolog
+do_something_with_pairs(Pairs0, Pairs1) :-
+    dict_pairs(Dict0, my_dict, Pairs0),
+    do_something_with_dicts(Dict0, Dict1),
+    dict_pairs(Dict1, my_dict, Pairs1).
+```
+
+`do_something_with_pairs/2` can then be queried from R using, e.g., lists with
+named elements.
+
+```r
+once(call("do_something_with_pairs", list(a=1, b=2), expression(X)))
+```
+
+The purpose of this rather trivial example is to remind the reader to avoid
+complicated syntax on the R side when it is much simpler to do the conversion at
+the Prolog end.
+
+Rolog automatically translates R lists with named elements to Prolog pairs. If
+a similar mechanism is desired for vectors with named 
+elements (e.g., `c(a=1, b=2)`), the vector can be converted to a named list 
+with `as.list()` at the R end before querying Prolog.
+
+Similar to R libraries, the Prolog system can be extended by add-on 
+libraries ("packs"). Assuming that a suitable compiler is installed, these
+add-ons can include foreign code, e.g. C++. One would typically do this directly
+in Prolog using `pack_install/1,2`, but it is also possible from the R end. For
+example, the following directive installs the pack "environ" [@Environ] from
+within R,
+
+```r
+once(call("pack_install", quote(environ), list(call("interactive", FALSE))))
+```
+
+The second argument translates to the option `[interactive(false)]` which is
+needed for operating systems in which input redirection is unreliable. _environ_
+is mostly a demo package that provides a predicate `environ/1` that unifies the
+argument with a list of environment variables. Some of these are empty, which
+results in empty atoms that cannot be translated to R symbols because the latter
+are not allowed to be empty.
+
+(Hooks f??r Hin- und R??ck-??bersetzung)
 
 * rearrange named arguments in R and pipe them into prolog in the right 
   direction
-* translating R classes to Prolog dicts
+
+## Translating R classes to Prolog dicts
+
+Case study for linear models
 
 # 4. Examples
 
@@ -363,7 +483,7 @@ some familiarity with the Prolog language is helpful.
 
 ## Hello, world
 
-Prolog’s typical “hello world” example is a search through a directed acyclic
+Prolog's typical _hello world_ example is a search through a directed acyclic
 graph, for example, a family tree like the one given in Listing\ 1.
 
 ```prolog
@@ -403,7 +523,7 @@ Listing\ 1.
 : A family tree in Prolog.
 
 The listing is included in the package and can be accessed from R using the
-function `system.file(…)`. Within Prolog, the normal workflow is to consult the
+function `system.file(...)`. Within Prolog, the normal workflow is to consult the
 code with `[family]` and then to raise queries such as `ancestor(X, jim)`, which
 returns, one by one, four solutions for the variable _X_. In R, we obtain the
 following results:
@@ -423,13 +543,13 @@ database. `findall(expr)` searches for all solutions of the query `expr`, and
 returns the conditions under which the query succeeds. In this example, the
 query succeeds if _X_ is either `pat`, `pam`, `tom` or `bob`, as indicated by
 the four bindings for _X_ in the resulting list. If we are just interested in
-the first solution, we can invoke the query with `once(…)` instead
-of `findall(…)`. 
+the first solution, we can invoke the query with `once(...)` instead
+of `findall(...)`. 
 
 A rather cumbersome aspect of Rolog is the construction of Prolog
 terms and queries. `expression(X)` encapsulates the variable `X`, R symbols from
 `quote(jim)` or `as.symbol("jim")` are translated to Prolog atoms, and Prolog
-compounds such as `ancestor/2` are generated using `call("ancestor", …)`. A 
+compounds such as `ancestor/2` are generated using `call("ancestor", ...)`. A 
 simplified syntax is provided by `as.rolog()` that accepts quoted expressions
 with dots indicating Prolog variables:
 
@@ -443,8 +563,8 @@ Note that the dot is removed from the variable name.
 
 ## Non-deterministic queries
 
-As an alternative to `once(…)` and `findall(…)`, we can create a query with
-`query(…)` and `submit()` the query as often as needed or until it fails, as is
+As an alternative to `once(...)` and `findall(...)`, we can create a query with
+`query(...)` and `submit()` the query as often as needed or until it fails, as is
 shown below for a query like `member(X, [1, 2, Y])`, which succeeds if _X_ is
 either 1, 2 or the same as _Y_.
 
@@ -584,9 +704,9 @@ Listing\ 3.
 
 As in the first example, we first consult a little Prolog program with a
 minimalistic grammar and lexicon (Listing\ 3), and then raise a query asking for
-the syntactic structure of “john saw a man with a telescope”. Closer inspection
-of the two results reveals the two possible meanings, “john saw a man _who
-carries_ a telescope” versus “john saw a man _through_ a telescope”. More Prolog
+the syntactic structure of "john saw a man with a telescope". Closer inspection
+of the two results reveals the two possible meanings, "john saw a man _who
+carries_ a telescope" versus "john saw a man _through_ a telescope". More Prolog
 examples of natural language processing are found 
 in Blackburn and Bos [@Blackburn2005], including the resolution of anaphoric
 references and the extraction of semantic meaning.
@@ -607,7 +727,7 @@ However, so far, R expressions such as `pbinom(k, N, p)` are typeset as-is;
 prettier mathematical expressions such as $P_\mathrm{Bi}(X \le k; N, p)$ require
 Latex commands like `P_\mathrm{Bi}\left(X \le k; N, p\right)`, which are
 cumbersome to type in and hardly readable even for simple expressions. Below we
-make use of Prolog’s grammar rules for the automatic translation of R
+make use of Prolog's grammar rules for the automatic translation of R
 expressions to MathML. The result can then be rendered on a web page. A limited
 set of rules for translation from R to MathML is found in `pl/mathml.pl` of the
 Rolog package, as well as an example file `mathml.Rmd`. The relevant code
@@ -755,7 +875,7 @@ pack [@Workman2021] and can easily be connected to R using the present package.
 
 # 5. Conclusions
 
-+++
++++ for inspiration
 
 The library presented here achieves a tight integration of the R statistical software system
 with two open source Prolog implementations. Our designing principles have been
@@ -775,7 +895,7 @@ computations. We also hope that this interface will encourage logic programming 
 to engage in areas of research where a synergy of knowledge representation
 and statistical prowess is needed such as in bioinformatics and computational biology.
 Symmetrically, our library increases the tools available to R researchers and programmers
-who wish to exploit Prolog’s advanced AI capabilities.
+who wish to exploit Prolog's advanced AI capabilities.
 
 Possible extensions to the library include tighter integration with backtracking, although
 this has not been a limitation to the current applications. One specific aspect of
@@ -789,9 +909,9 @@ R..eal was originally designed, developed and tested on YAP 6.3.1 under the Linu
 operating system. It has also been compiled for, and known to be working onMS operating
 systems and Mac OS. It was later ported [19] to the SWI [21] engine via a complete
 re-write of the C code. This has become the main development code as YAP provides a
-comprehensive compatibility layer to SWI’s C interface [20]. The library and examples
+comprehensive compatibility layer to SWI's C interface [20]. The library and examples
 presented here can be downloaded from our website (http://bioinformatics.
-nki.nl/˜nicos/sware/r..eal/).
+nki.nl/~nicos/sware/r..eal/).
 
 +++
 
