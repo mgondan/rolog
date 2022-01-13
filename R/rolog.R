@@ -257,9 +257,9 @@ portray <- function(
 #' respectively. The names can be modified with the options below.
 #'
 #' @param as.rolog
-#' logical, default is FALSE. If TRUE, the query is left unevaluated and
-#' forwared to the function [as.rolog()]. This allows using simplified syntax
-#' that looks a bit more Prolog-like. See examples below.
+#' logical, default is FALSE. If TRUE, the query is forwarded to the 
+#' function [as.rolog()] before it is raised. This allows using 
+#' simplified syntax that looks a bit more Prolog-like. See examples below.
 #'
 #' @param options
 #' This is a list of options controlling translation from and to prolog.
@@ -322,7 +322,7 @@ once <- function(
 {
   options <- c(options, rolog_options())
   
-  # Translate from simplified syntax
+  # Translate from simplified syntax (R side)
   if(as.rolog)
     query <- as.rolog(substitute(query))
 
@@ -349,10 +349,10 @@ once <- function(
 #' respectively. The names can be modified with the options below.
 #'
 #' @param as.rolog
-#' logical, default is FALSE. If TRUE, the query is left unevaluated and
-#' forwared to the function [as.rolog()]. This allows using simplified syntax
-#' that looks a bit more Prolog-like. See examples below.
-#' 
+#' logical, default is FALSE. If TRUE, the query is forwarded to the
+#' function [as.rolog()] before it is raised. This allows using
+#' simplified syntax that looks a bit more Prolog-like. See examples below.
+#'
 #' @param options
 #' This is a list of options controlling translation from and to prolog.
 #' * _boolvec_ (see option rolog.boolvec, default is !) is the name of the
@@ -398,7 +398,7 @@ findall <- function(
   # Translate from simplified syntax
   if(as.rolog)
     query <- as.rolog(substitute(query))
-  
+
   # Decorate result with the prolog syntax of the query
   if(options$portray)
     q <- portray(query, options)
@@ -422,10 +422,10 @@ findall <- function(
 #' respectively. The names can be modified with the options below.
 #'
 #' @param as.rolog
-#' logical, default is FALSE. If TRUE, the query is left unevaluated and
-#' forwared to the function [as.rolog()]. This allows using simplified syntax
-#' that looks a bit more Prolog-like. See examples below.
-#' 
+#' logical, default is FALSE. If TRUE, the query is forwarded to the
+#' function [as.rolog()] before it is raised. This allows using
+#' simplified syntax that looks a bit more Prolog-like. See examples below.
+#'
 #' @param options
 #' This is a list of options controlling translation from and to prolog.
 #' * _boolvec_ (see option rolog.boolvec, default is !) is the name of the
