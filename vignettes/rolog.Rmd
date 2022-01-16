@@ -321,28 +321,21 @@ between the syntactic components of two programming languages that follow
 completely different paradigms. Whereas symbols, functions, numbers and
 character strings are easily mapped between R and Prolog, there are loose ends 
 at both sides. In particular, Prolog variables are translated from and to 
-R _expressions_ (not to be confused with R symbols), and R vectors are
-translated to the Prolog terms `#/N`, `%/N`, `!/N`, and `$$/N`, as mentioned
-above. This leads to cumbersome syntax such as 
+R _expressions_ (not to be confused with R symbols), and R vectors of 
+length _N_ > 1 are translated to the Prolog terms `#/N`, `%/N`, `!/N`, 
+and `$$/N`, as mentioned above.
 
-```r
-query(call("member", expression(X), list(1, 2, 3, quote(a), quote(b)))
-```
+These rules are, in principle, arbitrary and can be intercepted at several 
+stages of the process, using the following hooks:
 
-for simple everyday expressions like `member(X, [1, 2, 3, a, b])` on the Prolog
-side.
-
-For this reason, the translation between R and Prolog can be intercepted at
-several stages of the process, using the following hooks:
-
-* an R function `r2rolog(expr)` that may be used to preprocess specific R
+* an R function `preproc(expr, ...)` that may be used to preprocess specific R
   elements before they are translated into Prolog.
 * a Prolog predicate `rolog_pl/2` that may be used to manipulate a term before
   the predicate is called.
 * a Prolog predicate `pl_rolog/2` that may be used to manipulate a term
   after the predicate has been called. Default is again the identity function.
-* an R function `rolog2r(expr)` that can be used to postprocess the result of
-  the query.
+* an R function `postproc(expr, ...)` that can be used to postprocess the result
+  of the query.
 
 The process is illustrated in Figure\ 1. For all hooks, the default is not to do
 anything, that is, the identity function.
@@ -374,12 +367,12 @@ grViz(
     Result -> rolog2r [dir=back];
 
     Query [shape=Mdiamond;width=0.7;height=0.7];
-    r2rolog [shape=rect,label="r2rolog(expr)"];
+    r2rolog [shape=rect,label="preproc(...)"];
     forth [label="(rolog)"];
     rolog_pl [shape=rect,label="rolog_pl/2"];
     Prolog [shape=Mcircle];
     pl_rolog [shape=rect,label="pl_rolog/2"];
-    rolog2r [shape=rect,label="rolog2r(expr)"];
+    rolog2r [shape=rect,label="postproc(...)"];
     back [label="(rolog)"];
     Result [shape=Msquare];
 }')
@@ -388,29 +381,41 @@ grViz(
 Figure\ 1.
 : Workflow in Rolog.
 
+## Preprocessing in R
 
-## Convenience functions in R
-
-The R function `as.rolog(expr)` is meant to simplify this a bit by
-translating symbols starting with a dot to Prolog variables, and calls
-like `""[1, 2, 3, a, b]` to lists. The argument _expr_ is typically a quoted
-expression; in this example, we would have 
+We have already seen above that raising even simple everyday Prolog queries such
+as `member(X, [1, 2, 3, a, b])` require complicated R expressions such as
 
 ```r
-q <- quote(member(.X, ""[1, 2, 3, a, b]))
-query(as.rolog(q))
+query(call("member", expression(X), list(1, 2, 3, quote("a"), quote(b)))
 ```
 
-which is not _much_ shorter, but maybe a bit easier to read. An even shorter
-version is `query(member(.X, ""[1, 2, 3, a, b]), as.rolog=TRUE)`. Note that the
-name of the variable is still _X_, not "dot-X". A bit flexibility is lost 
-because `quote()` treats the arguments `a`, `b` as symbols; to evaluate them,
-they can be put in parentheses:
+The R function `as.rolog(expr, quoted=FALSE)` is meant to simplify this a bit by
+translating symbols starting with a dot to Prolog variables, and calls
+like `""[1, 2, 3, a, b]` to lists. The argument _expr_ is typically 
+an _unevaluated_ R call or symbol and then handled using non-standard 
+evaluation [@Wickham2019]. This corresponds to Case\ 1 in the snippet below. In
+those cases where _expr_ is already quoted, it has to be indicated by the second
+argument (Case\ 2 below).
+
+```r
+# Case 1
+query(member(.X, ""[1, 2, 3, a, b]), preproc=as.rolog)
+
+# Case 2
+q <- quote(member(.X, ""[1, 2, 3, a, b]))
+query(q, preproc=as.rolog, quoted=TRUE)
+```
+
+Note that the name of the variable in the later course will still be _X_, 
+not "dot-X". A bit flexibility is lost because `quote()` treats the
+arguments _a_, _b_ as symbols; to evaluate them (i.e., "unquote"), they can be
+put in parentheses:
 
 ```r
 a <- 4
 b <- 5
-query(member(.X, ""[1, 2, 3, a, (b)]), as.rolog=TRUE)
+query(member(.X, ""[1, 2, 3, a, (b)]), preproc=as.rolog)
 ```
 
 resulting in the query `member(X, [1, 2, 3, a, 5])`.

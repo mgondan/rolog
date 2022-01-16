@@ -247,6 +247,12 @@ portray <- function(
   .portray(query, options)
 }
 
+#' Identity function that accepts extra arguments
+.identity <- function(x, ...)
+{
+  return(x)
+}
+
 #' Invoke a query once
 #'
 #' @param query 
@@ -256,11 +262,12 @@ portray <- function(
 #' length _N_ > 1 are translated to prolog compounds !/N, %/N, #/N and $$/N,
 #' respectively. The names can be modified with the options below.
 #'
-#' @param as.rolog
-#' logical, default is FALSE. If TRUE, the query is forwarded to the 
-#' function [as.rolog()] before it is raised. This allows using 
-#' simplified syntax that looks a bit more Prolog-like. See examples below.
-#'
+#' @param preproc
+#' a function, default is identity. This allows preprocessing of specific 
+#' R objects before they are translated to Prolog. Use cases include translation
+#' of objects to lists, or simplified, Prolog-style R syntax (see example 
+#' below).
+#' 
 #' @param options
 #' This is a list of options controlling translation from and to prolog.
 #' * _boolvec_ (see option rolog.boolvec, default is !) is the name of the
@@ -271,6 +278,9 @@ portray <- function(
 #'   scalar prolog elements. If _scalar_ is `FALSE`, vectors of length 1 are
 #'   also translated to compounds.
 #'   
+#' @param ...
+#' further arguments passed to preproc
+#' 
 #' @return
 #' If the query fails, `FALSE` is returned. If the query succeeds, a
 #' (possibly empty) list is returned that includes the bindings required to
@@ -288,28 +298,34 @@ portray <- function(
 #' for options controlling R to prolog translation
 #'
 #' @examples
-#' 
 #' # This query returns FALSE
 #' once(call("member", 1, list(quote(a), quote(b), quote(c))))
 #' 
+#' @examples
 #' # This query returns an empty list meaning yes, it works
 #' once(call("member", 3, list(1, 2, 3)))
 #'
+#' @examples
 #' # This query returns a list stating that it works if X = 1
 #' once(call("member", 1, list(quote(a), expression(X))))
 #' 
+#' @examples
 #' # The same query using simplified syntax
-#' once(member(1, ""[a, .X]), as.rolog=TRUE)
+#' once(member(1, ""[a, .X]), preproc=as.rolog)
 #' 
+#' @examples
 #' # This query returns a list stating that X = 1 and Z = expression(Y)
 #' once(call("=", list(expression(X), expression(Y)), list(1, expression(Z))))
 #' 
+#' @examples
 #' # This works for X = [1 | _]; i.e. something like [|](1, expression(_6330))
 #' once(call("member", 1, expression(X)))
 #'
+#' @examples
 #' # This returns S = '1.0' (scalar)
 #' once(call("format", call("string", expression(S)), "~w", list(1)), options=list(scalar=TRUE))
 #'   
+#' @examples
 #' # This returns S = '#(1.0)' (vector), because the 1 is translated to #(1.0). 
 #' # To prevent "~w" from being translated to $$("~w"), it is given as an atom.
 #' once(call("format", call("string", expression(S)), as.symbol("~w"), list(1)), 
@@ -317,14 +333,14 @@ portray <- function(
 #'
 once <- function(
   query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))),
-  as.rolog=FALSE,
-  options=NULL)
+  preproc=.identity,
+  options=NULL,
+  ...)
 {
   options <- c(options, rolog_options())
   
   # Translate from simplified syntax (R side)
-  if(as.rolog)
-    query <- as.rolog(substitute(query))
+  query <- preproc(query, ...)
 
   # Decorate result with the prolog syntax of the query
   if(options$portray)
@@ -348,11 +364,12 @@ once <- function(
 #' length _N_ > 1 are translated to prolog compounds !/N, %/N, #/N and $$/N,
 #' respectively. The names can be modified with the options below.
 #'
-#' @param as.rolog
-#' logical, default is FALSE. If TRUE, the query is forwarded to the
-#' function [as.rolog()] before it is raised. This allows using
-#' simplified syntax that looks a bit more Prolog-like. See examples below.
-#'
+#' @param preproc
+#' a function, default is identity. This allows preprocessing of specific 
+#' R objects before they are translated to Prolog. Use cases include translation
+#' of objects to lists, or simplified, Prolog-style R syntax (see example 
+#' below).
+#' 
 #' @param options
 #' This is a list of options controlling translation from and to prolog.
 #' * _boolvec_ (see option rolog.boolvec, default is !) is the name of the
@@ -363,6 +380,9 @@ once <- function(
 #'   scalar prolog elements. If _scalar_ is `FALSE`, vectors of length 1 are
 #'   also translated to compounds.
 #'   
+#' @param ...
+#' further arguments passed to preproc
+#' 
 #' @return
 #' If the query fails, an empty list is returned. If the query 
 #' succeeds _N_ >= 1 times, a list of length _N_ is returned, each element
@@ -385,19 +405,22 @@ once <- function(
 #' # Continued
 #' findall(call("member", expression(X), list(call("sin", call("/", quote(pi), 2)), expression(Y))))
 #' 
-#' # The same using simplified syntax
-#' findall(member(.X, ""[a, "b", 3L, 4, TRUE, NULL, NA, sin(pi/2), .Y]), as.rolog=TRUE)
+#' # The same using simplified syntax (using non-standard evaluation)
+#' findall(member(.X, ""[a, "b", 3L, 4, TRUE, NULL, NA, sin(pi/2), .Y]), preproc=as.rolog)
+#' 
+#' # The same using simplified syntax (using quoted expression)
+#' findall(member(.X, ""[a, "b", 3L, 4, TRUE, NULL, NA, sin(pi/2), .Y]), preproc=as.rolog, quoted=TRUE)
 #' 
 findall <- function(
   query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))),
-  as.rolog=FALSE,
-  options=NULL)
+  preproc=.identity,
+  options=NULL,
+  ...)
 {
   options <- c(options, rolog_options())
-  
-  # Translate from simplified syntax
-  if(as.rolog)
-    query <- as.rolog(substitute(query))
+
+  # Translate from simplified syntax (R side)
+  query <- preproc(query, ...)
 
   # Decorate result with the prolog syntax of the query
   if(options$portray)
@@ -405,10 +428,10 @@ findall <- function(
 
   # Invoke C++ function that calls prolog
   r <- .findall(query, options)
-  
+
   if(options$portray)
     attr(r, 'query') <- q
-  
+
   return(r)
 }
 
@@ -421,11 +444,12 @@ findall <- function(
 #' length _N_ > 1 are translated to prolog compounds !/N, %/N, #/N and $$/N,
 #' respectively. The names can be modified with the options below.
 #'
-#' @param as.rolog
-#' logical, default is FALSE. If TRUE, the query is forwarded to the
-#' function [as.rolog()] before it is raised. This allows using
-#' simplified syntax that looks a bit more Prolog-like. See examples below.
-#'
+#' @param preproc
+#' a function, default is identity. This allows preprocessing of specific 
+#' R objects before they are translated to Prolog. Use cases include translation
+#' of objects to lists, or simplified, Prolog-style R syntax (see example 
+#' below).
+#' 
 #' @param options
 #' This is a list of options controlling translation from and to prolog.
 #' * _boolvec_ (see option rolog.boolvec, default is !) is the name of the
@@ -435,6 +459,9 @@ findall <- function(
 #' * If _scalar_ is `TRUE` (default), vectors of length 1 are translated to 
 #'   scalar prolog elements. If _scalar_ is `FALSE`, vectors of length 1 are
 #'   also translated to compounds.
+#'
+#' @param ...
+#' further arguments passed to preproc
 #'
 #' @return
 #' If the creation of the query succeeds, `TRUE`.
@@ -479,13 +506,13 @@ findall <- function(
 query <- function(
   query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))),
   as.rolog=FALSE,
-  options=NULL)
+  options=NULL,
+  ...)
 {
   options <- c(options, rolog_options())
 
-  # Translate from simplified syntax
-  if(as.rolog)
-    query <- as.rolog(substitute(query))
+  # Translate from simplified syntax (R side)
+  query <- preproc(query, ...)
 
   # Decorate result with the prolog syntax of the query
   if(options$portray)
@@ -567,55 +594,4 @@ clear <- function()
 submit <- function()
 {
   .submit()
-}
-
-#' Translate simplified to canonical representation
-#'
-#' @param query
-#' an R call representing a prolog query with prolog-like syntax, e.g.,
-#' `member(.X, ""[a, b, .Y])` that is used in [query()], [once()], and
-#' [findall()]. The argument is translated to Rolog's canonical representation, 
-#' with R calls corresponding to Prolog terms and R expressions corresponding to
-#' Prolog variables. Variables and expressions in parentheses are evaluated.
-#'
-#' @seealso [query()], [once()], [findall()]
-#'
-#' @examples
-#' q = quote(member(.X, ""[a, "b", 3L, 4, pi, (pi), TRUE, .Y]))
-#' findall(as.rolog(q))
-#'
-as.rolog <- function(query=quote(member(.X, ""[a, "b", 3L, 4, (pi), TRUE, .Y])))
-{
-  if(is.symbol(query))
-  {
-    # Variable
-    s = as.character(query)
-    if(s == ".")
-      return(expression(`_`))
-
-    if(substr(s, 1, 1) == ".")
-      return(as.expression(as.symbol(substr(s, 2, nchar(s)))))
-  }
-
-  if(is.call(query))
-  {
-    args <- as.list(query)
-    
-    # Things like (2 + 3) or (a) are evaluated
-    if(args[[1]] == "(")
-      return(as.rolog(eval(args[[2]])))
-
-    # `[`("", 1, 2, 3), aka. ""[1, 2, 3] is a list
-    if(args[[1]] == "[" & length(args[[2]]) == 1 & args[[2]] == "")
-      return(lapply(args[c(-1, -2)], FUN=as.rolog))
-
-    # list(1, 2, 3) is a list not a call
-    if(args[[1]] == "list")
-      return(lapply(args[-1], FUN=as.rolog))
-
-    args[-1] <- lapply(args[-1], FUN=as.rolog)
-    return(as.call(args))
-  }
-
-  return(query)
 }
