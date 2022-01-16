@@ -7,8 +7,9 @@
 once(
   query = call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE,
     expression(Y))),
-  as.rolog = FALSE,
-  options = NULL
+  preproc = .identity,
+  options = NULL,
+  ...
 )
 }
 \arguments{
@@ -18,9 +19,10 @@ Vectors of booleans, integers, floating point numbers, and strings with
 length \emph{N} > 1 are translated to prolog compounds !/N, \%/N, #/N and $$/N,
 respectively. The names can be modified with the options below.}
 
-\item{as.rolog}{logical, default is FALSE. If TRUE, the query is forwarded to the
-function \code{\link[=as.rolog]{as.rolog()}} before it is raised. This allows using
-simplified syntax that looks a bit more Prolog-like. See examples below.}
+\item{preproc}{a function, default is identity. This allows preprocessing of specific
+R objects before they are translated to Prolog. Use cases include translation
+of objects to lists, or simplified, Prolog-style R syntax (see example
+below).}
 
 \item{options}{This is a list of options controlling translation from and to prolog.
 \itemize{
@@ -32,6 +34,8 @@ integers, doubles and strings, respectively (defaults are \%, # and $$).
 scalar prolog elements. If \emph{scalar} is \code{FALSE}, vectors of length 1 are
 also translated to compounds.
 }}
+
+\item{...}{further arguments passed to preproc}
 }
 \value{
 If the query fails, \code{FALSE} is returned. If the query succeeds, a
@@ -42,7 +46,6 @@ satisfy the query.
 Invoke a query once
 }
 \examples{
-
 # This query returns FALSE
 once(call("member", 1, list(quote(a), quote(b), quote(c))))
 
@@ -53,7 +56,7 @@ once(call("member", 3, list(1, 2, 3)))
 once(call("member", 1, list(quote(a), expression(X))))
 
 # The same query using simplified syntax
-once(member(1, ""[a, .X]), as.rolog=TRUE)
+once(member(1, ""[a, .X]), preproc=as.rolog)
 
 # This query returns a list stating that X = 1 and Z = expression(Y)
 once(call("=", list(expression(X), expression(Y)), list(1, expression(Z))))
