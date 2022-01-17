@@ -247,12 +247,6 @@ portray <- function(
   .portray(query, options)
 }
 
-#' Identity function that accepts extra arguments
-.identity <- function(x, ...)
-{
-  return(x)
-}
-
 #' Invoke a query once
 #'
 #' @param query 
@@ -278,9 +272,6 @@ portray <- function(
 #'   scalar prolog elements. If _scalar_ is `FALSE`, vectors of length 1 are
 #'   also translated to compounds.
 #'   
-#' @param ...
-#' further arguments passed to preproc
-#' 
 #' @return
 #' If the query fails, `FALSE` is returned. If the query succeeds, a
 #' (possibly empty) list is returned that includes the bindings required to
@@ -311,7 +302,7 @@ portray <- function(
 #' 
 #' @examples
 #' # The same query using simplified syntax
-#' once(member(1, ""[a, .X]), preproc=as.rolog)
+#' once(quote(member(1, ""[a, .X])), preproc=as.rolog)
 #' 
 #' @examples
 #' # This query returns a list stating that X = 1 and Z = expression(Y)
@@ -333,14 +324,13 @@ portray <- function(
 #'
 once <- function(
   query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))),
-  preproc=.identity,
-  options=NULL,
-  ...)
+  preproc=identity,
+  options=NULL)
 {
   options <- c(options, rolog_options())
   
   # Translate from simplified syntax (R side)
-  query <- preproc(query, ...)
+  query <- preproc(query)
 
   # Decorate result with the prolog syntax of the query
   if(options$portray)
@@ -380,9 +370,6 @@ once <- function(
 #'   scalar prolog elements. If _scalar_ is `FALSE`, vectors of length 1 are
 #'   also translated to compounds.
 #'   
-#' @param ...
-#' further arguments passed to preproc
-#' 
 #' @return
 #' If the query fails, an empty list is returned. If the query 
 #' succeeds _N_ >= 1 times, a list of length _N_ is returned, each element
@@ -405,22 +392,18 @@ once <- function(
 #' # Continued
 #' findall(call("member", expression(X), list(call("sin", call("/", quote(pi), 2)), expression(Y))))
 #' 
-#' # The same using simplified syntax (using non-standard evaluation)
-#' findall(member(.X, ""[a, "b", 3L, 4, TRUE, NULL, NA, sin(pi/2), .Y]), preproc=as.rolog)
-#' 
-#' # The same using simplified syntax (using quoted expression)
-#' findall(member(.X, ""[a, "b", 3L, 4, TRUE, NULL, NA, sin(pi/2), .Y]), preproc=as.rolog, quoted=TRUE)
+#' # The same using simplified syntax
+#' findall(quote(member(.X, ""[a, "b", 3L, 4, TRUE, NULL, NA, sin(pi/2), .Y])), preproc=as.rolog)
 #' 
 findall <- function(
   query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))),
-  preproc=.identity,
-  options=NULL,
-  ...)
+  preproc=identity,
+  options=NULL)
 {
   options <- c(options, rolog_options())
 
   # Translate from simplified syntax (R side)
-  query <- preproc(query, ...)
+  query <- preproc(query)
 
   # Decorate result with the prolog syntax of the query
   if(options$portray)
@@ -460,9 +443,6 @@ findall <- function(
 #'   scalar prolog elements. If _scalar_ is `FALSE`, vectors of length 1 are
 #'   also translated to compounds.
 #'
-#' @param ...
-#' further arguments passed to preproc
-#'
 #' @return
 #' If the creation of the query succeeds, `TRUE`.
 #'   
@@ -484,7 +464,7 @@ findall <- function(
 #'
 #' @examples
 #' # The same in simplified syntax
-#' query(member(.X, ""[a, "b", 3L, 4, TRUE, .Y]), as.rolog=TRUE)
+#' query(quote(member(.X, ""[a, "b", 3L, 4, TRUE, .Y])), preproc=as.rolog)
 #' submit() # X = a
 #' submit() # X = "b"
 #' clear()
@@ -505,14 +485,13 @@ findall <- function(
 #' 
 query <- function(
   query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))),
-  as.rolog=FALSE,
-  options=NULL,
-  ...)
+  preproc=identity,
+  options=NULL)
 {
   options <- c(options, rolog_options())
 
   # Translate from simplified syntax (R side)
-  query <- preproc(query, ...)
+  query <- preproc(query)
 
   # Decorate result with the prolog syntax of the query
   if(options$portray)

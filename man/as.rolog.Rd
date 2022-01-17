@@ -4,7 +4,7 @@
 \alias{as.rolog}
 \title{Translate simplified to canonical representation}
 \usage{
-as.rolog(query = member(.X, ""[a, "b", 3L, 4, (pi), TRUE, .Y]), quoted = FALSE)
+as.rolog(query = quote(member(.X, ""[a, "b", 3L, 4, (pi), TRUE, .Y])))
 }
 \arguments{
 \item{query}{an R call representing a Prolog query with prolog-like syntax,
@@ -17,15 +17,11 @@ Prolog variables. Variables and expressions in parentheses are evaluated.}
 Translate simplified to canonical representation
 }
 \examples{
-as.rolog(member(.X, ""[a, "b", 3L, 4, pi, (pi), TRUE, .Y]))
+q <- quote(member(.X, ""[a, "b", 3L, 4, pi, (pi), TRUE, .Y]))
+as.rolog(q)
 
 q <- quote(member(.X, ""[a, "b", 3L, 4, pi, (pi), TRUE, .Y]))
-as.rolog(q, quoted=TRUE)
-
-findall(member(.X, ""[a, "b", 3L, 4, pi, (pi), TRUE, .Y]), preproc=as.rolog)
-
-q <- quote(member(.X, ""[a, "b", 3L, 4, pi, (pi), TRUE, .Y]))
-findall(q, preproc=as.rolog, quoted=TRUE)
+findall(q, preproc=as.rolog)
 
 }
 \seealso{

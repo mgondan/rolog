@@ -7,9 +7,8 @@
 query(
   query = call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE,
     expression(Y))),
-  as.rolog = FALSE,
-  options = NULL,
-  ...
+  preproc = identity,
+  options = NULL
 )
 }
 \arguments{
@@ -18,6 +17,11 @@ character strings, boolean values, expressions, lists, and other calls.
 Vectors of booleans, integers, floating point numbers, and strings with
 length \emph{N} > 1 are translated to prolog compounds !/N, \%/N, #/N and $$/N,
 respectively. The names can be modified with the options below.}
+
+\item{preproc}{a function, default is identity. This allows preprocessing of specific
+R objects before they are translated to Prolog. Use cases include translation
+of objects to lists, or simplified, Prolog-style R syntax (see example
+below).}
 
 \item{options}{This is a list of options controlling translation from and to prolog.
 \itemize{
@@ -29,13 +33,6 @@ integers, doubles and strings, respectively (defaults are \%, # and $$).
 scalar prolog elements. If \emph{scalar} is \code{FALSE}, vectors of length 1 are
 also translated to compounds.
 }}
-
-\item{...}{further arguments passed to preproc}
-
-\item{preproc}{a function, default is identity. This allows preprocessing of specific
-R objects before they are translated to Prolog. Use cases include translation
-of objects to lists, or simplified, Prolog-style R syntax (see example
-below).}
 }
 \value{
 If the creation of the query succeeds, \code{TRUE}.
@@ -54,7 +51,7 @@ submit() # X = "b"
 clear()
 
 # The same in simplified syntax
-query(member(.X, ""[a, "b", 3L, 4, TRUE, .Y]), as.rolog=TRUE)
+query(quote(member(.X, ""[a, "b", 3L, 4, TRUE, .Y])), preproc=as.rolog)
 submit() # X = a
 submit() # X = "b"
 clear()

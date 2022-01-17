@@ -7,9 +7,8 @@
 findall(
   query = call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE,
     expression(Y))),
-  preproc = .identity,
-  options = NULL,
-  ...
+  preproc = identity,
+  options = NULL
 )
 }
 \arguments{
@@ -34,8 +33,6 @@ integers, doubles and strings, respectively (defaults are \%, # and $$).
 scalar prolog elements. If \emph{scalar} is \code{FALSE}, vectors of length 1 are
 also translated to compounds.
 }}
-
-\item{...}{further arguments passed to preproc}
 }
 \value{
 If the query fails, an empty list is returned. If the query
@@ -52,11 +49,8 @@ findall(call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, NULL, NA)
 # Continued
 findall(call("member", expression(X), list(call("sin", call("/", quote(pi), 2)), expression(Y))))
 
-# The same using simplified syntax (using non-standard evaluation)
-findall(member(.X, ""[a, "b", 3L, 4, TRUE, NULL, NA, sin(pi/2), .Y]), preproc=as.rolog)
-
-# The same using simplified syntax (using quoted expression)
-findall(member(.X, ""[a, "b", 3L, 4, TRUE, NULL, NA, sin(pi/2), .Y]), preproc=as.rolog, quoted=TRUE)
+# The same using simplified syntax
+findall(quote(member(.X, ""[a, "b", 3L, 4, TRUE, NULL, NA, sin(pi/2), .Y])), preproc=as.rolog)
 
 }
 \seealso{

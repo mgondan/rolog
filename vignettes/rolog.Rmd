@@ -14,8 +14,6 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 options(rmarkdown.html_vignette.check_title=FALSE)
 library(DiagrammeR)
-library(DiagrammeRsvg)
-library(svglite)
 ```
 
   Matthias Gondan\
@@ -390,24 +388,17 @@ as `member(X, [1, 2, 3, a, b])` require complicated R expressions such as
 query(call("member", expression(X), list(1, 2, 3, quote("a"), quote(b)))
 ```
 
-The R function `as.rolog(expr, quoted=FALSE)` is meant to simplify this a bit by
+The R function `as.rolog(expr)` is meant to simplify this a bit by
 translating symbols starting with a dot to Prolog variables, and calls
 like `""[1, 2, 3, a, b]` to lists. The argument _expr_ is typically 
-an _unevaluated_ R call or symbol and then handled using non-standard 
-evaluation [@Wickham2019]. This corresponds to Case\ 1 in the snippet below. In
-those cases where _expr_ is already quoted, it has to be indicated by the second
-argument (Case\ 2 below).
+a quoted R call or symbol:
 
 ```r
-# Case 1
-query(member(.X, ""[1, 2, 3, a, b]), preproc=as.rolog)
-
-# Case 2
 q <- quote(member(.X, ""[1, 2, 3, a, b]))
-query(q, preproc=as.rolog, quoted=TRUE)
+query(q, preproc=as.rolog)
 ```
 
-Note that the name of the variable in the later course will still be _X_, 
+Note that the name of the variable will still be _X_ in the later course, 
 not "dot-X". A bit flexibility is lost because `quote()` treats the
 arguments _a_, _b_ as symbols; to evaluate them (i.e., "unquote"), they can be
 put in parentheses:
@@ -415,10 +406,12 @@ put in parentheses:
 ```r
 a <- 4
 b <- 5
-query(member(.X, ""[1, 2, 3, a, (b)]), preproc=as.rolog)
+q <- quote(member(.X, ""[1, 2, 3, a, (b)]))
+query(q, preproc=as.rolog)
 ```
 
-resulting in the query `member(X, [1, 2, 3, a, 5])`.
+resulting in the query `member(X, [1, 2, 3, a, 5])`. More sophisticated work
+with quasi-quotations are described in the "Advanced R" book [@Wickham2019].
 
 ## Convenience functions in Prolog
 
@@ -561,7 +554,7 @@ with dots indicating Prolog variables:
 ```r
 # Same query in simplified syntax
 q = quote(ancestor(.X, jim))
-findall(as.rolog(q))
+findall(q, preproc=as.rolog)
 ```
 
 Note that the dot is removed from the variable name.
@@ -654,8 +647,8 @@ the R script below.
 library(rolog)
 consult(system.file(file.path("pl", "buggy.pl"), package="rolog"))
 
-q = quote(search(tratio(x, mu, s, n), .S))
-findall(as.rolog(q))
+q <- quote(search(tratio(x, mu, s, n), .S))
+findall(q, preproc=as.rolog)
 ```
 
 The fourth and the sixth result are the combination of the two buggy 
@@ -850,8 +843,8 @@ result of `dbinom(X, Size, Prob, Log)`.
 consult(system.file(file.path("pl", "interval.pl"), package="rolog"))
 
 # findall(1 ... 2 / -3 ... 3, Res).
-query = quote(int(`...`(1, 2) / `...`(-3, 3), .Res))
-findall(as.rolog(query))
+q <- quote(int(`...`(1, 2) / `...`(-3, 3), .Res))
+findall(q, preproc=as.rolog)
 
 # t-ratio
 D  = quote(`...`(5.7, 5.8))

@@ -10,43 +10,28 @@
 #' @seealso [query()], [once()], [findall()]
 #'
 #' @examples
-#' as.rolog(member(.X, ""[a, "b", 3L, 4, pi, (pi), TRUE, .Y]))
-#'
-#' @examples
 #' q <- quote(member(.X, ""[a, "b", 3L, 4, pi, (pi), TRUE, .Y]))
-#' as.rolog(q, quoted=TRUE)
+#' as.rolog(q)
 #' 
 #' @examples
-#' findall(member(.X, ""[a, "b", 3L, 4, pi, (pi), TRUE, .Y]), preproc=as.rolog)
-#'
-#' @examples
 #' q <- quote(member(.X, ""[a, "b", 3L, 4, pi, (pi), TRUE, .Y]))
-#' findall(q, preproc=as.rolog, quoted=TRUE)
+#' findall(q, preproc=as.rolog)
 #'
-as.rolog <- function(query=member(.X, ""[a, "b", 3L, 4, (pi), TRUE, .Y]),
-										 quoted=FALSE)
+as.rolog <- function(query=quote(member(.X, ""[a, "b", 3L, 4, (pi), TRUE, .Y])))
 {
-	if(quoted)
-		return(as.rolog1(query))
-	
-	as.rolog1(substitute(query))
-}
-
-as.rolog1 <- function(x)
-{
-	if(is.symbol(x))
+	if(is.symbol(query))
 	{
 		# Anonymous variable
-		if(x == ".")
+		if(query == ".")
 			return(expression(`_`))
 		
-		if(substr(x, 1, 1) == ".")
-			return(as.expression(as.symbol(substr(x, 2, nchar(x)))))
+		if(substr(query, 1, 1) == ".")
+			return(as.expression(as.symbol(substr(query, 2, nchar(query)))))
 	}
 	
-	if(is.call(x))
+	if(is.call(query))
 	{
-		args <- as.list(x)
+		args <- as.list(query)
 		
 		# Things like (2 + 3) or (a) are evaluated
 		if(args[[1]] == "(")
@@ -54,18 +39,18 @@ as.rolog1 <- function(x)
 		
 		# `[`("", 1, 2, 3), aka. ""[1, 2, 3] is a list
 		if(args[[1]] == "[" & length(args[[2]]) == 1 & args[[2]] == "")
-			return(lapply(args[c(-1, -2)], FUN=as.rolog1))
+			return(lapply(args[c(-1, -2)], FUN=as.rolog))
 		
 		# list(1, 2, 3) is a list not a call
 		if(args[[1]] == "list")
-			return(lapply(args[-1], FUN=as.rolog1))
+			return(lapply(args[-1], FUN=as.rolog))
 		
-		args[-1] <- lapply(args[-1], FUN=as.rolog1)
+		args[-1] <- lapply(args[-1], FUN=as.rolog)
 		return(as.call(args))
 	}
 	
-	if(is.list(x))
-		return(lapply(x, FUN=as.rolog1))
+	if(is.list(query))
+		return(lapply(query, FUN=as.rolog))
 	
-	return(x)
+	return(query)
 }

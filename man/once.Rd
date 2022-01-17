@@ -7,9 +7,8 @@
 once(
   query = call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE,
     expression(Y))),
-  preproc = .identity,
-  options = NULL,
-  ...
+  preproc = identity,
+  options = NULL
 )
 }
 \arguments{
@@ -34,8 +33,6 @@ integers, doubles and strings, respectively (defaults are \%, # and $$).
 scalar prolog elements. If \emph{scalar} is \code{FALSE}, vectors of length 1 are
 also translated to compounds.
 }}
-
-\item{...}{further arguments passed to preproc}
 }
 \value{
 If the query fails, \code{FALSE} is returned. If the query succeeds, a
@@ -56,7 +53,7 @@ once(call("member", 3, list(1, 2, 3)))
 once(call("member", 1, list(quote(a), expression(X))))
 
 # The same query using simplified syntax
-once(member(1, ""[a, .X]), preproc=as.rolog)
+once(quote(member(1, ""[a, .X])), preproc=as.rolog)
 
 # This query returns a list stating that X = 1 and Z = expression(Y)
 once(call("=", list(expression(X), expression(Y)), list(1, expression(Z))))
