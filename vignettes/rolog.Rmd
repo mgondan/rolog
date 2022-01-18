@@ -14,6 +14,8 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 options(rmarkdown.html_vignette.check_title=FALSE)
 library(DiagrammeR)
+library(DiagrammeRsvg)
+library(htmltools)
 ```
 
   Matthias Gondan\
@@ -324,22 +326,19 @@ length _N_ > 1 are translated to the Prolog terms `#/N`, `%/N`, `!/N`,
 and `$$/N`, as mentioned above.
 
 These rules are, in principle, arbitrary and can be intercepted at several 
-stages of the process, using the following hooks:
+stages of the process:
 
-* an R function `preproc(expr, ...)` that may be used to preprocess specific R
-  elements before they are translated into Prolog.
-* a Prolog predicate `rolog_pl/2` that may be used to manipulate a term before
-  the predicate is called.
-* a Prolog predicate `pl_rolog/2` that may be used to manipulate a term
-  after the predicate has been called. Default is again the identity function.
-* an R function `postproc(expr, ...)` that can be used to postprocess the result
-  of the query.
+* an R function that may be used to preprocess specific R elements before they
+  are translated into Prolog.
+* a Prolog predicate that may be used to manipulate a term before it is called.
+* a Prolog predicate that may be used to manipulate a term after it has been
+  called.
+* an R function that can be used to postprocess the result of the query.
 
-The process is illustrated in Figure\ 1. For all hooks, the default is not to do
-anything, that is, the identity function.
+The process is illustrated in Figure\ 1.
 
 ```{r, echo=FALSE, fig.width=6, fig.height=2}
-grViz(
+HTML(export_svg(grViz(
   'digraph G {
     rankdir=LR;
     Query Result;
@@ -367,13 +366,13 @@ grViz(
     Query [shape=Mdiamond;width=0.7;height=0.7];
     r2rolog [shape=rect,label="preproc(...)"];
     forth [label="(rolog)"];
-    rolog_pl [shape=rect,label="rolog_pl/2"];
+    rolog_pl [shape=rect,label="preproc/2"];
     Prolog [shape=Mcircle];
-    pl_rolog [shape=rect,label="pl_rolog/2"];
+    pl_rolog [shape=rect,label="postproc/2"];
     rolog2r [shape=rect,label="postproc(...)"];
     back [label="(rolog)"];
     Result [shape=Msquare];
-}')
+}')))
 ```
 
 Figure\ 1.
@@ -395,7 +394,7 @@ a quoted R call or symbol:
 
 ```r
 q <- quote(member(.X, ""[1, 2, 3, a, b]))
-query(q, preproc=as.rolog)
+query(as.rolog(q))
 ```
 
 Note that the name of the variable will still be _X_ in the later course, 
@@ -407,13 +406,14 @@ put in parentheses:
 a <- 4
 b <- 5
 q <- quote(member(.X, ""[1, 2, 3, a, (b)]))
-query(q, preproc=as.rolog)
+query(as.rolog(q))
 ```
 
 resulting in the query `member(X, [1, 2, 3, a, 5])`. More sophisticated work
-with quasi-quotations are described in the "Advanced R" book [@Wickham2019].
+with quasi-quotations (i.e., "unquoting" expressions) is described in 
+the "Advanced R" book [@Wickham2019].
 
-## Convenience functions in Prolog
+## Pre- and postprocessing in Prolog
 
 Recent versions of SWI-Prolog support so-called dictionaries of the 
 form `Tag{Key1:Value1, Key2:Value2, ...}`. The tag is typically an 
@@ -441,10 +441,14 @@ The purpose of this rather trivial example is to remind the reader to avoid
 complicated syntax on the R side when it is much simpler to do the conversion at
 the Prolog end.
 
-Rolog automatically translates R lists with named elements to Prolog pairs. If
-a similar mechanism is desired for vectors with named 
-elements (e.g., `c(a=1, b=2)`), the vector can be converted to a named list 
-with `as.list()` at the R end before querying Prolog.
+## Postprocessing in R
+
+This may again be a function that reverts some of the manipulations during
+preprocessing. For `once()` and `submit()`, the function operates on the
+bindings. For `findall()`, the function is applied to each alternative using
+the `lapply()` iterator.
+
+## Use case 1: empty atoms
 
 Similar to R libraries, the Prolog system can be extended by add-on 
 libraries ("packs"). Assuming that a suitable compiler is installed, these
@@ -460,18 +464,26 @@ once(call("pack_install", quote(environ), list(call("interactive", FALSE))))
 The second argument translates to the option `[interactive(false)]` which is
 needed for operating systems in which input redirection is unreliable. _environ_
 is mostly a demo package that provides a predicate `environ/1` that unifies the
-argument with a list of environment variables. Some of these are empty, which
-results in empty atoms that cannot be translated to R symbols because the latter
-are not allowed to be empty.
+argument with a list of environment variables. Some of these are empty, though.
+Empty atoms that cannot be translated to R symbols because the latter are not
+allowed to be empty.
 
 (Hooks f??r Hin- und R??ck-??bersetzung)
 
 * rearrange named arguments in R and pipe them into prolog in the right 
   direction
 
-## Translating R classes to Prolog dicts
+## Use case 2: Translating R classes to Prolog dicts
 
-Case study for linear models
+Case study for linear models. 
+
+## Use case 3: Working with named arguments/dicts
+
+* R preprocessing: function arguments to named list
+* Prolog: to dict
+* Do something with dicts
+* Prolog: translate back
+* R postprocessing: named list to function arguments
 
 # 4. Examples
 
