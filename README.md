@@ -139,7 +139,7 @@ for X that satisfy member(X, [1, 2, 3]).
 The second example uses Prolog for rendering R expressions as MathML. This is a nice illustration of two-way communication between R and Prolog,
 because Prolog has to ask back for the name of the integration variable (the x in dx).
 
-`rmarkdown::render(system.file("vignettes/rolog.Rmd", package="rolog"), output_file="mathml.html", output_dir=getwd())`
+`rmarkdown::render(system.file("doc/rolog.Rmd", package="rolog"), output_file="mathml.html", output_dir=getwd())`
 
 You should find an HTML page with nice equations in the file `mathml.html` of the current folder. Note that it uses MathML, 
 which yields best results with the Firefox browser.
