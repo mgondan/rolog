@@ -679,7 +679,11 @@ public:
   
   int next_solution() ;
   List bindings() ;
-} ; // RlQuery
+  const List& get_options() const 
+  {
+    return options ;
+  }
+} ;
 
 RlQuery::RlQuery(RObject aquery, List aoptions)
   : names(),
@@ -899,7 +903,11 @@ PREDICATE(r_eval, 1)
 {
   CharacterVector names ;
   PlTerm vars ;
-  List options = List::create(Named("realvec") = "#", Named("boolvec") = "!", Named("charvec") = "$", Named("intvec") = "%", Named("atomize") = false, Named("scalar") = true) ;
+  List options ;
+  if(query_id)
+    options = query_id->get_options() ;
+  else
+    options = List::create(Named("realvec") = "#", Named("boolvec") = "!", Named("charvec") = "$", Named("intvec") = "%", Named("atomize") = false, Named("scalar") = true) ;
 
   RObject Expr = pl2r(A1, names, vars, options) ;
   RObject Res = Expr ;
@@ -923,7 +931,11 @@ PREDICATE(r_eval, 2)
 {
   CharacterVector names ;
   PlTerm vars ;
-  List options = List::create(Named("realvec") = "#", Named("boolvec") = "!", Named("charvec") = "$", Named("intvec") = "%", Named("atomize") = false, Named("scalar") = true) ;
+  List options ;
+  if(query_id)
+    options = query_id->get_options() ;
+  else
+    options = List::create(Named("realvec") = "#", Named("boolvec") = "!", Named("charvec") = "$", Named("intvec") = "%", Named("atomize") = false, Named("scalar") = true) ;
  
   RObject Expr = pl2r(A1, names, vars, options) ;
   RObject Res = Expr ;
