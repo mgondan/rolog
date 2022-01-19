@@ -10,7 +10,7 @@ swipl:
 libinst:
 	mkdir -p ../inst
 	mkdir -p ../inst/doc
-	cp vignettes/bibliography.bibtex ../inst/doc
+	cp ../vignettes/bibliography.bibtex ../inst/doc
 	mkdir -p ../libs
 	cp rolog.so ../libs
 	rm ../inst/swipl/bin/swipl
