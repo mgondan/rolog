@@ -78,19 +78,24 @@ test :- test(sum(i, 1, 10, i)).
 %
 % Integrate over range
 %
-ml(Flags, integrate(Fn, From, To), M)
- => r_eval('['(formalArgs(args(Fn)), 1), Arg1),
+% extract value
+math(Flags, $(integrate(Fn, Lower, Upper), value), New, M)
+ => Flags = New,
+    M = integrate(Fn, Lower, Upper).
+
+% with named arguments
+math(Flags, integrate(f=Fn, lower=Lower, upper=Upper), New, M)
+ => Flags = New,
+    M = integrate(Fn, Lower, Upper).
+
+% No argument names
+math(Flags, integrate(Fn, Lower, Upper), New, M)
+ => Flags = New,
+    r_eval('['(formalArgs(args(Fn)), 1), Arg1),
     atom_string(DX, Arg1),
-    ml(Flags, integrate(fn(Fn, [DX]), From, To, DX), M).
+    M = integrate(fn(Fn, [DX]), Lower, Upper, DX).
 
-paren(Flags, integrate(Fn, From, To), Paren)
- => r_eval('['(formalArgs(args(Fn)), 1), Arg1),
-    atom_string(DX, Arg1),
-    paren(Flags, integrate(fn(Fn, [DX]), From, To, DX), Paren).
-
-prec(_Flags, integrate(_, _, _), Prec)
- => current(Prec, yfx, +).
-
+% Internal
 ml(Flags, integrate(Fn, From, To, DX), M)
  => ml(Flags, Fn, XFn),
     ml(Flags, From, XFrom),
@@ -103,7 +108,7 @@ paren(Flags, integrate(_, _, _, A), Paren)
  => paren(Flags, A, Paren).
 
 prec(_Flags, integrate(_, _, _, _), Prec)
- => current(Prec, yfx, +).
+ => current(Prec, yfx, *).
 
 test :- test(integrate(sin, 0, pi)).
 

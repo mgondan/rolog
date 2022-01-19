@@ -9,17 +9,24 @@ output: html_document
 library(rolog)
 consult(system.file("pl/mathml.pl", package="rolog"))
 
-mathml = function(term)
+mathml = function(term, canonicalize=FALSE)
 {
-  t = once(call("r2mathml", term, expression(X)))
+  if(canonicalize)
+    term <- canonicalize(term)
+
+  t <- once(call("r2mathml", term, expression(X)))
   cat(paste(t$X, collapse=""))
 }
 ```
 
 # Binomial probability
 
+This one is easy. At the Prolog end, there is a handler for `pbinom/3` that
+translates it into a function-style MathML syntax like P_bi(X <= k; N, pi), see
+below.
+
 ```{r, results="asis"}
-term = quote(pbinom(k, n, p))
+term <- quote(pbinom(k, n, p))
 
 # Pretty-print as MathML
 mathml(term)
@@ -37,30 +44,57 @@ eval(term)
 This is a bit more tricky, because Prolog needs to call back R to obtain the 
 name of the integration variable. The _Rolog_ package provides a Prolog
 predicate r_eval/2 for this purpose. Here, it is used for something like
-r_eval(formalArgs(args(sin)), X) (see mathml.pl), which unifies X with $x$.
+r_eval(formalArgs(args(sin)), X) (see mathml.pl) provided by the Rolog package.
+_X_ then unifies X with $x$.
 
 ```{r, results='asis'}
-term = quote(integrate(sin, 0L, 2L*pi))
+term <- quote(integrate(sin, 0L, 2L*pi))
 mathml(term)
 eval(term)
 ```
 
-Note that at the prolog end (see mathml.pl distributed in this folder), 
-integrate/3 is rather rigid, it accepts only these three arguments in that 
-particular order, and without names, that is, 
-integrate(sin, lower=0L, upper=2L * pi) would not print the desired result. 
-
 # A self-written function
 
+Note that the prolog end, the handler for `integrate/3` is rather rigid, it
+accepts only these three arguments in that particular order, and without names,
+that is, `integrate(sin, lower=0L, upper=2L * pi)` would not print the desired
+result.
+
+Therefore, I have placed two more handlers into mathml.pl that accept terms with
+named arguments, `integrate(f=Fn, lower=Lower, upper=Upper)`, as well as a term
+of the form `$(integrate(Fn, Lower, Upper), value)` that is needed for the
+evaluation below.
+
 ```{r, results='asis'}
-f = function(u)
+canonical <- function(term)
+{
+  if(is.call(term))
+  {
+    f <- match.fun(term[[1]])
+    if(!is.primitive(f))
+      term <- match.call(f, term)
+    
+    # Recurse into arguments
+    term[-1] <- lapply(term[-1], canonical)
+  }
+
+  return(term)
+}
+
+# A custom function
+g <- function(u)
 {
   sin(u)
 }
 
-term = quote(integrate(f=f, lower=-Inf, upper=Inf))
-mathml(term)
+# Mixture of (partially) named and positional arguments in unusual order
+term <- quote(2L * integrate(low=-Inf, up=Inf, g)$value)
+mathml(canonical(term))
 
 # It's a bit of a mystery that R knows the result of this integral.
 eval(term)
 ```
+
+The extra R function `canonical()` applies `match.call()` to a non-primitive R
+call, basically cleaning up the arguments and bringing them into the correct
+order.

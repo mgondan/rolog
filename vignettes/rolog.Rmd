@@ -748,11 +748,8 @@ library(rolog)
 consult(system.file(file.path("pl", "mathml.pl"), package="rolog"))
 
 # R interface to Prolog predicate r2mathml/2
-mathml = function(term, simplified=TRUE)
+mathml = function(term)
 {
-	if(simplified)
-		term = as.rolog(term)
-	
   t = once(call("r2mathml", term, expression(X)))
   cat(paste(t$X, collapse=""))
 }
@@ -782,11 +779,9 @@ next example). Here, the predicate is used for the
 R\ function `formalArgs(args(sin))`, which returns the name of the function
 argument of `sin`, that is, `x`.
 
-Note that at the Prolog end, `integrate(Fun, Lower, Upper)` is rather rigid,
-accepting only these three arguments in that particular order, and without
-names. In other words, something like `integrate(sin, lower=0L, upper=2L * pi)`
-will not print the desired result. A third example in `mathml.Rmd` illustrates
-rendering of self-written functions (not shown here).
+A third example in `mathml.Rmd` illustrates rendering of self-written functions
+and the use of named function arguments as 
+in `integrate(low=0L, up=2L*pi, sin)`.
 
 ## Calling Prolog from R
 
