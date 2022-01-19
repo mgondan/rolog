@@ -256,12 +256,6 @@ portray <- function(
 #' length _N_ > 1 are translated to prolog compounds !/N, %/N, #/N and $$/N,
 #' respectively. The names can be modified with the options below.
 #'
-#' @param preproc
-#' a function, default is identity. This allows preprocessing of specific 
-#' R objects before they are translated to Prolog. Use cases include translation
-#' of objects to lists, or simplified, Prolog-style R syntax (see example 
-#' below).
-#' 
 #' @param options
 #' This is a list of options controlling translation from and to prolog.
 #' * _boolvec_ (see option rolog.boolvec, default is !) is the name of the
@@ -302,7 +296,8 @@ portray <- function(
 #' 
 #' @examples
 #' # The same query using simplified syntax
-#' once(quote(member(1, ""[a, .X])), preproc=as.rolog)
+#' q = quote(member(1, ""[a, .X]))
+#' once(as.rolog(q))
 #' 
 #' @examples
 #' # This query returns a list stating that X = 1 and Z = expression(Y)
@@ -324,14 +319,10 @@ portray <- function(
 #'
 once <- function(
   query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))),
-  preproc=identity,
   options=NULL)
 {
   options <- c(options, rolog_options())
   
-  # Translate from simplified syntax (R side)
-  query <- preproc(query)
-
   # Decorate result with the prolog syntax of the query
   if(options$portray)
     q <- portray(query, options)
@@ -354,12 +345,6 @@ once <- function(
 #' length _N_ > 1 are translated to prolog compounds !/N, %/N, #/N and $$/N,
 #' respectively. The names can be modified with the options below.
 #'
-#' @param preproc
-#' a function, default is identity. This allows preprocessing of specific 
-#' R objects before they are translated to Prolog. Use cases include translation
-#' of objects to lists, or simplified, Prolog-style R syntax (see example 
-#' below).
-#' 
 #' @param options
 #' This is a list of options controlling translation from and to prolog.
 #' * _boolvec_ (see option rolog.boolvec, default is !) is the name of the
@@ -393,17 +378,14 @@ once <- function(
 #' findall(call("member", expression(X), list(call("sin", call("/", quote(pi), 2)), expression(Y))))
 #' 
 #' # The same using simplified syntax
-#' findall(quote(member(.X, ""[a, "b", 3L, 4, TRUE, NULL, NA, sin(pi/2), .Y])), preproc=as.rolog)
+#' q <- quote(member(.X, ""[a, "b", 3L, 4, TRUE, NULL, NA, sin(pi/2), .Y]))
+#' findall(as.rolog(q))
 #' 
 findall <- function(
   query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))),
-  preproc=identity,
   options=NULL)
 {
   options <- c(options, rolog_options())
-
-  # Translate from simplified syntax (R side)
-  query <- preproc(query)
 
   # Decorate result with the prolog syntax of the query
   if(options$portray)
@@ -427,12 +409,6 @@ findall <- function(
 #' length _N_ > 1 are translated to prolog compounds !/N, %/N, #/N and $$/N,
 #' respectively. The names can be modified with the options below.
 #'
-#' @param preproc
-#' a function, default is identity. This allows preprocessing of specific 
-#' R objects before they are translated to Prolog. Use cases include translation
-#' of objects to lists, or simplified, Prolog-style R syntax (see example 
-#' below).
-#' 
 #' @param options
 #' This is a list of options controlling translation from and to prolog.
 #' * _boolvec_ (see option rolog.boolvec, default is !) is the name of the
@@ -464,7 +440,8 @@ findall <- function(
 #'
 #' @examples
 #' # The same in simplified syntax
-#' query(quote(member(.X, ""[a, "b", 3L, 4, TRUE, .Y])), preproc=as.rolog)
+#' q <- quote(member(.X, ""[a, "b", 3L, 4, TRUE, .Y]))
+#' query(as.rolog(q))
 #' submit() # X = a
 #' submit() # X = "b"
 #' clear()
@@ -485,13 +462,9 @@ findall <- function(
 #' 
 query <- function(
   query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))),
-  preproc=identity,
   options=NULL)
 {
   options <- c(options, rolog_options())
-
-  # Translate from simplified syntax (R side)
-  query <- preproc(query)
 
   # Decorate result with the prolog syntax of the query
   if(options$portray)

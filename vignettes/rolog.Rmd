@@ -329,10 +329,9 @@ These rules are, in principle, arbitrary and can be intercepted at several
 stages of the process:
 
 * an R function that may be used to preprocess specific R elements before they
-  are translated into Prolog.
-* a Prolog predicate that may be used to manipulate a term before it is called.
-* a Prolog predicate that may be used to manipulate a term after it has been
-  called.
+  are translated into Prolog (see, e.g., the R function `as.rolog()`).
+* a Prolog wrapper that manipulates the term before it is called and afterwards
+  (see the example with dicts below)
 * an R function that can be used to postprocess the result of the query.
 
 The process is illustrated in Figure\ 1.
@@ -387,9 +386,9 @@ as `member(X, [1, 2, 3, a, b])` require complicated R expressions such as
 query(call("member", expression(X), list(1, 2, 3, quote("a"), quote(b)))
 ```
 
-The R function `as.rolog(expr)` is meant to simplify this a bit by
+The R function `as.rolog(call)` is meant to simplify this a bit by
 translating symbols starting with a dot to Prolog variables, and calls
-like `""[1, 2, 3, a, b]` to lists. The argument _expr_ is typically 
+like `""[1, 2, 3, a, b]` to lists. The argument _call_ is typically 
 a quoted R call or symbol:
 
 ```r
@@ -412,6 +411,10 @@ query(as.rolog(q))
 resulting in the query `member(X, [1, 2, 3, a, 5])`. More sophisticated work
 with quasi-quotations (i.e., "unquoting" expressions) is described in 
 the "Advanced R" book [@Wickham2019].
+
+Section\ 4 includes an example for mathematical rendering of R expressions. In
+that example, a preprocessing function is used to bring function calls with
+named arguments to a canonical form which is then handled in Prolog.
 
 ## Pre- and postprocessing in Prolog
 
@@ -444,47 +447,35 @@ the Prolog end.
 ## Postprocessing in R
 
 This may again be a function that reverts some of the manipulations during
-preprocessing. For `once()` and `submit()`, the function operates on the
-bindings. For `findall()`, the function is applied to each alternative using
-the `lapply()` iterator.
+preprocessing. For `once()` and `submit()`, such a function would operate on the
+bindings. For example, many Prolog programmers are used to operate with atoms
+instead of character strings, which is the preferred representation of symbolic
+information in R. The following simple example illustrates conversion of the
+results for a query like `member(X, [a, b, c])` to strings.
 
-## Use case 1: empty atoms
+```{r}
+postproc <- function(x)
+{
+  # replace Prolog variable by the value of an R variable with the same name
+	if(is.name(x))
+	  return(as.character(x))
+	
+	# Recurse into lists and calls
+	if(is.call(x))
+	  x[-1] <- lapply(x[-1], FUN=postproc)
 
-Similar to R libraries, the Prolog system can be extended by add-on 
-libraries ("packs"). Assuming that a suitable compiler is installed, these
-add-ons can include foreign code, e.g. C++. One would typically do this directly
-in Prolog using `pack_install/1,2`, but it is also possible from the R end. For
-example, the following directive installs the pack "environ" [@Environ] from
-within R,
+	if(is.list(x))
+	  x <- lapply(x, FUN=postproc)
 
-```r
-once(call("pack_install", quote(environ), list(call("interactive", FALSE))))
+  # Leave the rest unchanged
+	return(x)
+}
+
+# This may be the return value of a Prolog query
+q <- quote(member(.X, ""[a, b, c]))
+r <- findall(as.rolog(q))
+postproc(r)
 ```
-
-The second argument translates to the option `[interactive(false)]` which is
-needed for operating systems in which input redirection is unreliable. _environ_
-is mostly a demo package that provides a predicate `environ/1` that unifies the
-argument with a list of environment variables. Some of these are empty, though.
-Empty atoms that cannot be translated to R symbols because the latter are not
-allowed to be empty.
-
-(Hooks f??r Hin- und R??ck-??bersetzung)
-
-* rearrange named arguments in R and pipe them into prolog in the right 
-  direction
-
-## Use case 2: Translating R classes to Prolog dicts
-
-Case study for linear models. 
-
-## Use case 3: Working with named arguments/dicts
-
-* R preprocessing: function arguments to named list
-* Prolog: to dict
-* Do something with dicts
-* Prolog: translate back
-* R postprocessing: named list to function arguments
-
 # 4. Examples
 
 In this section I present a few usage examples for the Rolog package in
@@ -566,7 +557,7 @@ with dots indicating Prolog variables:
 ```r
 # Same query in simplified syntax
 q = quote(ancestor(.X, jim))
-findall(q, preproc=as.rolog)
+findall(as.rolog(q))
 ```
 
 Note that the dot is removed from the variable name.
@@ -601,6 +592,62 @@ submit()
 Note that in SWI-Prolog, it is generally not possible to open two queries
 simultaneously, so opening a second query while another one is still open will
 raise a warning.
+
+## Definite clause grammars
+
+One of the main driving forces of Prolog development was natural language 
+processing [@Dahl1981]. Therefore, the next example is an illustration of 
+sentence parsing using so-called definite clause grammars.
+
+```prolog
+:- use_module(library(dcg/basics)).
+
+% R-friendly user interface
+sentence(Tree, Sentence) :-
+    string_codes(Sentence, Codes),
+    phrase(s(Tree), Codes).
+
+% Simple grammar with sentences, noun, verb and participle phrases
+s(s(NP, VP)) --> np(NP, C), blank, vp(VP, C).
+np(NP, C) --> pn(NP, C).
+np(np(Det, N), C) --> det(Det, C), blank, n(N, C).
+np(np(Det, N, PP), C) --> det(Det, C), blank, n(N, C), blank, pp(PP).
+vp(vp(V, NP), C) --> v(V, C), blank, np(NP, _).
+vp(vp(V, NP, PP), C) --> v(V, C), blank, np(NP, _), blank, pp(PP).
+pp(pp(P, NP)) --> p(P), blank, np(NP, _).
+
+% Determiners, personal nouns, nouns, verbs and participles
+det(det(a), sg) --> "a".
+det(det(the), _) --> "the".
+pn(pn(john), sg) --> "john".
+n(n(man), sg) --> "man".
+n(n(men), pl) --> "men".
+n(n(telescope), sg) --> "telescope".
+v(v(sees), sg) --> "sees".
+v(v(see), pl) --> "see".
+v(v(saw), _) --> "saw".
+p(p(with)) --> "with".
+```
+
+Listing\ 3.
+: Simple grammar and lexicon. The `sentence/2` predicate simplifies the R call.
+
+As in the first example, we first consult a little Prolog program with a
+minimalistic grammar and lexicon (Listing\ 3), and then raise a query asking for
+the syntactic structure of "john saw a man with a telescope". Closer inspection
+of the two results reveals the two possible meanings, "john saw a man _who
+carries_ a telescope" versus "john saw a man _through_ a telescope". More Prolog
+examples of natural language processing are found 
+in Blackburn and Bos [@Blackburn2005], including the resolution of anaphoric
+references and the extraction of semantic meaning.
+
+```{r}
+# [telescope].
+consult(system.file(file.path("pl", "telescope.pl"), package="rolog"))
+
+# findall(sentence(Tree, "john saw a man with a telescope")).
+findall(call("sentence", expression(Tree), "john saw a man with a telescope"))
+```
 
 ## Term manipulation
 
@@ -660,7 +707,7 @@ library(rolog)
 consult(system.file(file.path("pl", "buggy.pl"), package="rolog"))
 
 q <- quote(search(tratio(x, mu, s, n), .S))
-findall(q, preproc=as.rolog)
+findall(as.rolog(q))
 ```
 
 The fourth and the sixth result are the combination of the two buggy 
@@ -673,62 +720,6 @@ in principle, be rewritten in R using non-standard evaluation
 techniques [@Wickham2019]. Prolog's inbuilt pattern matching algorithm 
 simplifies things a lot, though.
 
-## Definite clause grammars
-
-One of the main driving forces of Prolog development was natural language 
-processing [@Dahl1981]. Therefore, the next example is an illustration of 
-sentence parsing using so-called definite clause grammars.
-
-```prolog
-:- use_module(library(dcg/basics)).
-
-% R-friendly user interface
-sentence(Tree, Sentence) :-
-    string_codes(Sentence, Codes),
-    phrase(s(Tree), Codes).
-
-% Simple grammar with sentences, noun, verb and participle phrases
-s(s(NP, VP)) --> np(NP, C), blank, vp(VP, C).
-np(NP, C) --> pn(NP, C).
-np(np(Det, N), C) --> det(Det, C), blank, n(N, C).
-np(np(Det, N, PP), C) --> det(Det, C), blank, n(N, C), blank, pp(PP).
-vp(vp(V, NP), C) --> v(V, C), blank, np(NP, _).
-vp(vp(V, NP, PP), C) --> v(V, C), blank, np(NP, _), blank, pp(PP).
-pp(pp(P, NP)) --> p(P), blank, np(NP, _).
-
-% Determiners, personal nouns, nouns, verbs and participles
-det(det(a), sg) --> "a".
-det(det(the), _) --> "the".
-pn(pn(john), sg) --> "john".
-n(n(man), sg) --> "man".
-n(n(men), pl) --> "men".
-n(n(telescope), sg) --> "telescope".
-v(v(sees), sg) --> "sees".
-v(v(see), pl) --> "see".
-v(v(saw), _) --> "saw".
-p(p(with)) --> "with".
-```
-
-Listing\ 3.
-: Simple grammar and lexicon. The `sentence/2` predicate simplifies the R call.
-
-As in the first example, we first consult a little Prolog program with a
-minimalistic grammar and lexicon (Listing\ 3), and then raise a query asking for
-the syntactic structure of "john saw a man with a telescope". Closer inspection
-of the two results reveals the two possible meanings, "john saw a man _who
-carries_ a telescope" versus "john saw a man _through_ a telescope". More Prolog
-examples of natural language processing are found 
-in Blackburn and Bos [@Blackburn2005], including the resolution of anaphoric
-references and the extraction of semantic meaning.
-
-```{r}
-# [telescope].
-consult(system.file(file.path("pl", "telescope.pl"), package="rolog"))
-
-# findall(sentence(Tree, "john saw a man with a telescope")).
-findall(call("sentence", expression(Tree), "john saw a man with a telescope"))
-```
-
 ## Rendering of mathematical expressions
 
 The R extension of the markdown language [@Xie2020] enables reproducible
@@ -738,10 +729,10 @@ prettier mathematical expressions such as $P_\mathrm{Bi}(X \le k; N, p)$ require
 Latex commands like `P_\mathrm{Bi}\left(X \le k; N, p\right)`, which are
 cumbersome to type in and hardly readable even for simple expressions. Below we
 make use of Prolog's grammar rules for the automatic translation of R
-expressions to MathML. The result can then be rendered on a web page. A limited
-set of rules for translation from R to MathML is found in `pl/mathml.pl` of the
-Rolog package, as well as an example file `mathml.Rmd`. The relevant code
-snippets are shown in Listing\ 4, along with their output.
+expressions to MathML. The result can then be used for calculations or it can be
+rendered on a web page. A limited set of rules for translation from R to MathML
+is found in `pl/mathml.pl` of the Rolog package. The relevant code snippets are
+shown in the listings below, along with their output.
 
 ```{r}
 library(rolog)
@@ -755,33 +746,82 @@ mathml = function(term)
 }
 ```
 
+Listing 4.
+: R program that uses Rolog to generates MathML from R expressions.
+
+The first example is easy. At the Prolog end, there is a handler for `pbinom/3`
+that translates the term into a function-style MathML syntax like
+P_bi(X <= k; N, pi), see below.
+
 ```{r, results="asis"}
 term = quote(pbinom(k, N, p))
+
+# Pretty print
 mathml(term)
 
+# Do some calculations with the same term
 k = 10
 N = 22
 p = 0.4
 eval(term)
-
-term = quote(integrate(sin, 0L, 2L*pi))
-mathml(term)
-eval(term)
 ```
 
-Listing 4.
-: R markdown file that uses Rolog to generates MathML from R expressions.
-
-The integrate example is interesting because Prolog needs find out the name of
+The next example is interesting because Prolog needs find out the name of
 the integration variable for `sin`. For that purpose, Rolog provides a 
 predicate `r_eval/2` that calls R from Prolog (i.e., the reverse direction, see
 next example). Here, the predicate is used for the 
 R\ function `formalArgs(args(sin))`, which returns the name of the function
 argument of `sin`, that is, `x`.
 
-A third example in `mathml.Rmd` illustrates rendering of self-written functions
-and the use of named function arguments as 
-in `integrate(low=0L, up=2L*pi, sin)`.
+```{r, results="asis"}
+term = quote(integrate(sin, 0L, 2L*pi))
+mathml(term)
+eval(term)
+```
+
+Note that the prolog end, the handler for `integrate/3` is rather rigid, it
+accepts only these three arguments in that particular order, and without names,
+that is, `integrate(sin, lower=0L, upper=2L * pi)` would not print the desired
+result.
+
+Therefore, mathml.pl includes two handlers that accept terms with named
+arguments, `integrate(f=Fn, lower=Lower, upper=Upper)`, as well as terms of the
+form `$(integrate(Fn, Lower, Upper), value)` that are needed for the evaluation
+below.
+
+```{r, results='asis'}
+canonical <- function(term)
+{
+  if(is.call(term))
+  {
+    f <- match.fun(term[[1]])
+    if(!is.primitive(f))
+      term <- match.call(f, term)
+    
+    # Recurse into arguments
+    term[-1] <- lapply(term[-1], canonical)
+  }
+
+  return(term)
+}
+
+# A custom function
+g <- function(u)
+{
+  sin(u)
+}
+
+# Mixture of (partially) named and positional arguments in unusual order
+term <- quote(2L * integrate(low=-Inf, up=Inf, g)$value)
+mathml(canonical(term))
+
+# It is a bit of a mystery that R knows the result of this integral.
+eval(term)
+```
+
+The extra R function `canonical()` applies `match.call()` to a non-primitive R
+call, basically cleaning up the arguments and bringing them into the correct
+order.
 
 ## Calling Prolog from R
 
@@ -851,7 +891,7 @@ consult(system.file(file.path("pl", "interval.pl"), package="rolog"))
 
 # findall(1 ... 2 / -3 ... 3, Res).
 q <- quote(int(`...`(1, 2) / `...`(-3, 3), .Res))
-findall(q, preproc=as.rolog)
+findall(as.rolog(q))
 
 # t-ratio
 D  = quote(`...`(5.7, 5.8))
