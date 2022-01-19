@@ -7,7 +7,6 @@
 once(
   query = call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE,
     expression(Y))),
-  preproc = identity,
   options = NULL
 )
 }
@@ -17,11 +16,6 @@ character strings, boolean values, expressions, lists, and other calls.
 Vectors of booleans, integers, floating point numbers, and strings with
 length \emph{N} > 1 are translated to prolog compounds !/N, \%/N, #/N and $$/N,
 respectively. The names can be modified with the options below.}
-
-\item{preproc}{a function, default is identity. This allows preprocessing of specific
-R objects before they are translated to Prolog. Use cases include translation
-of objects to lists, or simplified, Prolog-style R syntax (see example
-below).}
 
 \item{options}{This is a list of options controlling translation from and to prolog.
 \itemize{
@@ -53,7 +47,8 @@ once(call("member", 3, list(1, 2, 3)))
 once(call("member", 1, list(quote(a), expression(X))))
 
 # The same query using simplified syntax
-once(quote(member(1, ""[a, .X])), preproc=as.rolog)
+q = quote(member(1, ""[a, .X]))
+once(as.rolog(q))
 
 # This query returns a list stating that X = 1 and Z = expression(Y)
 once(call("=", list(expression(X), expression(Y)), list(1, expression(Z))))

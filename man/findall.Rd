@@ -7,7 +7,6 @@
 findall(
   query = call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE,
     expression(Y))),
-  preproc = identity,
   options = NULL
 )
 }
@@ -17,11 +16,6 @@ character strings, boolean values, expressions, lists, and other calls.
 Vectors of booleans, integers, floating point numbers, and strings with
 length \emph{N} > 1 are translated to prolog compounds !/N, \%/N, #/N and $$/N,
 respectively. The names can be modified with the options below.}
-
-\item{preproc}{a function, default is identity. This allows preprocessing of specific
-R objects before they are translated to Prolog. Use cases include translation
-of objects to lists, or simplified, Prolog-style R syntax (see example
-below).}
 
 \item{options}{This is a list of options controlling translation from and to prolog.
 \itemize{
@@ -50,7 +44,8 @@ findall(call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, NULL, NA)
 findall(call("member", expression(X), list(call("sin", call("/", quote(pi), 2)), expression(Y))))
 
 # The same using simplified syntax
-findall(quote(member(.X, ""[a, "b", 3L, 4, TRUE, NULL, NA, sin(pi/2), .Y])), preproc=as.rolog)
+q <- quote(member(.X, ""[a, "b", 3L, 4, TRUE, NULL, NA, sin(pi/2), .Y]))
+findall(as.rolog(q))
 
 }
 \seealso{
