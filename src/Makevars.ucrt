@@ -18,3 +18,8 @@ swipl:
 	rm ../inst/swipl/bin/swipl.exe
 	rm ../inst/swipl/bin/swipl-win.exe
 	rm ../inst/swipl/bin/swipl-ld.exe
+
+libinst:
+	mkdir -p ../inst
+	mkdir -p ../inst/doc
+	cp vignettes/bibliography.bibtex ../inst/doc

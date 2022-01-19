@@ -8,6 +8,9 @@ swipl:
 	cd ../linux && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DINSTALL_DOCUMENTATION=OFF -DSWIPL_PACKAGES_JAVA=OFF -DCMAKE_BUILD_TYPE=Release ../src/swipl-devel && make && make install
 
 libinst:
+	mkdir -p ../inst
+	mkdir -p ../inst/doc
+	cp vignettes/bibliography.bibtex ../inst/doc
 	mkdir -p ../libs
 	cp rolog.so ../libs
 	rm ../inst/swipl/bin/swipl
