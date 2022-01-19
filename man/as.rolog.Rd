@@ -21,7 +21,7 @@ q <- quote(member(.X, ""[a, "b", 3L, 4, pi, (pi), TRUE, .Y]))
 as.rolog(q)
 
 q <- quote(member(.X, ""[a, "b", 3L, 4, pi, (pi), TRUE, .Y]))
-findall(q, preproc=as.rolog)
+findall(as.rolog(q))
 
 }
 \seealso{

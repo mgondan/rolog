@@ -15,7 +15,7 @@
 #' 
 #' @examples
 #' q <- quote(member(.X, ""[a, "b", 3L, 4, pi, (pi), TRUE, .Y]))
-#' findall(q, preproc=as.rolog)
+#' findall(as.rolog(q))
 #'
 as.rolog <- function(query=quote(member(.X, ""[a, "b", 3L, 4, (pi), TRUE, .Y])))
 {
