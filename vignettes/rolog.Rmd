@@ -916,7 +916,8 @@ The slightly cumbersome syntax for entering an interval $\langle \ell, u\rangle$
 is due to the fact that the ellipsis is a reserved symbol in R and cannot be
 used as an infix operator. A way more powerful and comprehensive system for
 constraint logic programming over intervals is available as a Prolog 
-pack [@Workman2021] and can easily be connected to R using the present package.
+pack [@Workman2021] and can easily be connected to R using, for example, the
+present package.
 
 # 5. Conclusions
 
@@ -932,7 +933,7 @@ R corresponds well with the logical underpinning of Prolog. R..eal provides a pr
 environment for building highly effective pipelines and interactive, query-based
 data exploration.
 
-Interfacing the R environmentwith Prolog widens the range of applications for logic
+Interfacing the R environment with Prolog widens the range of applications for logic
 programming and inductive logic programming. It has the potential to facilitate the
 development of systems combining logic and probabilistic reasoning and will significantly
 improve the development of ILP applications requiring statistical and numerical
@@ -942,22 +943,32 @@ and statistical prowess is needed such as in bioinformatics and computational bi
 Symmetrically, our library increases the tools available to R researchers and programmers
 who wish to exploit Prolog's advanced AI capabilities.
 
-Possible extensions to the library include tighter integration with backtracking, although
-this has not been a limitation to the current applications. One specific aspect of
-such closer integration that might be of immediate value is the re-use of hidden variables
-(Section 3.3). An even tighter integration might be possible by allowing hidden
-and other R variables to be available for garbage collection. Finally, it would be interesting
-to investigate an even tighter syntactic integration by means of extensions to the
-syntax admitted by Prolog.
-
-R..eal was originally designed, developed and tested on YAP 6.3.1 under the Linux
-operating system. It has also been compiled for, and known to be working onMS operating
-systems and Mac OS. It was later ported [19] to the SWI [21] engine via a complete
-re-write of the C code. This has become the main development code as YAP provides a
-comprehensive compatibility layer to SWI's C interface [20]. The library and examples
-presented here can be downloaded from our website (http://bioinformatics.
-nki.nl/~nicos/sware/r..eal/).
-
 +++
+
+Simple ways to extend the package have been described in Section\ 3; such
+extensions could, for example, include R objects and structures like those
+returned by `lm`, or S4 classes. In many use cases, this may be realized by
+transforming the R object to a list with named elements, and "reconstruct" the
+object on the Prolog end if needed. After a query, the process is reversed.
+If speed is an issue, some of these steps can, in principle, be moved into the
+package and implemented in Rcpp.
+
+At its present stage, a major limitation of Rolog is its rather slow speed. For
+example, translation of R lists or vectors to the respective elements of the
+Prolog language (lists, #/N) is done element-wise, in both directions. I tried
+to optimize this process using Rcpp [@Edelbuettel2018], but Prolog does not
+support vectors or matrices, so there is an upper bound in any optimization. Of
+course, Prolog's primary purpose is not vector or matrix calculation, so this
+limitation may not show up in real applications. Another issue, maybe a bit 
+annoying, is the rather cumbersome syntax of the interface, with the need for
+quoted calls and R expressions being a bit misused for representing Prolog
+variables. Rolog was deliberately chosen to be minimalistic and, so far, only
+depends on base R. A more concise form of representation might be obtained by
+tools from the "Tidyverse" ecosystem, as described in Chapter\ 19 of Advanced
+R [@Wickham2019]. Finally, at this stage, Rolog is unable to deal with cyclic
+Prolog terms (e.g., `once(call("=", expression(A), call("f", expression(A))))
+raises an error message).
+
+The source code of the package is found at https://github.com/mgondan/rolog.
 
 # References
