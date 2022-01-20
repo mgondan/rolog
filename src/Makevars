@@ -5,7 +5,7 @@ all: swipl $(SHLIB) libinst
 
 swipl:
 	mkdir -p ../linux
-	cd ../linux && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DINSTALL_DOCUMENTATION=OFF -DSWIPL_PACKAGES_JAVA=OFF -DCMAKE_BUILD_TYPE=Release ../src/swipl-devel && make && make install
+	cd ../linux && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DINSTALL_DOCUMENTATION=OFF -DSWIPL_PACKAGES_JAVA=OFF -DSWIPL_PACKAGES_X=OFF -DCMAKE_BUILD_TYPE=Release ../src/swipl-devel && make && make install
 
 libinst:
 	mkdir -p ../inst
