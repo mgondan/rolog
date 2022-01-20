@@ -1,7 +1,7 @@
 ---
 title: "rolog: Prolog queries from R"
-author: "Matthias Gondan"
-date: "Department of Psychology, University of Innsbruck, Austria"
+author: "Matthias Gondan (Department of Psychology, University of Innsbruck, Austria)"
+date: "2022-01-20"
 bibliography: bibliography.bibtex
 output: rmarkdown::html_vignette
 vignette: >
