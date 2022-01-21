@@ -777,7 +777,7 @@ RObject submit_()
   if(!query_id->next_solution())
   {
     delete query_id ;
-    query_id = NULL
+    query_id = NULL ;
     return false ;
     // return LogicalVector::create(false) ;
   }
