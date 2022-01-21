@@ -166,14 +166,15 @@ CharacterVector pl2r_charvec(PlTerm pl)
 RObject pl2r_symbol(PlTerm pl)
 {
   if(pl == "na")
-    return LogicalVector::create(NA_LOGICAL) ;
+    return wrap(NA_LOGICAL) ;
   
   if(pl == "true")
-    return LogicalVector::create(1) ;
+    return wrap(true) ;
   
   if(pl == "false")
-    return LogicalVector::create(0) ;
+    return wrap(false) ;
 
+  // R does not accept empty symbols, translate to string
   if(pl == "")
     return as<RObject>(CharacterVector(0)) ;
 
@@ -752,7 +753,7 @@ RObject query_(RObject query, List options)
     stop("Cannot raise simultaneous queries. Please invoke query_close()") ;
 
   query_id = new RlQuery(query, options) ;
-  return LogicalVector::create(true) ;
+  return wrap(true) ;
 }
 
 // Clear query (and invoke cleanup handlers, see PL_close_query)
@@ -763,8 +764,7 @@ RObject clear_()
     delete query_id ;
   query_id = NULL ;
 
-  // invisible
-  return LogicalVector::create(true) ;
+  return wrap(true) ;
 }
 
 // Submit query
@@ -772,14 +772,16 @@ RObject clear_()
 RObject submit_()
 {
   if(query_id == NULL)
-    stop("submit: no open query.") ;
+  {
+    warning("submit: no open query.") ;
+    return wrap(false) ;
+  }
 
   if(!query_id->next_solution())
   {
     delete query_id ;
     query_id = NULL ;
-    return false ;
-    // return LogicalVector::create(false) ;
+    return wrap(false) ;
   }
   
   return query_id->bindings() ;
@@ -859,7 +861,7 @@ RObject portray_(RObject query, List options)
   try
   {
     if(!q.next_solution())
-      return LogicalVector::create(false) ;
+      return wrap(false) ;
   }
   
   catch(PlException& ex)
@@ -887,7 +889,7 @@ RObject call_(String query)
     clear_() ;
   }
 
-  int r = false ;
+  bool r = false ;
   try
   {
     r = PlCall(query.get_cstring()) ;
@@ -900,7 +902,7 @@ RObject call_(String query)
     stop("%s failed: %s", query.get_cstring(), s) ;
   }
   
-  return LogicalVector::create(r == TRUE) ;
+  return wrap(r) ;
 }
 
 // Call R expression from Prolog
