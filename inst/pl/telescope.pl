@@ -1,6 +1,6 @@
 :- use_module(library(dcg/basics)).
 
-% R-friendly user interface
+% Translate R string to code points and invoke phrase/2
 sentence(Tree, Sentence) :-
     string_codes(Sentence, Codes),
     phrase(s(Tree), Codes).
@@ -15,13 +15,13 @@ vp(vp(V, NP, PP), C) --> v(V, C), blank, np(NP, _), blank, pp(PP).
 pp(pp(P, NP)) --> p(P), blank, np(NP, _).
 
 % Determiners, personal nouns, nouns, verbs and participles
-det(det(a), sg) --> "a".
-det(det(the), _) --> "the".
-pn(pn(john), sg) --> "john".
-n(n(man), sg) --> "man".
-n(n(men), pl) --> "men".
-n(n(telescope), sg) --> "telescope".
-v(v(sees), sg) --> "sees".
-v(v(see), pl) --> "see".
-v(v(saw), _) --> "saw".
-p(p(with)) --> "with".
+det(det(a), sg) --> `a`.
+det(det(the), _) --> `the`.
+pn(pn(john), sg) --> `john`.
+n(n(man), sg) --> `man`.
+n(n(men), pl) --> `men`.
+n(n(telescope), sg) --> `telescope`.
+v(v(sees), sg) --> `sees`.
+v(v(see), pl) --> `see`.
+v(v(saw), _) --> `saw`.
+p(p(with)) --> `with`.
