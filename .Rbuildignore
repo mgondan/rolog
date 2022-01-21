@@ -11,7 +11,6 @@
 ^.*\.github$
 ^.*\.clang-format$
 ^.*\.travis.yml$
-^.*\.so\..*$
 ^.*\.so$
 ^.*\.obj$
 ^.*\.dll$
