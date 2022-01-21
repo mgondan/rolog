@@ -13,6 +13,6 @@
 ^.*\.travis.yml$
 ^.*\.so\..*$
 ^.*\.so$
-^.*\.obj$
+^inst/libs
 ^doc$
 ^Meta$
