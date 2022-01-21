@@ -8,7 +8,7 @@ swipl:
 	mkdir -p ../inst/swipl/bin
 	rm -f ../inst/swipl/bin/*.dll
 	cd ../mingw64 && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DSWIPL_PACKAGES_X=OFF -DINSTALL_DOCUMENTATION=OFF -DHAVE_ARCHIVE_READ_SUPPORT_FORMAT_CPIO=0 -DCMAKE_BUILD_TYPE=Release -DMINGW_ROOT=/ucrt64 -G "MSYS Makefiles" ../src/swipl-devel
-	find ../mingw -name Makefile -exec dos2unix \{\} \;
+	find ../mingw64 -name Makefile -exec dos2unix \{\} \;
 	cd ../mingw64 && make && make install
 	mkdir -p ../inst/libs/x64
 	cp ../inst/swipl/bin/libswipl.dll ../inst/libs/x64
