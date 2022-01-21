@@ -775,7 +775,12 @@ RObject submit_()
     stop("submit: no open query.") ;
 
   if(!query_id->next_solution())
-    return LogicalVector::create(false) ;
+  {
+    delete query_id ;
+    query_id = NULL
+    return false ;
+    // return LogicalVector::create(false) ;
+  }
   
   return query_id->bindings() ;
 }
