@@ -14,5 +14,7 @@
 ^.*\.so\..*$
 ^.*\.so$
 ^.*\.obj$
+^.*\.dll$
+^inst/libs
 ^doc$
 ^Meta$
