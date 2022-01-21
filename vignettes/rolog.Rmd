@@ -230,8 +230,8 @@ work in both directions, but a few exceptions exist. For example, there is an
 empty atom in Prolog, but no empty symbol in R, so the empty atom is translated
 to a character string in R. 
 
-Table\ 1.
-: Creating Prolog terms from R.
+Table\ 1
+: Creating Prolog terms from R
 
 |R                       |Prolog                   |Note/Alternatives        |
 |:-----------------------|:------------------------|:------------------------|
@@ -243,7 +243,7 @@ Table\ 1.
 |`3`                     |Float 3.0                |                         |
 |`call("term", 1L, 2L)`  |term(1, 2)               |                         |
 |`list(1L, 2L, 3L)`      |List [1, 2, 3]           |                         |
-|`list(a=1, b=2, c=3)`   |List [a-1, b-2, c-3]     |oneway                   |
+|`list(a=1, b=2, c=3)`   |List [a-1, b-2, c-3]     |                         |
 |`c(1, 2, 3)`            |#(1.0, 2.0, 3.0)         |vectors of length > 1    |
 |`c(1L, 2L, 3L)` or `1:3`|\'%\'(1, 2, 3)           |                         |
 |`c("a", "b", "c")`      |\$\$(\"a\", \"b\", \"c\")|                         |
@@ -322,60 +322,63 @@ completely different paradigms. Whereas symbols, functions, numbers and
 character strings are easily mapped between R and Prolog, there are loose ends 
 at both sides. In particular, Prolog variables are translated from and to 
 R _expressions_ (not to be confused with R symbols), and R vectors of 
-length _N_ > 1 are translated to the Prolog terms `#/N`, `%/N`, `!/N`, 
+length _N_ > 1 are translated to the Prolog terms `#/N`, `%/N`, `!/N`,
 and `$$/N`, as mentioned above.
 
 These rules are, in principle, arbitrary and can be intercepted at several 
 stages of the process:
 
-* an R function that may be used to preprocess specific R elements before they
-  are translated into Prolog (see, e.g., the R function `as.rolog()`).
-* a Prolog wrapper that manipulates the term before it is called and afterwards
-  (see the example with dicts below)
-* an R function that can be used to postprocess the result of the query.
+* R functions that may be used to preprocess specific R elements before
+  translation into Prolog (see, e.g., the R function `as.rolog()`)
+* Prolog wrappers that manipulate the term before it is called and afterwards
+  (see the dicts below)
+* R functions that postprocess the result of a query
 
 The process is illustrated in Figure\ 1.
 
 ```{r, echo=FALSE, fig.width=6, fig.height=2}
 HTML(export_svg(grViz(
-  'digraph G {
-    rankdir=LR;
-    Query Result;
+  'digraph G
+   {
+     rankdir=LR
+     Query Result
 
-    subgraph cluster_0 {
-      style=filled;
-      color=lightgrey;
-      node [style=filled,color=white];
-      r2rolog -> forth -> rolog_pl;
-    }
+     subgraph cluster_0 
+     {
+       style=filled
+       color=lightgrey
+       node [style=filled,color=white]
+       r2rolog -> forth -> rolog_pl
+     }
 
-    subgraph cluster_1 {
-      style=filled;
-      color=lightgrey;
-      node [style=filled,color=white];
-      rolog2r -> back [dir=back];
-      back -> pl_rolog [dir=back];
-    }
+     subgraph cluster_1 
+     {
+       style=filled
+       color=lightgrey
+       node [style=filled,color=white]
+       rolog2r -> back [dir=back]
+       back -> pl_rolog [dir=back]
+     }
   
-    Query -> r2rolog;
-    rolog_pl:e -> Prolog;
-    pl_rolog:e -> Prolog [dir=back];
-    Result -> rolog2r [dir=back];
+     Query -> r2rolog
+     rolog_pl:e -> Prolog
+     pl_rolog:e -> Prolog [dir=back]
+     Result -> rolog2r [dir=back]
 
-    Query [shape=Mdiamond;width=0.7;height=0.7];
-    r2rolog [shape=rect,label="preproc(...)"];
-    forth [label="(rolog)"];
-    rolog_pl [shape=rect,label="preproc/2"];
-    Prolog [shape=Mcircle];
-    pl_rolog [shape=rect,label="postproc/2"];
-    rolog2r [shape=rect,label="postproc(...)"];
-    back [label="(rolog)"];
-    Result [shape=Msquare];
-}')))
+     Query [shape=Mdiamond;width=0.7;height=0.7]
+     r2rolog [shape=rect,label="preproc(...)"]
+     forth [label="(rolog)"]
+     rolog_pl [shape=rect,label="preproc/2"]
+     Prolog [shape=Mcircle]
+     pl_rolog [shape=rect,label="postproc/2"]
+     rolog2r [shape=rect,label="postproc(...)"]
+     back [label="(rolog)"]
+     Result [shape=Msquare]
+   }')))
 ```
 
-Figure\ 1.
-: Workflow in Rolog.
+Figure\ 1
+: Workflow in Rolog
 
 ## Preprocessing in R
 
@@ -416,6 +419,39 @@ Section\ 4 includes an example for mathematical rendering of R expressions. In
 that example, a preprocessing function is used to bring function calls with
 named arguments to a canonical form which is then handled in Prolog.
 
+## Postprocessing in R
+
+This may again be a function that reverts some of the manipulations during
+preprocessing. For `once()` and `submit()`, such a function would operate on the
+bindings. For example, many Prolog programmers are used to operate with atoms
+instead of character strings, which is the preferred representation of symbolic
+information in R. The following simple example illustrates conversion of the
+results for a query like `member(X, [a, b, c])` to strings.
+
+```{r}
+stringify <- function(x)
+{
+  # replace Prolog variable by the value of an R variable with the same name
+	if(is.name(x))
+	  return(as.character(x))
+	
+	# Recurse into lists and calls
+	if(is.call(x))
+	  x[-1] <- lapply(x[-1], FUN=stringify)
+
+	if(is.list(x))
+	  x <- lapply(x, FUN=stringify)
+
+  # Leave the rest unchanged
+	return(x)
+}
+
+# This may be the return value of a Prolog query
+q <- quote(member(.X, ""[a, b, c]))
+r <- findall(as.rolog(q))
+stringify(r)
+```
+
 ## Pre- and postprocessing in Prolog
 
 Recent versions of SWI-Prolog support so-called dictionaries of the 
@@ -440,42 +476,12 @@ named elements.
 once(call("do_something_with_pairs", list(a=1, b=2), expression(X)))
 ```
 
-The purpose of this rather trivial example is to remind the reader to avoid
-complicated syntax on the R side when it is much simpler to do the conversion at
-the Prolog end.
+In the code above, `dict_pairs/2` takes the role of both `preproc/2`
+and `postproc/2` in Figure\ 1. It illustrates that complicated syntax on the R
+side when can be much simpler to do the conversion at the Prolog end.
 
-## Postprocessing in R
+A way to extend Prolog by add-ons ("packs") are shown in the next section.
 
-This may again be a function that reverts some of the manipulations during
-preprocessing. For `once()` and `submit()`, such a function would operate on the
-bindings. For example, many Prolog programmers are used to operate with atoms
-instead of character strings, which is the preferred representation of symbolic
-information in R. The following simple example illustrates conversion of the
-results for a query like `member(X, [a, b, c])` to strings.
-
-```{r}
-postproc <- function(x)
-{
-  # replace Prolog variable by the value of an R variable with the same name
-	if(is.name(x))
-	  return(as.character(x))
-	
-	# Recurse into lists and calls
-	if(is.call(x))
-	  x[-1] <- lapply(x[-1], FUN=postproc)
-
-	if(is.list(x))
-	  x <- lapply(x, FUN=postproc)
-
-  # Leave the rest unchanged
-	return(x)
-}
-
-# This may be the return value of a Prolog query
-q <- quote(member(.X, ""[a, b, c]))
-r <- findall(as.rolog(q))
-postproc(r)
-```
 # 4. Examples
 
 In this section I present a few usage examples for the Rolog package in
@@ -506,12 +512,6 @@ mother(X, Y) :-
     parent(X, Y),
     female(X).
 
-brother(X, Y) :-
-    parent(Z, X),
-    parent(Z, Y),
-    male(X),
-    dif(X, Y).
-
 ancestor(X, Z) :-
     parent(X, Z).
 
@@ -520,8 +520,8 @@ ancestor(X, Z) :-
     ancestor(Y, Z).
 ```
 
-Listing\ 1.
-: A family tree in Prolog.
+Listing\ 1
+: A family tree in Prolog
 
 The listing is included in the package and can be accessed from R using the
 function `system.file(...)`. Within Prolog, the normal workflow is to consult the
@@ -550,23 +550,23 @@ of `findall(...)`.
 A rather cumbersome aspect of Rolog is the construction of Prolog
 terms and queries. `expression(X)` encapsulates the variable `X`, R symbols from
 `quote(jim)` or `as.symbol("jim")` are translated to Prolog atoms, and Prolog
-compounds such as `ancestor/2` are generated using `call("ancestor", ...)`. A 
-simplified syntax is provided by `as.rolog()` that accepts quoted expressions
-with dots indicating Prolog variables:
+compounds such as `ancestor/2` are generated using `call("ancestor", ...)`. 
+
+A simplified syntax is provided by `as.rolog(...)` that accepts quoted
+expressions with dots indicating Prolog variables:
 
 ```r
-# Same query in simplified syntax
 q = quote(ancestor(.X, jim))
 findall(as.rolog(q))
 ```
 
-Note that the dot is removed from the variable name.
+Note that `as.rolog(...)` removes the dot from the variable name.
 
 ## Non-deterministic queries
 
 As an alternative to `once(...)` and `findall(...)`, we can create a query with
-`query(...)` and `submit()` the query as often as needed or until it fails, as is
-shown below for a query like `member(X, [1, 2, Y])`, which succeeds if _X_ is
+`query(...)` and `submit()` the query as often as needed or until it fails, as 
+is shown below for a query like `member(X, [1, 2, Y])`, which succeeds if _X_ is
 either 1, 2 or the same as _Y_.
 
 ```{r}
@@ -597,12 +597,14 @@ raise a warning.
 
 One of the main driving forces of Prolog development was natural language 
 processing [@Dahl1981]. Therefore, the next example is an illustration of 
-sentence parsing using so-called definite clause grammars.
+sentence parsing using so-called definite clause grammars. As Listing\ 3 shows,
+Rolog can access modules from SWI's standard library (here, it 
+is "dcg/basics.pl").
 
 ```prolog
 :- use_module(library(dcg/basics)).
 
-% R-friendly user interface
+% Translate R string to code points and invoke phrase/2
 sentence(Tree, Sentence) :-
     string_codes(Sentence, Codes),
     phrase(s(Tree), Codes).
@@ -617,20 +619,20 @@ vp(vp(V, NP, PP), C) --> v(V, C), blank, np(NP, _), blank, pp(PP).
 pp(pp(P, NP)) --> p(P), blank, np(NP, _).
 
 % Determiners, personal nouns, nouns, verbs and participles
-det(det(a), sg) --> "a".
-det(det(the), _) --> "the".
-pn(pn(john), sg) --> "john".
-n(n(man), sg) --> "man".
-n(n(men), pl) --> "men".
-n(n(telescope), sg) --> "telescope".
-v(v(sees), sg) --> "sees".
-v(v(see), pl) --> "see".
-v(v(saw), _) --> "saw".
-p(p(with)) --> "with".
+det(det(a), sg) --> `a`.
+det(det(the), _) --> `the`.
+pn(pn(john), sg) --> `john`.
+n(n(man), sg) --> `man`.
+n(n(men), pl) --> `men`.
+n(n(telescope), sg) --> `telescope`.
+v(v(sees), sg) --> `sees`.
+v(v(see), pl) --> `see`.
+v(v(saw), _) --> `saw`.
+p(p(with)) --> `with`.
 ```
 
-Listing\ 3.
-: Simple grammar and lexicon. The `sentence/2` predicate simplifies the R call.
+Listing\ 3
+: Simple grammar and lexicon. `sentence/2` preprocesses the R call.
 
 As in the first example, we first consult a little Prolog program with a
 minimalistic grammar and lexicon (Listing\ 3), and then raise a query asking for
@@ -648,6 +650,10 @@ consult(system.file(file.path("pl", "telescope.pl"), package="rolog"))
 # findall(sentence(Tree, "john saw a man with a telescope")).
 findall(call("sentence", expression(Tree), "john saw a man with a telescope"))
 ```
+
+## Prolog add-ons
+
+
 
 ## Term manipulation
 
