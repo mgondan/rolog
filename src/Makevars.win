@@ -7,10 +7,11 @@ swipl:
 	mkdir -p ../mingw64
 	mkdir -p ../inst/swipl/bin
 	rm -f ../inst/swipl/bin/*.dll
-	cd ../mingw64 && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DSWIPL_PACKAGES_X=OFF -DINSTALL_DOCUMENTATION=OFF -DHAVE_ARCHIVE_READ_SUPPORT_FORMAT_CPIO=0 -DCMAKE_BUILD_TYPE=Release -DMINGW_ROOT=/ucrt64 -G "MSYS Makefiles" ../src/swipl-devel && make && make install
+	cd ../mingw64 && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DSWIPL_PACKAGES_X=OFF -DINSTALL_DOCUMENTATION=OFF -DHAVE_ARCHIVE_READ_SUPPORT_FORMAT_CPIO=0 -DCMAKE_BUILD_TYPE=Release -DMINGW_ROOT=/ucrt64 -G "MSYS Makefiles" ../src/swipl-devel
+	find ../mingw -name Makefile -exec dos2unix \{\} \;
+	cd ../mingw64 && make && make install
 	mkdir -p ../inst/libs/x64
 	cp ../inst/swipl/bin/libswipl.dll ../inst/libs/x64
-	# cp -n `objdump -p libswipl.dll | grep 'DLL Name:' | sed -e "s?\t*DLL Name: ?/ucrt64/bin/?g"` .
 	cp /ucrt64/bin/libgmp-10.dll ../inst/libs/x64
 	cp /ucrt64/bin/zlib1.dll ../inst/libs/x64
 	cp `ldd ../inst/swipl/bin/archive4pl.dll | grep -o ' /ucrt64/bin/.*\\.dll'` ../inst/swipl/bin
