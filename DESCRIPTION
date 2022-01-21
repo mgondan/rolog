@@ -2,16 +2,16 @@ Package: rolog
 Type: Package
 Title: Invoke SWI-Prolog from R
 Version: 1.0
-Date: 2021-12-03
+Date: 2022-01-21
 Author: Matthias Gondan
-Maintainer: Matthias Gondan <Matthias.Gondan@psy.ku.dk>
+Maintainer: Matthias Gondan <Matthias.Gondan-Rochon@uibk.ac.at>
 Description: Invoke SWI-Prolog from R (consult, query, once, findall).
 License: LGPL-2.1
 Imports: Rcpp (>= 1.0.7)
 LinkingTo: Rcpp
 RoxygenNote: 7.1.2
 Encoding: UTF-8
-SystemRequirements: GNU make, cmake (>= 3.10)
+SystemRequirements: GNU make, cmake (>= 3.10), pkgconfig
 Suggests: 
     rmarkdown,
     knitr,
