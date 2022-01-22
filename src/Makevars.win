@@ -7,8 +7,13 @@ swipl:
 	mkdir -p ../mingw64
 	mkdir -p ../inst/swipl/bin
 	rm -f ../inst/swipl/bin/*.dll
-	cd ../mingw64 && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DSWIPL_PACKAGES_X=OFF -DINSTALL_DOCUMENTATION=OFF -DHAVE_ARCHIVE_READ_SUPPORT_FORMAT_CPIO=0 -DCMAKE_BUILD_TYPE=Release -DMINGW_ROOT=/ucrt64 -G "MSYS Makefiles" ../src/swipl-devel
+	cd ../mingw64 && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DSWIPL_PACKAGES_X=OFF -DINSTALL_DOCUMENTATION=OFF -DHAVE_ARCHIVE_READ_SUPPORT_FORMAT_CPIO=0 -DCMAKE_BUILD_TYPE=Release -DMINGW_ROOT=/ucrt64 -DCMAKE_C_FLAGS=-D__USE_MINGW_ANSI_STDIO -G "MSYS Makefiles" ../src/swipl-devel
 	find ../mingw64 -name Makefile -exec dos2unix \{\} \;
+	mkdir -p ../mingw64/home
+	cp ../src/swipl-devel/swipl.rc ../mingw64/home
+	echo "user:file_search_path(library, Packages) :-" >> ../mingw64/home/swipl.rc
+	echo "    cmake_source_directory(B)," >> ../mingw64/home/swipl.rc
+	echo "    atomic_list_concat([B, '..', packages], /, Packages)." >> ../mingw64/home/swipl.rc
 	cd ../mingw64 && make && make install
 	mkdir -p ../inst/libs/x64
 	cp ../inst/swipl/bin/libswipl.dll ../inst/libs/x64
