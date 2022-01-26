@@ -9,7 +9,7 @@ Description: Invoke SWI-Prolog from R (consult, query, once, findall).
 License: LGPL-2.1
 Imports: Rcpp (>= 1.0.7)
 LinkingTo: Rcpp
-RoxygenNote: 7.1.2
+RoxygenNote: 7.1.2.9000
 Encoding: UTF-8
 SystemRequirements: GNU make, cmake (>= 3.10), pkgconfig, dos2unix
 Suggests: 
