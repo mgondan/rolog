@@ -10,10 +10,9 @@ swipl:
 	cd ../mingw64 && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DSWIPL_PACKAGES_X=OFF -DINSTALL_DOCUMENTATION=OFF -DHAVE_ARCHIVE_READ_SUPPORT_FORMAT_CPIO=0 -DCMAKE_BUILD_TYPE=Release -DMINGW_ROOT=/ucrt64 -DCMAKE_C_FLAGS=-D__USE_MINGW_ANSI_STDIO -G "MSYS Makefiles" ../src/swipl-devel
 	find ../mingw64 -name Makefile -exec dos2unix \{\} \;
 	cd ../mingw64 && make && make install
-	mkdir -p ../inst/libs/x64
-	cp ../inst/swipl/bin/libswipl.dll ../inst/libs/x64
-	cp /ucrt64/bin/libgmp-10.dll ../inst/libs/x64
-	cp /ucrt64/bin/zlib1.dll ../inst/libs/x64
+	cp ../inst/swipl/bin/libswipl.dll .
+	cp /ucrt64/bin/libgmp-10.dll .
+	cp /ucrt64/bin/zlib1.dll .
 	cp `ldd ../inst/swipl/bin/archive4pl.dll | grep -o ' /ucrt64/bin/.*\\.dll'` ../inst/swipl/bin
 	cp `ldd ../inst/swipl/bin/bdb4pl.dll | grep -o ' /ucrt64/bin/.*\\.dll'` ../inst/swipl/bin
 	rm ../inst/swipl/bin/swipl.exe
