@@ -178,7 +178,6 @@ RObject pl2r_symbol(PlTerm pl)
   if(pl == "")
     return as<RObject>(CharacterVector(0)) ;
 
-  printf("Symbol %s\n", (char*) pl) ;
   return as<RObject>(Symbol((char*) pl)) ;
 }
 
