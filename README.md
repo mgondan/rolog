@@ -47,42 +47,28 @@ Please tell me if anything is misssing.
 
 `rolog` is a source package, so a few things need to be done before you get started.
 
-1. Please make sure you have a `git` client on your computer, the one recommended by RStudio is https://git-scm.com/download/win. As
-   before, please allow the program to change the `PATH` so that `git.exe` is found.
+1. Download and install a recent R-devel from https://cran.r-project.org/bin/windows/base/rdevel.html
 
-2. For the vignette, pandoc is needed. Please do not use the most recent version, as they have changed the way they handle 
-   references. Version 2.9.2.1 is found here, https://github.com/jgm/pandoc/releases/tag/2.9.2.1 I assume you install it
-   into C:/Program Files/Pandoc, which is the default.
+2. Download and install a recent RStudio that supports "ucrt".
 
-3. Download and install R-devel from https://cran.r-project.org/bin/windows/base/rdevel.html. Note that this is not yet compatible 
-   to RStudio, so please say hello again to the "blue R", RGui.exe.
-
-4. Download RTools4.2 from https://cran.r-project.org/bin/windows/Rtools/ and install it, preferably into c:\rtools42, which is 
+3. Download RTools4.2 from https://cran.r-project.org/bin/windows/Rtools/ and install it, preferably into c:\rtools42, which is 
    the default.
 
-5. Invoke c:\rtools42\ucrt64.exe
+4. Invoke c:\rtools42\ucrt64.exe
 
-6. A shell appears, type `pacman -Syu`
+5. A shell appears, type `pacman -Syu`
 
-7. `pacman -S mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-libjpeg mingw-w64-ucrt-x86_64-libyaml mingw-w64-ucrt-x86_64-pcre mingw-w64-ucrt-x86_64-libarchive mingw-w64-ucrt-x86_64-db mingw-w64-ucrt-x86_64-texlive-latex-recommended mingw-w64-ucrt-x86_64-texlive-fonts-extra mingw-w64-ucrt-x86_64-qpdf`
+6. `pacman -S mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-libjpeg mingw-w64-ucrt-x86_64-libyaml mingw-w64-ucrt-x86_64-pcre mingw-w64-ucrt-x86_64-libarchive mingw-w64-ucrt-x86_64-db mingw-w64-ucrt-x86_64-texlive-latex-recommended mingw-w64-ucrt-x86_64-texlive-fonts-extra mingw-w64-ucrt-x86_64-qpdf`
 
-8. Invoke `/c/Program\ Files/R/R-devel/bin/R.exe`
+7. In RStudio, call:
 
-In R, call:
-
-`install.packages("Rcpp", type="source")`
-
-`install.packages("remotes", type="source")`
+`install.packages("remotes")`
 
 `install.packages("rmarkdown", type="source")`
 
-`install.packages("devtools", type="source")`
-
-`Sys.setenv(RSTUDIO_PANDOC='c:/program files/pandoc')`
-
 `remotes::install_github("mgondan/rolog", build_vignettes=TRUE)`
 
-9. You can check the installation like this:
+8. You can check the installation like this:
 
 `library(rolog)`
 
@@ -116,10 +102,6 @@ attr(,"query")
 
 I can't tell why the upper part of the output is cropped, but it looks good. The three issues are expected, 
 since tcmalloc, jpl and xpce are not part of this installation.
-
-10. Reinstall your current R, preferably R-4.1, so that RStudio is working again. You
-   can now use library(rolog). It issues a warning with a version mismatch, this warning 
-   will disappear if R-4.2 is available.
 
 ## Example 1
 
