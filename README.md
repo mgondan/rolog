@@ -4,7 +4,7 @@ Access SWI-Prolog from R
 
 ## Linux
 
-1. You obviously need R and a few packages on your computer, maybe also rmarkdown and pandoc to render Rmd files to html (see Example\ 2). Please use R version 4.1.
+1. You obviously need R and a few packages on your computer, maybe also rmarkdown and pandoc to render Rmd files to html (see Example 2). Please use R version 4.1.
 
 `sudo apt install r-base pandoc pandoc-citeproc`
 
