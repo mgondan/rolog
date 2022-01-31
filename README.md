@@ -64,7 +64,7 @@ Please tell me if anything is misssing.
 
 `install.packages("remotes")`
 
-`install.packages("rmarkdown", type="source")`
+`install.packages("rmarkdown")`
 
 `remotes::install_github("mgondan/rolog", build_vignettes=TRUE)`
 
