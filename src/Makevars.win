@@ -11,7 +11,19 @@ swipl:
 	# dos2unix all Makefiles
 	find ../mingw64 -name Makefile -exec sed -i 's/\r//' \{\} \;
 	cd ../mingw64 && make && make install
+<<<<<<< HEAD
 	cp ../inst/swipl/bin/libswipl.dll /ucrt64/bin/libgmp-10.dll /ucrt64/bin/zlib1.dll `ldd ../inst/swipl/bin/archive4pl.dll | grep -o ' /ucrt64/bin/.*dll '` `ldd /ucrt64/bin/libarchive-13.dll | grep -o ' /ucrt64/bin/.*\.dll'` `ldd ../inst/swipl/bin/bdb4pl.dll | grep -o ' /ucrt64/bin/.*dll '` `ldd /ucrt64/bin/libdb-6.0.dll | grep -o ' /ucrt64/bin/.*\.dll'` .
+=======
+	DLLs= ../inst/swipl/bin/libswipl.dll
+	DLLs+= /ucrt64/bin/libgmp-10.dll
+	DLLs+= /ucrt64/bin/zlib1.dll
+	DLLs+= `ldd ../inst/swipl/bin/archive4pl.dll | grep -o ' /ucrt64/bin/.*dll '`
+	DLLs+= `ldd /ucrt64/bin/libarchive-13.dll | grep -o ' /ucrt64/bin/.*\.dll'`
+	DLLs+= `ldd ../inst/swipl/bin/bdb4pl.dll | grep -o ' /ucrt64/bin/.*dll '`
+	DLLs+= `ldd /ucrt64/bin/libdb-6.0.dll | grep -o ' /ucrt64/bin/.*\.dll'`
+	echo $(DLLs)
+	cp $(DLLs) .
+>>>>>>> 5061d7038df44d0ae34f189fbede513eeeaaa4b4
 	rm ../inst/swipl/bin/swipl.exe
 	rm ../inst/swipl/bin/swipl-win.exe
 	rm ../inst/swipl/bin/swipl-ld.exe
