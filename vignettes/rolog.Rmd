@@ -947,21 +947,8 @@ present package.
 
 # 5. Conclusions
 
-
-+++ for inspiration
-
-with two open source Prolog implementations. Our designing principles have been
-those of simplicity and transparency across the systems. This has been accomplished by
-(a) keeping to a minimum the transformations the user needs to be aware of, and by (b)
-providing intuitive, mnemonic syntax to the inconsistencies between the two languages.
-As a result, r..eal programs are clear and easy to follow. The functional inheritance of
-R corresponds well with the logical underpinning of Prolog. R..eal provides a productive
-environment for building highly effective pipelines and interactive, query-based
-data exploration.
-
-+++
-
-R has become the primary language for statistical programming and data science.
+R has become the primary language for statistical programming and data science,
+but is currently lacking support for traditional, symbolic artificial intelligence.
 There are already two addons for SWI-Prolog that allow to run R calculations
 from Prolog [@Angelopoulos2013;@Rserve], but a connection in the other direction
 was missing, so far. Rolog bridges this gap by providing an interface to a
@@ -971,7 +958,10 @@ Prolog predicates allow Prolog to ring back and evaluate terms in R. The design
 of the package is minimalistic, providing three main 
 functions `query(...)`, `submit()`, and `clear()`, and a very limited set of
 convenience tools (`consult(...)`, `once(...)`, and `findall(...)`) to
-facilitate everyday actions.
+facilitate everyday actions. As both systems are homoiconic in nature, it was easy to
+establish a one-to-one correspondence between the elements of the two languages. Most
+exceptions (e.g., lack of R support for empty symbols) can be avoided and/or 
+circumvented by wrapper functions at both ends.
 
 Simple ways to extend the package have been described in Section\ 3; such
 extensions could, for example, include R objects and structures like those
