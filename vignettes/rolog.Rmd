@@ -485,26 +485,14 @@ some familiarity with the Prolog language is helpful.
 ## Hello, world
 
 Prolog's typical _hello world_ example is a search through a directed acyclic
-graph, for example, a family tree like the one given in Listing\ 1.
+graph (DAG), for example, a family tree like the one given in Listing\ 1.
 
 ```prolog
-female(pam).
-female(pat).
-female(ann).
-
-male(tom).
-male(bob).
-male(jim).
-
 parent(pam, bob).
 parent(tom, bob).
 parent(bob, ann).
 parent(bob, pat).
 parent(pat, jim).
-
-mother(X, Y) :-
-    parent(X, Y),
-    female(X).
 
 ancestor(X, Z) :-
     parent(X, Z).
@@ -515,9 +503,9 @@ ancestor(X, Z) :-
 ```
 
 Listing\ 1
-: A family tree in Prolog
+: A family tree in Prolog (see also family.pl)
 
-The listing is included in the package and can be accessed from R using the
+Listing\ 1 is included in the package and can be accessed from R using the
 function `system.file(...)`. Within Prolog, the normal workflow is to consult the
 code with `[family]` and then to raise queries such as `ancestor(X, jim)`, which
 returns, one by one, four solutions for the variable _X_. In R, we obtain the
@@ -529,23 +517,34 @@ library(rolog)
 # [family].
 consult(system.file(file.path("pl", "family.pl"), package="rolog"))
 
-# findall(ancestor(X, jim)).
-findall(call("ancestor", expression(X), quote(jim)))
+# ancestor(X, jim).
+query(call("ancestor", expression(X), quote(jim)))
+
+# solutions for X, one by one
+submit()
+submit()
+submit()
+submit()
+submit() # no more results (closing the query)
+submit() # warning that no query is open
+# clear() # normally used to close a query
 ```
 
 As stated above, `consult()` loads the facts and rules of Listing\ 1 into the
-database. `findall(expr)` searches for all solutions of the query `expr`, and
-returns the conditions under which the query succeeds. In this example, the
-query succeeds if _X_ is either `pat`, `pam`, `tom` or `bob`, as indicated by
-the four bindings for _X_ in the resulting list. If we are just interested in
-the first solution, we can invoke the query with `once(...)` instead
-of `findall(...)`. 
+database. `query(expr)` initializes the query `expr`, and the subsequent calls
+to `submit` return the conditions under which the query succeeds. In this 
+example, the query succeeds if _X_ is either `pat`, `pam`, `tom` or `bob`. 
+A query is closed with `clear()`, or automatically if the query fails. Note that
+it is generally not possible to open two queries simultaneously, so opening a
+second query while another one is still open will raise a warning. If we are
+interested in just the first solution, we can use `once(expr)` as a shortcut
+to `query(expr)`-`submit()`-`clear()`. If we want to collect all solutions of a
+query with a finite set of solutions, we can use `findall(expr)`.
 
 A rather cumbersome aspect of Rolog is the construction of Prolog
 terms and queries. `expression(X)` encapsulates the variable `X`, R symbols from
 `quote(jim)` or `as.symbol("jim")` are translated to Prolog atoms, and Prolog
 compounds such as `ancestor/2` are generated using `call("ancestor", ...)`. 
-
 A simplified syntax is provided by `as.rolog(...)` that accepts quoted
 expressions with dots indicating Prolog variables:
 
@@ -556,36 +555,51 @@ findall(as.rolog(q))
 
 Note that `as.rolog(...)` removes the dot from the variable name.
 
-## Non-deterministic queries
+## Backdoor test
 
-As an alternative to `once(...)` and `findall(...)`, we can create a query with
-`query(...)` and `submit()` the query as often as needed or until it fails, as 
-is shown below for a query like `member(X, [1, 2, Y])`, which succeeds if _X_ is
-either 1, 2 or the same as _Y_.
+A more useful application of DAGs is confounder adjustment in causal 
+analysis [@greenland1999;@ggdag]. The Prolog file `backdoor.pl` is an 
+implementation of Greenland et al.'s criteria for the backdoor test 
+for _d_-separation in DAGs, with a predicate `minimal/3` that searches for
+minimally sufficient sets of variables for confounder adjustment on the causal
+path between exposure and outcome.
 
 ```{r}
-# member(X, [1, 2, Y]).
-query(call("member", expression(X), list(1L, 2L, expression(Y))))
+# [backdoor].
+consult(system.file(file.path("pl", "backdoor.pl"), package="rolog"))
 
-# first solution for X: 1
-submit()
+# Figure 12 in Greenland et al.
+add_node = function(N)
+	invisible(once(call("assert"), call("node", N)))
 
-# next solution: 2
-submit()
+add_arrow = function(X, Y)
+	invisible(once(call("assert"), call("arrow", X, Y)))
 
-# next solution: Y
-submit()
+add_node("a")
+add_node("b")
+add_node("c")
+add_node("d") # outcome
+add_node("e") # exposure
+add_node("f")
+add_node("u")
 
-# no more results (closing the query)
-submit()
+add_arrow("a", "d").
+add_arrow("a", "f").
+add_arrow("b", "d").
+add_arrow("b", "f").
+add_arrow("c", "d").
+add_arrow("c", "f").
+add_arrow("e", "d").
+add_arrow("f", "e").
+add_arrow("u", "a").
+add_arrow("u", "b").
+add_arrow("u", "c").
 
-# warning that no query is open
-submit()
+findall(call("minimal", "e", "d", expression(S)))
 ```
 
-Note that in SWI-Prolog, it is generally not possible to open two queries
-simultaneously, so opening a second query while another one is still open will
-raise a warning.
+The query to `minimal/3` returns two minimally sufficient sets of covariates for
+confounder adjustment.
 
 ## Definite clause grammars
 
