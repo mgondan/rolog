@@ -147,6 +147,7 @@ minimal(X, Y, M) :-
     findall(_, (member(Si, Sufficient), proper_subset(Si, M)), []).
 
 % Figure 12
+:- dynamic node/1.
 node(a).
 node(b).
 node(c).
@@ -155,7 +156,7 @@ node(e).
 node(f).
 node(u).
 
-% Directional edges
+:- dynamic arrow/2.
 arrow(a, d).
 arrow(a, f).
 arrow(b, d).
