@@ -570,10 +570,10 @@ consult(system.file(file.path("pl", "backdoor.pl"), package="rolog"))
 
 # Figure 12 in Greenland et al.
 add_node = function(N)
-	invisible(once(call("assert"), call("node", N)))
+	invisible(once(call("assert", call("node", N))))
 
 add_arrow = function(X, Y)
-	invisible(once(call("assert"), call("arrow", X, Y)))
+	invisible(once(call("assert", call("arrow", X, Y))))
 
 add_node("a")
 add_node("b")
@@ -583,17 +583,17 @@ add_node("e") # exposure
 add_node("f")
 add_node("u")
 
-add_arrow("a", "d").
-add_arrow("a", "f").
-add_arrow("b", "d").
-add_arrow("b", "f").
-add_arrow("c", "d").
-add_arrow("c", "f").
-add_arrow("e", "d").
-add_arrow("f", "e").
-add_arrow("u", "a").
-add_arrow("u", "b").
-add_arrow("u", "c").
+add_arrow("a", "d")
+add_arrow("a", "f")
+add_arrow("b", "d")
+add_arrow("b", "f")
+add_arrow("c", "d")
+add_arrow("c", "f")
+add_arrow("e", "d")
+add_arrow("f", "e")
+add_arrow("u", "a")
+add_arrow("u", "b")
+add_arrow("u", "c")
 
 findall(call("minimal", "e", "d", expression(S)))
 ```
