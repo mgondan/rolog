@@ -57,8 +57,6 @@
 
 .onUnload <- function(libpath)
 {
-  print(libpath)
-
   # See .onLoad for details
   library.dynam.unload("rolog", libpath=libpath)
 
