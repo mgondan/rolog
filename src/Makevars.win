@@ -5,7 +5,7 @@ all: swipl $(SHLIB)
 
 swipl:
 	mkdir -p ../rtools40
-	cd ../rtools40 && /mingw64/bin/cmake -DMINGW_ROOT=/mingw64 -DINSTALL_DOCUMENTATION=OFF -DSWIPL_PACKAGES_X=OFF -DWIN32_DLLS="" -DLibArchive_INCLUDE_DIRS="`pkg-config --cflags-only-I libarchive`" -DLibArchive_LIBRARIES="`pkg-config --libs --static libarchive`" -DCMAKE_C_FLAGS="-DPCRE_STATIC -DHAVE_EVP_MD_CTX_FREE=1 -DHAVE_X509_DIGEST=1 -DHAVE_X509_CRL_DIGEST=1" -DCMAKE_C_STANDARD_LIBRARIES="-lswipl -lgmp -lz -lm -lpthread -lws2_32 -lpsapi -lwinmm -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32" -DCMAKE_INSTALL_PREFIX=../inst/swipl -G "MSYS Makefiles" ../src/swipl-devel
+	cd ../rtools40 && /mingw64/bin/cmake -DMINGW_ROOT=/mingw64 -DINSTALL_DOCUMENTATION=OFF -DSWIPL_PACKAGES_X=OFF -DWIN32_DLLS="" -DLibArchive_INCLUDE_DIRS="`pkg-config --cflags-only-I libarchive`" -DLibArchive_LIBRARIES="`pkg-config --libs --static libarchive`" -DCMAKE_C_FLAGS="-DPCRE_STATIC -DHAVE_EVP_MD_CTX_FREE=1 -DHAVE_X509_DIGEST=1 -DHAVE_X509_CRL_DIGEST=1" -DCMAKE_INSTALL_PREFIX=../inst/swipl -G "MSYS Makefiles" ../src/swipl-devel
 	# dos2unix all Makefiles
 	find ../rtools40 -name Makefile -exec sed -i 's/\r//' \{\} \;
 	cd ../rtools40 && make && make install
