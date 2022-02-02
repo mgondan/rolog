@@ -58,7 +58,7 @@ Please tell me if anything is misssing.
 
 5. A shell appears, type `pacman -Syu`
 
-6. `pacman -S mingw-w64-x86_64-cmake mingw-w64-x86_64-libjpeg mingw-w64-x86_64-libyaml mingw-w64-x86_64-pcre mingw-w64-x86_64-libarchive`
+6. `pacman -S mingw-w64-x86_64-cmake mingw-w64-x86_64-make mingw-w64-x86_64-libjpeg mingw-w64-x86_64-libyaml mingw-w64-x86_64-pcre mingw-w64-x86_64-libarchive`
 
 7. In RStudio, call:
 
