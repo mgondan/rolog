@@ -70,7 +70,7 @@ R> `install.packages("rmarkdown")`
 
 R> `install_github("mgondan/rolog")`
 
-R> quit()
+R> `quit()`
 
 8. Now start RGui or RStudio and check the installation like this:
 
@@ -94,18 +94,19 @@ Does this output appear?
 ````
 ................................................ not present
 Warning: See http://www.swi-prolog.org/build/issues/tcmalloc.html
+Warning: library(bdb) .......................... NOT FOUND
+Warning: See http://www.swi-prolog.org/build/issues/bdb.html
 Warning: library(jpl) .......................... NOT FOUND
 Warning: See http://www.swi-prolog.org/build/issues/jpl.html
 Warning: library(pce) .......................... NOT FOUND
 Warning: See http://www.swi-prolog.org/build/issues/xpce.html
-Warning: Found 3 issues.
+Warning: Found 4 issues.
 list()
 attr(,"query")
 [1] "check_installation"
 ````
 
-I can't tell why the upper part of the output is cropped, but it looks good. The three issues are expected, 
-since tcmalloc, jpl and xpce are not part of this installation.
+The four issues are expected, since tcmalloc, bdb, jpl and xpce are not part of this installation.
 
 ## Windows (R-devel)
 
