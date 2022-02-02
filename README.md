@@ -43,7 +43,67 @@ This takes about 20 min on my computer. Then please move on to the examples.
 
 Please tell me if anything is misssing.
 
-## Windows
+## Windows (R 4.1)
+
+`rolog` is a source package, so a few things need to be done before you get started.
+
+1. Download and install R-4.1.2 https://www.r-project.org/ (Please do _not_ install the files for 32 bit-support)
+
+2. Download and install a recent RStudio from https://www.rstudio.com/
+
+3. Download RTools4.0 from https://cran.r-project.org/bin/windows/Rtools/rtools40.html and install it, preferably into c:\rtools40, which is 
+   the default.
+
+4. Invoke c:\rtools40\mingw64.exe
+
+5. A shell appears, type `pacman -Syu`
+
+6. `pacman -S mingw-w64-x86_64-cmake mingw-w64-x86_64-libjpeg mingw-w64-x86_64-libyaml mingw-w64-x86_64-pcre mingw-w64-x86_64-libarchive`
+
+7. In RStudio, call:
+
+`install.packages("remotes")`
+
+`install.packages("rmarkdown")`
+
+`remotes::install_github("mgondan/rolog", build_vignettes=TRUE)`
+
+8. You can check the installation like this:
+
+`library(rolog)`
+
+Does this message appear?
+
+````
+Welcome to SWI-Prolog (threaded, 64 bits, version 8.5.3-28-g85fd90216-DIRTY)
+SWI-Prolog comes with ABSOLUTELY NO WARRANTY. This is free software.
+Please run ?- license. for legal details.
+
+For online help and background, visit https://www.swi-prolog.org
+For built-in help, use ?- help(Topic). or ?- apropos(Word).
+````
+
+`once(call("check_installation"))`
+
+Does this output appear?
+
+````
+................................................ not present
+Warning: See http://www.swi-prolog.org/build/issues/tcmalloc.html
+Warning: library(jpl) .......................... NOT FOUND
+Warning: See http://www.swi-prolog.org/build/issues/jpl.html
+Warning: library(pce) .......................... NOT FOUND
+Warning: See http://www.swi-prolog.org/build/issues/xpce.html
+Warning: Found 3 issues.
+list()
+attr(,"query")
+[1] "check_installation"
+````
+
+I can't tell why the upper part of the output is cropped, but it looks good. The three issues are expected, 
+since tcmalloc, jpl and xpce are not part of this installation.
+
+## Windows (R-devel)
 
 `rolog` is a source package, so a few things need to be done before you get started.
 
@@ -122,5 +182,5 @@ The second example is the vignette with nice use cases in Section 4.
 
 `rmarkdown::render(system.file("vignettes", "rolog.Rmd", package="rolog"), output_file="rolog.html", output_dir=getwd())`
 
-You should find an HTML page in `rolog.html` of the current folder. Note that it includes equations with MathML, which yields 
-best results in the Firefox browser.
+You should find an HTML page in `rolog.html` of the current folder. Note that it includes equations with MathML, which look
+best in the Firefox browser.
