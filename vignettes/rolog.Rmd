@@ -1010,11 +1010,8 @@ raises an error message).
 
 The source code of the package is found at https://github.com/mgondan/rolog/,
 including installation instructions for Unix, Windows and macOS. At the moment,
-Rolog is a source package that requires the current development version 
-of R (i.e. Version 4.2 and above) and the RTools 4.2 toolchain under Windows. 
-The reason is a dependence on libarchive [@libarchive] for the installation of 
-addons in Prolog, which is not available in RTools 4.0. As soon as R 4.2 is
-released, binaries will be made available on https://cran.r-project.org/.
+Rolog is a source package that requires the RTools 4.2 toolchain under Windows. 
+Binaries will be made available soon on https://cran.r-project.org/.
 
 # Acknowledgement
 
