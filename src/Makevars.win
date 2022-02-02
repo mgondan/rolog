@@ -1,0 +1,20 @@
+PKG_CPPFLAGS=-I../inst/swipl/include $(CXXPICFLAGS) -D_REENTRANT -D__SWI_PROLOG__ -O2 -gdwarf-2 -g3 -Wall -fno-strict-aliasing -D__WINDOWS__ -D_WINDOWS -D_WIN32_WINNT=0x0600 -DWIN64
+PKG_LIBS=-Wl,-Bsymbolic-functions -L../inst/swipl/bin -lswipl -lgmp -lz -lm -lpthread -lws2_32 -lpsapi -lwinmm -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+
+all: swipl $(SHLIB)
+
+swipl:
+	mkdir -p ../rtools40
+	cd ../rtools40 && /mingw64/bin/cmake -DMINGW_ROOT=/mingw64 -DINSTALL_DOCUMENTATION=OFF -DSWIPL_PACKAGES_X=OFF -DWIN32_DLLS="" -DLibArchive_INCLUDE_DIRS="`pkg-config --cflags-only-I libarchive`" -DLibArchive_LIBRARIES="`pkg-config --libs --static libarchive`" -DCMAKE_C_FLAGS="-DPCRE_STATIC -DHAVE_EVP_MD_CTX_FREE=1 -DHAVE_X509_DIGEST=1 -DHAVE_X509_CRL_DIGEST=1" -DCMAKE_INSTALL_PREFIX=../inst/swipl -G "MSYS Makefiles" ../src/swipl-devel
+	# dos2unix all Makefiles
+	find ../rtools40 -name Makefile -exec sed -i 's/\r//' \{\} \;
+	cd ../rtools40 && make && make install
+	cp ../inst/swipl/bin/libswipl.dll .
+	rm ../inst/swipl/bin/swipl.exe
+	rm ../inst/swipl/bin/swipl-win.exe
+	rm ../inst/swipl/bin/swipl-ld.exe
+
+libinst:
+	mkdir -p ../inst
+	mkdir -p ../inst/doc
+	cp ../vignettes/bibliography.bibtex ../inst/doc
