@@ -68,7 +68,7 @@ R> `install.packages("remotes")`
 
 R> `install.packages("rmarkdown")`
 
-R> `install_github("mgondan/rolog")`
+R> `remotes::install_github("mgondan/rolog")`
 
 R> `quit()`
 
