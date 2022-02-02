@@ -2,7 +2,7 @@
 ^\.Rproj\.user$
 ^linux/
 ^mingw64/
-^rtools40ucrt/
+^rtools40/
 ^inst/swipl
 ^.*\.git$
 ^.*\.plrc$
