@@ -60,7 +60,7 @@ Please tell me if anything is misssing.
 
 6. `pacman -S mingw-w64-x86_64-cmake mingw-w64-x86_64-make mingw-w64-x86_64-libjpeg mingw-w64-x86_64-libyaml mingw-w64-x86_64-pcre mingw-w64-x86_64-libarchive`
 
-7. Check if R is working: Please use the R from the command line, the installation does not yet work in RGui or RStudio.
+7. Check if R is working: Either use R from the command line, or RGui or RStudio.
 
 `/c/Program\ Files/R/R-4.1.2/bin/R`
 
@@ -70,9 +70,7 @@ R> `install.packages("rmarkdown")`
 
 R> `remotes::install_github("mgondan/rolog")`
 
-R> `quit()`
-
-8. Now start RGui or RStudio and check the installation like this:
+8. Check the installation like this:
 
 `library(rolog)`
 
