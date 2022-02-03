@@ -8,3 +8,7 @@ mingw64
 rtools40ucrt
 linux
 src/rolog.so
+src-x64
+rtools40
+mingw32
+src-i386

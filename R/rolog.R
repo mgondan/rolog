@@ -95,9 +95,9 @@
   {
     Sys.setenv(SWI_HOME_DIR=file.path(libname, pkgname, "swipl"))
 
-    if(is.null(R.Version()$crt) & R.Version()$r_arch == "x64")
+    if(is.null(R.Version()$crt) & R.Version()$arch == "x86_64")
       Sys.setenv(SWI_HOME_DIR=file.path(libname, pkgname, "mingw64", "swipl"))
-    if(is.null(R.Version()$crt) & R.Version()$r_arch == "i386")
+    if(is.null(R.Version()$crt) & R.Version()$arch == "i386")
       Sys.setenv(SWI_HOME_DIR=file.path(libname, pkgname, "mingw32", "swipl"))
   
     if(!rolog_init() && !rolog_init())

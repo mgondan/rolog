@@ -3,3 +3,7 @@ RcppExports.o
 rolog.o
 swipl-devel
 symbols.rds
+zlib1.dll
+libgmp-10.dll
+libswipl.dll
+CMakeFiles
