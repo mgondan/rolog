@@ -12,7 +12,7 @@ all: swipl $(SHLIB)
 
 swipl:
 	mkdir -p ../$(MINGWROOT)
-	cd ../$(MINGWROOT) && cmake -DMINGW_ROOT=/$(MINGWROOT) -DINSTALL_DOCUMENTATION=OFF -DSWIPL_PACKAGES_X=OFF -DWIN32_DLLS="" -DLibArchive_INCLUDE_DIRS="`pkg-config --cflags-only-I libarchive`" -DLibArchive_LIBRARIES="`pkg-config --libs --static libarchive`" -DCMAKE_C_FLAGS="-DPCRE_STATIC -DHAVE_EVP_MD_CTX_FREE=1 -DHAVE_X509_DIGEST=1 -DHAVE_X509_CRL_DIGEST=1" -DCMAKE_INSTALL_PREFIX=../inst/$(MINGWROOT)/swipl -G "MSYS Makefiles" ../src/swipl-devel
+	cd ../$(MINGWROOT) && cmake -DCMAKE_BUILD_TYPE=Release -DMINGW_ROOT=/$(MINGWROOT) -DINSTALL_DOCUMENTATION=OFF -DSWIPL_PACKAGES_X=OFF -DWIN32_DLLS="" -DLibArchive_INCLUDE_DIRS="`pkg-config --cflags-only-I libarchive`" -DLibArchive_LIBRARIES="`pkg-config --libs --static libarchive`" -DCMAKE_C_FLAGS="-DPCRE_STATIC -DHAVE_EVP_MD_CTX_FREE=1 -DHAVE_X509_DIGEST=1 -DHAVE_X509_CRL_DIGEST=1" -DCMAKE_INSTALL_PREFIX=../inst/$(MINGWROOT)/swipl -G "MSYS Makefiles" ../src/swipl-devel
 	# dos2unix all Makefiles
 	find ../$(MINGWROOT) -name Makefile -exec sed -i 's/\r//' \{\} \;
 	cd ../$(MINGWROOT) && make && make install
