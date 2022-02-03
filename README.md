@@ -1,6 +1,20 @@
-# rolog
+# rolog: Access SWI-Prolog from R
 
-Access SWI-Prolog from R
+The logic programming language Prolog was invented in the 1970ies by Alain
+Colmerauer, mostly for the purpose of natural language processing. Since then,
+logic programming has become an important driving force in research on artificial
+intelligence, natural language processing, program analysis, knowledge
+representation and theorem proving. 
+
+SWI-Prolog (swipl, https://www.swi-prolog.org/) is an open-source implementation
+of the logic programming language Prolog. Swipl targets developers of applications, 
+with many users in academia, research and industry. SWI-Prolog includes a large number 
+of libraries for "the real world", for example, a web server, encryption, interfaces 
+to C/C++ and other programming languages, as well as a development environment and 
+debugger.
+
+This R package makes swipl accessible to the R programming 
+language (www.r-project.org).
 
 ## Linux
 
@@ -163,21 +177,20 @@ attr(,"query")
 [1] "check_installation"
 ````
 
-I can't tell why the upper part of the output is cropped, but it looks good. The three issues are expected, 
-since tcmalloc, jpl and xpce are not part of this installation.
+The three issues are expected, since tcmalloc, jpl and xpce are not part of this installation.
 
 ## Example 1
 
 This is a hello(world).
 
-`library(rolog)`
+R> `library(rolog)`
 
 Run a query such as member(X, [1, 2, 3]) with 
 
-`findall(call("member", expression(X), list(1L, 2L, 3L)))`
+R> `findall(call("member", expression(X), list(1L, 2L, 3L)))`
 
-Sorry for the cumbersome syntax. At the moment, expression(X) encapsulates variables. The query returns bindings
-for X that satisfy member(X, [1, 2, 3]).
+Sorry for the cumbersome syntax. At the moment, expression(X) encapsulates variables. The query 
+returns bindings for X that satisfy member(X, [1, 2, 3]).
 
 ## Example 2
 
