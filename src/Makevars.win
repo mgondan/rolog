@@ -1,8 +1,8 @@
-ifdef _WIN64
-	PKG_CPPFLAGS=$(PKG_CPPFLAGS) -DWIN64
-	MINGWROOT=mingw64
+ifeq "$(WIN)" "64"
+    PKG_CPPFLAGS=$(PKG_CPPFLAGS) -DWIN64
+    MINGWROOT=mingw64
 else
-	MINGWROOT=mingw32
+    MINGWROOT=mingw32
 endif
 
 PKG_CPPFLAGS=-I../inst/$(MINGWROOT)/swipl/include $(CXXPICFLAGS) -D_REENTRANT -D__SWI_PROLOG__ -O2 -gdwarf-2 -g3 -Wall -fno-strict-aliasing -D__WINDOWS__ -D_WINDOWS -D_WIN32_WINNT=0x0600
