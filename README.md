@@ -13,8 +13,12 @@ of libraries for "the real world", for example, a web server, encryption, interf
 to C/C++ and other programming languages, as well as a development environment and 
 debugger.
 
-This R package makes swipl accessible to the R programming 
-language (www.r-project.org).
+This R package embeds swipl in a package for the R programming language (www.r-project.org).
+
+## License
+
+This R package is distributed under a BSD-2 simplified license (see the file LICENSE). SWI-Prolog
+is distributed under its own license (BSD-2, as well).
 
 ## Linux
 
