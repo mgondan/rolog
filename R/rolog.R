@@ -94,6 +94,12 @@
   if(.Platform$OS.type == "windows")
   {
     Sys.setenv(SWI_HOME_DIR=file.path(libname, pkgname, "swipl"))
+
+    if(.Platform$r_arch == "x64")
+      Sys.setenv(SWI_HOME_DIR=file.path(libname, pkgname, "mingw64", "swipl"))
+    if(.Platform$r_arch == "i386")
+      Sys.setenv(SWI_HOME_DIR=file.path(libname, pkgname, "mingw32", "swipl"))
+  
     if(!rolog_init() && !rolog_init())
       stop("Rolog: initialization of swipl failed.")  
   }
