@@ -13,8 +13,8 @@ RoxygenNote: 7.1.2.9000
 Encoding: UTF-8
 SystemRequirements: 
     GNU make,
-    cmake (>= 3.10),
-    pkgconfig
+    CMake (>= 3.10),
+    PkgConfig
 Suggests: 
     rmarkdown,
     knitr,
