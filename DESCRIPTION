@@ -14,7 +14,7 @@ Encoding: UTF-8
 SystemRequirements: 
     GNU make,
     CMake (>= 3.10),
-    PkgConfig
+    pkg-config
 Suggests: 
     rmarkdown,
     knitr,
