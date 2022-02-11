@@ -69,16 +69,17 @@ Please tell me if anything is misssing.
 
 2. Download and install a recent RStudio from https://www.rstudio.com/
 
-3. Download RTools4.0 from https://cran.r-project.org/bin/windows/Rtools/rtools40.html and install it, preferably into c:\rtools40, which is 
-   the default.
+3. Download RTools4.0 from https://cran.r-project.org/bin/windows/Rtools/rtools40.html and install it, preferably into c:\rtools40, which is the default.
 
-4. Invoke c:\rtools40\mingw64.exe
+4. The pacman repository of Rtools does not include git, so I installed git for Windows (Git - Downloading Package) and made it accessible to the path.
 
-5. A shell appears, type `pacman -Syu`
+5. Invoke c:\rtools40\mingw64.exe
 
-6. `pacman -S mingw-w64-x86_64-cmake mingw-w64-x86_64-make mingw-w64-x86_64-libjpeg mingw-w64-x86_64-libyaml mingw-w64-x86_64-pcre mingw-w64-x86_64-libarchive`
+6. A shell appears, type `pacman -Syu`
 
-7. Check if R is working: Either use R from the command line, or RGui or RStudio.
+7. `pacman -S mingw-w64-x86_64-cmake mingw-w64-x86_64-make mingw-w64-x86_64-libjpeg mingw-w64-x86_64-libyaml mingw-w64-x86_64-pcre mingw-w64-x86_64-libarchive`
+
+8. Check if R is working: Either use R from the command line, or RGui or RStudio.
 
 `/c/Program\ Files/R/R-4.1.2/bin/R`
 
@@ -135,13 +136,15 @@ The four issues are expected, since tcmalloc, bdb, jpl and xpce are not part of 
 3. Download RTools4.2 from https://cran.r-project.org/bin/windows/Rtools/ and install it, preferably into c:\rtools42, which is 
    the default.
 
-4. Invoke c:\rtools42\ucrt64.exe
+4. The pacman repository of Rtools does not include git, so I installed git for Windows (Git - Downloading Package) and made it accessible to the path.
 
-5. A shell appears, type `pacman -Syu`
+5. Invoke c:\rtools42\ucrt64.exe
 
-6. `pacman -S mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-libjpeg mingw-w64-ucrt-x86_64-libyaml mingw-w64-ucrt-x86_64-pcre mingw-w64-ucrt-x86_64-libarchive mingw-w64-ucrt-x86_64-db mingw-w64-ucrt-x86_64-texlive-latex-recommended mingw-w64-ucrt-x86_64-texlive-fonts-extra mingw-w64-ucrt-x86_64-qpdf`
+6. A shell appears, type `pacman -Syu`
 
-7. In RStudio, call:
+7. `pacman -S mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-libjpeg mingw-w64-ucrt-x86_64-libyaml mingw-w64-ucrt-x86_64-pcre mingw-w64-ucrt-x86_64-libarchive mingw-w64-ucrt-x86_64-db mingw-w64-ucrt-x86_64-texlive-latex-recommended mingw-w64-ucrt-x86_64-texlive-fonts-extra mingw-w64-ucrt-x86_64-qpdf`
+
+8. In RStudio, call:
 
 `install.packages("remotes")`
 
@@ -149,7 +152,7 @@ The four issues are expected, since tcmalloc, bdb, jpl and xpce are not part of 
 
 `remotes::install_github("mgondan/rolog", build_vignettes=TRUE)`
 
-8. You can check the installation like this:
+9. You can check the installation like this:
 
 `library(rolog)`
 
