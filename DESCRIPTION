@@ -15,7 +15,16 @@ SystemRequirements:
     GNU make,
     CMake (>= 3.10),
     pkg-config,
-    libarchive
+    libarchive,
+    libregex,
+    libexpat,
+    liblzma,
+    libzstd,
+    liblz4,
+    libz2,
+    libz,
+    libbcrypt
+
 Suggests: 
     rmarkdown,
     knitr,
