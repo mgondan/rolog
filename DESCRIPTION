@@ -24,7 +24,6 @@ SystemRequirements:
     libz2,
     libz,
     libbcrypt
-
 Suggests: 
     rmarkdown,
     knitr,
