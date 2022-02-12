@@ -1,5 +1,5 @@
-This R package embeds contains SWI-Prolog (https://www.swi-prolog.org/) covered 
-by the Simplified BSD license (which happens to be the same license as the present
+This R package embeds contains (https://www.swi-prolog.org/) covered by the
+Simplified BSD license (which happens to be the same license as the present
 R package).
 
 SWI-Prolog contains components covered by the GNU Lesser Public License.
