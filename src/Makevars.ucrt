@@ -12,7 +12,7 @@ swipl:
 		-DCMAKE_BUILD_TYPE=Release\
 		-DLibArchive_INCLUDE_DIRS=-I/ucrt64/include\
 		-DHAVE_ARCHIVE_READ_SUPPORT_FORMAT_CPIO=0\
-		-DLibArchive_LIBRARIES="-L/ucrt64/lib -larchive -lregex -lexpat -lzstd -llz4 -lbz2 -lz -lbcrypt -liconv -lxml2 -lnettle -llzma -ltre -lintl -liconv -lws2_32"\
+		-DLibArchive_LIBRARIES="-L/ucrt64/lib -larchive -lregex -lexpat -lzstd -llz4 -lbz2 -lbcrypt -liconv -lxml2 -lnettle -llzma -ltre -lintl -liconv -lws2_32 -lz"\
 		-DCMAKE_C_FLAGS="-DPCRE_STATIC -DHAVE_EVP_MD_CTX_FREE=1 -DHAVE_X509_DIGEST=1 -DHAVE_X509_CRL_DIGEST=1 -D__USE_MINGW_ANSI_STDIO"\
 		-DCMAKE_INSTALL_PREFIX=../inst/swipl\
 		-G "MSYS Makefiles" ../src/swipl-devel
