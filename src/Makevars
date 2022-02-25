@@ -23,5 +23,11 @@ libinst:
 	cp rolog.so ../libs
 	rm ../inst/swipl/bin/swipl
 	rm ../inst/swipl/bin/swipl-ld
-	rm ../inst/swipl/lib/swipl/bin/x86_64-linux/swipl
-	rm ../inst/swipl/lib/swipl/bin/x86_64-linux/swipl-ld
+ifdef CMAKE_VERSION
+	-rm ../inst/swipl/lib/swipl/bin/x86_64-linux/swipl
+	-rm ../inst/swipl/lib/swipl/bin/x86_64-linux/swipl-ld
+endif
+ifdef CMAKE_VERSION_MACOS
+	-rm ../inst/swipl/lib/swipl/bin/*/swipl
+	-rm ../inst/swipl/lib/swipl/bin/*/swipl-ld
+endif
