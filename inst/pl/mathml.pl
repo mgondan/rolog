@@ -1097,7 +1097,7 @@ math(Flags, tan(Alpha), New, X)
 %
 ml(Flags, fn(Name, (Args ; Params)), M)
  => ml(Flags, Name, F),
-    ml(Flags, paren(list(sign(;), [list(sign(,), Args), list(sign(,), Params)])), X),
+    ml(Flags, paren(list(sign(';'), [list(sign(','), Args), list(sign(','), Params)])), X),
     M = mrow([F, mo(&(af)), X]).
 
 paren(Flags, fn(_Name, (Args ; Params)), Paren)
@@ -1126,7 +1126,7 @@ ml(Flags, fn(Name, [Arg]), M)
 
 ml(Flags, fn(Name, Args), M)
  => ml(Flags, Name, F),
-    ml(Flags, paren(list(sign(,), Args)), X),
+    ml(Flags, paren(list(sign(','), Args)), X),
     M = mrow([F, mo(&(af)), X]).
 
 paren(Flags, fn(_Name, Args), Paren)
