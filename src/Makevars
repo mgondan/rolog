@@ -12,7 +12,7 @@ ifdef CMAKE_VERSION
 	cd ../linux && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DINSTALL_DOCUMENTATION=OFF -DSWIPL_PACKAGES_JAVA=OFF -DSWIPL_PACKAGES_X=OFF -DCMAKE_BUILD_TYPE=Release ../src/swipl-devel && make && make install
 endif
 ifdef CMAKE_VERSION_MACOS
-	cd ../linux && /Applications/CMake.app/Contents/bin/cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DINSTALL_DOCUMENTATION=OFF -DSWIPL_PACKAGES_JAVA=OFF -DSWIPL_PACKAGES_X=OFF -DCMAKE_BUILD_TYPE=Release ../src/swipl-devel && make && make install
+	cd ../linux && /Applications/CMake.app/Contents/bin/cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DINSTALL_DOCUMENTATION=OFF -DSWIPL_PACKAGES_JAVA=OFF -DSWIPL_PACKAGES_X=OFF -DSWIPL_PACKAGES_TERM=OFF -DCMAKE_BUILD_TYPE=Release ../src/swipl-devel && make && make install
 endif
 
 libinst:
