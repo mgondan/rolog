@@ -5,7 +5,7 @@ Version: 0.9
 Date: 2022-02-21
 Author: Matthias Gondan
 Maintainer: Matthias Gondan <Matthias.Gondan-Rochon@uibk.ac.at>
-Description: Query SWI-Prolog from R (consult, query, once, findall). This R package embeds SWI-Prolog, https://www.swi-prolog.org/.
+Description: Query SWI-Prolog from R (consult, query, once, findall). This R package embeds SWI-Prolog, <https://www.swi-prolog.org/>
 License: BSD_2_clause + file LICENSE
 Imports: Rcpp (>= 1.0.7)
 LinkingTo: Rcpp
