@@ -17,7 +17,7 @@
     arch <- R.version$arch
     if(arch == 'aarch64')
       arch <- 'arm64'
-    folder <- dir(fp, pattern=R.version$arch, full.names=TRUE)
+    folder <- dir(fp, pattern=arch, full.names=TRUE)
     print(dir(fp, full.names=TRUE))
     print(R.version$arch)
     print(folder)
