@@ -14,6 +14,7 @@
   {
     # Find folder like x86_64-linux
     fp <- file.path(libname, pkgname, "swipl", "lib", "swipl", "lib")
+    print(dir(fp, full.names=TRUE))
     folder <- dir(fp, pattern=R.version$arch, full.names=TRUE)
 
     # Are we in roxygenize mode?
