@@ -18,11 +18,7 @@
     if(arch == 'aarch64')
       arch <- 'arm64'
     folder <- dir(fp, pattern=arch, full.names=TRUE)
-    print(dir(fp, full.names=TRUE))
-    print(R.version$arch)
-    print(folder)
-    print(dir(folder, full.names=TRUE))
-
+ 
     # Are we in roxygenize mode?
     if(length(folder) == 0L)
     {
