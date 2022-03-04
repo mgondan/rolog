@@ -14,9 +14,14 @@
   {
     # Find folder like x86_64-linux
     fp <- file.path(libname, pkgname, "swipl", "lib", "swipl", "lib")
+    arch <- R.version$arch
+    if(arch == 'aarch64')
+      arch <- 'arm64'
+    folder <- dir(fp, pattern=R.version$arch, full.names=TRUE)
     print(dir(fp, full.names=TRUE))
     print(R.version$arch)
-    folder <- dir(fp, pattern=R.version$arch, full.names=TRUE)
+    print(folder)
+    print(dir(folder, full.names=TRUE))
 
     # Are we in roxygenize mode?
     if(length(folder) == 0L)
