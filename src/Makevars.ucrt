@@ -6,7 +6,7 @@ all: swipl $(SHLIB)
 # RTools40
 swipl:
 	mkdir -p ../rtools40
-	cd ../rtools40 && cmake -DMINGW_ROOT=/ucrt64\
+	cd ../rtools40 && /ucrt64/bin/cmake -DMINGW_ROOT=/ucrt64\
 		-DINSTALL_DOCUMENTATION=OFF -DSWIPL_PACKAGES_X=OFF\
 		-DWIN32_DLLS=""\
 		-DCMAKE_BUILD_TYPE=Release\
