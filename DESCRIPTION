@@ -1,6 +1,6 @@
 Package: rolog
 Type: Package
-Title: Invoke SWI-Prolog from R
+Title: Query 'SWI'-'Prolog' from R
 Version: 0.9
 Date: 2022-02-21
 Author: Matthias Gondan
