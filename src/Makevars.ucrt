@@ -1,9 +1,6 @@
 PKG_CPPFLAGS=-I../inst/swipl/include $(CXXPICFLAGS) -D_REENTRANT -D__SWI_PROLOG__ -O2 -gdwarf-2 -g3 -Wall -fno-strict-aliasing -D__WINDOWS__ -D_WINDOWS -D_WIN32_WINNT=0x0600 -DWIN64
 PKG_LIBS=-Wl,-Bsymbolic-functions -L../inst/swipl/bin -lswipl -lgmp -lz -lm -lpthread -lws2_32 -lpsapi -lwinmm -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
 
-WIN32_ZLIB1=$(shell which zlib1.dll)
-WIN32_DLLS="$(WIN32_ZLIB1)"
-
 all: swipl $(SHLIB)
 
 # RTools42
@@ -13,7 +10,9 @@ swipl:
 	rm -f ../inst/swipl/bin/*.dll
 	cd ../mingw64 && cmake -DMINGW_ROOT=/ucrt64\
 		-DCMAKE_INSTALL_PREFIX=../inst/swipl\
-		-DWIN32_DLLS=$(WIN32_DLLS)\
+ifneq(,$(shell which zlib1.dll))
+		-DWIN32_DLLS=""\
+endif
 		-DSWIPL_PACKAGES_X=OFF -DINSTALL_DOCUMENTATION=OFF\
 		-DHAVE_ARCHIVE_READ_SUPPORT_FORMAT_CPIO=0\
 		-DCMAKE_BUILD_TYPE=Release\
