@@ -16,7 +16,7 @@ swipl:
 		-DOPENSSL_OS_LIBS="-L/ucrt64/lib -lssl -lcrypto -lcrypt32 -lws2_32 -lgdi32 -lz"\
 		-DCMAKE_C_FLAGS="-DPCRE_STATIC -D__USE_MINGW_ANSI_STDIO"\
 		-DCMAKE_INSTALL_PREFIX=../inst/swipl\
-		-G "MSYS Makefiles" swipl-devel
+		-G "MSYS Makefiles" ../src/swipl-devel
 	# dos2unix all Makefiles
 	find ../rtools40 -name Makefile -exec sed -i 's/\r//' \{\} \;
 	cd ../rtools40 && make && make install
