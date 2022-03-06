@@ -14,6 +14,7 @@ swipl:
 	mkdir -p ../mingw64
 	mkdir -p ../inst/swipl/bin
 	rm -f ../inst/swipl/bin/*.dll
+	echo $(wildcard /ucrt/bin/zlib1.dll)
 	cd ../mingw64 && cmake -DMINGW_ROOT=/ucrt64\
 		-DCMAKE_INSTALL_PREFIX=../inst/swipl\
 		-DSWIPL_PACKAGES_X=OFF -DINSTALL_DOCUMENTATION=OFF\
