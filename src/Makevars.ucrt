@@ -1,7 +1,7 @@
 PKG_CPPFLAGS=-I../inst/swipl/include $(CXXPICFLAGS) -D_REENTRANT -D__SWI_PROLOG__ -O2 -gdwarf-2 -g3 -Wall -fno-strict-aliasing -D__WINDOWS__ -D_WINDOWS -D_WIN32_WINNT=0x0600 -DWIN64
 PKG_LIBS=-Wl,-Bsymbolic-functions -L../inst/swipl/bin -lswipl -lgmp -lz -lm -lpthread -lws2_32 -lpsapi -lwinmm -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
 
-ifeq (,$(ls /ucrt/bin/zlib1.dll))
+ifeq (,$(shell ls /ucrt/bin/zlib1.dll))
 WIN32_DLLS="-UWIN32_DLLS"
 else
 WIN32_DLLS="-DWIN32_DLLS=\"\""
@@ -14,7 +14,7 @@ swipl:
 	mkdir -p ../mingw64
 	mkdir -p ../inst/swipl/bin
 	rm -f ../inst/swipl/bin/*.dll
-	echo $(ls /ucrt/bin/zlib1.dll)
+	echo $(shell ls /ucrt/bin/zlib1.dll)
 	cd ../mingw64 && cmake -DMINGW_ROOT=/ucrt64\
 		-DCMAKE_INSTALL_PREFIX=../inst/swipl\
 		-DSWIPL_PACKAGES_X=OFF -DINSTALL_DOCUMENTATION=OFF\
