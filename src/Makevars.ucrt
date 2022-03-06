@@ -10,7 +10,9 @@ swipl:
 	rm -f ../inst/swipl/bin/*.dll
 	cd ../mingw64 && cmake -DMINGW_ROOT=/ucrt64\
 		-DCMAKE_INSTALL_PREFIX=../inst/swipl\
-ifneq(,$(shell which zlib1.dll))
+ifeq(,$(shell which zlib1.dll))
+		\
+else
 		-DWIN32_DLLS=""\
 endif
 		-DSWIPL_PACKAGES_X=OFF -DINSTALL_DOCUMENTATION=OFF\
