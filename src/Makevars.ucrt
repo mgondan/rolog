@@ -12,7 +12,7 @@ swipl:
 		-DCMAKE_BUILD_TYPE=Release\
 		-DLibArchive_INCLUDE_DIRS=-I/ucrt64/include\
 		-DHAVE_ARCHIVE_READ_SUPPORT_FORMAT_CPIO=0\
-		-DLibArchive_LIBRARIES="-larchive -lregex -lexpat -llzma -lzstd -llz4 -lb2 -lbz2 -lz -lbcrypt"\
+		-DLibArchive_LIBRARIES="-L/ucrt64/lib -larchive -lregex -lexpat -llzma -lzstd -llz4 -lb2 -lbz2 -lz -lbcrypt"\
 		-DOPENSSL_OS_LIBS="-L/ucrt64/lib -lssl -lcrypto -lcrypt32 -lws2_32 -lgdi32 -lz"\
 		-DCMAKE_C_FLAGS="-DPCRE_STATIC -D__USE_MINGW_ANSI_STDIO"\
 		-DCMAKE_INSTALL_PREFIX=../inst/swipl\
