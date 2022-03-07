@@ -4,7 +4,7 @@ PKG_LIBS=-Wl,-Bsymbolic-functions -L../inst/swipl/bin -lswipl -lgmp -lz -lm -lpt
 ifeq ("$(wildcard /ucrt64/bin/zlib*.dll)","")
 WIN32_DLLS="-DWIN32_DLLS=''"
 LibArchive_INCLUDE_DIRS="-DLibArchive_INCLUDE_DIRS='-I/ucrt64/include'"
-LibArchive_LIBRARIES="-DLibArchive_LIBRARIES='-L/ucrt64/lib -larchive -lregex -lexpat -llzma -lzstd -llz4 -lb2 -lbz2 -lz -lbcrypt'"
+LibArchive_LIBRARIES="-DLibArchive_LIBRARIES='/ucrt64/lib/libarchive.a;/ucrt64/lib/libregex.a;/ucrt64/lib/libexpat.a;/ucrt64/lib/liblzma.a;/ucrt64/lib/libzstd.a;/ucrt64/lib/liblz4.a;/ucrt64/lib/libb2.a;/ucrt64/lib/libbz2.a;/ucrt64/lib/libz.a;/ucrt64/lib/libbcrypt.a'"
 else
 WIN32_DLLS=-UWIN32_DLLS
 LibArchive_INCLUDE_DIRS=-ULibArchive_INCLUDE_DIRS
