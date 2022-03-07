@@ -20,7 +20,7 @@ swipl:
 		$(WIN32_DLLS)\
 		-DHAVE_ARCHIVE_READ_SUPPORT_FORMAT_CPIO=0\
 		-DCMAKE_BUILD_TYPE=Release\
-		-DCMAKE_C_FLAGS=-D__WINDOWS__ -D__USE_MINGW_ANSI_STDIO\
+		-DCMAKE_C_FLAGS="-D__WINDOWS__ -D__USE_MINGW_ANSI_STDIO"\
 		-G "MSYS Makefiles" ../src/swipl-devel
 	# dos2unix all Makefiles
 	find ../mingw64 -name Makefile -exec sed -i 's/\r//' \{\} \;
