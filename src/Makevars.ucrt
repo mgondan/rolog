@@ -3,8 +3,12 @@ PKG_LIBS=-Wl,-Bsymbolic-functions -L../inst/swipl/bin -lswipl -lgmp -lz -lm -lpt
 
 ifeq ("$(wildcard /ucrt64/bin/zlib*.dll)","")
 WIN32_DLLS="-DWIN32_DLLS=''"
+LibArchive_INCLUDE_DIRS="-ILibArchive_INCLUDE_DIRS='-I/ucrt64/include'"
+LibArchive_LIBRARIES="-DLibArchive_LIBRARIES='-L/ucrt64/lib -larchive -lregex -lexpat -llzma -lzstd -llz4 -lb2 -lbz2 -lz -lbcrypt'"
 else
 WIN32_DLLS=-UWIN32_DLLS
+LibArchive_INCLUDE_DIRS=-ULibArchive_INCLUDE_DIRS
+LibArchive_LIBRARIES=-ULibArchive_LIBRARIES
 endif
 
 all: swipl $(SHLIB)
@@ -18,6 +22,8 @@ swipl:
 		-DCMAKE_INSTALL_PREFIX=../inst/swipl\
 		-DSWIPL_PACKAGES_X=OFF -DINSTALL_DOCUMENTATION=OFF\
 		$(WIN32_DLLS)\
+		$(LibArchive_INCLUDE_DIRS)\
+		$(LibArchive_LIBRARIES)\
 		-DHAVE_ARCHIVE_READ_SUPPORT_FORMAT_CPIO=0\
 		-DCMAKE_BUILD_TYPE=Release\
 		-DCMAKE_C_FLAGS="-D__WINDOWS__ -D__USE_MINGW_ANSI_STDIO"\
