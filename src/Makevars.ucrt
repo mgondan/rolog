@@ -3,7 +3,7 @@ PKG_LIBS=-Wl,-Bsymbolic-functions -L../inst/swipl/bin -lswipl -lgmp -lz -lm -lpt
 
 ifeq ("$(wildcard /ucrt64/bin/zlib*.dll)","")
 WIN32_DLLS="-DWIN32_DLLS=''"
-LibArchive_INCLUDE_DIRS="-ILibArchive_INCLUDE_DIRS='-I/ucrt64/include'"
+LibArchive_INCLUDE_DIRS="-DLibArchive_INCLUDE_DIRS='-I/ucrt64/include'"
 LibArchive_LIBRARIES="-DLibArchive_LIBRARIES='-L/ucrt64/lib -larchive -lregex -lexpat -llzma -lzstd -llz4 -lb2 -lbz2 -lz -lbcrypt'"
 else
 WIN32_DLLS=-UWIN32_DLLS
