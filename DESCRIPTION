@@ -20,6 +20,7 @@ SystemRequirements:
     liblzma,
     libzstd,
     liblz4,
+    libb2,
     libz2,
     libz,
     libbcrypt
