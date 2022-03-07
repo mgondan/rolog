@@ -2,9 +2,9 @@ PKG_CPPFLAGS=-I../inst/swipl/include $(CXXPICFLAGS) -D_REENTRANT -D__SWI_PROLOG_
 PKG_LIBS=-Wl,-Bsymbolic-functions -L../inst/swipl/bin -lswipl -lgmp -lz -lm -lpthread -lws2_32 -lpsapi -lwinmm -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
 
 ifneq ("$(wildcard /ucrt64/bin/zlib1.dll)","")
-WIN32_DLLS="-DWIN32_DLLS=\"\""
+WIN32_DLLS="-DWIN32_DLLS=''"
 else
-WIN32_DLLS="-UWIN32_DLLS"
+WIN32_DLLS=-UWIN32_DLLS
 endif
 
 all: swipl $(SHLIB)
