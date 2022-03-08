@@ -20,7 +20,6 @@ SystemRequirements:
     liblzma,
     libzstd,
     liblz4,
-    libb2,
     libz2,
     libz,
     libbcrypt
@@ -32,3 +31,4 @@ Suggests:
     htmltools,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+VignetteBuilder: knitr, rmarkdown
