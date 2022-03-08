@@ -6,11 +6,11 @@ ifeq "$(WIN)" "64"
     PKG_CPPFLAGS=$(PKG_CPPFLAGS) -DWIN64
     MINGW_ROOT=/mingw64
     LibArchive_INCLUDE_DIRS=/mingw64/include
-    LibArchive_LIBRARIES="`/mingw64/bin/pkg-config --libs --static libarchive`"
+    LibArchive_LIBRARIES="`/mingw64/lib/libarchive.a;/mingw64/lib/libregex.a;/mingw64/lib/libexpat.a;/mingw64/lib/liblzma.a;/mingw64/lib/libstd.a;/mingw64/lib/liblz4.a;/mingw64/lib/libbz2.a;/mingw64/lib/libz.a;/mingw64/lib/libbcrypt.a`"
 else
     MINGW_ROOT=/mingw32
     LibArchive_INCLUDE_DIRS=/mingw32/include
-    LibArchive_LIBRARIES="`/mingw32/bin/pkg-config --libs --static libarchive`"
+    LibArchive_LIBRARIES="`/mingw32/lib/libarchive.a;/mingw32/lib/libregex.a;/mingw32/lib/libexpat.a;/mingw32/lib/liblzma.a;/mingw32/lib/libstd.a;/mingw32/lib/liblz4.a;/mingw32/lib/libbz2.a;/mingw32/lib/libz.a;/mingw32/lib/libbcrypt.a`"
 endif
 
 all: swipl $(SHLIB)
@@ -27,7 +27,6 @@ swipl:
 		-DCMAKE_BUILD_TYPE=Release\
 		-DCMAKE_C_FLAGS=-D__USE_MINGW_ANSI_STDIO\
 		-DCMAKE_LDFLAGS=-lz\
-		-DGMP_LIBRARIES=$(GMP_LIBRARIES)\
 		-DLibArchive_INCLUDE_DIRS=$(LibArchive_INCLUDE_DIRS)\
 		-DLibArchive_LIBRARIES=$(LibArchive_LIBRARIES)\
 		-G "MSYS Makefiles" ../src/swipl-devel
