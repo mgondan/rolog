@@ -27,6 +27,8 @@ swipl:
 		-DCMAKE_BUILD_TYPE=Release\
 		-DCMAKE_C_FLAGS=-D__USE_MINGW_ANSI_STDIO\
 		-DGMP_LIBRARIES=$(GMP_LIBRARIES)\
+		-DLibArchive_INCLUDE_DIRS=$(LibArchive_INCLUDE_DIRS)\
+		-DLibArchive_LIBRARIES=$(LibArchive_LIBRARIES)\
 		-G "MSYS Makefiles" ../src/swipl-devel
 	# dos2unix all Makefiles
 	find ../rtools40 -name Makefile -exec sed -i 's/\r//' \{\} \;
