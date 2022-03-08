@@ -1,15 +1,7 @@
-PKG_CPPFLAGS=-I../inst/swipl/include $(CXXPICFLAGS) -D_REENTRANT -D__SWI_PROLOG__ -O2 -gdwarf-2 -g3 -Wall -fno-strict-aliasing -D__WINDOWS__ -D_WINDOWS -D_WIN32_WINNT=0x0600 -DWIN64
+PKG_CPPFLAGS=-I../inst/swipl/include -Iswipl-devel/packages/cpp $(CXXPICFLAGS) -D_REENTRANT -D__SWI_PROLOG__ -O2 -gdwarf-2 -g3 -Wall -fno-strict-aliasing -D__WINDOWS__ -D_WINDOWS -D_WIN32_WINNT=0x0600 -DWIN64
 PKG_LIBS=-Wl,-Bsymbolic-functions -L../inst/swipl/bin -lswipl -lgmp -lz -lm -lpthread -lws2_32 -lpsapi -lwinmm -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
 
-ifeq ("$(wildcard /ucrt64/bin/zlib*.dll)","")
 WIN32_DLLS="-DWIN32_DLLS=''"
-LibArchive_INCLUDE_DIRS="-DLibArchive_INCLUDE_DIRS='-I/ucrt64/include'"
-LibArchive_LIBRARIES="-DLibArchive_LIBRARIES='/ucrt64/lib/libarchive.a;/ucrt64/lib/libregex.a;/ucrt64/lib/libexpat.a;/ucrt64/lib/liblzma.a;/ucrt64/lib/libzstd.a;/ucrt64/lib/liblz4.a;/ucrt64/lib/libb2.a;/ucrt64/lib/libbz2.a;/ucrt64/lib/libz.a;/ucrt64/lib/libbcrypt.a'"
-else
-WIN32_DLLS=-UWIN32_DLLS
-LibArchive_INCLUDE_DIRS=-ULibArchive_INCLUDE_DIRS
-LibArchive_LIBRARIES=-ULibArchive_LIBRARIES
-endif
 
 all: swipl $(SHLIB)
 
@@ -18,23 +10,17 @@ swipl:
 	mkdir -p ../mingw64
 	mkdir -p ../inst/swipl/bin
 	rm -f ../inst/swipl/bin/*.dll
-	cd ../mingw64 && cmake -DMINGW_ROOT=/ucrt64\
+	cd ../mingw64 && cmake -DMINGW_ROOT=/x86_64-w64-mingw32.static.posix/bin\
 		-DCMAKE_INSTALL_PREFIX=../inst/swipl\
-		-DSWIPL_PACKAGES_X=OFF -DINSTALL_DOCUMENTATION=OFF\
+		-DSWIPL_PACKAGES=OFF -DSWIPL_PACKAGES_CPP=ON -DINSTALL_DOCUMENTATION=OFF\
 		$(WIN32_DLLS)\
-		$(LibArchive_INCLUDE_DIRS)\
-		$(LibArchive_LIBRARIES)\
-		-DHAVE_ARCHIVE_READ_SUPPORT_FORMAT_CPIO=0\
 		-DCMAKE_BUILD_TYPE=Release\
-		-DCMAKE_C_FLAGS="-D__WINDOWS__ -D__USE_MINGW_ANSI_STDIO"\
+		-DCMAKE_C_FLAGS=-D__USE_MINGW_ANSI_STDIO\
 		-G "MSYS Makefiles" ../src/swipl-devel
 	# dos2unix all Makefiles
 	find ../mingw64 -name Makefile -exec sed -i 's/\r//' \{\} \;
 	cd ../mingw64 && make && make install
-	cp /ucrt64/bin/zlib1.dll ../inst/swipl/bin/libswipl.dll /ucrt64/bin/libgmp-10.dll .
-	cp /ucrt64/bin/libarchive-13.dll ../inst/swipl/bin
-	cp /ucrt64/bin/libdb-6.0.dll ../inst/swipl/bin
-	cp `ldd ../inst/swipl/bin/archive4pl.dll | grep -o ' /ucrt64/bin/.*dll '` `ldd /ucrt64/bin/libarchive-13.dll | grep -o ' /ucrt64/bin/.*\.dll'` `ldd ../inst/swipl/bin/bdb4pl.dll | grep -o ' /ucrt64/bin/.*dll '` `ldd /ucrt64/bin/libdb-6.0.dll | grep -o ' /ucrt64/bin/.*\.dll'` ../inst/swipl/bin
+	cp ../inst/swipl/bin/libswipl.dll .
 	rm ../inst/swipl/bin/swipl.exe
 	rm ../inst/swipl/bin/swipl-win.exe
 	rm ../inst/swipl/bin/swipl-ld.exe
