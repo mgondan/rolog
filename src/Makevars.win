@@ -1,52 +1,32 @@
+PKG_CPPFLAGS=-I../inst/swipl/include -Iswipl-devel/packages/cpp $(CXXPICFLAGS) -D_REENTRANT -D__SWI_PROLOG__ -O2 -gdwarf-2 -g3 -Wall -fno-strict-aliasing -D__WINDOWS__ -D_WINDOWS -D_WIN32_WINNT=0x0600
+PKG_LIBS=-Wl,-Bsymbolic-functions -L../inst/swipl/bin -lswipl -lgmp -lz -lm -lpthread -lws2_32 -lpsapi -lwinmm -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+WIN32_DLLS="-DWIN32_DLLS=''"
+
 ifeq "$(WIN)" "64"
     PKG_CPPFLAGS=$(PKG_CPPFLAGS) -DWIN64
     MINGW_ROOT=/mingw64
-    CMAKE_C_COMPILER=/mingw64/bin/gcc.exe
-    CMAKE_CXX_COMPILER=/mingw64/bin/g++.exe
-    CMAKE_RC_COMPILER=/mingw64/bin/windres.exe
-    PKG_CONFIG_EXECUTABLE=/mingw64/bin/pkg-config.exe
-    LibArchive_INCLUDE_DIRS=/mingw64/include
-    LibArchive_LIBRARIES="`/mingw64/bin/pkg-config --libs --static libarchive`"
 else
     MINGW_ROOT=/mingw32
-    CMAKE_C_COMPILER=/mingw32/bin/gcc.exe
-    CMAKE_CXX_COMPILER=/mingw32/bin/g++.exe
-    CMAKE_RC_COMPILER=/mingw32/bin/windres.exe
-    PKG_CONFIG_EXECUTABLE=/mingw32/bin/pkg-config.exe
-    LibArchive_INCLUDE_DIRS=/mingw32/include
-    LibArchive_LIBRARIES="`/mingw32/bin/pkg-config --libs --static libarchive`"
 endif
-
-PKG_CPPFLAGS=-I../inst$(MINGW_ROOT)/swipl/include $(CXXPICFLAGS) -D_REENTRANT -D__SWI_PROLOG__ -O2 -gdwarf-2 -g3 -Wall -fno-strict-aliasing -D__WINDOWS__ -D_WINDOWS -D_WIN32_WINNT=0x0600
-PKG_LIBS=-Wl,-Bsymbolic-functions -L../inst$(MINGW_ROOT)/swipl/bin -lswipl -lgmp -lz -lm -lpthread -lws2_32 -lpsapi -lwinmm -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
 
 all: swipl $(SHLIB)
 
+# RTools40
 swipl:
-	mkdir -p ..$(MINGW_ROOT)
-	cd ..$(MINGW_ROOT) && $(MINGW_ROOT)/bin/cmake\
+	mkdir -p ../rtools40
+	mkdir -p ../inst/swipl/bin
+	rm -f ../inst/swipl/bin/*.dll
+	cd ../rtools40 && cmake -DMINGW_ROOT=$(MINGW_ROOT)\
+		-DCMAKE_INSTALL_PREFIX=../inst/swipl\
+		-DSWIPL_PACKAGES=OFF -DSWIPL_PACKAGES_CPP=ON -DINSTALL_DOCUMENTATION=OFF\
+		$(WIN32_DLLS)\
 		-DCMAKE_BUILD_TYPE=Release\
-		-DMINGW_ROOT=$(MINGW_ROOT)\
-		-DCMAKE_C_COMPILER=$(CMAKE_C_COMPILER)\
-		-DCMAKE_CXX_COMPILER=$(CMAKE_CXX_COMPILER)\
-		-DCMAKE_RC_COMPILER=$(CMAKE_RC_COMPILER)\
-		-DPKG_CONFIG_EXECUTABLE=$(PKG_CONFIG_EXECUTABLE)\
-		-DINSTALL_DOCUMENTATION=OFF\
-		-DSWIPL_PACKAGES_X=OFF\
-		-DWIN32_DLLS=""\
-		-DLibArchive_INCLUDE_DIRS=$(LibArchive_INCLUDE_DIRS)\
-		-DLibArchive_LIBRARIES=$(LibArchive_LIBRARIES)\
-		-DCMAKE_C_FLAGS="-DPCRE_STATIC -DHAVE_EVP_MD_CTX_FREE=1 -DHAVE_X509_DIGEST=1 -DHAVE_X509_CRL_DIGEST=1"\
-		-DCMAKE_INSTALL_PREFIX=../inst$(MINGW_ROOT)/swipl\
-		-G "MSYS Makefiles"\
-		../src/swipl-devel
+		-DCMAKE_C_FLAGS=-D__USE_MINGW_ANSI_STDIO\
+		-G "MSYS Makefiles" ../src/swipl-devel
 	# dos2unix all Makefiles
-	find ..$(MINGW_ROOT) -name Makefile -exec sed -i 's/\r//' \{\} \;
-	cd ..$(MINGW_ROOT) && make && make install
-	cp ../inst$(MINGW_ROOT)/swipl/bin/libswipl.dll .
-	rm ../inst$(MINGW_ROOT)/swipl/bin/swipl.exe
-	rm ../inst$(MINGW_ROOT)/swipl/bin/swipl-win.exe
-	rm ../inst$(MINGW_ROOT)/swipl/bin/swipl-ld.exe
-
-clean:
-	rm *.o *.dll
+	find ../rtools40 -name Makefile -exec sed -i 's/\r//' \{\} \;
+	cd ../rtools40 && make && make install
+	cp ../inst/swipl/bin/libswipl.dll .
+	rm ../inst/swipl/bin/swipl.exe
+	rm ../inst/swipl/bin/swipl-win.exe
+	rm ../inst/swipl/bin/swipl-ld.exe
