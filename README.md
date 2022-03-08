@@ -1,5 +1,7 @@
 # rolog: Access SWI-Prolog from R
 
+*Please note that this package is currently broken under Windows. I still have to learn the details of the CRAN build system.* 
+
 The logic programming language Prolog was invented in the 1970ies by Alain
 Colmerauer, mostly for the purpose of natural language processing. Since then,
 logic programming has become an important driving force in research on artificial
