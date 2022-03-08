@@ -9,7 +9,6 @@ ifeq "$(WIN)" "64"
 else
     MINGW_ROOT=/mingw32
     GMP_LIBRARIES='-L/mingw32/lib -lgmp'
-    undefined reference to `__gmpq_init'
 endif
 
 all: swipl $(SHLIB)
