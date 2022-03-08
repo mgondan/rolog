@@ -5,8 +5,12 @@ WIN32_DLLS="-DWIN32_DLLS=''"
 ifeq "$(WIN)" "64"
     PKG_CPPFLAGS=$(PKG_CPPFLAGS) -DWIN64
     MINGW_ROOT=/mingw64
+    LibArchive_INCLUDE_DIRS=/mingw64/include
+    LibArchive_LIBRARIES="`/mingw64/bin/pkg-config --libs --static libarchive`"
 else
     MINGW_ROOT=/mingw32
+    LibArchive_INCLUDE_DIRS=/mingw32/include
+    LibArchive_LIBRARIES="`/mingw32/bin/pkg-config --libs --static libarchive`"
 endif
 
 all: swipl $(SHLIB)
