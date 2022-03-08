@@ -26,7 +26,7 @@ swipl:
 		$(WIN32_DLLS)\
 		-DCMAKE_BUILD_TYPE=Release\
 		-DCMAKE_C_FLAGS=-D__USE_MINGW_ANSI_STDIO\
-		-DCMAKE_LDFLAGS=-lz\
+		-DCMAKE_C_STANDARD_LIBRARIES="-lz"
 		-DLibArchive_INCLUDE_DIRS=$(LibArchive_INCLUDE_DIRS)\
 		-DLibArchive_LIBRARIES=$(LibArchive_LIBRARIES)\
 		-G "MSYS Makefiles" ../src/swipl-devel
