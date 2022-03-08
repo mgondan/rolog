@@ -4,9 +4,12 @@ WIN32_DLLS="-DWIN32_DLLS=''"
 
 ifeq "$(WIN)" "64"
     PKG_CPPFLAGS=$(PKG_CPPFLAGS) -DWIN64
+    GMP_LIBRARIES='-L/mingw64/lib -lgmp'
     MINGW_ROOT=/mingw64
 else
     MINGW_ROOT=/mingw32
+    GMP_LIBRARIES='-L/mingw32/lib -lgmp'
+    undefined reference to `__gmpq_init'
 endif
 
 all: swipl $(SHLIB)
@@ -22,6 +25,7 @@ swipl:
 		$(WIN32_DLLS)\
 		-DCMAKE_BUILD_TYPE=Release\
 		-DCMAKE_C_FLAGS=-D__USE_MINGW_ANSI_STDIO\
+		-DGMP_LIBRARIES=$(GMP_LIBRARIES)\
 		-G "MSYS Makefiles" ../src/swipl-devel
 	# dos2unix all Makefiles
 	find ../rtools40 -name Makefile -exec sed -i 's/\r//' \{\} \;
