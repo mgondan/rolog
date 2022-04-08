@@ -19,7 +19,7 @@ swipl:
 		-DCMAKE_BUILD_TYPE=Release\
 		-DCMAKE_C_FLAGS="-D__USE_MINGW_ANSI_STDIO -DHAVE_EVP_MD_CTX_FREE=1 -DHAVE_X509_DIGEST=1 -DHAVE_X509_CRL_DIGEST=1"\
 		-DOPENSSL_OS_LIBS="-lssl -lcrypto -lcrypt32 -lws2_32 -lgdi32 -lz"\
-		../src/swipl-devel
+		-G Ninja ../src/swipl-devel
 	# dos2unix all Makefiles
 	find ../mingw64 -name Makefile -exec sed -i 's/\r//' \{\} \;
 	cd ../mingw64 && make && make install
