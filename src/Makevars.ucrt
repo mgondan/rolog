@@ -15,7 +15,7 @@ swipl:
 		-DLibArchive_INCLUDE_DIRS="-I."\
 		-DLibArchive_LIBRARIES="-larchive -lnettle -lxml2 -liconv -lregex -lexpat -llzma -lzstd -llz4 -lbz2 -lz -lbcrypt -lws2_32"\
 		-DCMAKE_BUILD_TYPE=Release\
-		-DCMAKE_C_FLAGS="-D__USE_MINGW_ANSI_STDIO -DHAVE_EVP_MD_CTX_FREE=1 -DHAVE_X509_DIGEST=1 -DHAVE_X509_CRL_DIGEST=1 -DNO_SYS_IOCTL_H_WITH_SYS_TERMIOS_H"\
+		-DCMAKE_C_FLAGS="-D__USE_MINGW_ANSI_STDIO -DHAVE_EVP_MD_CTX_FREE=1 -DHAVE_X509_DIGEST=1 -DHAVE_X509_CRL_DIGEST=1"\
 		-DOPENSSL_OS_LIBS="-lssl -lcrypto -lcrypt32 -lws2_32 -lgdi32 -lz"\
 		../src/swipl-devel
 	# dos2unix all Makefiles
