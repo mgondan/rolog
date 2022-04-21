@@ -14,8 +14,6 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 options(rmarkdown.html_vignette.check_title=FALSE)
 library(DiagrammeR)
-library(DiagrammeRsvg)
-library(htmltools)
 ```
 
   Matthias Gondan\
@@ -328,52 +326,6 @@ stages of the process:
   (see the dicts below)
 * R functions that postprocess the result of a query
 
-The process is illustrated in Figure\ 1.
-
-```{r, echo=FALSE, fig.width=6, fig.height=2}
-HTML(export_svg(grViz(
-  'digraph G
-   {
-     rankdir=LR
-     Query Result
-
-     subgraph cluster_0 
-     {
-       style=filled
-       color=lightgrey
-       node [style=filled,color=white]
-       r2rolog -> forth -> rolog_pl
-     }
-
-     subgraph cluster_1 
-     {
-       style=filled
-       color=lightgrey
-       node [style=filled,color=white]
-       rolog2r -> back [dir=back]
-       back -> pl_rolog [dir=back]
-     }
-  
-     Query -> r2rolog
-     rolog_pl:e -> Prolog
-     pl_rolog:e -> Prolog [dir=back]
-     Result -> rolog2r [dir=back]
-
-     Query [shape=Mdiamond;width=0.7;height=0.7]
-     r2rolog [shape=rect,label="preproc(...)"]
-     forth [label="(rolog)"]
-     rolog_pl [shape=rect,label="preproc/2"]
-     Prolog [shape=Mcircle]
-     pl_rolog [shape=rect,label="postproc/2"]
-     rolog2r [shape=rect,label="postproc(...)"]
-     back [label="(rolog)"]
-     Result [shape=Msquare]
-   }')))
-```
-
-Figure\ 1
-: Workflow in Rolog
-
 ## Preprocessing in R
 
 We have already seen above that raising even simple everyday Prolog queries such
@@ -471,8 +423,8 @@ once(call("do_something_with_pairs", list(a=1, b=2), expression(X)))
 ```
 
 In the code above, `dict_pairs/2` takes the role of both `preproc/2`
-and `postproc/2` in Figure\ 1. It illustrates that complicated syntax on the R
-side when can be much simpler to do the conversion at the Prolog end.
+and `postproc/2`. It illustrates that complicated syntax on the R side can be
+considerably simplified when conversion is done at the Prolog end.
 
 A way to extend Prolog by add-ons ("packs") are shown in the next section.
 
@@ -1010,8 +962,8 @@ raises an error message).
 
 The source code of the package is found at https://github.com/mgondan/rolog/,
 including installation instructions for Unix, Windows and macOS. At the moment,
-Rolog is a source package that requires the RTools 4.2 toolchain under Windows. 
-Binaries will be made available soon on https://cran.r-project.org/.
+Rolog is a source package that requires R 4.2 and the RTools 4.2 toolchain under
+Windows. Binaries will be made available soon on https://cran.r-project.org/.
 
 # Acknowledgement
 
