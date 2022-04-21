@@ -11,9 +11,8 @@ vignette: >
 ---
 
 ```{r, include=FALSE}
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+knitr::opts_chunk$set(collapse=TRUE, comment="#>")
 options(rmarkdown.html_vignette.check_title=FALSE)
-library(DiagrammeR)
 ```
 
   Matthias Gondan\
