@@ -40,6 +40,12 @@
       dyn.load(file.path(folder, "libswipl.dylib")) # macOS
   }
 
+  if(.Platform$OS.type == "windows")
+  {
+    folder <- file.path(libname, pkgname, "swipl", "bin")
+    dyn.load(file.path(folder, paste("libswipl", .Platform$dynlib.ext, sep="")))
+  }
+
   # Load rolog.so
   library.dynam(chname="rolog", package=pkgname, lib.loc=libname, local=FALSE)
   
@@ -72,6 +78,12 @@
       dyn.unload(file.path(folder, paste("libswipl", .Platform$dynlib.ext, sep="")))
     else
       dyn.unload(file.path(folder, "libswipl.dylib"))
+  }
+
+  if(.Platform$OS.type == "windows")
+  {
+    folder <- file.path(libname, pkgname, "swipl", "bin")
+    dyn.unload(file.path(folder, paste("libswipl", .Platform$dynlib.ext, sep="")))
   }
 
   invisible()
