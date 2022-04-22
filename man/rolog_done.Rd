@@ -12,8 +12,3 @@ rolog_done()
 \description{
 Clean up when detaching the library
 }
-\details{
-At this stage, this function is of little practical use, since it is not yet
-possible to initialize prolog twice in the same R session. See the source file
-rolog.cpp for details.
-}
