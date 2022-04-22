@@ -157,14 +157,6 @@ rolog_init <- function(argv1=commandArgs()[1])
 #' 
 #' @return
 #' `TRUE` on success
-#'
-#' @md
-#' 
-#' @details
-#' At this stage, this function is of little practical use, since it is not yet
-#' possible to initialize prolog twice in the same R session. See the source file
-#' rolog.cpp for details.
-#' 
 rolog_done <- function()
 {
   .done()
