@@ -1012,13 +1012,7 @@ LogicalVector done_()
   // Just in case there are open queries
   clear_() ;
 
-  // Prolog documentation says that PL_cleanup is not fully functional, so this
-  // code is preliminary. In particular, it is currently not possible to unload 
-  // rolog and load it again in the same R session.
-  //
-  // For these reasons, the call to cleanup is currently suppressed.
-
-  // PL_cleanup(0) ;
-  // pl_initialized = false ;
+  PL_cleanup(0) ;
+  pl_initialized = false ;
   return true ;
 }
