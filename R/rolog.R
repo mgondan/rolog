@@ -82,7 +82,8 @@
 
   if(.Platform$OS.type == "windows")
   {
-    folder <- file.path(libname, pkgname, "swipl", "bin")
+    fp <- file.path(libpath, "swipl", "bin")
+    folder <- dir(fp, pattern=R.version$arch, full.names=TRUE)
     dyn.unload(file.path(folder, paste("libswipl", .Platform$dynlib.ext, sep="")))
   }
 
