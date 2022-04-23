@@ -1,9 +1,0 @@
-This R package embeds SWI-Prolog (https://www.swi-prolog.org/) covered by the
-Simplified BSD license (which happens to be the same license as the present
-R package).
-
-SWI-Prolog contains components covered by the GNU Lesser Public License.
-Distribution of this program is subject to additional conditions. These 
-components are:
-
-     libgmp
