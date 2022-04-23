@@ -29,6 +29,7 @@
 ^src/swipl-devel/packages/redis/
 ^src/swipl-devel/packages/plunit/
 ^src/swipl-devel/src/Tests/
+^src/swipl-devel/man/
 ^.*\.git$
 ^.*\.plrc$
 ^.*\.fileheader$
