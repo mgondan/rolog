@@ -10,7 +10,7 @@ swipl:
 	rm -f ../inst/swipl/bin/*.dll
 	cd ../mingw64 && cmake -DMINGW_ROOT=/x86_64-w64-mingw32.static.posix/bin\
 		-DCMAKE_INSTALL_PREFIX=../inst/swipl\
-		-DSWIPL_PACKAGES_X=OFF -DINSTALL_DOCUMENTATION=OFF\
+		-DSWIPL_PACKAGES_X=OFF -DINSTALL_DOCUMENTATION=OFF -DUSE_GMP=OFF\
 		-DWIN32_DLLS=""\
 		-DLibArchive_INCLUDE_DIRS="-I."\
 		-DLibArchive_LIBRARIES="-larchive -lnettle -lxml2 -liconv -lregex -lexpat -llzma -lzstd -llz4 -lbz2 -lz -lbcrypt -lws2_32"\
