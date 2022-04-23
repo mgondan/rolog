@@ -7,7 +7,6 @@
 ^src/swipl-devel/packages/xpce/
 ^src/swipl-devel/packages/semweb/
 ^src/swipl-devel/packages/bdb/
-^src/swipl-devel/packages/cpp/
 ^src/swipl-devel/packages/yaml/
 ^src/swipl-devel/packages/utf8proc/
 ^src/swipl-devel/packages/cppproxy/
@@ -25,7 +24,6 @@
 ^src/swipl-devel/packages/protobufs/
 ^src/swipl-devel/packages/libedit/
 ^src/swipl-devel/packages/stomp/
-^src/swipl-devel/packages/zlib/
 ^src/swipl-devel/packages/nlp/
 ^src/swipl-devel/packages/pengines/
 ^src/swipl-devel/packages/redis/
