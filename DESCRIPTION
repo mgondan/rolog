@@ -6,7 +6,7 @@ Date: 2022-04-21
 Author: Matthias Gondan
 Maintainer: Matthias Gondan <Matthias.Gondan-Rochon@uibk.ac.at>
 Description: This R package embeds 'SWI'-'Prolog', <https://www.swi-prolog.org/>, so that R can send deterministic and non-deterministic queries to 'prolog' ('consult', 'query'/'submit', 'once', 'findall').
-License: BSD_2_clause
+License: FreeBSD
 Imports: Rcpp (>= 1.0.7)
 Depends: R (>= 4.2)
 LinkingTo: Rcpp
