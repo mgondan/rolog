@@ -9,37 +9,6 @@
 #
 .onLoad <- function(libname, pkgname)
 {
-  # Load libswipl.so
-  #if(.Platform$OS.type == "unix")
-  #{
-  #  # Find folder like x86_64-linux
-  #  fp <- file.path(libname, pkgname, "swipl", "lib", "swipl", "lib")
-  #  arch <- R.version$arch
-  #  if(arch == 'aarch64')
-  #    arch <- 'arm64'
-  #  folder <- dir(fp, pattern=arch, full.names=TRUE)
-# 
-#    # Are we in roxygenize mode?
-#    if(length(folder) == 0L)
-  #  {
-  #    inst <- dir(file.path(libname, pkgname), pattern="inst", full.names=FALSE)
-  #    if("inst" %in% inst)
-  #    {
-  #      fp <- file.path(libname, pkgname, "inst", "swipl", "lib", "swipl", "lib")
-  #      folder <- dir(fp, pattern=R.version$arch, full.names=TRUE)
-  #    }
-#
- #     if(length(folder) == 0L)
-  #      stop("Rolog: could not load libswipl.dll/so/dylib")
-  #  }
-#
- #   # Preload libswipl.dll
-  #  if(R.version$os == "linux-gnu")
-  #    dyn.load(file.path(folder, paste("libswipl", .Platform$dynlib.ext, sep="")))
-  #  else
-  #    dyn.load(file.path(folder, "libswipl.dylib")) # macOS
-  #}
-
   if(.Platform$OS.type == "windows")
   {
     folder <- file.path(libname, pkgname, "swipl", "bin")
@@ -68,17 +37,6 @@
 {
   # See .onLoad for details
   library.dynam.unload("rolog", libpath=libpath)
-
-  #if(.Platform$OS.type == "unix")
-  #{
-  #  fp <- file.path(libpath, "swipl", "lib", "swipl", "lib")
-  #  folder <- dir(fp, pattern=R.version$arch, full.names=TRUE)
-#
- #   if(R.version$os == "linux-gnu")
-  #    dyn.unload(file.path(folder, paste("libswipl", .Platform$dynlib.ext, sep="")))
-  #  else
-  #    dyn.unload(file.path(folder, "libswipl.dylib"))
-  #}
 
   if(.Platform$OS.type == "windows")
   {
@@ -110,11 +68,6 @@
   {
     Sys.setenv(SWI_HOME_DIR=file.path(libname, pkgname, "swipl"))
 
-    if(is.null(R.Version()$crt) & R.Version()$arch == "x86_64")
-      Sys.setenv(SWI_HOME_DIR=file.path(libname, pkgname, "mingw64", "swipl"))
-    if(is.null(R.Version()$crt) & R.Version()$arch == "i386")
-      Sys.setenv(SWI_HOME_DIR=file.path(libname, pkgname, "mingw32", "swipl"))
-  
     if(!rolog_init() && !rolog_init())
       stop("Rolog: initialization of swipl failed.")  
   }
