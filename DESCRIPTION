@@ -15,6 +15,7 @@ Encoding: UTF-8
 SystemRequirements: 
     GNU make,
     CMake (>= 3.10),
+    pandoc,
     libarchive,
     libregex,
     libexpat,
