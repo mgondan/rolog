@@ -9,7 +9,21 @@
 #
 .onLoad <- function(libname, pkgname)
 {
-  if(.Platform$OS.type == "windows")
+	# Load libswipl.dylib under macOS
+	if(.Platform$OS.type == "unix" & R.version$os != "linux-gnu")
+	{
+		# Find folder like x86_64-linux
+		fp <- file.path(libname, pkgname, "swipl", "lib", "swipl", "lib")
+		arch <- R.version$arch
+		if(arch == 'aarch64')
+			arch <- 'arm64'
+		folder <- dir(fp, pattern=arch, full.names=TRUE)
+		
+		# Preload libswipl.dll
+		dyn.load(file.path(folder, "libswipl.dylib")) # macOS
+	}
+	
+	if(.Platform$OS.type == "windows")
   {
     folder <- file.path(libname, pkgname, "swipl", "bin")
     dyn.load(file.path(folder, paste("libswipl", .Platform$dynlib.ext, sep="")))
@@ -38,6 +52,13 @@
   # See .onLoad for details
   library.dynam.unload("rolog", libpath=libpath)
 
+	if(.Platform$OS.type == "unix" & R.version$os != "linux-gnu")
+	{
+		fp <- file.path(libpath, "swipl", "lib", "swipl", "lib")
+		folder <- dir(fp, pattern=R.version$arch, full.names=TRUE)
+		dyn.unload(file.path(folder, "libswipl.dylib"))
+	}
+	
   if(.Platform$OS.type == "windows")
   {
     folder <- file.path(libpath, "swipl", "bin")
