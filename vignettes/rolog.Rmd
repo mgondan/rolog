@@ -40,12 +40,12 @@ networks for machine learning and deep learning. Whereas Prolog is weak in
 statistical computation, but strong in symbolic manipulation, the converse may
 be said for the R language. SWI-Prolog is a widely used Prolog system that
 offers a wide range of extensions for real world applications, and there already
-exist two so-called Prolog packs to invoke R (rserve-client, Real) from
-SWI-Prolog. However, given the large user community of R, there may also be a
-need for a connection in the reverse direction that allows invoking Prolog
-queries in R computations. The R package rolog embeds the SWI-Prolog system,
-thus enabling deterministic and non-deterministic queries to the
-Prolog interpreter. Usage of the rolog library is illustrated by a few examples.
+exist two Prolog "packs" to invoke R (rserve-client, real) from SWI-Prolog.
+However, given the large user community of R, there may also be a need for a 
+connection in the reverse direction that allows invoking Prolog queries 
+in R computations. The R package rolog embeds the SWI-Prolog system, thus
+enabling deterministic and non-deterministic queries to the Prolog interpreter.
+Usage of the rolog library is illustrated by a few examples.
 
 ## Keywords
 
@@ -98,9 +98,9 @@ R (see the CRAN task view for optimization problems), but more of them would be
 available via a bridge between R and Prolog. 
 
 Earlier approaches to connect Prolog and R have been published as SWI-Prolog 
-packs [real, Rserve_client, @Angelopoulos2013;@Rserve] and as a YAP 
+packs [real, rserve_client, @Angelopoulos2013;@Rserve] and as a YAP 
 module [YapR, @YapR]. Whereas real establishes a direct link to an embedded
-instance of R, Rserve_client communicates with a local or remote R 
+instance of R, rserve_client communicates with a local or remote R 
 service [@Urbanek2021]. The former approach emphasizes speed, the latter might
 be preferred from a security perspective, especially in systems such as 
 SWISH [@SWISH] that accept only a set of sandboxed commands for Prolog, but do
