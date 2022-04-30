@@ -87,7 +87,7 @@ statistical models or machine learning need help from other systems, for
 example, from R.
 
 Angelopoulos et al. [@Angelopoulos2013] summarize work at the intersection of
-symbolic knowledge representation and statistical interence, especially in the
+symbolic knowledge representation and statistical inference, especially in the
 area of model fits [EM algorithms, MCMC, @Sato2001;@Angelopoulos2008] and
 stochastic logic programs [@Cussens2000;@Kimmig2011]. One of the major strengths
 of logic programming is handling constraints; and a number of systems for
@@ -322,11 +322,11 @@ and `$$/N`, as mentioned above.
 These rules are, in principle, arbitrary and can be intercepted at several 
 stages of the process:
 
-* R functions that may be used to preprocess specific R elements before
+* R functions that may be used to pre-process specific R elements before
   translation into Prolog (see, e.g., the R function `as.rolog()`)
 * Prolog wrappers that manipulate the term before it is called and afterwards
   (see the dicts below)
-* R functions that postprocess the result of a query
+* R functions that post-process the result of a query
 
 The process is illustrated in Figure\ 1.
 
@@ -374,7 +374,7 @@ HTML(export_svg(grViz(
 Figure\ 1
 : Workflow in rolog
 
-## Preprocessing in R
+## Pre-processing in R
 
 We have seen above that raising even simple everyday Prolog queries such
 as `member(X, [1, 2, 3, a, b])` require complicated R expressions such as
@@ -410,13 +410,13 @@ with quasi-quotations (i.e., "unquoting" expressions) is described in
 the "Advanced R" book [@Wickham2019].
 
 Section\ 4 includes an example for mathematical rendering of R expressions. In
-that example, a preprocessing function is used to bring function calls with
+that example, a pre-processing function is used to bring function calls with
 named arguments to a canonical form which is then handled in Prolog.
 
-## Postprocessing in R
+## Post-processing in R
 
 This may again be a function that reverts some of the manipulations during
-preprocessing. For `once()` and `submit()`, such a function would operate on the
+pre-processing. For `once()` and `submit()`, such a function would operate on the
 bindings. For example, many Prolog programmers are used to operate with atoms
 instead of character strings, the latter being the preferred representation of
 symbolic information in R. The following simple example illustrates conversion
@@ -446,7 +446,7 @@ r <- findall(as.rolog(q))
 stringify(r)
 ```
 
-## Pre- and postprocessing in Prolog
+## Pre- and post-processing in Prolog
 
 Recent versions of SWI-Prolog support so-called dictionaries of the 
 form `Tag{Key1:Value1, Key2:Value2, ...}`. The tag is typically an 
@@ -640,7 +640,7 @@ p(p(with)) --> `with`.
 ```
 
 Listing\ 2
-: Simple grammar and lexicon. `sentence/2` preprocesses the R call.
+: Simple grammar and lexicon. `sentence/2` pre-processes the R call.
 
 As in the first example, we first consult a little Prolog program with a
 minimalistic grammar and lexicon (Listing\ 2), and then raise a query asking for
@@ -680,7 +680,7 @@ once(call("environ", expression(X)))
 ```
 
 The query then unifies _X_ with a list with Key=Value terms. The purpose if this
-example is obviously not to mimick the built-in function `Sys.getenv()` from R,
+example is obviously not to mimic the built-in function `Sys.getenv()` from R,
 but to illustrate the installation and usage of Prolog extensions from within R.
 
 ## Term manipulation
@@ -901,7 +901,7 @@ The example in Listing\ 5 is a bit trivial, basically illustrating the syntax
 and the workflow. More serious applications of `r_eval/1,2` are illustrated in
 the example on mathematical expressions where `r_eval/2` is used to obtain
 a names of a function argument, as well as in the next example on interval
-arithmetic, where `r_eval/2` is used with monototonically behaving R functions.
+arithmetic, where `r_eval/2` is used with monotonically behaving R functions.
 
 ## Interval arithmetic
 
