@@ -88,7 +88,7 @@ example, from R.
 
 Angelopoulos et al. [@Angelopoulos2013] summarize work at the intersection of
 symbolic knowledge representation and statistical interence, especially in the
-area of model fits [EM algoritms, MCMC, @Sato2001;@Angelopoulos2008] and
+area of model fits [EM algorithms, MCMC, @Sato2001;@Angelopoulos2008] and
 stochastic logic programs [@Cussens2000;@Kimmig2011]. One of the major strengths
 of logic programming is handling constraints; and a number of systems for
 constraint satisfaction tools have been developed (constraint logic programming
@@ -101,7 +101,7 @@ Earlier approaches to connect Prolog and R have been published as SWI-Prolog
 packs [real, Rserve_client, @Angelopoulos2013;@Rserve] and as a YAP 
 module [YapR, @YapR]. Whereas real establishes a direct link to an embedded
 instance of R, Rserve_client communicates with a local or remote R 
-service [@Urbanek2021]. The former approach emphasises speed, the latter might
+service [@Urbanek2021]. The former approach emphasizes speed, the latter might
 be preferred from a security perspective, especially in systems such as 
 SWISH [@SWISH] that accept only a set of sandboxed commands for Prolog, but do
 not impose restrictions on R. A common feature of the two packages is that they
@@ -266,7 +266,7 @@ once(call("r_eval", c(1, 2, NA, NaN, Inf), expression(X)))
 
 ## Package options
 
-A few package-specific options have been defined to allow some finetuning of
+A few package-specific options have been defined to allow some fine-tuning of
 the rules for translation between R and Prolog.
 
 * realvec (string): Name of the prolog term for vectors of floats (default is #)
