@@ -28,7 +28,7 @@
 #' for querying all solutions
 #'
 #' @seealso [query()], [submit()], and [clear()] for fine-grained control over
-#' non-deterministic queryies
+#' non-deterministic queries
 #' 
 #' @seealso [rolog_options()]
 #' for options controlling R to prolog translation
