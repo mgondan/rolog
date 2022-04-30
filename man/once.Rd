@@ -70,7 +70,7 @@ once(call("format", call("string", expression(S)), as.symbol("~w"), list(1)),
 for querying all solutions
 
 \code{\link[=query]{query()}}, \code{\link[=submit]{submit()}}, and \code{\link[=clear]{clear()}} for fine-grained control over
-non-deterministic queryies
+non-deterministic queries
 
 \code{\link[=rolog_options]{rolog_options()}}
 for options controlling R to prolog translation
