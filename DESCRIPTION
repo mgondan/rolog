@@ -30,9 +30,6 @@ SystemRequirements:
 Suggests: 
     rmarkdown,
     knitr,
-    DiagrammeR,
-    DiagrammeRsvg,
-    htmltools,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 VignetteBuilder: knitr, rmarkdown
