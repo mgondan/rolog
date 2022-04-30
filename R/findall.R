@@ -28,7 +28,7 @@
 #' for a single query
 #'
 #' @seealso [query()], [submit()], and [clear()] for fine-grained control over
-#' non-deterministic queryies
+#' non-deterministic queries
 #'
 #' @seealso [rolog_options()]
 #' 
