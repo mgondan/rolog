@@ -53,7 +53,7 @@ findall(as.rolog(q))
 for a single query
 
 \code{\link[=query]{query()}}, \code{\link[=submit]{submit()}}, and \code{\link[=clear]{clear()}} for fine-grained control over
-non-deterministic queryies
+non-deterministic queries
 
 \code{\link[=rolog_options]{rolog_options()}}
 }
