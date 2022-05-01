@@ -45,3 +45,5 @@
 ^inst/libs
 ^doc$
 ^Meta$
+^CRAN-SUBMISSION$
+^cran-comments\.md$
