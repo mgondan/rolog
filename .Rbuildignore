@@ -28,6 +28,8 @@
 ^src/swipl-devel/packages/pengines/
 ^src/swipl-devel/packages/redis/
 ^src/swipl-devel/packages/plunit/
+^src/swipl-devel/packages/odbc/
+^src/swipl-devel/packages/pcre/
 ^src/swipl-devel/src/Tests/
 ^src/swipl-devel/man/
 ^.*\.git$

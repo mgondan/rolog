@@ -4,32 +4,25 @@ PKG_LIBS=`pkg-config ../inst/swipl/share/pkgconfig/swipl.pc --libs`
 CMAKE_VERSION := $(shell cmake --version 2>/dev/null)
 CMAKE_VERSION_MACOS := $(shell /Applications/CMake.app/Contents/bin/cmake --version 2>/dev/null)
 
-all: swipl $(SHLIB) libinst
+all: $(SHLIB)
 
-swipl:
+$(SHLIB): RcppExports.o rolog.o
+
+rolog.o: swipl
+
+swipl: ../linux/done
+
+../linux/done:
 	mkdir -p ../linux
 ifdef CMAKE_VERSION
-	cd ../linux && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DINSTALL_DOCUMENTATION=OFF -DSWIPL_PACKAGES_JAVA=OFF -DSWIPL_PACKAGES_X=OFF -DUSE_GMP=OFF -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release -S ../src/swipl-devel && $(MAKE) -j1 install
+	cd ../linux && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DINSTALL_DOCUMENTATION=OFF -DSWIPL_PACKAGES_JAVA=OFF -DSWIPL_PACKAGES_X=OFF -DSWIPL_PACKAGES_ODBC=OFF -DSWIPL_PACKAGES_PCRE=OFF -DUSE_GMP=OFF -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release -S ../src/swipl-devel && $(MAKE) -j1 install
 endif
 ifdef CMAKE_VERSION_MACOS
-	cd ../linux && /Applications/CMake.app/Contents/bin/cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DINSTALL_DOCUMENTATION=OFF -DSWIPL_PACKAGES_JAVA=OFF -DSWIPL_PACKAGES_X=OFF -DUSE_GMP=OFF -DBUILD_TESTING=OFF -DSWIPL_PACKAGES_TERM=OFF -DCMAKE_BUILD_TYPE=Release -S ../src/swipl-devel && $(MAKE) install
+	cd ../linux && LDFLAGS="-L/opt/R/arm64/lib" CFLAGS="-I/opt/R/arm64/include" /Applications/CMake.app/Contents/bin/cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl -DINSTALL_DOCUMENTATION=OFF -DSWIPL_PACKAGES_JAVA=OFF -DSWIPL_PACKAGES_X=OFF -DSWIPL_PACKAGES_ODBC=OFF -DSWIPL_PACKAGES_PCRE=OFF -DUSE_GMP=OFF -DBUILD_TESTING=OFF -DCMAKE_BUILD_TYPE=Release -S ../src/swipl-devel && $(MAKE) -j1 install
 endif
-
-$(SHLIB) rolog.o: swipl
-
-libinst: $(SHLIB)
-	mkdir -p ../inst
-	mkdir -p ../inst/doc
-	cp ../vignettes/bibliography.bibtex ../inst/doc
-	mkdir -p ../libs
-	cp rolog.so ../libs
 	rm ../inst/swipl/bin/swipl
 	rm ../inst/swipl/bin/swipl-ld
-ifdef CMAKE_VERSION
-	-rm ../inst/swipl/lib/swipl/bin/x86_64-linux/swipl
-	-rm ../inst/swipl/lib/swipl/bin/x86_64-linux/swipl-ld
-endif
-ifdef CMAKE_VERSION_MACOS
 	-rm ../inst/swipl/lib/swipl/bin/*/swipl
 	-rm ../inst/swipl/lib/swipl/bin/*/swipl-ld
-endif
+	touch ../linux/done
+

@@ -8,7 +8,9 @@ swipl:
 	mkdir -p ../inst/swipl/bin
 	rm -f ../inst/swipl/bin/*.dll
 	cd ../mingw64 && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl\
-		-DSWIPL_PACKAGES_X=OFF -DINSTALL_DOCUMENTATION=OFF\
+		-DSWIPL_PACKAGES_X=OFF -DSWIPL_PACKAGES_ODBC=OFF\
+		-DSWIPL_PACKAGES_PCRE=OFF\
+		-DINSTALL_DOCUMENTATION=OFF\
 		-DUSE_GMP=OFF -DBUILD_TESTING=OFF\
 		-DLibArchive_INCLUDE_DIRS="-I."\
 		-DLibArchive_LIBRARIES="-larchive -lnettle -lxml2 -liconv -lregex -lexpat -llzma -lzstd -llz4 -lbz2 -lz -lbcrypt -lws2_32"\

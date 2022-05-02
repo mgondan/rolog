@@ -13,6 +13,8 @@ vignette: >
 ```{r, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 options(rmarkdown.html_vignette.check_title=FALSE)
+library(DiagrammeR)
+library(DiagrammeRsvg)
 ```
 
   Matthias Gondan\
@@ -328,48 +330,48 @@ stages of the process:
 The process is illustrated in Figure\ 1. 
 
 ```{r, echo=FALSE, fig.width=6, fig.height=2}
-#HTML(export_svg(grViz(
-#  'digraph G
-#   {
-#     rankdir=LR
-#     Query Result
-#
-#     subgraph cluster_0 
-#     {
-#       style=filled
-#       color=lightgrey
-#       node [style=filled,color=white]
-#       r2rolog -> forth -> rolog_pl
-#     }
-#
-#     subgraph cluster_1 
-#     {
-#       style=filled
-#       color=lightgrey
-#       node [style=filled,color=white]
-#       rolog2r -> back [dir=back]
-#       back -> pl_rolog [dir=back]
-#     }
-#  
-#     Query -> r2rolog
-#     rolog_pl:e -> Prolog
-#     pl_rolog:e -> Prolog [dir=back]
-#     Result -> rolog2r [dir=back]
-#
-#     Query [shape=Mdiamond;width=0.7;height=0.7]
-#     r2rolog [shape=rect,label="preproc(...)"]
-#     forth [label="(rolog)"]
-#     rolog_pl [shape=rect,label="preproc/2"]
-#     Prolog [shape=Mcircle]
-#     pl_rolog [shape=rect,label="postproc/2"]
-#     rolog2r [shape=rect,label="postproc(...)"]
-#     back [label="(rolog)"]
-#     Result [shape=Msquare]
-#   }')))
+HTML(export_svg(grViz(
+  'digraph G
+   {
+     rankdir=LR
+     Query Result
+
+     subgraph cluster_0 
+     {
+       style=filled
+       color=lightgrey
+       node [style=filled,color=white]
+       r2rolog -> forth -> rolog_pl
+     }
+
+     subgraph cluster_1 
+     {
+       style=filled
+       color=lightgrey
+       node [style=filled,color=white]
+       rolog2r -> back [dir=back]
+       back -> pl_rolog [dir=back]
+     }
+  
+     Query -> r2rolog
+     rolog_pl:e -> Prolog
+     pl_rolog:e -> Prolog [dir=back]
+     Result -> rolog2r [dir=back]
+
+     Query [shape=Mdiamond;width=0.7;height=0.7]
+     r2rolog [shape=rect,label="preproc(...)"]
+     forth [label="(rolog)"]
+     rolog_pl [shape=rect,label="preproc/2"]
+     Prolog [shape=Mcircle]
+     pl_rolog [shape=rect,label="postproc/2"]
+     rolog2r [shape=rect,label="postproc(...)"]
+     back [label="(rolog)"]
+     Result [shape=Msquare]
+   }')))
 ```
 
 Figure\ 1
-: Workflow in rolog (_The figure will be shown again when DiagrammeR is available_)
+: Workflow in rolog
 
 ## Pre-processing in R
 
