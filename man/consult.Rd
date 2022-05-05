@@ -10,7 +10,7 @@ consult(fname = system.file(file.path("pl", "family.pl"), package = "rolog"))
 \item{fname}{file name of database}
 }
 \value{
-\code{TRUE} on success
+\code{TRUE} (invisible) on success, \code{FALSE} on failure with a warning
 }
 \description{
 Consult a prolog database

@@ -7,7 +7,7 @@
 findall(
   query = call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE,
     expression(Y))),
-  options = NULL
+  options = options=list(portray=FALSE)
 )
 }
 \arguments{
