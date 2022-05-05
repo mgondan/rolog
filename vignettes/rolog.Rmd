@@ -1021,7 +1021,6 @@ instructions for Unix, Windows and macOS.
 I am grateful to Jan Wielemaker, the main developer of SWI-Prolog; this package
 would never have been finalized without his help. Moreover, development of the
 package profited substantially from the Prolog packs rserve_client [@Rserve] and 
-real [@Angelopoulos2013]. The project was financially supported by the European
-Commission (Erasmus+ project QHelp, 2019-1-EE01-KA203-051708).
+real [@Angelopoulos2013].
 
 # References
