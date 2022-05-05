@@ -6,8 +6,6 @@ test_that("consult works with default arguments",
 test_that("once works with default arguments", 
 {
   l = list(X=as.symbol("a"))
-  attr(l, "query") = "member(X, [a, b, 3, 4.0, true, Y])"
-
   expect_equal(once(), l)
 })
 
