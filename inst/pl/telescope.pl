@@ -23,5 +23,4 @@ n(n(men), pl) --> `men`.
 n(n(telescope), sg) --> `telescope`.
 v(v(sees), sg) --> `sees`.
 v(v(see), pl) --> `see`.
-v(v(saw), _) --> `saw`.
 p(p(with)) --> `with`.

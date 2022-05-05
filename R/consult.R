@@ -17,5 +17,8 @@
 #' 
 consult <- function(fname=system.file(file.path("pl", "family.pl"), package="rolog"))
 {
-	.consult(fname)
+	if(.consult(fname))
+		return(invisible(TRUE))
+	
+	return(FALSE)
 }

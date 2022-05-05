@@ -45,7 +45,7 @@
 #' 
 findall <- function(
 	query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))),
-	options=NULL)
+	options=list(portray=FALSE))
 {
 	options <- c(options, rolog_options())
 	
