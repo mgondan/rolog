@@ -1,3 +1,7 @@
+# rolog 0.9.4
+
+* Added a vignette with a manuscript for JSS
+
 # rolog 0.9.3
 
 * Added a `NEWS.md` file to track changes to the package.
