@@ -1,6 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^linux/
+^jss/
 ^mingw64/
 ^rtools40/
 ^inst/swipl
