@@ -18,7 +18,5 @@ test_that("findall works with default arguments",
   l5 = list(X=TRUE)
   l6 = list(Y=expression(X))
   l = list(l1, l2, l3, l4, l5, l6)
-  attr(l, "query") = "member(X, [a, b, 3, 4.0, true, Y])"
-  
   expect_equal(findall(), l)
 })
