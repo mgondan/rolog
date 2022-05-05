@@ -44,20 +44,20 @@
 #' findall(as.rolog(q))
 #' 
 findall <- function(
-	query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))),
-	options=list(portray=FALSE))
+    query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))),
+    options=list(portray=FALSE))
 {
-	options <- c(options, rolog_options())
+    options <- c(options, rolog_options())
 	
-	# Decorate result with the prolog syntax of the query
-	if(options$portray)
-		q <- portray(query, options)
+    # Decorate result with the prolog syntax of the query
+    if(options$portray)
+        q <- portray(query, options)
+
+    # Invoke C++ function that calls prolog
+    r <- .findall(query, options)
+
+    if(options$portray)
+        attr(r, 'query') <- q
 	
-	# Invoke C++ function that calls prolog
-	r <- .findall(query, options)
-	
-	if(options$portray)
-		attr(r, 'query') <- q
-	
-	return(r)
+    return(r)
 }
