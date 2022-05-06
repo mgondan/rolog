@@ -169,7 +169,7 @@ Wielemaker J (2012).
 Wielemaker J (2021{\natexlab{a}}).
 \newblock \emph{A C++ interface to SWI-Prolog}.
 \newblock
-  \urlprefix\url{https://www.swi-prolog.org/pldoc/doc_for?object=section(%27packages/pl2cpp.html%27)}.
+  \urlprefix\url{https://www.swi-prolog.org/pldoc/man?section=cpp-intro}.
 
 \bibitem[{Wielemaker(2021{\natexlab{b}})}]{Rserve}
 Wielemaker J (2021{\natexlab{b}}).
