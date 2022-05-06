@@ -19,15 +19,21 @@ mjax(pi, f(paren=0, _)) -->
 
 mjax(X, f(paren=0, _)) -->
     {atom(X)},
-    atom(X).
+    !, atom(X).
+
+mjax(-1.0Inf, f(paren=0, _)) -->
+    !, "-\\infty".
+
+mjax(1.0Inf, f(paren=0, _)) -->
+    !, "\\infty".
 
 mjax(X, f(paren=0, _)) -->
     {number(X)},
-    number(X).
+    !, number(X).
 
 mjax(X, f(paren=0, _)) -->
     {string(X), atom_string(A, X)},
-    "\\mathrm{", atom(A), "}".
+    !, "\\mathrm{", atom(A), "}".
 
 % Parentheses
 mjax(brace(X), f(paren=P, F)) -->
@@ -148,8 +154,16 @@ mjax(A - B, f(paren=P, F)) -->
     {P is max(Q, R)}.
 
 % dot product
+mjax(A * B, P) -->
+    "{", mjax(left(A, *), f(paren=0, F)), "}",
+    "{", mjax(right(*, B), f(paren=0, F)), "}",
+    !, { P = f(paren=0, F) }.
+
+% dot product
 mjax(A * B, f(paren=P, F)) -->
-    mjax(left(A, *), f(paren=Q, F)), " \\cdot ", mjax(right(*, B), f(paren=R, F)),
+    mjax(left(A, *), f(paren=Q, F)), 
+    " \\cdot ", 
+    mjax(right(*, B), f(paren=R, F)),
     {P is max(Q, R)}.
 
 % ratio
@@ -175,6 +189,15 @@ mjax(dfrac(A, B), f(paren=0, F)) -->
 % other stuff
 mjax(sqrt(X), f(paren=0, F)) -->
     "\\sqrt", mjax(brace(X), f(paren=_, F)).
+
+mjax(function(sin, Args), P) -->
+    !, mjax(sin(Args), P).
+
+mjax(function(cos, Args), P) -->
+    !, mjax(cos(Args), P).
+
+mjax(function(tan, Args), P) -->
+    !, mjax(tan(Args), P).
 
 mjax(function(Name, Args), f(paren=P, F)) -->
     mjax(Name, f(paren=_, F)), mjax(paren(Args), f(paren=P, F)).
@@ -299,6 +322,28 @@ mjax(left(cos(X), /), f(paren=1, _)) -->
 
 mjax(left(tan(X), /), f(paren=1, _)) -->
     !, mjax(paren(tan(X)), f(paren=1, _)).
+
+% Integral
+mjax($(integrate(Fn, Lower, Upper), value), P) -->
+    !, mjax(integrate(Fn, Lower, Upper), P).
+
+% with named arguments
+mjax(integrate(f=Fn, lower=Lower, upper=Upper), P) -->
+    !, mjax(integrate(Fn, Lower, Upper), P).
+
+% No argument names
+mjax(integrate(Fn, Lower, Upper), P) -->
+    !, 
+    { r_eval('['(formalArgs(args(Fn)), 1), Arg1),
+      atom_string(DX, Arg1)
+    }, mjax(integrate(Fn, Lower, Upper, DX), P).
+
+% Internal
+mjax(integrate(Fn, From, To, DX), P) -->
+    !, "\\int_{", mjax(From, _), "}",
+    "^{", mjax(To, _), "}",
+    "{", mjax(function(Fn, DX), P), "}",
+    "\\,{", mjax(d*DX, _), "}".
 
 % Negative numbers
 mjax(left(X, Op), P) -->

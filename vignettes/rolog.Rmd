@@ -644,10 +644,11 @@ Listing\ 2
 
 As in the first example, we first consult a little Prolog program with a
 minimalistic grammar and lexicon (Listing\ 2), and then raise a query asking for
-the syntactic structure of "john saw a man with a telescope". Closer inspection
-of the two results reveals the two possible meanings, "john saw a man _who
-carries_ a telescope" versus "john saw a man _through_ a telescope". More Prolog
-examples of natural language processing are found in Blackburn and
+the syntactic structure of "john sees a man with a telescope". Closer inspection
+of the two results reveals the two possible meanings, "john sees a man _who
+carries_ a telescope" versus "john sees a man _through_ a telescope". 
+More Prolog examples of natural language processing are found in
+Blackburn and
 Bos [@Blackburn2005], including the resolution of anaphoric references and the
 extraction of semantic meaning.
 
@@ -655,8 +656,8 @@ extraction of semantic meaning.
 # [telescope].
 consult(system.file(file.path("pl", "telescope.pl"), package="rolog"))
 
-# findall(sentence(Tree, "john saw a man with a telescope")).
-findall(call("sentence", expression(Tree), "john saw a man with a telescope"))
+# findall(sentence(Tree, "john sees a man with a telescope")).
+findall(call("sentence", expression(Tree), "john sees a man with a telescope"))
 ```
 
 ## Installation of add-ons for Prolog
