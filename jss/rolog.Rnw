@@ -220,10 +220,26 @@ cat(r, sep="\n")
 
 \subsection[R interface]{\proglang{R} interface}
 
+\begin{listing}[t]
+\begin{framed}
+<<echo=TRUE, output=TRUE, eval=TRUE>>=
+L <- list(1L, 2.0, quote(a), "b", expression(X), TRUE)
+Q <- call("member", 1L, L)
+query(Q)      # returns TRUE + attribute with Prolog term
+submit()      # member(1, [1 | _]) is satisfied (= empty list)
+submit()      # the query is again satisfied if X = 1
+clear()       # close the query
+@
+\end{framed}
+\caption{A query to \code{member/2} predicate}
+\label{lst:member}
+\end{listing}
+
 Most of the work can done using the 
 three \proglang{R}\ functions \code{query}, \code{submit}, and \code{clear}. The
 functions \code{consult}, \code{once}, and \code{findall} are provided for
-convenience.
+convenience. The \proglang{R} program in Listing~\ref{lst:member} illustrates a
+query to \proglang{Prolog}'s \code{member/2} using \pkg{rolog}'s syntax rules.
 
 \code{consult}. In most applications, a number of \proglang{Prolog} facts and
 rules will be loaded into the system. To facilitate this recurrent task, 
@@ -245,11 +261,9 @@ argument, \emph{options}, may be used for ad hoc modifications of the
 translation between \proglang{R} and \proglang{Prolog}, see the section below.
 The function returns \code{TRUE} on success. Note that the function does not
 check if the corresponding \proglang{Prolog} predicate actually exists (but 
-see \code{submit()} below).
-
-Only a single query can be opened at a given time. If a new query is created
-while another query is still open, a warning is shown and the other query is
-closed.
+see \code{submit()} below). Only a single query can be opened at a given time.
+If a new query is created while another query is still open, a warning is shown
+and the other query is closed.
 
 \code{submit}. Once a query has been created, it can be submitted
 using \code{submit()}. If the query fails, the return value is \code{FALSE}. If
@@ -263,30 +277,6 @@ the \proglang{R} function \code{isFALSE(x)}.
 \code{clear}. Closes the query. The name of the function is chosen to avoid name
 clashes with \proglang{R}'s own built-in function \code{close}. The function
 returns an invisible \code{TRUE}, even if there is no open query.
-
-The \proglang{R} program in Listing~\ref{listing1} illustrates a query 
-to \proglang{Prolog}'s \code{member/2} using \pkg{rolog}'s syntax rules.
-
-\begin{listing}[ht]
-<<echo=TRUE, output=TRUE, eval=TRUE>>=
-# member(1, [1, 2.0, a, "b", X])
-# return value is TRUE (query successfully created), with an attribute
-# that shows the prolog representation of the query
-query(call("member", 
-           1L, list(1L, 2.0, quote(a), "b", expression(X), TRUE)))
-
-# returns an empty list, stating that member(1, [1 | _]) is satisfied
-submit()
-
-# returns a list, stating that the query is also satisfied if X = 1
-submit()
-
-# close the query
-clear()
-@
-\caption{A query to \proglang{Prolog}'s \code{member/2} predicate}
-\label{listing1}
-\end{listing}
 
 \code{once} and \code{findall}. The function \code{once(call, options)} is a
 convenience function that acts as a shortcut 
@@ -306,23 +296,23 @@ symbol in \proglang{R}, so the empty atom is translated to a character string
 in \proglang{R}.
 
 \begin{table}
-\caption{Creating Prolog terms from R}
+\caption{Creating Prolog terms in R}
 \label{tab1}
 \begin{center}
 \begin{tabular}{lll}
 \hline
 R                                      & Prolog                                       & Note/Alternatives              \\
 \hline
-\code{expression(X)}                   & Variable \code{X}                            & not necessarily uppercase in R \\
+\code{expression(X)}                   & Variable \code{X}                            & Not necessarily uppercase in R \\
 \code{as.symbol(abc)}                  & Atom \code{abc}                              & \code{as.name}, \code{quote}   \\
 \code{TRUE}, \code{FALSE}, \code{NULL} & Atoms \code{true}, \code{false}, \code{null} &                                \\
 \code{"abc"}                           & String \code{"abc"}                          &                                \\
 \code{3L}                              & Integer \code{3}                             &                                \\
 \code{3}                               & Float \code{3.0}                             &                                \\
-\code{call("term", 1L, 2L)}            & Compound \code{term(1, 2)}                   & see below for \code{list()} and \code{c()} \\
+\code{call("term", 1L, 2L)}            & Compound \code{term(1, 2)}                   & See below for \code{list()} and \code{c()} \\
 \code{list(1L, 2L, 3L)}                & List \code{[1, 2, 3]}                        &                                \\
 \code{list(a=1, b=2, c=3)}             & List \code{[a-1, b-2, c-3]}                  &                                \\
-\code{c(1, 2, 3)}                      & \code{\#(1.0, 2.0, 3.0)}                     & vectors of length > 1          \\
+\code{c(1, 2, 3)}                      & \code{\#(1.0, 2.0, 3.0)}                     & Vectors of length > 1          \\
 \code{c(1L, 2L, 3L)} or \code{1:3}     & \code{\%(1, 2, 3)}                           &                                \\
 \code{c("a", "b", "c")}                & \code{\$\$("a", "b", "c")}                   &                                \\
 \code{c(TRUE, FALSE, NA)}              & \code{!(true, false, na)}                    &                                \\
@@ -335,7 +325,7 @@ Moreover, \proglang{R} is mostly vectorized, lacking support for scalar
 entities (in \proglang{R}, scalar entities are treated as vectors of length\ 1.
 Conversely, Prolog does not natively support vectors or matrices. The problem is
 solved in the following way: 
-
+%
 \begin{itemize}
 \item \proglang{R} vectors of length 0 are translated to \proglang{Prolog}'s
   empty list.
@@ -345,7 +335,7 @@ solved in the following way:
   terms \code{\#/N}, \code{\%/N}, \code{\$\$/N}, and \code{!/N} for floating
   point numbers, integers, strings and logicals, respectively.
 \end{itemize}
-
+%
 In the reverse direction, \proglang{Prolog} terms like \code{\#/N} are
 translated back to \proglang{R} vectors of length $N$, including 
 terms \code{\#/0} and \code{\#/1} that map to \proglang{R} vectors of
@@ -355,14 +345,15 @@ by a query to \code{r_eval/2} (see also below, subsection \proglang{Prolog}
 interface):
 
 <<echo=TRUE, output=TRUE, eval=TRUE>>=
-once(call("r_eval", c(1, 2, NA, NaN, Inf), expression(X)))
+Q <- call("r_eval", c(1, 2, NA, NaN, Inf), expression(X))
+once(Q, options=list(portray=TRUE))
 @
 
 \subsection{Package options}
 
 A few package-specific options have been defined to allow some fine-tuning of
 the rules for translation between \proglang{R} and \proglang{Prolog}.
-
+%
 \begin{itemize}
 \item \emph{realvec} (string): Name of the \proglang{Prolog} term for vectors of
   floats (default is \code{\#})
@@ -379,19 +370,15 @@ the rules for translation between \proglang{R} and \proglang{Prolog}.
   result of \code{query}, \code{once} and \code{findall} includes an attribute 
   with a representation of the query in \proglang{Prolog}.
 \end{itemize}
-
+%
 The command \code{rolog_options()} returns a list with all the options. The 
-options can be globally modified like this:
+options can be globally modified with \code{options()} or in the optional
+argument of \code{query}, \code{once}, and \code{findall}.
 
 <<echo=TRUE>>=
 options(rolog.intvec="%%")
-@
-
-In a given query, the options can be set in the optional argument, for example,
-
-<<echo=TRUE, eval=FALSE>>=
-query(call("member", expression(X), list(1:3, 4:6)),
-      options=list(intvec="%%"))
+Q <- call("member", expression(X), list(1:3, 4:6))
+once(Q, options=list(intvec="%%"))
 @
 
 \subsection[Prolog interface]{\proglang{Prolog} interface}
@@ -401,15 +388,21 @@ from \proglang{Prolog}, that is, connecting the two systems in the reverse
 direction. Two predicates can be used for this purpose, \code{r_eval(Call)}
 and \code{r_eval(Function, Result)}. The former just invokes \proglang{R} with
 the command \emph{Call} (ignoring the result); the latter 
-evaluates \emph{Function} and unifies the result with \emph{Result}. Note that
-proper quoting of \proglang{R} functions is needed at the \proglang{Prolog} end,
-especially with \proglang{R} functions that start with uppercase letters or
-contain a dot in their name.
-
-Two use cases for \code{r_eval/2} are shown in Section\ 4 below.
+evaluates \emph{Function} and unifies the result 
+with \emph{Result}. Note that proper quoting of \proglang{R} functions is needed
+at the \proglang{Prolog} end, especially with \proglang{R} functions that start
+with uppercase letters or contain a dot in their name (see 
+Section~\ref{sec:examples}).
 
 \section{Extending the package}
 \label{sec:extending}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.8\columnwidth]{workflow}
+\caption[Workflow in rolog]{Workflow in \pkg{rolog}}
+\label{fig:workflow}
+\end{figure}
 
 The package is intentionally kept minimalistic, but can easily be extended by
 convenience functions on both ends, \proglang{Prolog} and \proglang{R}, to
@@ -426,7 +419,7 @@ the \proglang{Prolog} terms \code{\#/N}, \code{\%/N}, \code{!/N},
 and \code{\$\$/N}, as mentioned above. These rules are, in principle, arbitrary
 and can be intercepted at several stages. The process is illustrated 
 in Figure~\ref{fig:workflow}. 
-
+%
 \begin{itemize}
 \item \proglang{R} functions that may be used to pre-process 
   specific \proglang{R} elements before translation
@@ -435,14 +428,7 @@ in Figure~\ref{fig:workflow}.
   and afterwards (see the example with dicts below)
 \item \proglang{R} functions that post-process the result of a query
 \end{itemize}
-
-\begin{figure}[b]
-\centering
-\includegraphics[width=0.8\columnwidth]{workflow}
-\caption[Workflow in rolog]{Workflow in \pkg{rolog}}
-\label{fig:workflow}
-\end{figure}
-
+%
 \subsection[Pre-processing in R]{Pre-processing in \proglang{R}}
 
 We have seen above that raising even simple everyday \proglang{Prolog} queries
@@ -455,8 +441,8 @@ calls like \code{""[1, 2, 3, a, b]} to lists. The argument \emph{Call} is
 typically a quoted \proglang{R} call or symbol:
 
 <<echo=TRUE>>=
-q <- quote(member(.X, ""[1, 2, 3, a, b]))
-as.rolog(q)
+Q <- quote(member(.X, ""[1, 2, 3, a, b]))
+as.rolog(Q)
 @
 
 Note that the name of the variable will still be \emph{X} in the later course, 
@@ -466,9 +452,8 @@ variables (i.e., ``unquote''), they can be put in parentheses:
 
 <<echo=TRUE>>=
 a <- 4
-b <- 5
-q <- quote(member(.X, ""[1, 2, 3, a, (b)]))
-as.rolog(q)
+Q <- quote(member(.X, ""[1, 2, 3, a, (a)]))
+as.rolog(Q)
 @
 
 Section~\ref{sec:examples} includes an example for mathematical rendering 
@@ -482,32 +467,30 @@ unquoting expressions is described in ``Advanced R'' \citep{Wickham2019}.
 This may again be a function that reverts some of the manipulations during
 pre-processing. For \code{once()} and \code{submit()}, such a function would
 operate on the bindings. For example, many \proglang{Prolog} programmers are
-used to operate with atoms instead of character strings, whereas the latter is
-the preferred representation of symbolic information in \proglang{R}. The
-following simple example illustrates conversion of the results for a query
+used to operate with atoms instead of character strings, whereas character
+strings are the preferred representation of symbolic information 
+in \proglang{R}. The following function converts the result of a query
 like \code{member(X, [a, b, c])} to strings.
 
-<<echo=TRUE, eval=FALSE>>=
+<<echo=TRUE, eval=TRUE>>=
 stringify <- function(x)
 {
-  # replace Prolog variable by the value of the R variable
   if(is.name(x))
     return(as.character(x))
 
-  # Recurse into lists and calls
   if(is.call(x))
     x[-1] <- lapply(x[-1], FUN=stringify)
 
   if(is.list(x))
     x <- lapply(x, FUN=stringify)
 
-  # Leave the rest unchanged
   return(x)
 }
 
-q <- quote(member(.X, ""[a, b, c]))
-r <- findall(as.rolog(q))
-stringify(r)
+Q <- quote(member(.X, ""[a, b, c]))
+R <- findall(as.rolog(Q))
+S <- stringify(R)
+unlist(S)   # mainly to save space in the output
 @
 
 \subsection[Pre- and post-processing in Prolog]{Pre- and post-processing in \proglang{Prolog}}
@@ -541,7 +524,7 @@ complicated syntax on the \proglang{R} side can be much simplified when doing
 the conversion at the \proglang{Prolog} end. Ways to extend \proglang{Prolog} by
 add-ons (``packs'') are shown in the next section.
 
-\section{Examples}
+\section{Examples and use cases}
 \label{sec:examples}
 
 In this section we present a few usage examples for the \pkg{rolog} package in
@@ -812,38 +795,49 @@ such as $P_\mathrm{Bi}(X \le k; N, p)$ require Latex commands
 like \code{P\_/mathrm\{Bi\}/left(X /le k; N, p/right)}, which are
 cumbersome to type in and hard to read even for simple equations. Since
 recently, manual pages include support for mathematical 
-expressions \citep{Sarkar2022}, which already is a big improvement.
+expressions \citep{Sarkar2022}; a package that translates R calls to Latex or
+MathML can, therefore, be very useful.
 
 Below \proglang{Prolog}'s grammar rules are used for an \emph{automatic}
-translation of \proglang{R} expressions to MathML. The result can then be used
-for calculations or it can be rendered on a web page. A limited set of rules for
-translation from R to MathML is found in \code{pl/mathml.pl} of 
+translation of \proglang{R} expressions to MathJax (i.e., \LaTeX). A limited set
+of rules for translation from R to MathJax is found in \code{pl/mathjax.pl} of 
 package \pkg{rolog}. The relevant code snippets are shown in the listings below,
 along with their output.
 
 \begin{listing}
 
-<<echo=TRUE, eval=TRUE, results=verbatim>>=
-consult(system.file(file.path("pl", "mathml.pl"), package="rolog"))
+<<echo=TRUE>>=
+consult(system.file(file.path("pl", "mathjax.pl"), package="rolog"))
 
-mathml = function(term)
+mathjax = function(term)
 {
-  t = once(call("r2mathml", term, expression(X)))
-  cat(paste(t$X, collapse=""))
+  t = once(call("r2mathjax", term, expression(X)))
+  cat(paste("\\[\n", t$X, "\n\\]\n", collapse=""))
 }
 @
 
-\caption[Using rolog to generate MathML from R expressions]{Using \pkg{rolog} to generate MathML from \proglang{R} expressions}
-\label{lst:mathml1}
+\caption[Using rolog to generate MathJax from R expressions]{Using \pkg{rolog}
+  to generate MathJax from \proglang{R} expressions}
+\label{lst:mathjax}
 \end{listing}
 
 The first example is easy. At the \proglang{Prolog} end, there is a handler 
-for \code{pbinom/3} that translates the term into a pretty MathML syntax
+for \code{pbinom/3} that translates the term into a pretty MathJax syntax
 like $P_\mathrm{Bi}(X \le k; N, \pi)$.
 
-<<echo=TRUE, eval=TRUE, results=verbatim>>=
+<<echo=TRUE, eval=FALSE>>=
 term = quote(pbinom(k, N, p))
-mathml(term)     # pretty print
+mathjax(term)     # pretty print
+
+k = 10
+N = 22
+p = 0.4
+eval(term)       # determine result
+@
+
+<<echo=FALSE, eval=TRUE, results=tex>>=
+term = quote(pbinom(k, N, p))
+mathjax(term)     # pretty print
 
 k = 10
 N = 22
@@ -859,9 +853,9 @@ Here, the predicate is used for the \proglang{R}
 function \code{formalArgs(args(sin))}, which returns the name of the function
 argument of \code{sin}, that is, \emph{x}.
 
-<<echo=TRUE, eval=TRUE, results=verbatim>>=
+<<echo=TRUE, eval=FALSE, results=tex>>=
 term = quote(integrate(sin, 0L, 2L*pi))
-mathml(term)
+mathjax(term)
 @
 
 Note that the \proglang{Prolog} end, the handler for \code{integrate/3} is
@@ -872,7 +866,7 @@ something like \code{integrate(sin, lower=0L, upper=2L * pi)} would not print
 the desired result. Moreover, \code{integrate} does not return a number, but a
 structured object with several slots.
 
-<<echo=TRUE, eval=TRUE, results=verbatim>>=
+<<echo=TRUE, eval=FALSE, results=verbatim>>=
 canonical <- function(term)
 {
   if(is.call(term))
@@ -894,10 +888,10 @@ g <- function(u)
 
 # Mixture of (partially) named and positional arguments in unusual order
 term <- quote(2L * integrate(low=-Inf, up=Inf, g)$value)
-mathml(canonical(term))
+mathjax(canonical(term))
 @
 
-Therefore, \code{pl/mathml.pl} includes two handlers. One handler accepts
+Therefore, \code{pl/mathjax.pl} includes two handlers. One handler accepts
 canonicalized terms with named 
 arguments, \code{integrate(f=Fn, lower=Lower, upper=Upper)}. The extra
 function \code{canonical()} applies \code{match.call()} to 
@@ -1068,8 +1062,7 @@ installation instructions for Unix, Windows and macOS.
 
 Development of the package profited substantially from 
 the \proglang{Prolog} packs \pkg{rserve\_client} \citep{Rserve} 
-and \pkg{real} \citep{Angelopoulos2013}. The project was financially supported
-by the European Commission (Erasmus+ project QHelp, 2019-1-EE01-KA203-051708).
+and \pkg{real} \citep{Angelopoulos2013}.
 
 \section*{Note}
 
