@@ -52,7 +52,8 @@ rsvg_pdf(charToRaw(export_svg(grViz(
 @
 
 \author{Matthias Gondan~\orcidlink{0000-0001-9974-0057}\\Universit\"at Innsbruck
-   \And Jan Wielemaker\\SWI-Prolog Solutions b.v.}
+   \And Jan Wielemaker~\orcidlink{0000-0001-5574-5673}\\Vrije Universiteit
+   Amsterdam\\SWI-Prolog Solutions b.v.}
 \Plainauthor{Matthias Gondan, Jan Wielemaker}
 
 \title{\pkg{rolog}: \proglang{Prolog} queries from \proglang{R}}
@@ -110,9 +111,10 @@ arrays. Moreover, a huge number of
 packages (e.g., CRAN, \url{https://cran.r-project.org/}) have been contributed
 that cover problems from diverse areas such as bioinformatics, machine learning,
 specialized statistical methods, web programming and connections to other
-programming languages. An interface to \proglang{Prolog} is lacking so far.
+programming languages.
 
-The logic programming language \proglang{Prolog} was invented in the 1970ies 
+An interface to \proglang{Prolog} is lacking so far. The logic programming
+language \proglang{Prolog} was invented in the 1970ies
 by \citet{Colmerauer1996}, mostly for the purpose of natural language 
 processing. Since then, logic programming has become an important driving force
 in research on artificial intelligence, natural language processing, program
