@@ -27,8 +27,8 @@ jobs:
       matrix:
         r-version: ['4.2.0']
         config:
-          - {os: macOS-latest,   r: 'release'}
-          - {os: ubuntu-latest,   r: 'release'}
+          - {os: macOS-latest, r: 'release'}
+          - {os: ubuntu-latest, r: 'release'}
 
     steps:
       - uses: actions/checkout@v3
@@ -43,9 +43,9 @@ jobs:
           pandoc-version: '2.17.1'
       - name: Install dependencies
         run: |
-          install.packages(c("remotes", "rcmdcheck"))
-          remotes::install_deps(dependencies = TRUE)
+          install.packages(c("rcmdcheck", "remotes"))
+          remotes::install_deps(dependencies=TRUE)
         shell: Rscript {0}
       - name: Check
-        run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
+        run: rcmdcheck::rcmdcheck(args="--no-manual", error_on="error")
         shell: Rscript {0}
