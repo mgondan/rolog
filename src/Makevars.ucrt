@@ -14,9 +14,6 @@ swipl:
 		-DUSE_GMP=OFF -DBUILD_TESTING=OFF\
 		-DLibArchive_INCLUDE_DIRS="-I."\
 		-DLibArchive_LIBRARIES="-larchive -lnettle -lxml2 -liconv -lregex -lexpat -llzma -lzstd -llz4 -lbz2 -lz -lbcrypt -lws2_32"\
-		-DCMAKE_C_FLAGS="-DHAVE_EVP_MD_CTX_FREE=1 -DHAVE_X509_DIGEST=1 -DHAVE_X509_CRL_DIGEST=1"\
-		-DOPENSSL_OS_LIBS="-lws2_32 -lgdi32 -lcrypt32 -lz"\
-		-DMINGW_ROOT="dummy"\
 		-DCMAKE_BUILD_TYPE=Release ../src/swipl-devel
 	# dos2unix all Makefiles
 	find ../mingw64 -name Makefile -exec sed -i 's/\r//' \{\} \;
