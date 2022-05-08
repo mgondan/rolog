@@ -65,24 +65,24 @@ rsvg_pdf(charToRaw(export_svg(grViz(
   applications in expert systems, computer linguistics and traditional, that is,
   symbolic artificial intelligence. The main strength of \proglang{Prolog} is
   its concise representation of facts and rules for the representation of
-  knowledge and grammar, as well as its very efficient built-in search engine
-  for closed world domains. \proglang{R} is a statistical programming language
-  for data analysis and statistical modeling which is widely used in academia
-  and industry. Besides the core library, a lot of packages have been developed
-  for all kinds of statistical problems, including new-style artificial
+  knowledge and grammar, as well as its efficient built-in search engine for
+  closed world domains. \proglang{R} is a statistical programming language for
+  data analysis and statistical modeling which is widely used in academia and
+  industry. Besides the core library, a lot of packages have been developed for
+  all kinds of statistical problems, including statistics-based artificial
   intelligence tools such as neural networks for machine learning and deep
   learning. Whereas \proglang{Prolog} is weak in statistical computation, but
-  strong in symbolic manipulation, the converse may be said for 
-  the \proglang{R} language. SWI-Prolog is a widely used \proglang{Prolog}
-  system that offers a wide range of extensions for real world applications, and
-  there already exist two \proglang{Prolog} ``packs'' to
-  invoke \proglang{R} (\pkg{rserve-client}, \pkg{real}) from SWI-Prolog.
-  However, given the large user community of \proglang{R}, there may also be a
-  need for a connection in the reverse direction that allows 
-  invoking \proglang{Prolog} queries in \proglang{R} computations. 
-  The \proglang{R}\ package \pkg{rolog} embeds the SWI-Prolog system, thus
-  enabling deterministic and non-deterministic queries to the Prolog
-  interpreter. Usage of \pkg{rolog} is illustrated by a few examples.
+  strong in symbolic manipulation, the converse may be said for
+  the \proglang{R} language. SWI-Prolog is a widely
+  used \proglang{Prolog} system that offers a wide range of extensions for real
+  world applications, and there already exist two \proglang{Prolog} ``packs'' to
+  invoke \proglang{R} (\pkg{rserve-client}, \pkg{real}) from SWI-Prolog. Given
+  the large user community of \proglang{R}, there may also be a need for a
+  connection in the reverse direction that allows invoking \proglang{Prolog} 
+  queries in \proglang{R} computations. The \proglang{R}\ package \pkg{rolog}
+  embeds the SWI-Prolog system, thus enabling deterministic and
+  non-deterministic queries to the \proglang{Prolog} interpreter. Usage
+  of \pkg{rolog} is illustrated by a few examples.
 }
 
 \Keywords{Statistics; Logic Programming; Artificial Intelligence, \proglang{R}, \proglang{Prolog}}
@@ -113,31 +113,30 @@ that cover problems from diverse areas such as bioinformatics, machine learning,
 specialized statistical methods, web programming and connections to other
 programming languages.
 
-An interface to \proglang{Prolog} is lacking so far. The logic programming
-language \proglang{Prolog} was invented in the 1970ies
-by \citet{Colmerauer1996}, mostly for the purpose of natural language 
-processing. Since then, logic programming has become an important driving force
-in research on artificial intelligence, natural language processing, program
-analysis, knowledge representation and theorem
+An interface to \proglang{Prolog} is lacking so far. Based on earlier work by
+Kowalski, the logic programming language \proglang{Prolog} was invented in
+the 1970ies by Colmerauer and Roussel \citep{Kowalski1988}, mostly for the
+purpose of natural language processing. Since then, logic programming has become
+an important driving force in research on artificial intelligence, natural
+language processing, program analysis, knowledge representation and theorem
 proving \citep{Shoham1994,Lally2011,Carro2004,Hsiang1987}.  
-SWI-Prolog \citep{Wielemaker2012} is an open-source implementation of Prolog
-that mainly targets developers of applications, with many users in academia,
-research and industry. SWI-Prolog includes a large number of libraries
-for ``the real world'', for example, a web server, encryption, interfaces
-to \proglang{C}/\proglang{C++} and other programming languages, as well as a
-development environment and debugger. In addition, pluggable 
+SWI-Prolog \citep{Wielemaker2012} is an open-source implementation
+of \proglang{Prolog} that mainly targets developers of applications, with many
+users in academia, research and industry. SWI-Prolog includes a large number of
+libraries for ``the real world'', for example, a web server, encryption,
+interfaces to \proglang{C}/\proglang{C++} and other programming languages, as
+well as a development environment and debugger. In addition, pluggable 
 extensions (so-called packs) are available for specific tasks to enhance its
 capabilities.
 
 Unlike \proglang{R}, \proglang{Prolog} is a declarative programming language
 consisting of facts and rules that define relations, for example, in a problem
-space. \proglang{Prolog}'s major strength is its built-in query-driven search
-engine that efficiently deals with complex structured data, with the data not
-necessarily being numerical. In fact, \proglang{Prolog} only provides a basic
-collection of arithmetic calculations via a purely functional
-interface \code{is/2}. More complex calculations such as matrix
-algebra, statistical models or machine learning need help from other systems,
-for example, from \proglang{R}.
+space~\citep{Newell1972}. \proglang{Prolog}'s major strength is its built-in
+query-driven search engine that efficiently deals with complex structured data,
+with the data not necessarily being numerical. In fact, \proglang{Prolog} only
+provides a basic collection of arithmetic calculations via a purely functional.
+More complex calculations such as matrix algebra, statistical models or machine
+learning need help from other systems, for example, from \proglang{R}.
 
 \citet{Angelopoulos2013} summarize work at the
 intersection of symbolic knowledge representation and statistical inference,
@@ -166,15 +165,14 @@ interface for \proglang{R} calls from \proglang{Prolog}, but not the other way
 round, that is, querying \proglang{Prolog} from \proglang{R} is not possible, so
 far.
 
-\pkg{rolog} is an attempt to fill this gap, and to offer the possibility to raise
-\proglang{Prolog} queries in \proglang{R} scripts, for example, to perform
-efficient symbolic computations, searches in complex graphs, parsing natural
-language and definite clause grammars. In addition, two \proglang{Prolog}
-predicates are provided that enable \proglang{Prolog} to ring back to
-the \proglang{R} system for bidirectional communication. Similar to \pkg{real}, 
-tight communication between the two systems is established by linking to a
-shared library that embeds the current version of SWI-Prolog. The exchange of
-data is facilitated by the \proglang{C++} interfaces of the two
+\pkg{rolog} fills this gap by \proglang{Prolog} queries in \proglang{R} scripts,
+for example, to perform efficient symbolic computations, searches in complex
+graphs, parsing natural language and definite clause grammars. In addition,
+two \proglang{Prolog} predicates are provided that enable \proglang{Prolog} to
+ring back to the \proglang{R} system for bidirectional communication. Similar
+to \pkg{real}, tight communication between the two systems is established by
+linking to a shared library that embeds the current version of SWI-Prolog.
+The exchange of data is facilitated by the \proglang{C++} interfaces of the two
 languages \citep{Edelbuettel2018,Wielemaker2021}. A less tight connection might
 be established using the recently developed machine query
 interface \citep[MQI]{Zinda2021} that allows socket-based communication between
@@ -247,9 +245,8 @@ query to \proglang{Prolog}'s \code{member/2} using \pkg{rolog}'s syntax rules.
 rules will be loaded into the system. To facilitate this recurrent task, 
 the \proglang{Prolog} directive \code{consult/1} has been mirrored
 into \proglang{R}, \code{consult(filename)}, with \emph{filename} given as a
-string (or a list of strings if multiple files are to be consulted). Note that
-the full filename should be given, including the extension (e.g., ``.pl'').
-The function returns \code{TRUE} on success; in case of problems, it
+string (or a list of strings if multiple files are to be consulted). The
+function returns \code{TRUE} on success; in case of problems, it
 returns \code{FALSE} and an error message is shown.
 
 \code{query}. The function \code{query(call, options)} is used to create a
@@ -498,7 +495,7 @@ unlist(S)   # the unlist saves space in the output
 \subsection[Pre- and post-processing in Prolog]{Pre- and post-processing in \proglang{Prolog}}
 
 Recent versions of SWI-Prolog support so-called dictionaries of the 
-form \code{Tag{Key1:Value1, Key2:Value2, ...}}. The tag is typically an 
+form \code{Tag\{Key1:Value1, Key2:Value2, ...\}}. The tag is typically an 
 atom (but can be a variable, as well), the keys are unique atom or integers;
 the values can be anything. Suppose we have a \proglang{Prolog} predicate that
 does something with dicts, and we would like to query it from \proglang{R}. The
