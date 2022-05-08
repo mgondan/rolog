@@ -43,7 +43,8 @@ jobs:
           pandoc-version: '2.17.1'
       - name: Install dependencies
         run: |
-          install.packages(c("rcmdcheck", "remotes"))
+          install.packages("rcmdcheck")
+          install.packages("remotes")
           remotes::install_deps(dependencies=TRUE)
         shell: Rscript {0}
       - name: Check
