@@ -1,6 +1,7 @@
 ---
 title: "rolog: Prolog queries from R"
-author: "Matthias Gondan (Department of Psychology, University of Innsbruck, Austria)"
+author: "Matthias Gondan (Department of Psychology, University of Innsbruck, Austria) and Jan Wielemaker (Vrije Universiteit
+   Amsterdam/SWI-Prolog Solutions b.v.)"
 date: "2022-04-28"
 bibliography: bibliography.bibtex
 output: rmarkdown::html_vignette
@@ -27,107 +28,117 @@ library(DiagrammeRsvg)
   
 # Abstract
 
-Prolog is a classical logic programming language with many applications in
-expert systems, computer linguistics and traditional, that is, symbolic 
-artificial intelligence. The main strength of Prolog is its concise 
-representation of facts and rules for the representation of knowledge and
-grammar, as well as its very efficient built-in search engine for closed world
-domains. R is a statistical programming language for data analysis and
-statistical modeling which is widely used in academia and industry. Besides the
-core library, a lot of packages have been developed for all kinds of statistical
-problems, including new-style artificial intelligence tools such as neural
-networks for machine learning and deep learning. Whereas Prolog is weak in
-statistical computation, but strong in symbolic manipulation, the converse may
-be said for the R language. SWI-Prolog is a widely used Prolog system that
-offers a wide range of extensions for real world applications, and there already
-exist two Prolog "packs" to invoke R (rserve-client, real) from SWI-Prolog.
-However, given the large user community of R, there may also be a need for a 
-connection in the reverse direction that allows invoking Prolog queries 
-in R computations. The R package rolog embeds the SWI-Prolog system, thus
-enabling deterministic and non-deterministic queries to the Prolog interpreter.
-Usage of the rolog library is illustrated by a few examples.
+Prolog is a classical logic programming language with many
+applications in expert systems, computer linguistics and traditional, that is,
+symbolic artificial intelligence. The main strength of Prolog is
+its concise representation of facts and rules for the representation of
+knowledge and grammar, as well as its efficient built-in search engine for
+closed world domains. R is a statistical programming language for
+data analysis and statistical modeling which is widely used in academia and
+industry. Besides the core library, a lot of packages have been developed for
+all kinds of statistical problems, including statistics-based artificial
+intelligence tools such as neural networks for machine learning and deep
+learning. Whereas Prolog is weak in statistical computation, but
+strong in symbolic manipulation, the converse may be said for
+the R language. SWI-Prolog is a widely
+used Prolog system that offers a wide range of extensions for real
+world applications, and there already exist two Prolog "packs" to
+invoke R (`rserve-client`, `real`) from SWI-Prolog. Given
+the large user community of R, there may also be a need for a
+connection in the reverse direction that allows invoking Prolog 
+queries in R computations. The R\ package `rolog`
+embeds the SWI-Prolog system, thus enabling deterministic and
+non-deterministic queries to the Prolog interpreter. Usage
+of `rolog` is illustrated by a few examples.
 
 ## Keywords
 
-Statistics; Logic Programming; Artificial Intelligence
+Statistics; Logic Programming; Artificial Intelligence; R; Prolog
 
 # 1. rolog: Prolog queries from R
 
-The R [@R] programming language and environment is a widely used open source
-software for statistical data analysis. The basic R is a functional language 
-with lots of support for storage and manipulation of different data types,
-and a strong emphasis on operations involving vectors and arrays. Moreover, a
-huge number of R packages (e.g., CRAN, https://cran.r-project.org/) have been
-contributed that cover problems from diverse areas such as bioinformatics,
-machine learning, specialized statistical methods, web programming and
-connections to other programming languages. An interface to Prolog is lacking so
-far.
+The R [@R] programming language and environment is a widely used
+open source software for statistical data analysis. The basic R is a
+functional language with lots of support for storage and manipulation of
+different data types, and a strong emphasis on operations involving vectors and
+arrays. Moreover, a huge number of
+packages (e.g., CRAN, https://cran.r-project.org/) have been contributed
+that cover problems from diverse areas such as bioinformatics, machine learning,
+specialized statistical methods, web programming and connections to other
+programming languages.
 
-The logic programming language Prolog was invented in the 1970ies by 
-Colmerauer [@Colmerauer1996], mostly for the purpose of natural language 
-processing. Since then, logic programming has become an important driving force
-in research on artificial intelligence, natural language processing, program
-analysis, knowledge representation and theorem
-proving [@Shoham1994;@Lally2011;@Carro2004;@Hsiang1987]. 
-SWI-Prolog [@Wielemaker2012] is an open-source implementation of Prolog that
-mainly targets developers of applications, with many users in academia, research
-and industry. SWI-Prolog includes a large number of libraries for "the real
-world", for example, a web server, encryption, interfaces to C/C++ and other
-programming languages, as well as a development environment and debugger. In 
-addition, pluggable extensions (so-called packs) are available for specific
-tasks to enhance its capabilities.
+An interface to Prolog is lacking so far. Based on earlier work by
+Kowalski, the logic programming language Prolog was invented in
+the 1970ies by Colmerauer and Roussel [@Kowalski1988], mostly for the
+purpose of natural language processing. Since then, logic programming has become
+an important driving force in research on artificial intelligence, natural
+language processing, program analysis, knowledge representation and theorem
+proving [@Shoham1994;@Lally2011;@Carro2004;@Hsiang1987].  
+SWI-Prolog [@Wielemaker2012] is an open-source implementation
+of Prolog that mainly targets developers of applications, with many
+users in academia, research and industry. SWI-Prolog includes a large number of
+libraries for "the real world", for example, a web server, encryption,
+interfaces to C/C++ and other programming languages, as
+well as a development environment and debugger. In addition, pluggable 
+extensions (so-called packs) are available for specific tasks to enhance its
+capabilities.
 
-Unlike R, Prolog is a declarative programming language consisting of facts and
-rules that define relations, for example, in a problem space. Prolog's major
-strength is its built-in query-driven search engine that efficiently deals with
-complex structured data, with the data not necessarily being numerical. In fact,
-Prolog only provides a basic collection of arithmetic calculations via a purely
-functional interface `is/2`. More complex calculations such as matrix algebra,
-statistical models or machine learning need help from other systems, for
-example, from R.
+Unlike R, Prolog is a declarative programming language
+consisting of facts and rules that define relations, for example, in a problem
+space [@Newell1972]. Prolog's major strength is its built-in
+query-driven search engine that efficiently deals with complex structured data,
+with the data not necessarily being numerical. In fact, Prolog only
+provides a basic collection of arithmetic calculations via a purely functional.
+More complex calculations such as matrix algebra, statistical models or machine
+learning need help from other systems, for example, from R.
 
-Angelopoulos et al. [@Angelopoulos2013] summarize work at the intersection of
-symbolic knowledge representation and statistical inference, especially in the
-area of model fits [EM algorithms, MCMC, @Sato2001;@Angelopoulos2008] and
-stochastic logic programs [@Cussens2000;@Kimmig2011]. One of the major strengths
-of logic programming is handling constraints; and a number of systems for
-constraint satisfaction tools have been developed (constraint logic programming
-on booleans, finite domains, reals, and intervals) for that 
-purpose [e.g., @Fruehwirth1998;@Triska2018]. Some constraint handlers exist in
-R (see the CRAN task view for optimization problems), but more of them would be
-available via a bridge between R and Prolog. 
+Angelopoulos et al. [-@Angelopoulos2013] summarize work at the
+intersection of symbolic knowledge representation and statistical inference,
+especially in the area of model
+fits [EM algorithms, MCMC, @Sato2001;@Angelopoulos2008] and stochastic logic
+programs [@Cussens2000;@Kimmig2011]. One of the major strengths of logic
+programming is handling constraints; and a number of systems for constraint
+satisfaction tools have been developed (constraint logic programming on
+booleans, finite domains, reals, and intervals) for that
+purpose [e.g., @Fruehwirth1998;@Triska2018]. Some constraint handlers
+exist in R (see the CRAN task view for optimization problems), but
+more of them would be available via a bridge between R
+and Prolog. 
 
 Earlier approaches to connect Prolog and R have been published as SWI-Prolog 
 packs [real, rserve_client, @Angelopoulos2013;@Rserve] and as a YAP 
-module [YapR, @YapR]. Whereas real establishes a direct link to an embedded
-instance of R, rserve_client communicates with a local or remote R 
-service [@Urbanek2021]. The former approach emphasizes speed, the latter might
-be preferred from a security perspective, especially in systems such as 
-SWISH [@SWISH] that accept only a set of sandboxed commands for Prolog, but do
-not impose restrictions on R. A common feature of the two packages is that they
-provide an interface for R calls from Prolog, but not the other way round, that
-is, querying Prolog from R is not possible so far.
+module [YapR, @YapR]. Whereas real establishes a direct link 
+to an embedded instance of R, `rserve-client` communicates with a
+local or remote R service [@Urbanek2021]. The former approach
+emphasizes speed, the latter might be preferred from a security perspective,
+especially in systems such as SWISH [@SWISH] that accept only a set of
+sandboxed commands for Prolog, but do not impose restrictions
+on R. A common feature of the two packages is that they provide an
+interface for R calls from Prolog, but not the other way
+round, that is, querying Prolog from R is not possible, so
+far.
 
-rolog is an attempt to fill this gap, and to offer the possibilty to raise
-Prolog queries in R scripts, for example, to perform efficient symbolic
-computations, searches in complex graphs, parsing natural language and definite
-clause grammars. In addition, two Prolog predicates are provided that enable
-Prolog to ring back to the R system for bidirectional communication. Similar
-to rreal, tight communication between the two systems is established by linking
-to a shared library that embeds the current version of SWI-Prolog. The exchange
-of data is facilitated by the C++ interfaces of the two
-languages [@Edelbuettel2018;@Wielemaker2021]. A less tight connection might be
-established using the recently developed machine query interface [@Zinda2021]
-that allows socket-based communication between foreign languages and 
-SWI-Prolog (and, in fact, the MQI documentation includes an example in which
-R is called).
+`rolog` fills this gap by Prolog queries in R scripts,
+for example, to perform efficient symbolic computations, searches in complex
+graphs, parsing natural language and definite clause grammars. In addition,
+two Prolog predicates are provided that enable Prolog to
+ring back to the R system for bidirectional communication. Similar
+to `real`, tight communication between the two systems is established by
+linking to a shared library that embeds the current version of SWI-Prolog.
+The exchange of data is facilitated by the C++ interfaces of the two
+languages [@Edelbuettel2018;@Wielemaker2021]. A less tight connection might
+be established using the recently developed machine query
+interface [@Zinda2021] that allows socket-based communication between
+foreign languages and SWI-Prolog (and, in fact, the `MQI` documentation
+includes an example in which R is called).
 
-A bidirectional bridge between R and Prolog might overcome the limitations of 
-both languages, thereby combining the extensive numerical and statistical power
-of the R system with Prolog's skills in the representation of knowledge and
-reasoning. In addition to the useful little tools shown in the examples below, 
-rolog can therefore contribute to progress at the intersection of traditional
-artificial intelligence and contemporary statistical programming.
+A bidirectional bridge between R and Prolog might overcome
+the limitations of both languages, thereby combining the extensive numerical and
+statistical power of the R system with Prolog's skills in
+the representation of knowledge and reasoning. In addition to the useful little
+tools shown in the examples below, `rolog` can therefore contribute to
+progress at the intersection of traditional artificial intelligence and
+contemporary statistical programming.
 
 The next section presents the interface of rolog in detail. Section\ 3 presents
 possible extensions of the package at both ends, in R and Prolog. Section\ 4 is
@@ -136,12 +147,13 @@ Conclusions and further perspectives are summarized in Section 5.
 
 # 2. Basic syntax
 
-rolog has a rather minimalistic syntax, providing only some basic ingredients
-to establish communication with an embedded SWI-Prolog. The ways to extend the 
-interface are described in Section\ 3.
+`rolog` has a rather minimalistic syntax, providing only some basic
+ingredients to establish communication with an embedded SWI-Prolog. The ways to
+extend the interface are described in Section\ 3.
 
-After installation (in R, with `install.packages("rolog")`), the package is
-loaded in the standard way using R's `library`-command.
+After installation (in R, with `install.packages("rolog")`), the
+package is loaded in the standard way
+using R's `library()`-command.
 
 ```{r}
 library(rolog)
@@ -151,47 +163,47 @@ We can see SWI-Prolog's typical welcome message.
 
 ## R interface
 
-Most of the work can done using the three R functions `query`, `submit`,
-and `clear`. The functions `consult`, `once`, and `findall` are provided for
-convenience.
+Most of the work can done using the 
+three R\ functions `query`, `submit`, and `clear`. The
+functions `consult`, `once`, and `findall` are provided for
+convenience. The R program in Listing\ 1 illustrates a
+query to Prolog's `member/2` using `rolog`'s syntax rules.
 
-*consult*. In most applications, a number of Prolog facts and rules will be 
-loaded into the system. To facilitate this recurrent task, the prolog
-directive `consult/1` has been mirrored into R, `consult(filename)`, 
-with _filename_ given as a string (or a list of strings if multiple files are to
-be consulted). Note that the full filename should be given, including the
-extension (e.g., ".pl"). The function returns `TRUE` on success; in case of
-problems, it returns `FALSE` and an error message is shown.
+`consult`. In most applications, a number of Prolog facts and
+rules will be loaded into the system. To facilitate this recurrent task, 
+the Prolog directive `consult/1` has been mirrored
+into R, `consult(filename)`, with *filename* given as a
+string (or a list of strings if multiple files are to be consulted). The
+function returns `TRUE` on success; in case of problems, it
+returns `FALSE` and an error message is shown.
 
-*query*. The function `query(call, options)` is used to create a Prolog 
-query (without invoking it yet). The first argument _call_ is a regular R call
-that is created using R's function `call(name, ...)`. This call represents the
-Prolog predicate which will be queried in the later course. The creation of such
-predicates and Prolog terms is described below and can become quite 
-contrived (see the examples in Section\ 4). The second argument, _options_, may
-be used for ad hoc modifications of the translation between R and Prolog, see
-the section below. The function returns `TRUE` on success. Note that the
-function does not check if the corresponding Prolog predicate exists (but see
-`submit()` below).
+`query`. The function `query(call, options)` is used to create a
+Prolog query (without invoking it yet). The first 
+argument *call* is a regular R call that is created 
+using R's function `call(name, ...)`. This call represents
+the Prolog predicate which will be queried in the later course. The
+creation of such predicates and Prolog terms is described below and
+can become quite contrived (see the examples in Section\ 4). The second
+argument, *options*, may be used for ad hoc modifications of the
+translation between R and Prolog, see the section below.
+The function returns `TRUE` on success. Note that the function does not
+check if the corresponding Prolog predicate actually exists (but 
+see `submit()` below). Only a single query can be opened at a given time.
+If a new query is created while another query is still open, a warning is shown
+and the other query is closed.
 
-Only a single query can be opened at a given time. If a new query is created
-while another query is still open, a warning is shown and the other query is
-closed.
+`submit`. Once a query has been created, it can be submitted
+using `submit()`. If the query fails, the return value is `FALSE`. If
+the query succeeds, a list of constraints is returned, with bindings for the
+variables that satisfy the query. Repeated calls to submit are possible,
+returning the different solutions of a query (until it eventually fails).
+Programmatically distinguishing between the different types of return values for
+success and failure (list vs. `FALSE`) is facilitated by 
+the R function `isFALSE(x)`.
 
-*submit*. Once a query has been created, it can be submitted using `submit()`.
-If the query fails, the return value is `FALSE`. If the query succeeds, a list
-of constraints is returned, with bindings for the variables that satisfy the
-query. Repeated calls to submit are possible, returning the different solutions
-of a query (until it eventually fails). Programmatically distinguishing between
-the different types of return values for success and failure (list vs. `FALSE`)
-is facilitated by the R function `isFALSE(x)`.
-
-*clear*. Closes the query. The name of the function is chosen to avoid name
-clashes with R's own built-in function close. The function returns an invisible
-`TRUE`, even if there is no open query.
-
-The following short R program illustrates a query to Prolog's `member/2` using 
-Rolog's syntax rules.
+`clear`. Closes the query. The name of the function is chosen to avoid name
+clashes with R's own built-in function `close`. The function
+returns an invisible `TRUE`, even if there is no open query.
 
 ```{r}
 # member(1, [1, 2.0, a, "b", X])
@@ -210,19 +222,21 @@ clear()
 Listing\ 1.
 : A query to Prolog's `member/2` predicate.
 
-*once* and *findall*. The function `once(call, options)` is a convenience
-function that acts as a shortcut for `query(call, options)`, `submit()`, 
-and `clear()`. Similarly, `findall(call, options)` abbreviates the 
-commands `query(call, options)`, repetition of `submit()` until failure,
-and `clear()`, returning a list collecting the the return value of the 
-individual calls to submit.
+`once` and `findall`. The function `once(call, options)` is a
+convenience function that acts as a shortcut 
+for `query(call, options)`, `submit()`, and `clear()`.
+Similarly, `findall(call, options)` abbreviates the 
+commands `query(call, options)`, repetition of `submit()` until
+failure, and `clear()`, returning a list collecting the the return value of
+the individual calls to submit.
 
 ## Creating Prolog terms in R
 
-Table\ 1 summarizes the rules for the translation from R to Prolog. Most rules
-work in both directions, but a few exceptions exist. For example, there is an
-empty atom in Prolog, but no empty symbol in R, so the empty atom is translated
-to a character string in R. 
+Table\ 1 summarizes the rules for the translation from R 
+to Prolog. Most rules work in both directions, but a few exceptions
+exist. For example, there is an empty atom in Prolog, but no empty
+symbol in R, so the empty atom is translated to a character string
+in R.
 
 Table\ 1
 : Creating Prolog terms from R
@@ -243,25 +257,32 @@ Table\ 1
 |`c("a", "b", "c")`      |\$\$(\"a\", \"b\", \"c\")|                         |
 |`c(TRUE, FALSE, NA)`    |!(true, false, na)       |                         |
 
-Moreover, R is mostly vectorized, lacking support for scalar entities, that is,
-scalar entities are treated as vectors of length\ 1. Conversely, Prolog does not
-natively support vectors or matrices. The problem is solved in the following
-way: 
-
-* R vectors of length 0 are translated to Prolog's empty list.
-* R vectors of length 1 are translated to Prolog scalars.
-* R vectors of length _N_ > 1 are translated to Prolog 
-  terms `#/N`, `%/N`, `$$/N`, and `!/N` for floating points, integers, strings
-  and logicals, respectively.
-
-In the reverse direction, Prolog terms like `#/N` are translated back to R
-vectors of length _N_, including terms `#/0` and `#/1` that map to R vectors of
+Moreover, R is mostly vectorized, lacking support for scalar
+entities (in R, scalar entities are treated as vectors of length\ 1.
+Conversely, Prolog does not natively support vectors or matrices. The problem is
+solved in the following way: 
+%
+\begin{itemize}
+\item R vectors of length 0 are translated to Prolog's
+  empty list.
+\item R vectors of length 1 are translated to Prolog
+  scalars.
+\item R vectors of length $N > 1$ are translated to Prolog
+  terms `#/N`, `%/N`, `\$\$/N`, and `!/N` for floating
+  point numbers, integers, strings and logicals, respectively.
+\end{itemize}
+%
+In the reverse direction, Prolog terms like `#/N` are
+translated back to R vectors of length $N$, including 
+terms `#/0` and `#/1` that map to R vectors of
 length 0 and 1, respectively. To summarize, the rules for translation are not
 fully symmetrical. A quick check for symmetry of the representation is obtained
-by a query to `r_eval/2` (see also below, subsection Prolog interface):
+by a query to `r_eval/2` (see also below, subsection Prolog 
+interface):
 
 ```{r}
-once(call("r_eval", c(1, 2, NA, NaN, Inf), expression(X)))
+Q <- call("r_eval", c(1, 2, NA, NaN, Inf), expression(X))
+once(Q, options=list(portray=TRUE))
 ```
 
 ## Package options
@@ -269,63 +290,66 @@ once(call("r_eval", c(1, 2, NA, NaN, Inf), expression(X)))
 A few package-specific options have been defined to allow some fine-tuning of
 the rules for translation between R and Prolog.
 
-* realvec (string): Name of the prolog term for vectors of floats (default is #)
-* intvec (string): same for vectors of integers (default is %)
-* boolvec (string): same for vectors of logicals (default is !)
-* charvec (string): same for vectors of character strings (default is \$\$). The
-  single dollar cannot be used because it is the list operator in R.
-* scalar (logical): if `TRUE` (default), R vectors of length 1 are translated to
-  scalars in Prolog. If `FALSE`, R vectors are always translated to `#/N` etc.,
-  depending on the type.
-* portray (logical): if `TRUE (default)`, the result of `query`, `once` and 
-  `findall` includes an attribute with a representation of the query in Prolog.
+* *realvec* (string): Name of the Prolog term for vectors of
+  floats (default is `#`)
+* *intvec* (string): same for vectors of integers (default is `%`)
+* *boolvec* (string): same for vectors of logicals (default is `!`)
+* *charvec* (string): same for vectors of character strings (default
+  is `\$\$`). The single dollar cannot be used because it is the list
+  operator in R.
+* *scalar* (logical): if `TRUE` (default), R vectors of
+  length\ 1 are translated to scalars in Prolog. 
+  If `FALSE`, R\ vectors are always translated to `#/N`
+  etc., depending on the type.
+* *portray* (logical): if `TRUE` (default in `query`), the
+  result of `query`, `once` and `findall` includes an attribute 
+  with a representation of the query in Prolog.
 
-The command `rolog_options()` returns a list with all the options. The options
-can be globally modified like e.g. this:
+The command `rolog_options()` returns a list with all the options. The 
+options can be globally modified with `options()` or in the optional
+argument of `query`, `once`, and `findall`.
 
-```r
+```{r}
 options(rolog.intvec="%%")
-```
-
-In a given query, the options can be set in the optional argument, e.g.
-
-```r
-query(call("member", expression(X), list(1:3, 4:6)), options=list(intvec="%%"))
+Q <- call("member", expression(X), list(1:3, 4:6))
+once(Q, options=list(intvec="%%"))
 ```
 
 ## Prolog interface
 
-rolog offers some basic support to call R from Prolog, that is, connecting the
-two systems in the reverse direction. Two predicates can be used for this 
-purpose, `r_eval(Call)` and `r_eval(Function, Result)`. The former just invokes
-R with the command _Call_ (ignoring the result); the latter evaluates _Function_
-and unifies the result with _Result_. Note that proper quoting of R functions
-is needed at the Prolog end, especially with R functions that start with
-uppercase letters or contain a dot in their name.
-
-Two use cases for `r_eval/2` are shown in Section\ 4 below.
+`rolog` offers some basic support to call R 
+from Prolog, that is, connecting the two systems in the reverse
+direction. Two predicates can be used for this purpose, `r_eval(Call)`
+and `r_eval(Function, Result)`. The former just invokes R with
+the command *Call* (ignoring the result); the latter 
+evaluates *Function* and unifies the result 
+with *Result*. Note that proper quoting of R functions is needed
+at the Prolog end, especially with R functions that start
+with uppercase letters or contain a dot in their name (see Section\ 4).
 
 # 3. Extending the package
 
 The package is intentionally kept minimalistic, but can easily be extended by
-convenience functions on both ends, Prolog and R, to facilitate recurrent tasks
-and/or avoid cumbersome syntax. R is a functional language, whereas Prolog is
-declarative. Obviously, there cannot be a perfect one-to-one correspondence
-between the syntactic components of two programming languages that follow
-completely different paradigms. Whereas symbols, functions, numbers and
-character strings are easily mapped between R and Prolog, there are loose ends 
-at both sides. In particular, Prolog variables are translated from and to 
-R _expressions_ (not to be confused with R symbols), and R vectors of 
-length _N_ > 1 are translated to the Prolog terms `#/N`, `%/N`, `!/N`,
-and `$$/N`, as mentioned above.
+convenience functions on both ends, Prolog and R, to
+facilitate recurrent tasks and/or avoid cumbersome syntax. R is a
+functional language, whereas Prolog is declarative. Obviously, there
+cannot be a perfect one-to-one correspondence between the syntactic components
+of two programming languages that follow completely different paradigms. Whereas
+symbols, functions, numbers and character strings are easily mapped 
+between R and Prolog, there are loose ends at both sides.
+In particular, Prolog variables are translated from and 
+to R *expressions* (not to be confused with R
+symbols), and R vectors of length > 1 are translated to
+the Prolog terms `#/N`, `%/N`, `!/N`, 
+and `\$\$/N`, as mentioned above. These rules are, in principle, arbitrary
+and can be intercepted at several stages. The process is illustrated 
+in Figure\ 1. 
 
-These rules are, in principle, arbitrary and can be intercepted at several 
-stages of the process:
-
-* R functions that may be used to pre-process specific R elements before
-  translation into Prolog (see, e.g., the R function `as.rolog()`)
-* Prolog wrappers that manipulate the term before it is called and afterwards
-  (see the dicts below)
+* R functions that may be used to pre-process 
+  specific R elements before translation
+  to Prolog (see, e.g., the R function `as.rolog()`)
+* Prolog wrappers that manipulate the term before it is called
+  and afterwards (see the example with dicts below)
 * R functions that post-process the result of a query
 
 The process is illustrated in Figure\ 1. 
@@ -376,74 +400,66 @@ Figure\ 1
 
 ## Pre-processing in R
 
-We have seen above that raising even simple everyday Prolog queries such
-as `member(X, [1, 2, 3, a, b])` require complicated R expressions such as
+We have seen above that raising even simple everyday Prolog queries
+such as `member(X, [1, 2, 3, a, b])` require 
+complicated R expressions such as
+`call("member", expression(X), list(1, 2, 3, quote(a), quote(b)))`.
+The R function `as.rolog(Call)` is meant to simplify this a bit
+by translating symbols starting with a dot to Prolog variables, and 
+calls like `""[1, 2, 3, a, b]` to lists. The argument *Call* is 
+typically a quoted R call or symbol:
 
-```r
-query(call("member", expression(X), list(1, 2, 3, as.symbol("a"), quote(b)))
+```{r}
+Q <- quote(member(.X, ""[1, 2, 3, a, b]))
+as.rolog(Q)
 ```
 
-The R function `as.rolog(call)` is meant to simplify this a bit by
-translating symbols starting with a dot to Prolog variables, and calls
-like `""[1, 2, 3, a, b]` to lists. The argument _call_ is typically 
-a quoted R call or symbol:
-
-```r
-q <- quote(member(.X, ""[1, 2, 3, a, b]))
-query(as.rolog(q))
-```
-
-Note that the name of the variable will still be _X_ in the later course, 
+Note that the name of the variable will still be *X* in the later course, 
 not "dot-X". A bit flexibility is lost because `quote()` treats the
-arguments _a_, _b_ as symbols; to evaluate them (i.e., "unquote"), they can be
-put in parentheses:
+arguments *a*, *b* as symbols; to evaluate the respective 
+variables (i.e., "unquote"), they can be put in parentheses:
 
 ```r
 a <- 4
-b <- 5
-q <- quote(member(.X, ""[1, 2, 3, a, (b)]))
-query(as.rolog(q))
+Q <- quote(member(.X, ""[1, 2, 3, a, (a)]))
+as.rolog(Q)
 ```
 
-resulting in the query `member(X, [1, 2, 3, a, 5])`. More sophisticated work
-with quasi-quotations (i.e., "unquoting" expressions) is described in 
-the "Advanced R" book [@Wickham2019].
-
-Section\ 4 includes an example for mathematical rendering of R expressions. In
-that example, a pre-processing function is used to bring function calls with
-named arguments to a canonical form which is then handled in Prolog.
+Section\ 3 includes an example for mathematical rendering 
+of R expressions. In that example, a pre-processing function is used
+to bring function calls with named arguments to a canonical form which is then
+handled in Prolog. More sophisticated work with quasi-quotations and
+unquoting expressions is described in "Advanced R" [@Wickham2019].
 
 ## Post-processing in R
 
 This may again be a function that reverts some of the manipulations during
-pre-processing. For `once()` and `submit()`, such a function would operate on the
-bindings. For example, many Prolog programmers are used to operate with atoms
-instead of character strings, the latter being the preferred representation of
-symbolic information in R. The following simple example illustrates conversion
-of the results for a query like `member(X, [a, b, c])` to strings.
+pre-processing. For `once()` and `submit()`, such a function would
+operate on the bindings. For example, many Prolog programmers are
+used to operate with atoms instead of character strings, whereas character
+strings are the preferred representation of symbolic information 
+in R. The following function converts the result of a query
+like `member(X, [a, b, c])` to strings.
 
 ```{r}
 stringify <- function(x)
 {
-  # replace Prolog variable by the value of an R variable with the same name
-	if(is.name(x))
-	  return(as.character(x))
-	
-	# Recurse into lists and calls
-	if(is.call(x))
-	  x[-1] <- lapply(x[-1], FUN=stringify)
+  if(is.name(x))
+    return(as.character(x))
 
-	if(is.list(x))
-	  x <- lapply(x, FUN=stringify)
+  if(is.call(x))
+    x[-1] <- lapply(x[-1], FUN=stringify)
 
-  # Leave the rest unchanged
-	return(x)
+  if(is.list(x))
+    x <- lapply(x, FUN=stringify)
+
+  return(x)
 }
 
-# Example illustration
-q <- quote(member(.X, ""[a, b, c]))
-r <- findall(as.rolog(q))
-stringify(r)
+Q <- quote(member(.X, ""[a, b, c]))
+R <- findall(as.rolog(Q))
+S <- stringify(R)
+unlist(S)   # the unlist saves space in the output
 ```
 
 ## Pre- and post-processing in Prolog
@@ -451,10 +467,11 @@ stringify(r)
 Recent versions of SWI-Prolog support so-called dictionaries of the 
 form `Tag{Key1:Value1, Key2:Value2, ...}`. The tag is typically an 
 atom (but can be a variable, as well), the keys are unique atom or integers;
-the values can be anything. Suppose we have a Prolog predicate that does
-something with dicts, and we would like to query it from R. The simplest
-solution is a wrapper in Prolog that translates key-value 
-pairs `[Key1-Value1, Key2-Value2, ...]` back and forth to dicts:
+the values can be anything. Suppose we have a Prolog predicate that
+does something with dicts, and we would like to query it from R. The
+simplest solution is a wrapper in Prolog that 
+translates *key*-*value* pairs `[Key1-Value1, Key2-Value2, ...]`
+back and forth to dicts:
 
 ```prolog
 do_something_with_pairs(Pairs0, Pairs1) :-
@@ -463,36 +480,33 @@ do_something_with_pairs(Pairs0, Pairs1) :-
     dict_pairs(Dict1, my_dict, Pairs1).
 ```
 
-`do_something_with_pairs/2` can then be queried from R using, e.g., lists with
-named elements.
+`do_something_with_pairs/2` can then be queried from R using, 
+for example, lists with named elements (see Table\ 1).
 
 ```r
 once(call("do_something_with_pairs", list(a=1, b=2), expression(X)))
 ```
 
 In the code above, `dict_pairs/2` takes the role of both `preproc/2`
-and `postproc/2` in Figure\ 1. It illustrates that complicated syntax on the R
-side when can be much simpler to do the conversion at the Prolog end.
-
-A way to extend Prolog by add-ons ("packs") are shown in the next section.
+and `postproc/2` in Figure\ 1. It illustrates that
+complicated syntax on the R side can be much simplified when doing
+the conversion at the Prolog end. Ways to extend Prolog by
+add-ons ("packs") are shown in the next section.
 
 # 4. Examples
 
-In this section I present a few usage examples for the rolog package in
+In this section we present a few usage examples for the `rolog` package in
 increasing complexity. Although the code snippets are mostly self-explanatory,
 some familiarity with the Prolog language is helpful.
 
 ## Hello, world
 
-Prolog's typical _hello world_ example is a search through a directed acyclic
-graph (DAG), for example, a family tree like the one given in Listing\ 1.
+Prolog's typical *hello world* example is a search through a
+directed acyclic graph (DAG), for example, a family tree like the one given in
+Listing\ 2.
 
 ```prolog
-parent(pam, bob).
-parent(tom, bob).
-parent(bob, ann).
-parent(bob, pat).
-parent(pat, jim).
+parent(pam, bob). parent(bob, ann). parent(bob, pat). parent(pat, jim).
 
 ancestor(X, Z) :-
     parent(X, Z).
@@ -502,101 +516,72 @@ ancestor(X, Z) :-
     ancestor(Y, Z).
 ```
 
-Listing\ 1
+Listing\ 2
 : A family tree in Prolog (see also family.pl)
 
-Listing\ 1 is included in the package and can be accessed from R using the
-function `system.file(...)`. Within Prolog, the normal workflow is to consult
-the code with `[family]` and then to raise queries such as `ancestor(X, jim)`,
-which returns, one by one, four solutions for the variable _X_. In R, we obtain
-the following results:
+Listing\ 2 is included in the package is accessed using the
+function `system.file(...)`. Within Prolog, the normal workflow
+is to consult the code with `[family]` and then to raise queries such
+as `ancestor(X, jim)`, which returns, one by one, four solutions for the
+variable *X*. In R, we obtain the following results:
 
 ```{r}
 library(rolog)
-
-# [family].
 consult(system.file(file.path("pl", "family.pl"), package="rolog"))
-
-# ancestor(X, jim).
 query(call("ancestor", expression(X), quote(jim)))
-
-# solutions for X, one by one
-submit()
-submit()
-submit()
-submit()
-submit() # no more results (closing the query)
-submit() # warning that no query is open
-# clear() # normally used to close a query
+submit()        # solutions for X
+submit()        # etc.
+clear()         # close the query
 ```
 
-As stated above, `consult()` loads the facts and rules of Listing\ 1 into the
-database. `query(expr)` initializes the query `expr`, and the subsequent calls
-to `submit` return the conditions under which the query succeeds. In this 
-example, the query succeeds if _X_ is either `pat`, `pam`, `tom` or `bob`. 
-A query is closed with `clear()`, or automatically if the query fails. Note that
-it is generally not possible to open two queries simultaneously, so opening a
+As stated above, `consult()` loads the facts and rules of 
+Listing\ 2 into the Prolog 
+database. `query(Expr)` initializes the query *Expr*, and the
+subsequent calls to `submit` return the conditions under which the query
+succeeds. In this example, the query succeeds if *X* is
+either *pat*, *pam*, or *bob*. A query is closed
+with `clear()`, or automatically if the query fails. Note that it is
+generally not possible to open two queries simultaneously, so opening a
 second query while another one is still open will raise a warning. If we are
-interested in just the first solution, we can use `once(expr)` as a shortcut
-to `query(expr)`-`submit()`-`clear()`. If we want to collect all solutions of a
-query with a finite set of solutions, we can use `findall(expr)`.
+interested in just the first solution, we can use `once(expr)` as a
+shortcut to `query(Expr)`, then `submit()`, then `clear()`. If we
+want to collect all solutions of a query with a finite set of solutions, we can
+use `findall(Expr)`.
 
-A rather cumbersome aspect of Rolog is the construction of Prolog terms and
-queries. `expression(X)` encapsulates the variable `X`, R symbols
-from `quote(jim)` or `as.symbol("jim")` are translated to Prolog atoms, and
-Prolog compounds such as `ancestor/2` are generated
-using `call("ancestor", ...)`. A simplified syntax is provided
-by `as.rolog(...)` that accepts quoted expressions with dots indicating Prolog
-variables:
+As mentioned in Section\ 2, a simplified syntax is provided
+by `as.rolog(...)` that accepts quoted expressions with dots 
+indicating Prolog variables:
 
 ```r
-q = quote(ancestor(.X, jim))
-findall(as.rolog(q))
+Q <- quote(ancestor(.X, jim))
+findall(as.rolog(Q))
 ```
-
-Note that `as.rolog(...)` removes the dot from the variable name (`.X` to `X`).
 
 ## Backdoor test
 
-A more useful application of DAGs is confounder adjustment in causal 
-analysis [@greenland1999;@ggdag]. The Prolog file `backdoor.pl` is an 
-implementation of Greenland et al.'s criteria for the backdoor test 
-for _d_-separation in DAGs, with a predicate `minimal/3` that searches for
-minimally sufficient sets of variables for confounder adjustment on the causal
-path between exposure and outcome.
+A useful application of DAGs is confounder adjustment in causal 
+analysis [@greenland1999;@ggdag]. The Prolog 
+file `backdoor.pl` is an implementation of Greenland et al.'s criteria for
+the backdoor test for *d*-separation in DAGs, with a predicate `minimal/3`
+that searches for minimally sufficient sets of variables for confounder
+adjustment on the causal path between exposure and outcome. The nodes and arrows
+refer to Figure\ 12 in Greenland et al.
 
 ```{r}
-# [backdoor].
 consult(system.file(file.path("pl", "backdoor.pl"), package="rolog"))
 
-# Figure 12 in Greenland et al.
-add_node = function(N)
-	invisible(once(call("assert", call("node", N))))
+node <- function(N) invisible(once(call("assert", call("node", N))))
+node("a"); node("b"); node("c"); node("f"); node("u")
+node("e") # exposure
+node("d") # outcome
 
-add_arrow = function(X, Y)
-	invisible(once(call("assert", call("arrow", X, Y))))
+arrow <- function(X, Y) invisible(once(call("assert", call("arrow", X, Y))))
+arrow("a", "d"); arrow("a", "f"); arrow("b", "d"); arrow("b", "f")
+arrow("c", "d"); arrow("c", "f"); arrow("e", "d"); arrow("f", "e")
+arrow("u", "a"); arrow("u", "b"); arrow("u", "c")
 
-add_node("a")
-add_node("b")
-add_node("c")
-add_node("d") # outcome
-add_node("e") # exposure
-add_node("f")
-add_node("u")
-
-add_arrow("a", "d")
-add_arrow("a", "f")
-add_arrow("b", "d")
-add_arrow("b", "f")
-add_arrow("c", "d")
-add_arrow("c", "f")
-add_arrow("e", "d")
-add_arrow("f", "e")
-add_arrow("u", "a")
-add_arrow("u", "b")
-add_arrow("u", "c")
-
-findall(call("minimal", "e", "d", expression(S)))
+R <- findall(call("minimal", "e", "d", expression(S)))
+unlist(R)
 ```
 
 The query to `minimal/3` returns two minimally sufficient sets of covariates for
@@ -611,13 +596,6 @@ rolog can access modules from SWI's standard library (e.g., "dcg/basics.pl").
 
 ```prolog
 :- use_module(library(dcg/basics)).
-
-% Translate R string to code points and invoke phrase/2
-sentence(Tree, Sentence) :-
-    string_codes(Sentence, Codes),
-    phrase(s(Tree), Codes).
-
-% Simple grammar with sentences, noun, verb and participle phrases
 s(s(NP, VP)) --> np(NP, C), blank, vp(VP, C).
 np(NP, C) --> pn(NP, C).
 np(np(Det, N), C) --> det(Det, C), blank, n(N, C).
@@ -625,8 +603,6 @@ np(np(Det, N, PP), C) --> det(Det, C), blank, n(N, C), blank, pp(PP).
 vp(vp(V, NP), C) --> v(V, C), blank, np(NP, _).
 vp(vp(V, NP, PP), C) --> v(V, C), blank, np(NP, _), blank, pp(PP).
 pp(pp(P, NP)) --> p(P), blank, np(NP, _).
-
-% Determiners, personal nouns, nouns, verbs and participles
 det(det(a), sg) --> `a`.
 det(det(the), _) --> `the`.
 pn(pn(john), sg) --> `john`.
@@ -635,62 +611,67 @@ n(n(men), pl) --> `men`.
 n(n(telescope), sg) --> `telescope`.
 v(v(sees), sg) --> `sees`.
 v(v(see), pl) --> `see`.
-v(v(saw), _) --> `saw`.
 p(p(with)) --> `with`.
+
+% Translate R string to code points and invoke phrase/2
+sentence(Tree, Sentence) :-
+    string_codes(Sentence, Codes),
+    phrase(s(Tree), Codes).
 ```
 
-Listing\ 2
+Listing\ 3
 : Simple grammar and lexicon. `sentence/2` pre-processes the R call.
 
-As in the first example, we first consult a little Prolog program with a
-minimalistic grammar and lexicon (Listing\ 2), and then raise a query asking for
-the syntactic structure of "john sees a man with a telescope". Closer inspection
-of the two results reveals the two possible meanings, "john sees a man _who
-carries_ a telescope" versus "john sees a man _through_ a telescope". 
-More Prolog examples of natural language processing are found in
-Blackburn and
-Bos [@Blackburn2005], including the resolution of anaphoric references and the
-extraction of semantic meaning.
+As in the first example, we first consult a little Prolog program 
+with a minimalistic grammar and lexicon (Listing\ 3, see 
+also `pl/telescope.pl`), and then raise a query asking for the syntactic
+structure of "john sees a man with a telescope". Closer inspection of the two
+results reveals the two possible meanings, "john sees a man *who carries*
+a telescope" versus "john sees a man *through* a telescope".
+Further Prolog examples of natural language processing are found
+in \citet{Blackburn2005}, including the resolution of anaphoric references and
+the extraction of semantic meaning.
 
 ```{r}
-# [telescope].
 consult(system.file(file.path("pl", "telescope.pl"), package="rolog"))
-
-# findall(sentence(Tree, "john sees a man with a telescope")).
-findall(call("sentence", expression(Tree), "john sees a man with a telescope"))
+Q <- quote(sentence(.Tree, "john sees a man with a telescope"))
+unlist(findall(as.rolog(Q)))
 ```
 
 ## Installation of add-ons for Prolog
 
-In description of the previous example, I noted in passing that rolog can use
-the built-in libraries of SWI-Prolog (e.g., by calls to `use_module/1`). It is
-also possible to extend the installation by add-ons, including add-ons that
-require compilation, if the build tools (essentially, RTools) are properly
-configured. This is illustrated below by the demo add-on "environ" [@Environ]
-that collects the current environment variables.
+In description of the previous example, we noted in passing that `rolog` can
+access the built-in libraries of SWI-Prolog (e.g., by calls
+to `use_module/1,2`). It is also possible to extend the installation by
+add-ons, including add-ons that require compilation, if the build
+tools (essentially, RTools under Windows) are properly configured. This is
+illustrated below by the demo add-on `environ` [@Environ] that collects
+the current environment variables.
 
 ```r
-# pack_install(environ, [interactive(false)]).
-once(call("pack_install", as.name("environ"), list(call("interactive", FALSE))))
+once(call("pack_install", 
+          quote(environ), list(call("interactive", FALSE))))
 
-# use_module(library(environ))
 once(call("use_module", call("library", quote(environ))))
 
-# environ(X)
 once(call("environ", expression(X)))
 ```
 
-The query then unifies _X_ with a list with Key=Value terms. The purpose if this
-example is obviously not to mimic the built-in function `Sys.getenv()` from R,
-but to illustrate the installation and usage of Prolog extensions from within R.
+The query then unifies *X* with a list with `Key=Value` terms. The
+purpose if this example is obviously not to mimic the built-in
+function `Sys.getenv()` from R, but to illustrate the installation and 
+usage of Prolog extensions from within R. In most
+situations, the user would install the pack from within Prolog with
+`pack_install(environ)`.
 
 ## Term manipulation
 
-Prolog is homoiconic, that is, code is data. In this example, we make use of
-Prolog's ability to match expressions against given patterns and modify these
-expressions according to a few predefined "buggy rules" [@Brown1978], inspired
-by recurrent mistakes in the statistics exams of my students. Consider 
-the $t$-statistic for comparing an observed group average to a population mean:
+Prolog is homoiconic, that is, code is data. In this example, we make
+use of Prolog's ability to match expressions against given patterns
+and modify these expressions according to a few 
+predefined "buggy rules" [@Brown1978], inspired by recurrent mistakes in
+the statistics exams of our students. Consider the $t$-statistic for comparing
+an observed group average to a population mean:
 
 $$
 T = \frac{\overline{X} - \mu}{s / \sqrt{N}}
@@ -698,26 +679,20 @@ $$
 
 Some mistakes may occur in this calculation, for example, omission of the
 implicit parentheses around the numerator and the denominator when typing the
-numbers into a calculator, resulting
-to $\overline{X} - \frac{\mu}{s} \div \sqrt{N}$, or forgetting the square root
-around $N$, or both. Prolog code for the two buggy rules is given in Listing\ 3.
+numbers into a calculator, resulting 
+in $\overline{X} - \frac{\mu}{s} \div \sqrt{N}$, or forgetting the square root
+around $N$, or both. Prolog code for the two buggy rules is given in
+Listing\ 4.
 
-```Prolog
-% Correct step from task to solution
+```prolog
+% Correct steps and mistakes
 expert(tratio(X, Mu, S, N), frac(X - Mu, S / sqrt(N))).
-
-% Mistakes
 buggy(frac(X - Mu, S / SQRTN), X - frac(Mu, S) / SQRTN).
 buggy(sqrt(N), N).
 
-% Apply expert and buggy rules
+% Apply expert and buggy rules, or enter expressions
 step(X, Y) :-
-    expert(X, Y).
-
-step(X, Y) :-
-    buggy(X, Y).
-
-% Enter expressions
+    expert(X, Y) ; buggy(X, Y).
 step(X, Y) :-
     compound(X),
     mapargs(search, X, Y),
@@ -725,39 +700,37 @@ step(X, Y) :-
 
 % Search through problem space
 search(X, X).
-
 search(X, Z) :-
     step(X, Y),
     search(Y, Z).
 ```
 
-Listing 3
+Listing 4
 : Manipulating terms in Prolog
 
-The little e-learning system shown in Listing\ 2 (`buggy.pl`) is invoked using
-the R script below.
+The little e-learning system shown in Listing\ 4 produces six
+response alternatives. The fourth and the sixth result are combinations of the
+two buggy rules (parenthesis, then square root, and the other way round). Some
+additional filters would be needed to eliminate trivial and redundant solutions 
+\citep[see, e.g., the chapter on generate-and-test in][]{Sterling1994}.
 
 ```{r}
-library(rolog)
 consult(system.file(file.path("pl", "buggy.pl"), package="rolog"))
-
-q <- quote(search(tratio(x, mu, s, n), .S))
-findall(as.rolog(q))
+Q <- quote(search(tratio(x, mu, s, n), .S))
+unlist(findall(as.rolog(Q)))
 ```
 
-The fourth and the sixth result are combinations of the two buggy 
-rules (parenthesis, then square root, and the other way round). Some additional
-filters would be needed to eliminate trivial and redundant
-solutions [see, e.g., the chapter on generate-and-test in @Sterling1994].
+An important feature of such a term manipulation is that the evaluation of the
+term can be postponed; for example, there is no need to instantiate the
+variables *x*, *mu*, *s*, and *n* with given values before
+raising a query. This is especially helpful for variables that may represent
+larger sets of data in later steps.
 
-It should be mentioned that R is homoiconic, too, and the Prolog code above can,
-in principle, be rewritten in R using non-standard evaluation 
-techniques [@Wickham2019]. Prolog's inbuilt pattern matching algorithm 
-simplifies things a lot, though. An important feature of such a term 
-manipulation is that the evaluation of the term can be postponed; for example, 
-there is no need to instantiate the variables `X`, `Mu`, `s` and `N` with
-given values before raising a query. This is especially helpful for variables 
-that may represent larger sets of data in the later course.
+It should be mentioned that R is homoiconic, too, and 
+the Prolog code above can, in principle, be rewritten in R
+using non-standard evaluation 
+techniques [@Wickham2019]. Prolog's inbuilt pattern matching
+algorithm simplifies things a lot, though. 
 
 ## Rendering mathematical expressions
 
@@ -867,17 +840,20 @@ order.
 
 ## Calling Prolog from R
 
-The basic workflow of the bridge from R to Prolog is to (A)\ translate an 
-R\ expression into a Prolog term (i.e., a predicate), (B)\ query the predicate,
-and then, (C)\ translate the result (i.e., the bindings of the variables) back
-to R. The reverse direction is straightforward, we start by translating a
-Prolog term to an R expression (i.e. Step\ C), evaluate the R expression, and 
-then translate the result back to a Prolog term (Step A). Rolog provides two
-Prolog predicates for this purpose, `r_eval(Expr)` and `r_eval(Expr, Res)`. The
-former is used to invoke an R expression *Expr* for its side effects (e.g.,
-initializing a random number generator); it does not return a result. The latter
-is used to evaluate the R expression *Expr* and return the result *Res*. The
-code snippet in Listing\ 5 (`r_eval.pl`) illustrates this behavior.
+The basic workflow of the bridge from R to Prolog is
+to (A)~translate an R~expression into a Prolog
+term (i.e., a predicate), (B)~query the predicate, and then, (C)~translate 
+the result (i.e., the bindings of the variables) back to R. The
+reverse direction is straightforward, we start by translating 
+a Prolog~term to an R~expression (i.e. Step~C), evaluate
+the R~expression, and then translate the result back to
+a Prolog~term (Step~A). `rolog` provides two predicates for that
+purpose, `r_eval(Expr)` and `r_eval(Expr, Res)`. The
+former is used to invoke an R~expression *Expr* for its side
+effects (e.g., initializing a random number generator); it does not return a
+result. The latter is used to evaluate the R~expression *Expr*
+and return the result *Res*. The code snippet in
+Listing\ 6 (`r_eval.pl`) illustrates this behavior.
 
 ```prolog
 r_seed(Seed) :-
@@ -887,22 +863,21 @@ r_norm(N, L) :-
     r_eval(rnorm(N), L).
 ```
 
-```{r}
-# [r_eval].
-consult(system.file(file.path("pl", "r_eval.pl"), package="rolog"))
+Listing\ 6
+: Calling R from Prolog using `r_eval/1` and `r_eval/2`. The R\ call `set.seed` is quoted because the dot is an operator in Prolog.
 
-# rnorm(3)
+```{r}
+consult(system.file(file.path("pl", "r_eval.pl"), package="rolog"))
+invisible(once(call("r_seed", 1234)))
 once(call("r_norm", 3L, expression(X)))
 ```
 
-Listing\ 5
-: Calling Prolog from R using `r_eval/1` and `r_eval/2`. The R\ call `set.seed` is quoted because the dot is an operator in Prolog.
-
-The example in Listing\ 5 is a bit trivial, basically illustrating the syntax
-and the workflow. More serious applications of `r_eval/1,2` are illustrated in
-the example on mathematical expressions where `r_eval/2` is used to obtain
-a names of a function argument, as well as in the next example on interval
-arithmetic, where `r_eval/2` is used with monotonically behaving R functions.
+The example in Listing\ 6 is a bit trivial, basically illustrating
+the syntax and the workflow. More serious applications of `r_eval/1,2` are
+illustrated in the example on mathematical expressions where `r_eval/2` is
+used to obtain the name of a function argument, as well as in the next example
+on interval arithmetic, where `r_eval/2` is used to evaluate monotonically
+behaving R functions.
 
 ## Interval arithmetic
 
@@ -930,98 +905,104 @@ in `pl/interval.pl`; a few examples are shown below. Again, Prolog rings back to
 R via `r_eval/2` to determine the result of `dbinom(X, Size, Prob, Log)`.
 
 ```{r}
-# [interval].
 consult(system.file(file.path("pl", "interval.pl"), package="rolog"))
 
-# findall(1 ... 2 / -3 ... 3, Res).
-q <- quote(int(`...`(1, 2) / `...`(-3, 3), .Res))
-findall(as.rolog(q))
+Q <- quote(int(`...`(1, 2) / `...`(-3, 3), .Res))
+unlist(findall(as.rolog(Q)))
 
-# t-ratio
-D  = quote(`...`(5.7, 5.8))
-mu = 4
-s  = quote(`...`(3.8, 3.9))
-N  = 24L
-tratio = call("/", call("-", D, mu), call("/", s, call("sqrt", N)))
-findall(call("int", tratio, expression(Res)))
+D  <- quote(`...`(5.7, 5.8))
+mu <- 4
+s  <- quote(`...`(3.8, 3.9))
+N  <- 24L
+tratio <- call("/", call("-", D, mu), call("/", s, call("sqrt", N)))
+once(call("int", tratio, expression(Res)))
 
 # Binomial density
 prob = quote(`...`(0.2, 0.3))
 once(call("int", call("dbinom", 4L, 10L, prob, FALSE), expression(Res)))
-
-prob = quote(`...`(0.5, 0.6))
-once(call("int", call("dbinom", 4L, 10L, prob, FALSE), expression(Res)))
-
-prob = quote(`...`(0.2, 0.6))
-once(call("int", call("dbinom", 4L, 10L, prob, FALSE), expression(Res)))
 ```
 
 The slightly cumbersome syntax for entering an interval $\langle \ell, u\rangle$
-is due to the fact that the ellipsis is a reserved symbol in R and cannot be
-used as an infix operator. A way more powerful and comprehensive system for
-constraint logic programming over intervals is available as a Prolog 
-pack [@Workman2021] and can easily be connected to R using, for example, the
-present package.
+is due to the fact that the ellipsis is a reserved symbol in R and
+cannot be used as an infix operator. A powerful and comprehensive system for
+constraint logic programming over intervals is available as a Prolog
+pack [@Workman2021] and can easily be connected to R using, for
+example, the present package.
 
 # 5. Conclusions
 
-R has become the primary language for statistical programming and data science,
-but is currently lacking support for traditional, symbolic artificial
-intelligence. There are already two add-ons for SWI-Prolog that allow to run
-R calculations from Prolog [@Angelopoulos2013;@Rserve], but a connection in the
-other direction was missing, so far. rolog bridges this gap by providing an
-interface to a SWI-Prolog distribution embedded into an R package. The
-communication between the two systems is mainly in the form of queries from R to
-Prolog, but two Prolog predicates allow Prolog to ring back and evaluate terms
-in R. The design of the package is minimalistic, providing three main 
-functions `query(...)`, `submit()`, and `clear()`, and a very limited set of
-convenience tools (`consult(...)`, `once(...)`, and `findall(...)`) to
-facilitate everyday actions. As both systems are homoiconic in nature, it was
-easy to establish a one-to-one correspondence between the elements of the two
-languages. Most exceptions (e.g., lack of R support for empty symbols) can be
+R has become the primary language for statistical programming and
+data science, but is currently lacking support for traditional, symbolic
+artificial intelligence. There are already two add-ons for SWI-Prolog that allow
+to run R calculations from Prolog [@Angelopoulos2013;@Rserve],
+but a connection in the other direction was missing, so far. `rolog` bridges
+this gap by providing an interface to a SWI-Prolog distribution embedded into
+an R package. The communication between the two systems is mainly in
+the form of queries from R to Prolog, but two predicates
+allow Prolog to ring back and evaluate terms in R. The
+design of the package is minimalistic, providing three main 
+functions `query()`, `submit()`, and `clear()`, and a very
+limited set of convenience tools (`consult()`, `once()`, 
+and `findall()`) to facilitate recurrent everyday actions. As both
+systems are homoiconic in nature, it was easy to establish a one-to-one
+correspondence between many the elements of the two languages. Most
+exceptions (e.g., lack of R support for empty symbols) can be
 avoided and/or circumvented by wrapper functions at both ends.
 
-Simple ways to extend the package have been described in Section\ 3; such
-extensions could, for example, include R objects and structures like those
-returned by `lm`, or S4 classes. In many use cases, this may be realized by
-transforming the R object to a list with named elements, and "reconstruct" the
-object on the Prolog end if needed. After a query, the process is reversed.
-If speed is an issue, more of these steps can, in principle, be moved into the
-package and implemented in Rcpp.
+Simple ways to extend the package have been described in 
+Section\ 2; such extensions could, for example, 
+include R objects and structures like those returned by `lm()`,
+or S4 classes. In many use cases, this may be realized by transforming
+the R object to a list with named elements, and rebuild the
+object on the Prolog end on an as-needed basis. After a query, the
+process is reversed. If speed is an issue, more of these steps can, in
+principle, be moved into the package and implemented in `Rcpp`.
 
-rolog, thus, opens up a wide of applications in logic programming for
+`rolog`, thus, opens up a wide of applications in logic programming for
 statisticians and researchers at the intersection of symbolic and connectionist
 artificial intelligence, where concise knowledge representation is combined with
-statistical power. Moreover, rolog provides starting points for useful
+statistical power. Moreover, `rolog` provides starting points for useful
 small-scale solutions for everyday issues in data science (term transformations,
-pretty mathematical output, interval arithmetic).
+pretty mathematical output, interval arithmetic, see 
+Section\ 3).
 
-At its present stage, a major limitation of rolog is its rather slow speed. For
-example, translation of R lists or vectors to the respective elements of the
-Prolog language (lists, `#/N`) is done element-wise, in both directions. The
-translation is optimized using Rcpp [@Edelbuettel2018], but there remains an
-upper bound in the efficiency, because Prolog does not support vectors or
-matrices. Of course, Prolog's primary purpose is not vector or matrix
-calculation, so this limitation may not show up in real-world applications.
+At its present stage, a major limitation of `rolog` is its relatively slow
+speed. For example, translation of R lists or vectors to the
+respective elements of the Prolog language (also lists, `#/N`)
+is done element-wise, in both directions. The translation is optimized by
+using `Rcpp` [@Edelbuettel2018], but there remains an upper bound in
+the efficiency, because Prolog does not support vectors or
+matrices. Since Prolog's primary purpose is not vector or matrix
+calculation, this limitation may not show up in real-world applications.
 Another issue, maybe a bit annoying, is the rather cumbersome syntax of the
-interface, with the need for quoted calls and R expressions being a bit misused
-for representing Prolog variables. rolog was deliberately chosen to be
-minimalistic and, so far, only depends on base R. A more concise form of
-representation might be obtained by tools from the "Tidyverse" ecosystem, as
-described in Chapter\ 19 of Advanced R [@Wickham2019]. Finally, at this stage,
-rolog is unable to deal with cyclic Prolog
-terms (e.g., `once(call("=", expression(A), call("f", expression(A))))` raises
-an error message).
+interface, with the need for quoted calls and R expressions being a
+bit misused for representing Prolog variables. `rolog` was
+deliberately chosen to be minimalistic and, so far, only depends on 
+base R. A more concise representation might be obtained by tools from
+the "Tidyverse" ecosystem, as described in Chapter\ 19 of 
+Advanced R [@Wickham2019]. Finally, at this stage, `rolog` is unable to
+deal with cyclic 
+terms (e.g., `once(call("=", expression(A), call("f", expression(A))))`
+raises an error message).
 
-rolog is available for R version 4.2 and later. The source code of the package
-is found at https://github.com/mgondan/rolog/, including installation
-instructions for Unix, Windows and macOS.
+`rolog` is available for R Version 4.2 and later, and can easily
+be installed using the usual `install.packages("rolog")`. The source code
+of the package is found at https://github.com/mgondan/rolog/, including
+installation instructions for Unix, Windows and macOS.
 
 # Acknowledgement
 
-I am grateful to Jan Wielemaker, the main developer of SWI-Prolog; this package
-would never have been finalized without his help. Moreover, development of the
-package profited substantially from the Prolog packs rserve_client [@Rserve] and 
-real [@Angelopoulos2013].
+Development of the package profited substantially from 
+the Prolog packs `rserve_client` [@Rserve] 
+and `real` [@Angelopoulos2013].
+
+# Note
+
+The results in this paper were obtained 
+using R\ `r paste(R.Version()[7:8], collapse = ".")` with 
+the `rolog`~`r packageVersion("rolog")` package. R\ itself
+and all packages used are available from the 
+Comprehensive R Archive Network (CRAN) 
+at https://CRAN.R-project.org/.
 
 # References

@@ -86,7 +86,7 @@ rsvg_pdf(charToRaw(export_svg(grViz(
 }
 
 \Keywords{Statistics; Logic Programming; Artificial Intelligence, \proglang{R}, \proglang{Prolog}}
-\Plainkeywords{Statistics; Logic Programming; Artificial Intelligence, R, Prolog}
+\Plainkeywords{Statistics; Logic Programming; Artificial Intelligence; R; Prolog}
 
 \Address{
   Matthias Gondan\\
