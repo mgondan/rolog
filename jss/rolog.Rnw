@@ -263,8 +263,8 @@ translation between \proglang{R} and \proglang{Prolog}, see the section below.
 The function returns \code{TRUE} on success. Note that the function does not
 check if the corresponding \proglang{Prolog} predicate actually exists (but 
 see \code{submit()} below). Only a single query can be opened at a given time.
-If a new query _Q_ is created while another query _R_ is still open, a warning
-is shown and _R_ is closed.
+If a new query \emph{Q} is created while another query \emph{R} is still open, a
+warning is shown and \emph{R} is closed.
 
 \code{submit}. Once a query has been created, it can be submitted
 using \code{submit()}. If the query fails, the return value is \code{FALSE}. If
