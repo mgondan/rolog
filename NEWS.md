@@ -1,6 +1,7 @@
 # rolog 0.9.4
 
 * Added a vignette with a manuscript for JSS
+* Patch on swipl to suppress a deprecation warning under macOS (vfork)
 
 # rolog 0.9.3
 
