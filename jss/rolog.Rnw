@@ -134,9 +134,10 @@ consisting of facts and rules that define relations, for example, in a problem
 space~\citep{Newell1972}. \proglang{Prolog}'s major strength is its built-in
 query-driven search engine that efficiently deals with complex structured data,
 with the data not necessarily being numerical. In fact, \proglang{Prolog} only
-provides a basic collection of arithmetic calculations via a purely functional.
-More complex calculations such as matrix algebra, statistical models or machine
-learning need help from other systems, for example, from \proglang{R}.
+provides a basic collection of arithmetic calculations via a purely functional
+interface (\code{is/2}). More complex calculations such as matrix algebra,
+statistical models or machine learning need help from other systems, for
+example, from \proglang{R}.
 
 \citet{Angelopoulos2013} summarize work at the
 intersection of symbolic knowledge representation and statistical inference,
@@ -165,14 +166,15 @@ interface for \proglang{R} calls from \proglang{Prolog}, but not the other way
 round, that is, querying \proglang{Prolog} from \proglang{R} is not possible, so
 far.
 
-\pkg{rolog} fills this gap by \proglang{Prolog} queries in \proglang{R} scripts,
-for example, to perform efficient symbolic computations, searches in complex
-graphs, parsing natural language and definite clause grammars. In addition,
-two \proglang{Prolog} predicates are provided that enable \proglang{Prolog} to
-ring back to the \proglang{R} system for bidirectional communication. Similar
-to \pkg{real}, tight communication between the two systems is established by
-linking to a shared library that embeds the current version of SWI-Prolog.
-The exchange of data is facilitated by the \proglang{C++} interfaces of the two
+\pkg{rolog} fills this gap through \proglang{Prolog} queries in \proglang{R} 
+scripts, for example, to perform efficient symbolic computations, searches in
+complex graphs, parsing natural language and definite clause grammars. In
+addition, two \proglang{Prolog} predicates are provided that
+enable \proglang{Prolog} to ring back to the \proglang{R} system for
+bidirectional communication. Similar to \pkg{real}, tight communication between
+the two systems is established by linking to a shared library that embeds the
+current version of SWI-Prolog. The exchange of data is facilitated by
+the \proglang{C++} interfaces of the two
 languages \citep{Edelbuettel2018,Wielemaker2021}. A less tight connection might
 be established using the recently developed machine query
 interface \citep[MQI]{Zinda2021} that allows socket-based communication between
@@ -235,7 +237,7 @@ clear()       # close the query
 \label{lst:member}
 \end{listing}
 
-Most of the work can done using the 
+Most of the work can be done using the 
 three \proglang{R}\ functions \code{query}, \code{submit}, and \code{clear}. The
 functions \code{consult}, \code{once}, and \code{findall} are provided for
 convenience. The \proglang{R} program in Listing~\ref{lst:member} illustrates a
@@ -261,8 +263,8 @@ translation between \proglang{R} and \proglang{Prolog}, see the section below.
 The function returns \code{TRUE} on success. Note that the function does not
 check if the corresponding \proglang{Prolog} predicate actually exists (but 
 see \code{submit()} below). Only a single query can be opened at a given time.
-If a new query is created while another query is still open, a warning is shown
-and the other query is closed.
+If a new query _Q_ is created while another query _R_ is still open, a warning
+is shown and _R_ is closed.
 
 \code{submit}. Once a query has been created, it can be submitted
 using \code{submit()}. If the query fails, the return value is \code{FALSE}. If
@@ -282,8 +284,8 @@ convenience function that acts as a shortcut
 for \code{query(call, options)}, \code{submit()}, and \code{clear()}.
 Similarly, \code{findall(call, options)} abbreviates the 
 commands \code{query(call, options)}, repetition of \code{submit()} until
-failure, and \code{clear()}, returning a list collecting the the return value of
-the individual calls to submit.
+failure, and \code{clear()}, returning a list collecting the return value of the
+individual calls to submit.
 
 \subsection[Creating Prolog terms in R]{Creating \proglang{Prolog} terms 
 in \proglang{R}}
@@ -554,7 +556,7 @@ ancestor(X, Z) :-
 \label{lst:family}
 \end{listing}
 
-Listing~\ref{lst:family} is included in the package is accessed using the
+Listing~\ref{lst:family} is included in the package and is accessed using the
 function \code{system.file(...)}. Within \proglang{Prolog}, the normal workflow
 is to consult the code with \code{[family]} and then to raise queries such
 as \code{ancestor(X, jim)}, which returns, one by one, four solutions for the
@@ -575,10 +577,8 @@ database. \code{query(expr)} initializes the query \emph{expr}, and the
 subsequent calls to \code{submit} return the conditions under which the query
 succeeds. In this example, the query succeeds if \emph{X} is
 either \code{pat}, \code{pam}, or \code{bob}. A query is closed
-with \code{clear()}, or automatically if the query fails. Note that it is
-generally not possible to open two queries simultaneously, so opening a
-second query while another one is still open will raise a warning. If we are
-interested in just the first solution, we can use \code{once(expr)} as a
+with \code{clear()}, or automatically if the query fails. If we are interested
+in just the first solution of a query, we can use \code{once(expr)} as a
 shortcut to \code{query(expr)}, then \code{submit()}, then \code{clear()}. If we
 want to collect all solutions of a query with a finite set of solutions, we can
 use \code{findall(expr)}.
@@ -684,9 +684,9 @@ In description of the previous example, we noted in passing that \pkg{rolog} can
 access the built-in libraries of SWI-Prolog (e.g., by calls
 to \code{use_module/1,2}). It is also possible to extend the installation by
 add-ons, including add-ons that require compilation, if the build
-tools (essentially, RTools under Windows) are properly configured. This is
-illustrated below by the demo add-on \pkg{environ} \citep{Environ} that collects
-the current environment variables.
+tools (RTools under Windows, xcode-select under macOS) are properly configured.
+This is illustrated below by the demo add-on \pkg{environ} \citep{Environ} that
+collects the current environment variables.
 
 <<echo=TRUE, eval=FALSE>>=
 once(call("pack_install", 
@@ -821,7 +821,7 @@ mathjax(term)                             # pretty print
 eval(term, envir=list(k=10, N=22, p=0.4)) # determine result
 @
 
-The next example is interesting because \proglang{Prolog} needs find out the
+The next example is interesting because \proglang{Prolog} needs to find out the
 name of the integration variable for \code{sin}. For that purpose, \pkg{rolog}
 provides a predicate \code{r\_eval/2} that calls \proglang{R} 
 from \proglang{Prolog} (i.e., the reverse direction, see also next example).
@@ -990,7 +990,7 @@ functions \code{query(...)}, \code{submit()}, and \code{clear()}, and a very
 limited set of convenience tools (\code{consult(...)}, \code{once(...)}, 
 and \code{findall(...)}) to facilitate recurrent everyday actions. As both
 systems are homoiconic in nature, it was easy to establish a one-to-one
-correspondence between many the elements of the two languages. Most
+correspondence between many of the elements of the two languages. Most
 exceptions (e.g., lack of \proglang{R} support for empty symbols) can be
 avoided and/or circumvented by wrapper functions at both ends.
 
@@ -1020,15 +1020,14 @@ the efficiency, because \proglang{Prolog} does not support vectors or
 matrices. Since \proglang{Prolog}'s primary purpose is not vector or matrix
 calculation, this limitation may not show up in real-world applications.
 Another issue, maybe a bit annoying, is the rather cumbersome syntax of the
-interface, with the need for quoted calls and \proglang{R} expressions being a
-bit misused for representing \proglang{Prolog} variables. \pkg{rolog} was
-deliberately chosen to be minimalistic and, so far, only depends on 
-base \proglang{R}. A more concise representation might be obtained by tools from
-the ``Tidyverse'' ecosystem, as described in Chapter\ 19 of 
-Advanced R \citep{Wickham2019}. Finally, at this stage, \pkg{rolog} is unable to
-deal with cyclic 
-terms (e.g., \code{once(call("=", expression(A), call("f", expression(A))))}
-raises an error message).
+interface, with the need for quoted calls and \proglang{R} expressions for
+representing \proglang{Prolog} variables. \pkg{rolog} was deliberately chosen to
+be minimalistic and, so far, only depends on base \proglang{R}. A more concise
+representation might be obtained by tools from the ``Tidyverse'' ecosystem, as
+described in Chapter\ 19 of Advanced R \citep{Wickham2019}. Finally, at this
+stage, \pkg{rolog} is unable to deal with cyclic 
+terms (e.g., \code{once(call("=", expression(A), call("f", expression(A))))},
+i.e., \code{A = f(A)} raises an error message).
 
 \pkg{rolog} is available for \proglang{R} Version 4.2 and later, and can easily
 be installed using the usual \code{install.packages("rolog")}. The source code

@@ -88,9 +88,10 @@ consisting of facts and rules that define relations, for example, in a problem
 space [@Newell1972]. Prolog's major strength is its built-in
 query-driven search engine that efficiently deals with complex structured data,
 with the data not necessarily being numerical. In fact, Prolog only
-provides a basic collection of arithmetic calculations via a purely functional.
-More complex calculations such as matrix algebra, statistical models or machine
-learning need help from other systems, for example, from R.
+provides a basic collection of arithmetic calculations via a purely functional
+interface (`is/2`). More complex calculations such as matrix algebra,
+statistical models or machine learning need help from other systems, for
+example, from R.
 
 Angelopoulos et al. [-@Angelopoulos2013] summarize work at the
 intersection of symbolic knowledge representation and statistical inference,
@@ -118,7 +119,7 @@ interface for R calls from Prolog, but not the other way
 round, that is, querying Prolog from R is not possible, so
 far.
 
-`rolog` fills this gap by Prolog queries in R scripts,
+`rolog` fills this gap through Prolog queries in R scripts,
 for example, to perform efficient symbolic computations, searches in complex
 graphs, parsing natural language and definite clause grammars. In addition,
 two Prolog predicates are provided that enable Prolog to
@@ -163,7 +164,7 @@ We can see SWI-Prolog's typical welcome message.
 
 ## R interface
 
-Most of the work can done using the 
+Most of the work can be done using the 
 three R\ functions `query`, `submit`, and `clear`. The
 functions `consult`, `once`, and `findall` are provided for
 convenience. The R program in Listing\ 1 illustrates a
@@ -189,8 +190,8 @@ translation between R and Prolog, see the section below.
 The function returns `TRUE` on success. Note that the function does not
 check if the corresponding Prolog predicate actually exists (but 
 see `submit()` below). Only a single query can be opened at a given time.
-If a new query is created while another query is still open, a warning is shown
-and the other query is closed.
+If a new query _Q_ is created while another query _R_ is still open, a warning
+is shown and _R_ is closed.
 
 `submit`. Once a query has been created, it can be submitted
 using `submit()`. If the query fails, the return value is `FALSE`. If
@@ -227,8 +228,8 @@ convenience function that acts as a shortcut
 for `query(call, options)`, `submit()`, and `clear()`.
 Similarly, `findall(call, options)` abbreviates the 
 commands `query(call, options)`, repetition of `submit()` until
-failure, and `clear()`, returning a list collecting the the return value of
-the individual calls to submit.
+failure, and `clear()`, returning a list collecting the return value of the
+individual calls to submit.
 
 ## Creating Prolog terms in R
 
@@ -493,7 +494,7 @@ complicated syntax on the R side can be much simplified when doing
 the conversion at the Prolog end. Ways to extend Prolog by
 add-ons ("packs") are shown in the next section.
 
-# 4. Examples
+# 4. Examples and use cases
 
 In this section we present a few usage examples for the `rolog` package in
 increasing complexity. Although the code snippets are mostly self-explanatory,
@@ -519,7 +520,7 @@ ancestor(X, Z) :-
 Listing\ 2
 : A family tree in Prolog (see also family.pl)
 
-Listing\ 2 is included in the package is accessed using the
+Listing\ 2 is included in the package and is accessed using the
 function `system.file(...)`. Within Prolog, the normal workflow
 is to consult the code with `[family]` and then to raise queries such
 as `ancestor(X, jim)`, which returns, one by one, four solutions for the
@@ -540,13 +541,10 @@ database. `query(Expr)` initializes the query *Expr*, and the
 subsequent calls to `submit` return the conditions under which the query
 succeeds. In this example, the query succeeds if *X* is
 either *pat*, *pam*, or *bob*. A query is closed
-with `clear()`, or automatically if the query fails. Note that it is
-generally not possible to open two queries simultaneously, so opening a
-second query while another one is still open will raise a warning. If we are
-interested in just the first solution, we can use `once(expr)` as a
-shortcut to `query(Expr)`, then `submit()`, then `clear()`. If we
-want to collect all solutions of a query with a finite set of solutions, we can
-use `findall(Expr)`.
+with `clear()`, or automatically if the query fails. If we are interested in
+just the first solution, we can use `once(expr)` as a shortcut to `query(Expr)`,
+then `submit()`, then `clear()`. If we want to collect all solutions of a query
+with a finite set of solutions, we can use `findall(Expr)`.
 
 As mentioned in Section\ 2, a simplified syntax is provided
 by `as.rolog(...)` that accepts quoted expressions with dots 
@@ -644,9 +642,9 @@ In description of the previous example, we noted in passing that `rolog` can
 access the built-in libraries of SWI-Prolog (e.g., by calls
 to `use_module/1,2`). It is also possible to extend the installation by
 add-ons, including add-ons that require compilation, if the build
-tools (essentially, RTools under Windows) are properly configured. This is
-illustrated below by the demo add-on `environ` [@Environ] that collects
-the current environment variables.
+tools (essentially, RTools under Windows, and xcode under macOS) are properly
+configured. This is illustrated below by the demo add-on `environ` [@Environ]
+that collects the current environment variables.
 
 ```r
 once(call("pack_install", 
@@ -780,7 +778,7 @@ p = 0.4
 eval(term)
 ```
 
-The next example is interesting because Prolog needs find out the name of
+The next example is interesting because Prolog needs to find out the name of
 the integration variable for `sin`. For that purpose, rolog provides a
 predicate `r_eval/2` that calls R from Prolog (i.e., the reverse direction, see
 also next example). Here, the predicate is used for the 
@@ -945,7 +943,7 @@ functions `query()`, `submit()`, and `clear()`, and a very
 limited set of convenience tools (`consult()`, `once()`, 
 and `findall()`) to facilitate recurrent everyday actions. As both
 systems are homoiconic in nature, it was easy to establish a one-to-one
-correspondence between many the elements of the two languages. Most
+correspondence between many of the elements of the two languages. Most
 exceptions (e.g., lack of R support for empty symbols) can be
 avoided and/or circumvented by wrapper functions at both ends.
 
@@ -975,15 +973,14 @@ the efficiency, because Prolog does not support vectors or
 matrices. Since Prolog's primary purpose is not vector or matrix
 calculation, this limitation may not show up in real-world applications.
 Another issue, maybe a bit annoying, is the rather cumbersome syntax of the
-interface, with the need for quoted calls and R expressions being a
-bit misused for representing Prolog variables. `rolog` was
-deliberately chosen to be minimalistic and, so far, only depends on 
-base R. A more concise representation might be obtained by tools from
-the "Tidyverse" ecosystem, as described in Chapter\ 19 of 
+interface, with the need for quoted calls and R expressions for representing
+Prolog variables. `rolog` was deliberately chosen to be minimalistic and, so
+far, only depends on base R. A more concise representation might be obtained by
+tools from the "Tidyverse" ecosystem, as described in Chapter\ 19 of 
 Advanced R [@Wickham2019]. Finally, at this stage, `rolog` is unable to
 deal with cyclic 
-terms (e.g., `once(call("=", expression(A), call("f", expression(A))))`
-raises an error message).
+terms (e.g., `once(call("=", expression(A), call("f", expression(A))))`,
+i.e., `A = f(A)` raises an error message).
 
 `rolog` is available for R Version 4.2 and later, and can easily
 be installed using the usual `install.packages("rolog")`. The source code
