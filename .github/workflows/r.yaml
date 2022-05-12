@@ -27,7 +27,9 @@ jobs:
       matrix:
         r-version: ['4.2.0']
         config:
-          - {os: macOS-latest, r: 'release'}
+          - {os: macOS-10.15, r: 'release'}
+          - {os: macOS-11, r: 'release'}
+          - {os: macOS-12, r: 'release'}
           - {os: ubuntu-latest, r: 'release'}
 
     steps:
