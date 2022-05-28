@@ -64,6 +64,9 @@
     if(arch == 'aarch64')
       arch <- 'arm64'
     folder <- dir(fp, pattern=arch, full.names=TRUE)
+    if(!length(folder) & arch == "arm64")
+      folder <- dir(fp, pattern="aarch64-linux", full.names=TRUE)	
+
     if(R.version$os == "linux-gnu")
       dyn.unload(file.path(folder, paste("libswipl", .Platform$dynlib.ext, sep="")))
     else
