@@ -50,3 +50,9 @@
 ^Meta$
 ^CRAN-SUBMISSION$
 ^cran-comments\.md$
+
+ src/swipl-devel/.clang-format
+  src/swipl-devel/.fileheader
+  src/swipl-devel/.git
+  src/swipl-devel/.travis.yml
+  src/swipl-devel/bench/.git
