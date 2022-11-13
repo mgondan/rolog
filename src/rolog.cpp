@@ -176,11 +176,45 @@ RObject pl2r_symbol(PlTerm pl)
   if(pl == "false")
     return wrap(false) ;
 
-  // R does not accept empty symbols, translate to string
+  // Empty symbols
   if(pl == "")
-    return as<RObject>(CharacterVector(0)) ;
+    return Function("substitute")() ;
 
   return as<RObject>(Symbol(pl.as_string(EncUTF8))) ; // TODO: EncLocale?
+}
+
+// Convert prolog neck to R function
+RObject pl2r_function(PlTerm pl, CharacterVector& names, PlTerm& vars)
+{
+  PlTerm plhead = pl[1] ;
+  PlTerm plbody = pl[2] ;
+
+  Language head("alist") ;
+  for(unsigned int i=1 ; i<=plhead.arity() ; i++)
+  {
+    PlTerm arg = plhead[i] ;
+
+    // Compounds like mean=100 are translated to named function arguments
+    if(PL_is_compound(arg) && !strcmp(arg.name(), "=") && arg.arity() == 2)
+    {
+      PlTerm a1 = arg.operator[](1) ;
+      PlTerm a2 = arg.operator[](2) ;
+      if(PL_is_atom(a1))
+      {
+        head.push_back(Named(a1.name()) = pl2r(a2, names, vars)) ;
+        continue ;
+      }
+    }
+
+    // the argument is the name
+    head.push_back(Named((char*) arg) = pl2r_symbol(PlAtom(""))) ;
+  }
+
+  RObject body = pl2r_compound(plbody, names, vars) ;
+  head.push_back(body) ;
+
+  Function as_function("as.function") ;
+  return wrap(as_function(head)) ;
 }
 
 LogicalVector pl2r_boolvec(PlTerm pl)
@@ -267,6 +301,10 @@ RObject pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars, List opti
   // Convert !(1.0, 2.0, 3.0) to LogicalVectors
   if(!strcmp(pl.name().as_string(EncUTF8).c_str(), options("boolvec")))
     return pl2r_boolvec(pl) ;
+
+  // Convert :- to function
+  if(!strcmp(pl.name(), ":-"))
+    return pl2r_function(pl, names, vars) ;
 
   // Other compounds
   Language r(pl.name().as_string(EncUTF8).c_str()) ;
@@ -782,7 +820,10 @@ RlQuery* query_id = NULL ;
 RObject query_(RObject query, List options)
 {
   if(PL_current_query() != 0)
-    stop("Cannot raise simultaneous queries. Please invoke clear()") ;
+  {
+    warning("Cannot raise simultaneous queries. Please invoke clear()") ;
+    return wrap(false) ;
+  }
 
   query_id = new RlQuery(query, options) ;
   return wrap(true) ;
@@ -946,7 +987,7 @@ PREDICATE(r_eval, 1)
   if(query_id)
     options = query_id->get_options() ;
   else
-    options = List::create(Named("realvec") = "#", Named("boolvec") = "!", Named("charvec") = "$", Named("intvec") = "%", Named("atomize") = false, Named("scalar") = true) ;
+    options = List::create(Named("realvec") = "#", Named("boolvec") = "!", Named("charvec") = "$$", Named("intvec") = "%", Named("atomize") = false, Named("scalar") = true) ;
 
   RObject Expr = pl2r(A1, names, vars, options) ;
   RObject Res = Expr ;
@@ -974,7 +1015,7 @@ PREDICATE(r_eval, 2)
   if(query_id)
     options = query_id->get_options() ;
   else
-    options = List::create(Named("realvec") = "#", Named("boolvec") = "!", Named("charvec") = "$", Named("intvec") = "%", Named("atomize") = false, Named("scalar") = true) ;
+    options = List::create(Named("realvec") = "#", Named("boolvec") = "!", Named("charvec") = "$$", Named("intvec") = "%", Named("atomize") = false, Named("scalar") = true) ;
  
   RObject Expr = pl2r(A1, names, vars, options) ;
   RObject Res = Expr ;
