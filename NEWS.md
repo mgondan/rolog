@@ -1,3 +1,16 @@
+# rolog 0.9.7
+
+* Represent R functions as ':-'/2 in Prolog
+
+# rolog 0.9.6
+
+* Separate SWI-Prolog runtime in R package rswipl
+* Connect to installed SWI-Prolog (Windows registry, `PATH`, `SWI_HOME_DIR`)
+
+# rolog 0.9.5
+
+* skipped. Will use updated C++ interface at a later stage.
+
 # rolog 0.9.4
 
 * Added a vignette with a manuscript for JSS
