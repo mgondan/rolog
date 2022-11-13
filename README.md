@@ -6,34 +6,121 @@ logic programming has become an important driving force in research on artificia
 intelligence, natural language processing, program analysis, knowledge
 representation and theorem proving. 
 
-SWI-Prolog (swipl, https://www.swi-prolog.org/) is an open-source implementation
-of the logic programming language Prolog. Swipl targets developers of applications, 
-with many users in academia, research and industry. SWI-Prolog includes a large number 
-of libraries for "the real world", for example, a web server, encryption, interfaces 
-to C/C++ and other programming languages, as well as a development environment and 
-debugger.
+SWI-Prolog (https://www.swi-prolog.org/) is an open-source implementation of the
+logic programming language Prolog. SWI-Prolog targets developers of applications,
+with many users in academia, research and industry. SWI-Prolog includes a 
+large number of libraries for "the real world", for example, a web server,
+encryption, interfaces to C/C++ and other programming languages, as well as a
+development environment and debugger.
 
-This R package embeds swipl in a package for the R programming language (www.r-project.org).
+This R package connects to SWI-Prolog.
 
 ## License
 
-This R package is distributed under FreeBSD simplified license. SWI-Prolog is 
-distributed under its own license (BSD-2).
+This R package is distributed under a BSD-2 simplified license (see the file LICENSE).
 
-## Installation
+## Why is it called rolog?
 
-Please use R version >= 4.2. The package is on CRAN, it can be installed using 
-`install.packages("rolog")` from the R environment. The current sources can be
-installed using 
+I guess the name is obvious, rolog = Prolog for R. The package only connects to the
+SWI-Prolog runtime and does not embed it. rolog supports the following installations
+of SWI-Prolog, with decreasing priority:
 
-`install.packages('rmarkdown')`
+* If the environment variable `SWI_HOME_DIR` is set, the respective installation is
+  used.
+* If swipl.exe is found on the PATH, that one is used.
+* (Windows only): If SWI-Prolog is installed in the system, a respective entry is
+  found in the registry.
+* SWI-Prolog from the R package rswipl
 
-`install.packages('remotes')`
+# Installation
 
-`remotes::install_github('mgondan/rolog', build_vignettes=TRUE)`
+## Linux
 
-This takes about 20 min on my computer. Then please move on to the examples. Please note that
-under Windows, you need the RTools42 build system. 
+1. Please install SWI-Prolog on your computer, see here: https://www.swi-prolog.org/build/PPA.html.
+   Alternatively, install the R package rswipl.
+
+2. You obviously need R and a few packages on your computer, maybe also rmarkdown and pandoc
+   to render Rmd files to html (see Example 2).
+
+`sudo apt install r-base pandoc pandoc-citeproc`
+
+`R`
+
+`install.packages("Rcpp", "rmarkdown", "remotes")`
+
+optional: `install.packages("rswipl")`
+
+3. Please install the "rolog" pack for R
+
+`install.packages("rolog")
+
+Then please move on to the examples.
+
+## macOS
+
+1. Please install SWI-Prolog on your computer, see here: https://www.swi-prolog.org/download/stable
+   Alternatively, install the R package rswipl.
+
+2. You obviously need R and a few packages on your computer, maybe also rmarkdown and pandoc 
+   to render Rmd files to html (see Example 2).
+
+`brew install r-base pandoc pandoc-citeproc`
+
+`R`
+
+`install.packages("Rcpp", "rmarkdown", "remotes")`
+
+optional: `install.packages("rswipl")`
+
+3. Please install the "rolog" pack for R
+
+`install_packages("rolog")`
+
+## Windows
+
+1. Download and install a recent R from https://www.r-project.org/
+
+2. Download and install a recent RStudio from https://www.rstudio.com/
+
+3. Download and install a recent SWI-Prolog from https://www.swi-prolog.org/
+
+optional: R> `install.packages("rswipl")`
+
+install.packages("rolog")
+
+R> `library(rolog)`
+
+Does this message appear?
+
+````
+Welcome to SWI-Prolog (threaded, 64 bits, version 8.5.3-28-g85fd90216-DIRTY)
+SWI-Prolog comes with ABSOLUTELY NO WARRANTY. This is free software.
+Please run ?- license. for legal details.
+
+For online help and background, visit https://www.swi-prolog.org
+For built-in help, use ?- help(Topic). or ?- apropos(Word).
+````
+
+`once(call("check_installation"))`
+
+Does this output appear?
+
+````
+................................................ not present
+Warning: See http://www.swi-prolog.org/build/issues/tcmalloc.html
+Warning: library(bdb) .......................... NOT FOUND
+Warning: See http://www.swi-prolog.org/build/issues/bdb.html
+Warning: library(jpl) .......................... NOT FOUND
+Warning: See http://www.swi-prolog.org/build/issues/jpl.html
+Warning: library(pce) .......................... NOT FOUND
+Warning: See http://www.swi-prolog.org/build/issues/xpce.html
+Warning: Found 4 issues.
+list()
+attr(,"query")
+[1] "check_installation"
+````
+
+# Examples
 
 ## Example 1
 
