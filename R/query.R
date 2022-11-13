@@ -59,21 +59,26 @@
 #' clear()
 #' 
 query <- function(
-	query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))),
-	options=NULL)
+  query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))),
+  options=NULL)
 {
-	options <- c(options, rolog_options())
+  if(!options()$rolog.ok)
+  {
+    warning("swipl not found in the PATH. Please set SWI_HOME_DIR accordingly or install R package rswipl.")
+    return(FALSE)
+  }
+
+  options <- c(options, rolog_options())
 	
-	# Decorate result with the prolog syntax of the query
-	if(options$portray)
-		q <- portray(query, options)
+  # Decorate result with the prolog syntax of the query
+  if(options$portray)
+    q <- portray(query, options)
+
+  r <- .query(query, options)
 	
-	r <- .query(query, options)
-	
-	if(options$portray)
-		attr(r, "query") <- q
-	
-	return(r)
+  if(options$portray)
+    attr(r, "query") <- q	
+  return(r)
 }
 
 #' Clear current query
@@ -103,7 +108,13 @@ query <- function(
 #'
 clear <- function()
 {
-	invisible(.clear())
+  if(!options()$rolog.ok)
+  {
+    warning("swipl not found in the PATH. Please set SWI_HOME_DIR accordingly or install R package rswipl.")
+    return(FALSE)
+  }
+
+  invisible(.clear())
 }
 
 #' Submit a query that has been opened with [query()] before.
@@ -143,5 +154,11 @@ clear <- function()
 #' 
 submit <- function()
 {
-	.submit()
+  if(!options()$rolog.ok)
+  {
+    warning("swipl not found in the PATH. Please set SWI_HOME_DIR accordingly or install R package rswipl.")
+    return(FALSE)
+  }
+
+  .submit()
 }
