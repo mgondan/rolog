@@ -17,8 +17,14 @@
 #' 
 consult <- function(fname=system.file(file.path("pl", "family.pl"), package="rolog"))
 {
-	if(.consult(fname))
-		return(invisible(TRUE))
+  if(!options()$rolog.ok)
+  {
+    warning("swipl not found in the PATH. Please set SWI_HOME_DIR accordingly or install R package rswipl.")
+    return(FALSE)
+  }
+
+  if(.consult(fname))
+    return(invisible(TRUE))
 	
-	return(FALSE)
+  return(FALSE)
 }
