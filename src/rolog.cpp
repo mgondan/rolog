@@ -183,8 +183,11 @@ RObject pl2r_symbol(PlTerm pl)
   return as<RObject>(Symbol(pl.as_string(EncUTF8))) ; // TODO: EncLocale?
 }
 
+// Forward declaration, needed below
+RObject pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars, List options) ;
+
 // Convert prolog neck to R function
-RObject pl2r_function(PlTerm pl, CharacterVector& names, PlTerm& vars)
+RObject pl2r_function(PlTerm pl, CharacterVector& names, PlTerm& vars, List options)
 {
   PlTerm plhead = pl[1] ;
   PlTerm plbody = pl[2] ;
@@ -195,22 +198,22 @@ RObject pl2r_function(PlTerm pl, CharacterVector& names, PlTerm& vars)
     PlTerm arg = plhead[i] ;
 
     // Compounds like mean=100 are translated to named function arguments
-    if(PL_is_compound(arg) && !strcmp(arg.name(), "=") && arg.arity() == 2)
+    if(arg.is_compound() && arg.name() == "=" && arg.arity() == 2)
     {
       PlTerm a1 = arg.operator[](1) ;
       PlTerm a2 = arg.operator[](2) ;
-      if(PL_is_atom(a1))
+      if(a1.is_atom())
       {
-        head.push_back(Named(a1.name()) = pl2r(a2, names, vars)) ;
+        head.push_back(Named(a1.as_string(EncUTF8)) = pl2r(a2, names, vars, options)) ;
         continue ;
       }
     }
 
     // the argument is the name
-    head.push_back(Named((char*) arg) = pl2r_symbol(PlAtom(""))) ;
+    head.push_back(Named(arg.as_string(EncUTF8)) = pl2r_symbol(PlTerm_atom(""))) ;
   }
 
-  RObject body = pl2r_compound(plbody, names, vars) ;
+  RObject body = pl2r_compound(plbody, names, vars, options) ;
   head.push_back(body) ;
 
   Function as_function("as.function") ;
@@ -303,8 +306,8 @@ RObject pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars, List opti
     return pl2r_boolvec(pl) ;
 
   // Convert :- to function
-  if(!strcmp(pl.name(), ":-"))
-    return pl2r_function(pl, names, vars) ;
+  if(pl.name() == ":-")
+    return pl2r_function(pl, names, vars, options) ;
 
   // Other compounds
   Language r(pl.name().as_string(EncUTF8).c_str()) ;
