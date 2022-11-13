@@ -2,7 +2,7 @@
 % Please edit documentation in R/rolog.R
 \name{rolog_options}
 \alias{rolog_options}
-\title{Quick access to Rolog's own options}
+\title{Quick access the package options}
 \usage{
 rolog_options()
 }
@@ -10,7 +10,7 @@ rolog_options()
 list with some options for translating R expressions to prolog
 }
 \description{
-Quick access to Rolog's own options
+Quick access the package options
 }
 \details{
 Translation of R to Prolog

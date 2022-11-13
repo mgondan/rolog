@@ -7,7 +7,7 @@
 rolog_done()
 }
 \value{
-\code{TRUE} on success
+`TRUE` on success
 }
 \description{
 Clean up when detaching the library
