@@ -72,17 +72,23 @@ once <- function(
     query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))),
     options=list(portray=FALSE))
 {
-    options <- c(options, rolog_options())
+  if(!options()$rolog.ok)
+  {
+    warning("swipl not found in the PATH. Please set SWI_HOME_DIR accordingly or install R package rswipl.")
+    return(FALSE)
+  }
+
+  options <- c(options, rolog_options())
 	
-    # Decorate result with the prolog syntax of the query
-    if(options$portray)
-        q <- portray(query, options)
+  # Decorate result with the prolog syntax of the query
+  if(options$portray)
+    q <- portray(query, options)
 	
-    # Invoke C++ function that calls prolog
-    r <- .once(query, options)
+  # Invoke C++ function that calls prolog
+  r <- .once(query, options)
 	
-    if(options$portray)
-        attr(r, "query") <- q
+  if(options$portray)
+    attr(r, "query") <- q
 	
-    return(r)
+  return(r)
 }
