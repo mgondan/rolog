@@ -37,9 +37,15 @@
 #' @seealso [rolog_options()] for fine-grained control over the translation
 #' 
 portray <- function(
-	query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))), 
-	options=NULL)
+  query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))), 
+  options=NULL)
 {
-	options = c(options, rolog_options())
-	.portray(query, options)
+  if(!options()$rolog.ok)
+  {
+    warning("swipl not found in the PATH. Please set SWI_HOME_DIR accordingly or install R package rswipl.")
+    return(FALSE)
+  }
+
+  options = c(options, rolog_options())
+  .portray(query, options)
 }
