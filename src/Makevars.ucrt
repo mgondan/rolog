@@ -1,23 +1,77 @@
-PKG_CPPFLAGS=-I../inst/swipl/include -Iswipl-devel/packages/cpp $(CXXPICFLAGS) -D_REENTRANT -D__SWI_PROLOG__ -O2 -gdwarf-2 -g3 -Wall -fno-strict-aliasing -D__WINDOWS__ -D_WINDOWS -D_WIN32_WINNT=0x0600 -DWIN64
-PKG_LIBS=-Wl,-Bsymbolic-functions -L../inst/swipl/bin -lswipl -lgmp -lz -lm -lpthread -lws2_32 -lpsapi -lwinmm -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+RBIN="${R_HOME}/bin/R"
+RSCRIPT="${R_HOME}/bin/Rscript"
 
-all: swipl $(SHLIB)
+CXX=$(shell "${RBIN}" CMD config CXX)
+CPPFLAGS=$(shell "${RBIN}" CMD config --cppflags)
+CXXFLAGS=$(shell "${RBIN}" CMD config CXXFLAGS)
+CXXPICFLAGS=$(shell "${RBIN}" CMD config CXXPICFLAGS)
 
-swipl:
-	mkdir -p ../mingw64
-	mkdir -p ../inst/swipl/bin
-	rm -f ../inst/swipl/bin/*.dll
-	cd ../mingw64 && cmake -DCMAKE_INSTALL_PREFIX=../inst/swipl\
-		-DSWIPL_PACKAGES_X=OFF -DSWIPL_PACKAGES_ODBC=OFF\
-		-DSWIPL_PACKAGES_PCRE=OFF\
-		-DINSTALL_DOCUMENTATION=OFF\
-		-DUSE_GMP=OFF -DBUILD_TESTING=OFF\
-		-DLibArchive_INCLUDE_DIRS="-I."\
-		-DLibArchive_LIBRARIES="-larchive -lnettle -lxml2 -liconv -lregex -lexpat -llzma -lzstd -llz4 -lbz2 -lz -lbcrypt -lws2_32"\
-		-DCMAKE_BUILD_TYPE=Release ../src/swipl-devel
-	# dos2unix all Makefiles
-	find ../mingw64 -name Makefile -exec sed -i 's/\r//' \{\} \;
-	cd ../mingw64 && make install
-	rm ../inst/swipl/bin/swipl.exe
-	rm ../inst/swipl/bin/swipl-win.exe
-	rm ../inst/swipl/bin/swipl-ld.exe
+SWI_INCLUDE=
+SWI_LIBDIR=
+
+$(info Searching for R package rswipl...)
+SWI_HOME4 := $(shell "${RSCRIPT}" -e "cat(gsub('\\\\\\\\', '/',\
+  shortPathName(file.path(find.package('rswipl'), 'swipl'))))")
+ifeq ("$(SWI_HOME4)","")
+  $(info R package rswipl not found, moving on.)
+else
+  $(info R package rswipl found at $(SWI_HOME4))
+  SWI_INCLUDE=-I$(SWI_HOME4)/include
+  SWI_LIBDIR=-L"$(SWI_HOME4)"/bin
+endif
+
+$(info Searching for SWI-Prolog in the registry...)
+SWI_HOME3 := $(shell "${RSCRIPT}" -e "cat(gsub('\\\\\\\\', '/', shortPathName(\
+  file.path(readRegistry('SOFTWARE\\\\\\\\SWI\\\\\\\\Prolog', hive='HLM')[['home']]))))")
+ifeq ("$(SWI_HOME3)","")
+  $(info Registry: SWI/Prolog not found, moving on.)
+else
+  $(info SWI-Prolog found in registry at $(SWI_HOME3))
+  SWI_INCLUDE=-I$(SWI_HOME3)/include
+  SWI_LIBDIR=-L"$(SWI_HOME3)"/bin
+  ifneq ("$(SWI_HOME4)","")
+    $(info Overriding R package rswipl)
+  endif
+endif
+
+$(info Searching for 64 bit swipl.exe in the PATH...)
+SWI_ARCH := $(shell swipl --arch)
+SWI_HOME2 := $(shell swipl --dump-runtime-variables | grep PLBASE | sed "s/\\;//" | sed "s/PLBASE=//")
+ifeq ("$(SWI_HOME2)","")
+  $(info PATH: swipl.exe not found, moving on.)
+else
+  ifeq ("$(SWI_ARCH)", "x64-win64")
+    $(info swipl.exe found in PATH at $(SWI_HOME2))
+    SWI_INCLUDE=-I$(SWI_HOME2)/include
+    SWI_LIBDIR=-L$(SWI_HOME2)/bin
+    ifneq ("$(SWI_HOME3)$(SWI_HOME4)","")
+      $(info Overriding registry information and rswipl.)
+    endif
+  else
+    $(info PATH: swipl.exe (arch x64-win64) not found, moving on.)
+  endif
+endif
+
+$(info Searching for SWI_HOME_DIR in the environment...)
+SWI_HOME1 := $(SWI_HOME_DIR)
+ifeq ("$(SWI_HOME1)","")
+  $(info Environment: SWI_HOME_DIR not defined, moving on.)
+else
+  $(info Environment: Environment: SWI_HOME_DIR=$(SWI_HOME1))
+  SWI_INCLUDE=-I"$(SWI_HOME1)"/include
+  SWI_LIBDIR=-L"$(SWI_HOME1)"/bin
+  ifneq ("$(SWI_HOME2)$(SWI_HOME3)$(SWI_HOME2)","")
+    $(info Overriding PATH, registry, and rswipl.)
+  endif
+endif
+
+ifeq ("$(SWI_HOME1)$(SWI_HOME2)$(SWI_HOME3)$(SWI_HOME4)","")
+  $(error SWI-Prolog not found. Please install it from https://swi-prolog.org and/or set SWI_HOME_DIR accordingly and/or install R package rswipl.)
+endif
+
+PKG_CPPFLAGS=$(SWI_INCLUDE) -D_REENTRANT -D__SWI_PROLOG__ -D__WINDOWS__ -D_WINDOWS
+PKG_LIBS=$(SWI_LIBDIR) -lswipl
+
+all: $(SHLIB)
+
+$(SHLIB): RcppExports.o rolog.o
