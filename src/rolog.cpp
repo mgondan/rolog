@@ -789,9 +789,9 @@ int RlQuery::next_solution()
 
   catch(PlException& ex)
   {
-    const char* s = ex.as_string(EncLocale).c_str() ; // string is stored in a 16-ring-buffer
-    PL_clear_exception() ;
-    stop("Query failed: %s", s) ;
+  	warning(ex.as_string(EncLocale).c_str()) ;
+  	PL_clear_exception() ;
+  	stop("Query failed") ;
   }
 
   return q ;
@@ -942,9 +942,9 @@ RObject portray_(RObject query, List options)
   
   catch(PlException& ex)
   {
-    const char* s = ex.as_string(EncLocale).c_str() ;
+    warning(ex.as_string(EncLocale).c_str()) ;
     PL_clear_exception() ;
-    stop("portray of %s failed: %s", pl[0].as_string(EncLocale).c_str(), s) ;
+    stop("portray of %s failed.", pl[0].as_string(EncLocale).c_str()) ;
   }
   
   return pl2r(pl[1], names, vars, options) ;
@@ -973,9 +973,9 @@ RObject call_(String query)
   
   catch(PlException& ex)
   {
-    const char* s = ex.as_string(EncLocale).c_str() ; // string is stored in a 16-ring-buffer
+    warning(ex.as_string(EncLocale).c_str()) ;
     PL_clear_exception() ;
-    stop("%s failed: %s", query.get_cstring(), s) ;
+    stop("query failed: %s", query.get_cstring()) ;
   }
   
   return wrap(r) ;
