@@ -223,7 +223,7 @@
         full.names=TRUE)
   		
       if(length(libswipl))
-	msg <- sprintf("Found R package rswipl: %s", home)
+        msg <- sprintf("Found R package rswipl: %s", home)
     }
   }
 
@@ -265,6 +265,7 @@
     rolog.boolvec      = "!",  # prolog representation of R boolean vectors
     rolog.charvec      = "$$", # prolog representation of R character vectors
     rolog.portray      = TRUE, # return prolog call, nicely formatted
+    rolog.preproc      = dontCheck, # preprocessing hook in R
     rolog.scalar       = TRUE) # convert R vectors of size 1 to prolog scalars
 
   set <- !(names(op.rolog) %in% names(options()))
@@ -325,7 +326,6 @@
   }
 
   packageStartupMessage(options()$rolog.message)
-
   W <- once(call("message_to_string", quote(welcome), expression(W)))
   packageStartupMessage(W$W)
   invisible()
@@ -413,10 +413,16 @@ rolog_done <- function()
 rolog_options <- function()
 {
   list(
-    realvec=getOption("rolog.realvec", default="#"),
+  	swi_home_dir=getOption("rolog.swi_home_dir", default="unknown"),
+  	home=getOption("rolog.home", default="home"),
+  	ok=getOption("rolog.ok", default=FALSE),
+  	lib=getOption("rolog.lib", default="unknown"),
+  	message=getOption("rolog.message", default=NA),
+  	realvec=getOption("rolog.realvec", default="#"),
     intvec=getOption("rolog.intvec", default="%"),
     boolvec=getOption("rolog.boolvec", default="!"),
     charvec=getOption("rolog.charvec", default="$$"),
-    portray=getOption("rolog.portray", default=TRUE),
-    scalar=getOption("rolog.scalar", default=TRUE))
+  	portray=getOption("rolog.portray", default=TRUE),
+  	preproc=getOption("rolog.preproc", default=dontCheck),
+  	scalar=getOption("rolog.scalar", default=TRUE))
 }

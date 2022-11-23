@@ -80,6 +80,9 @@ once <- function(
 
   options <- c(options, rolog_options())
 	
+  # Hooks for preprocessing
+  query <- options$preproc(query)
+  
   # Decorate result with the prolog syntax of the query
   if(options$portray)
     q <- portray(query, options)
