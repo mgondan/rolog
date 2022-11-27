@@ -255,18 +255,22 @@
     msg <- "SWI-Prolog not found. Please set SWI_HOME_DIR accordingly, or add swipl to the PATH, or install the R package rswipl."
 
   op.rolog <- list(
-    rolog.swi_home_dir = home, # restore on .onUnload
+    rolog.swi_home_dir = home,  # restore on .onUnload
     rolog.home         = home,
     rolog.ok           = (length(libswipl) == 1),
     rolog.lib          = libswipl,
     rolog.message      = msg,
-    rolog.realvec      = "#",  # prolog representation of R numeric vectors
-    rolog.intvec       = "%",  # prolog representation of R integer vectors
-    rolog.boolvec      = "!",  # prolog representation of R boolean vectors
-    rolog.charvec      = "$$", # prolog representation of R character vectors
-    rolog.portray      = TRUE, # return prolog call, nicely formatted
+    rolog.realvec      = "#",   # prolog representation of R numeric vectors
+    rolog.realmat      = "##",  # same for matrices
+    rolog.intvec       = "%",   # prolog representation of R integer vectors
+    rolog.intmat       = "%%",  # same for matrices
+    rolog.boolvec      = "!",   # prolog representation of R boolean vectors
+    rolog.boolmat      = "!!",  # same for matrices
+    rolog.charvec      = "$$",  # prolog representation of R character vectors
+    rolog.charmat      = "$$$", # same for matrices
+    rolog.portray      = TRUE,  # return prolog call, nicely formatted
     rolog.preproc      = dontCheck, # preprocessing hook in R
-    rolog.scalar       = TRUE) # convert R vectors of size 1 to prolog scalars
+    rolog.scalar       = TRUE)  # convert R vectors of size 1 to prolog scalars
 
   set <- !(names(op.rolog) %in% names(options()))
   if(any(set))
@@ -290,21 +294,8 @@
   # See .onLoad for details
   library.dynam.unload("rolog", libpath=libpath)
 
-  if(options()$rolog.ok)
-  {
-    if(.Platform$OS.type == "unix")
-    {
-#      fp <- file.path(home, "lib")
-#      arch <- R.version$arch
-#      if(arch == "aarch64")
-#        arch <- "arm64"
-#      folder <- dir(fp, pattern=arch, full.names=TRUE)
-#      if(!length(folder) & arch == "arm64")
-#        folder <- dir(fp, pattern="aarch64-linux", full.names=TRUE)
-
-      dyn.unload(options()$rolog.lib)
-    }
-  }
+  if(options()$rolog.ok & .Platform$OS.type == "unix")
+    dyn.unload(options()$rolog.lib)
 
   invisible()
 }
@@ -413,16 +404,20 @@ rolog_done <- function()
 rolog_options <- function()
 {
   list(
-  	swi_home_dir=getOption("rolog.swi_home_dir", default="unknown"),
-  	home=getOption("rolog.home", default="home"),
-  	ok=getOption("rolog.ok", default=FALSE),
-  	lib=getOption("rolog.lib", default="unknown"),
-  	message=getOption("rolog.message", default=NA),
-  	realvec=getOption("rolog.realvec", default="#"),
+    swi_home_dir=getOption("rolog.swi_home_dir", default="unknown"),
+    home=getOption("rolog.home", default="home"),
+    ok=getOption("rolog.ok", default=FALSE),
+    lib=getOption("rolog.lib", default="unknown"),
+    message=getOption("rolog.message", default=NA),
+    realvec=getOption("rolog.realvec", default="#"),
+    realmat=getOption("rolog.realmat", default="##"),
     intvec=getOption("rolog.intvec", default="%"),
+    intmat=getOption("rolog.intmat", default="%%"),
     boolvec=getOption("rolog.boolvec", default="!"),
+    boolmat=getOption("rolog.boolmat", default="!!"),
     charvec=getOption("rolog.charvec", default="$$"),
-  	portray=getOption("rolog.portray", default=TRUE),
-  	preproc=getOption("rolog.preproc", default=dontCheck),
-  	scalar=getOption("rolog.scalar", default=TRUE))
+    charmat=getOption("rolog.charmat", default="$$$"),
+    portray=getOption("rolog.portray", default=TRUE),
+    preproc=getOption("rolog.preproc", default=dontCheck),
+    scalar=getOption("rolog.scalar", default=TRUE))
 }
