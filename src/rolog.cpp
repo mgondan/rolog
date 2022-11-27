@@ -425,6 +425,12 @@ RObject pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars, List options)
 
 // Translate R expression to prolog
 //
+// Forward declarations
+PlTerm r2pl_real(NumericVector r, List options) ;
+PlTerm r2pl_logical(LogicalVector r, List options) ;
+PlTerm r2pl_integer(IntegerVector r, List options) ;
+PlTerm r2pl_string(CharacterVector r, List options) ;
+
 // This returns an empty list
 PlTerm r2pl_null()
 {
@@ -439,9 +445,25 @@ PlTerm r2pl_na()
   return PlTerm_atom("na") ;
 }
 
+// Translate to matrix ##(#(1.0, 2.0, 3.0), #(4.0, 5.0, 6.0))
+PlTerm r2pl_matrix(Matrix<REALSXP> r, List aoptions)
+{
+  List options(aoptions) ;
+  options("scalar") = false ;
+
+  PlTermv rows(r.nrow()) ;
+  for(int i=0 ; i<r.nrow() ; i++)
+    PlCheck(rows[i].unify_term(r2pl_real(r.row(i), options))) ;
+
+  return PlCompound("##", rows) ;
+}
+
 // Translate to (scalar) real or compounds like #(1.0, 2.0, 3.0)
 PlTerm r2pl_real(NumericVector r, List options)
 {
+  if(Rf_isMatrix(r))
+    return r2pl_matrix(as<Matrix<REALSXP>>(r), options) ;
+
   if(r.length() == 0)
     return r2pl_null() ;
 
@@ -467,13 +489,29 @@ PlTerm r2pl_real(NumericVector r, List options)
     else
       PlCheck(args[i].unify_float(r[i])) ;
   }
-  
+
   return PlCompound((const char*) options("realvec"), args) ;
+}
+
+// Translate to matrix !!(!(true, false), !(false, true))
+PlTerm r2pl_matrix(Matrix<LGLSXP> r, List aoptions)
+{
+  List options(aoptions) ;
+  options("scalar") = false ;
+
+  PlTermv rows(r.nrow()) ;
+  for(int i=0 ; i<r.nrow() ; i++)
+    PlCheck(rows[i].unify_term(r2pl_logical(r.row(i), options))) ;
+
+  return PlCompound("!!", rows) ;
 }
 
 // Translate to (scalar) boolean or compounds like !(true, false, na)
 PlTerm r2pl_logical(LogicalVector r, List options)
 {
+  if(Rf_isMatrix(r))
+    return r2pl_matrix(as<Matrix<LGLSXP>>(r), options) ;
+
   if(r.length() == 0)
     return r2pl_null() ;
   
@@ -502,9 +540,25 @@ PlTerm r2pl_logical(LogicalVector r, List options)
   return PlCompound((const char*) options("boolvec"), args) ;
 }
 
+// Translate to matrix %%(%(1, 2), %(3, 4))
+PlTerm r2pl_matrix(Matrix<INTSXP> r, List aoptions)
+{
+  List options(aoptions) ;
+  options("scalar") = false ;
+
+  PlTermv rows(r.nrow()) ;
+  for(int i=0 ; i<r.nrow() ; i++)
+    PlCheck(rows[i].unify_term(r2pl_integer(r.row(i), options))) ;
+
+  return PlCompound("%%", rows) ;
+}
+
 // Translate to (scalar) integer or compounds like %(1, 2, 3)
 PlTerm r2pl_integer(IntegerVector r, List options)
 {
+  if(Rf_isMatrix(r))
+    return r2pl_matrix(as<Matrix<INTSXP>>(r), options) ;
+
   if(r.length() == 0)
     return r2pl_null() ;
   
@@ -579,9 +633,25 @@ PlTerm r2pl_atom(Symbol r)
   return PlTerm_atom(r.c_str()) ;
 }
 
+// Translate to matrix $$$($$(1, 2), $$(3, 4))
+PlTerm r2pl_matrix(Matrix<STRSXP> r, List aoptions)
+{
+  List options(aoptions) ;
+  options("scalar") = false ;
+
+  PlTermv rows(r.nrow()) ;
+  for(int i=0 ; i<r.nrow() ; i++)
+    PlCheck(rows[i].unify_term(r2pl_string(r.row(i), options))) ;
+
+  return PlCompound("$$$", rows) ;
+}
+
 // Translate CharacterVector to (scalar) string or things like $("a", "b", "c")
 PlTerm r2pl_string(CharacterVector r, List options)
 {
+  if(Rf_isMatrix(r))
+    return r2pl_matrix(as<Matrix<STRSXP>>(r), options) ;
+
   if(r.length() == 0)
     return r2pl_null() ;
   
