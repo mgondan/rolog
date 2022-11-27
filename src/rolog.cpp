@@ -111,6 +111,30 @@ DoubleVector pl2r_realvec(PlTerm pl)
   return r ;
 }
 
+// Convert matrix of reals (e.g., ##(#(1.0, 2.0), #(na, ...), ...))
+NumericMatrix pl2r_realmat(PlTerm pl)
+{
+  size_t nrow = pl.arity() ;
+  size_t ncol = 0 ;
+  if(nrow > 0)
+  {
+    for(size_t i=0; i<pl.arity(); i++)
+      if(i == 0)
+        ncol = pl[1].arity() ;
+      else
+      {
+        if(pl[i+1].arity() != ncol)
+          stop("cannot convert PlTerm to Matrix, inconsistent rows") ;
+      }
+  }
+
+  NumericMatrix r(nrow, ncol) ;
+  for(size_t i=0; i<nrow; i++)
+    r.row(i) = pl2r_realvec(pl[i+1]) ;
+
+  return r ;
+}
+
 // See above for pl2r_double
 long pl2r_int(PlTerm pl)
 {
@@ -145,6 +169,29 @@ IntegerVector pl2r_intvec(PlTerm pl)
   return r ;
 }
 
+IntegerMatrix pl2r_intmat(PlTerm pl)
+{
+  size_t nrow = pl.arity() ;
+  size_t ncol = 0 ;
+  if(nrow > 0)
+  {
+    for(size_t i=0; i<pl.arity(); i++)
+      if(i == 0)
+        ncol = pl[1].arity() ;
+      else
+      {
+        if(pl[i+1].arity() != ncol)
+          stop("cannot convert PlTerm to Matrix, inconsistent rows") ;
+      }
+  }
+
+  IntegerMatrix r(nrow, ncol) ;
+  for(size_t i=0; i<nrow; i++)
+    r.row(i) = pl2r_intvec(pl[i+1]) ;
+
+  return r ;
+}
+
 // See above for pl2r_double
 String pl2r_string(PlTerm pl)
 {
@@ -164,6 +211,29 @@ CharacterVector pl2r_charvec(PlTerm pl)
   CharacterVector r(pl.arity()) ;
   for(size_t i=0; i<pl.arity(); i++)
     r(i) = pl2r_string(pl[i+1]) ;
+
+  return r ;
+}
+
+CharacterMatrix pl2r_charmat(PlTerm pl)
+{
+  size_t nrow = pl.arity() ;
+  size_t ncol = 0 ;
+  if(nrow > 0)
+  {
+    for(size_t i=0; i<pl.arity(); i++)
+      if(i == 0)
+        ncol = pl[1].arity() ;
+      else
+      {
+        if(pl[i+1].arity() != ncol)
+          stop("cannot convert PlTerm to Matrix, inconsistent rows") ;
+      }
+  }
+
+  CharacterMatrix r(nrow, ncol) ;
+  for(size_t i=0; i<nrow; i++)
+    r.row(i) = pl2r_charvec(pl[i+1]) ;
 
   return r ;
 }
@@ -258,6 +328,29 @@ LogicalVector pl2r_boolvec(PlTerm pl)
   return r ;
 }
 
+LogicalMatrix pl2r_boolmat(PlTerm pl)
+{
+  size_t nrow = pl.arity() ;
+  size_t ncol = 0 ;
+  if(nrow > 0)
+  {
+    for(size_t i=0; i<pl.arity(); i++)
+      if(i == 0)
+        ncol = pl[1].arity() ;
+      else
+      {
+        if(pl[i+1].arity() != ncol)
+          stop("cannot convert PlTerm to Matrix, inconsistent rows") ;
+      }
+  }
+
+  LogicalMatrix r(nrow, ncol) ;
+  for(size_t i=0; i<nrow; i++)
+    r.row(i) = pl2r_boolvec(pl[i+1]) ;
+
+  return r ;
+}
+
 // Translate prolog variables to R expressions.
 RObject pl2r_variable(PlTerm pl, CharacterVector& names, PlTerm& vars)
 {
@@ -293,19 +386,35 @@ RObject pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars, List opti
   if(!PL_is_acyclic(pl.C_))
     stop("pl2r: Cannot convert cyclic term %s", pl.as_string(EncLocale).c_str()) ;
 
-  // Convert #(1.0, 2.0, 3.0) to DoubleVectors (# given by options("realvec"))
+  // Convert ##(#(...), ...) to NumericMatrix
+  if(!strcmp(pl.name().as_string(EncUTF8).c_str(), options("realmat")))
+    return pl2r_realmat(pl) ;
+
+  // Convert #(1.0, 2.0, 3.0) to DoubleVector (# given by options("realvec"))
   if(!strcmp(pl.name().as_string(EncUTF8).c_str(), options("realvec")))
     return pl2r_realvec(pl) ;
 
-  // Convert %(1.0, 2.0, 3.0) to IntegerVectors
+  // Convert %%(%(...), ...) to IntegerMatrix
+  if(!strcmp(pl.name().as_string(EncUTF8).c_str(), options("intmat")))
+    return pl2r_intmat(pl) ;
+
+  // Convert %(1.0, 2.0, 3.0) to IntegerVector
   if(!strcmp(pl.name().as_string(EncUTF8).c_str(), options("intvec")))
     return pl2r_intvec(pl) ;
 
-  // Convert $(1.0, 2.0, 3.0) to CharacterVectors
+  // Convert $$$($$(...), ...) to StringMatrix
+  if(!strcmp(pl.name().as_string(EncUTF8).c_str(), options("charmat")))
+    return pl2r_charmat(pl) ;
+
+  // Convert $$(1.0, 2.0, 3.0) to CharacterVector
   if(!strcmp(pl.name().as_string(EncUTF8).c_str(), options("charvec")))
     return pl2r_charvec(pl) ;
 
-  // Convert !(1.0, 2.0, 3.0) to LogicalVectors
+  // Convert !!(!(...), ...) to LogicalMatrix
+  if(!strcmp(pl.name().as_string(EncUTF8).c_str(), options("boolmat")))
+    return pl2r_boolmat(pl) ;
+
+  // Convert !(1.0, 2.0, 3.0) to LogicalVector
   if(!strcmp(pl.name().as_string(EncUTF8).c_str(), options("boolvec")))
     return pl2r_boolvec(pl) ;
 
