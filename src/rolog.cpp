@@ -7,13 +7,17 @@ using namespace Rcpp ;
 // [] -> NULL
 // real -> NumericVector
 // #(r1, r2, r3) -> NumericVector (# is a default, see option realvec)
+// ##(#(row1), #(row2), ...) -> Matrix
 // integer -> IntegerVector
 // %(i1, i2, i3) -> IntegerVector (see option intvec for the name)
+// %%(%(row1), %(row2), ...) -> Matrix
 // string -> CharacterVector
-// $(s1, s2, s3) CharacterVector
+// $$(s1, s2, s3) CharacterVector
+// $$$($$(row1), $$(row2), ...) -> Matrix
 // na (atom) -> NA
 // true, false (atoms) -> LogicalVector
 // !(l1, l2, l3) -> LogicalVector (see option boolvec)
+// !!(!(row1), !(row2), ...) -> Matrix
 // the empty atom -> ""
 // other atoms -> symbol/name
 // variable -> expression(variable name)
@@ -102,7 +106,7 @@ DoubleVector pl2r_realvec(PlTerm pl)
 {
   DoubleVector r(pl.arity()) ;
   for(size_t i=0; i<pl.arity(); i++)
-    r(i) = pl2r_double(pl.operator[](i+1)) ;
+    r(i) = pl2r_double(pl[i+1]) ;
 
   return r ;
 }
@@ -136,7 +140,7 @@ IntegerVector pl2r_intvec(PlTerm pl)
 {
   IntegerVector r(pl.arity()) ;
   for(size_t i=0; i<pl.arity(); i++)
-    r(i) = pl2r_int(pl.operator[](i+1)) ;
+    r(i) = pl2r_int(pl[i+1]) ;
 
   return r ;
 }
@@ -159,7 +163,7 @@ CharacterVector pl2r_charvec(PlTerm pl)
 {
   CharacterVector r(pl.arity()) ;
   for(size_t i=0; i<pl.arity(); i++)
-    r(i) = pl2r_string(pl.operator[](i+1)) ;
+    r(i) = pl2r_string(pl[i+1]) ;
 
   return r ;
 }
@@ -200,8 +204,8 @@ RObject pl2r_function(PlTerm pl, CharacterVector& names, PlTerm& vars, List opti
     // Compounds like mean=100 are translated to named function arguments
     if(arg.is_compound() && arg.name() == "=" && arg.arity() == 2)
     {
-      PlTerm a1 = arg.operator[](1) ;
-      PlTerm a2 = arg.operator[](2) ;
+      PlTerm a1 = arg[1] ;
+      PlTerm a2 = arg[2] ;
       if(a1.is_atom())
       {
         head.push_back(Named(a1.as_string(EncUTF8)) = pl2r(a2, names, vars, options)) ;
@@ -225,7 +229,7 @@ LogicalVector pl2r_boolvec(PlTerm pl)
   LogicalVector r(pl.arity()) ;
   for(size_t i=0; i<pl.arity(); i++)
   {
-    PlTerm t = pl.operator[](i+1) ;
+    PlTerm t = pl[i+1] ;
     if(t.is_atom())
     {
       if(t == "na")
@@ -318,8 +322,8 @@ RObject pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars, List opti
     // Compounds like mean=100 are translated to named function arguments
     if(arg.is_compound() && !strcmp(arg.name().as_string(EncUTF8).c_str(), "=") && arg.arity() == 2)
     {
-      PlTerm a1 = arg.operator[](1) ;
-      PlTerm a2 = arg.operator[](2) ;
+      PlTerm a1 = arg[1] ;
+      PlTerm a2 = arg[2] ;
       if(a1.is_atom())
       {
         r.push_back(Named(a1.name().as_string(EncUTF8).c_str()) = pl2r(a2, names, vars, options)) ;
@@ -347,10 +351,10 @@ RObject pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars, List opti
 //
 RObject pl2r_list(PlTerm pl, CharacterVector& names, PlTerm& vars, List options)
 {
-  PlTerm head = pl.operator[](1) ;
+  PlTerm head = pl[1] ;
   
   // if the tail is a list or empty, return a normal list
-  RObject tail = pl2r(pl.operator[](2), names, vars, options) ;
+  RObject tail = pl2r(pl[2], names, vars, options) ;
   if(TYPEOF(tail) == VECSXP || TYPEOF(tail) == NILSXP)
   {
     List r = as<List>(tail) ;
@@ -358,8 +362,8 @@ RObject pl2r_list(PlTerm pl, CharacterVector& names, PlTerm& vars, List options)
     // convert prolog pair a-X to named list element
     if(head.is_compound() && !strcmp(head.name().as_string(EncUTF8).c_str(), "-") && head.arity() == 2)
     {
-      PlTerm a1 = head.operator[](1) ;
-      PlTerm a2 = head.operator[](2) ;
+      PlTerm a1 = head[1] ;
+      PlTerm a2 = head[2] ;
       if(a1.is_atom())
       {
         r.push_front(pl2r(a2, names, vars, options), a1.name().as_string(EncUTF8).c_str()) ;
@@ -378,8 +382,8 @@ RObject pl2r_list(PlTerm pl, CharacterVector& names, PlTerm& vars, List options)
   // convert prolog pair a-X to named list element
   if(head.is_compound() && !strcmp(head.name().as_string(EncUTF8).c_str(), "-") && head.arity() == 2)
   {
-    PlTerm a1 = head.operator[](1) ;
-    PlTerm a2 = head.operator[](2) ;
+    PlTerm a1 = head[1] ;
+    PlTerm a2 = head[2] ;
     if(a1.is_atom())
     {
       r.push_back(Named(a1.name().as_string(EncUTF8).c_str()) = pl2r(a2, names, vars, options)) ;
@@ -455,7 +459,7 @@ PlTerm r2pl_matrix(Matrix<REALSXP> r, List aoptions)
   for(int i=0 ; i<r.nrow() ; i++)
     PlCheck(rows[i].unify_term(r2pl_real(r.row(i), options))) ;
 
-  return PlCompound("##", rows) ;
+  return PlCompound((const char*) options("realmat"), rows) ;
 }
 
 // Translate to (scalar) real or compounds like #(1.0, 2.0, 3.0)
@@ -503,7 +507,7 @@ PlTerm r2pl_matrix(Matrix<LGLSXP> r, List aoptions)
   for(int i=0 ; i<r.nrow() ; i++)
     PlCheck(rows[i].unify_term(r2pl_logical(r.row(i), options))) ;
 
-  return PlCompound("!!", rows) ;
+  return PlCompound((const char*) options("boolmat"), rows) ;
 }
 
 // Translate to (scalar) boolean or compounds like !(true, false, na)
@@ -550,7 +554,7 @@ PlTerm r2pl_matrix(Matrix<INTSXP> r, List aoptions)
   for(int i=0 ; i<r.nrow() ; i++)
     PlCheck(rows[i].unify_term(r2pl_integer(r.row(i), options))) ;
 
-  return PlCompound("%%", rows) ;
+  return PlCompound((const char*) options("intmat"), rows) ;
 }
 
 // Translate to (scalar) integer or compounds like %(1, 2, 3)
@@ -643,7 +647,7 @@ PlTerm r2pl_matrix(Matrix<STRSXP> r, List aoptions)
   for(int i=0 ; i<r.nrow() ; i++)
     PlCheck(rows[i].unify_term(r2pl_string(r.row(i), options))) ;
 
-  return PlCompound("$$$", rows) ;
+  return PlCompound((const char*) options("charmat"), rows) ;
 }
 
 // Translate CharacterVector to (scalar) string or things like $("a", "b", "c")
@@ -859,9 +863,9 @@ int RlQuery::next_solution()
 
   catch(PlException& ex)
   {
-  	warning(ex.as_string(EncLocale).c_str()) ;
-  	PL_clear_exception() ;
-  	stop("Query failed") ;
+    warning(ex.as_string(EncLocale).c_str()) ;
+    PL_clear_exception() ;
+    stop("Query failed") ;
   }
 
   return q ;
@@ -1023,7 +1027,6 @@ RObject portray_(RObject query, List options)
 // Execute a query given as a string
 //
 // Example:
-//
 // once("use_module(library(http/html_write))")
 //
 // [[Rcpp::export(.call)]]
@@ -1060,7 +1063,11 @@ PREDICATE(r_eval, 1)
   if(query_id)
     options = query_id->get_options() ;
   else
-    options = List::create(Named("realvec") = "#", Named("boolvec") = "!", Named("charvec") = "$$", Named("intvec") = "%", Named("atomize") = false, Named("scalar") = true) ;
+    options = List::create(Named("realvec") = "#", Named("realmat") = "##",
+      Named("boolvec") = "!", Named("boolmat") = "!!",
+      Named("charvec") = "$$", Named("charmat") = "$$$",
+      Named("intvec") = "%", Named("intmat") = "%%", 
+      Named("atomize") = false, Named("scalar") = true) ;
 
   RObject Expr = pl2r(A1, names, vars, options) ;
   RObject Res = Expr ;
@@ -1088,7 +1095,11 @@ PREDICATE(r_eval, 2)
   if(query_id)
     options = query_id->get_options() ;
   else
-    options = List::create(Named("realvec") = "#", Named("boolvec") = "!", Named("charvec") = "$$", Named("intvec") = "%", Named("atomize") = false, Named("scalar") = true) ;
+    options = List::create(Named("realvec") = "#", Named("realmat") = "##",
+      Named("boolvec") = "!", Named("boolmat") = "!!",
+      Named("charvec") = "$$", Named("charmat") = "$$$",
+      Named("intvec") = "%", Named("intmat") = "%%", 
+      Named("atomize") = false, Named("scalar") = true) ;
  
   RObject Expr = pl2r(A1, names, vars, options) ;
   RObject Res = Expr ;
