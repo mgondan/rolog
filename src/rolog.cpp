@@ -267,7 +267,7 @@ RObject pl2r_variable(PlTerm pl, CharacterVector& names, PlTerm& vars)
   PlTerm_var v ;
   for(int i=0 ; i<names.length() ; i++)
   {
-    tail.next(v) ;
+    PlCheck(tail.next(v)) ;
     if(v == pl)
       return ExpressionVector::create(Symbol(names(i))) ;
   }
@@ -429,7 +429,7 @@ RObject pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars, List options)
 PlTerm r2pl_null()
 {
   PlTerm_var pl ;
-  PlTerm_tail(pl).close() ;
+  PlCheck(PlTerm_tail(pl).close()) ;
   return pl ;
 }
 
@@ -561,7 +561,7 @@ PlTerm r2pl_var(ExpressionVector r, CharacterVector& names, PlTerm& vars, List o
   PlTerm_var v ;
   for(R_xlen_t i=0 ; i<names.length() ; i++)
   {
-    tail.next(v) ;
+    PlCheck(tail.next(v)) ;
     if(n == names(i))
       return v ;
   }
@@ -569,7 +569,7 @@ PlTerm r2pl_var(ExpressionVector r, CharacterVector& names, PlTerm& vars, List o
   // If no such variable exists, create a new one and remember the name
   names.push_back(n.c_str()) ;
   PlTerm_var pl ;
-  tail.append(pl) ;
+  PlCheck(tail.append(pl)) ;
   return pl ;
 }
 
@@ -669,12 +669,12 @@ PlTerm r2pl_list(List r, CharacterVector& names, PlTerm& vars, List options)
     
     // Convert named argument to prolog pair a-X.
     if(n.length() && n(i) != "")
-      tail.append(PlCompound("-", PlTermv(PlTerm_atom(n(i)), arg))) ;
+      PlCheck(tail.append(PlCompound("-", PlTermv(PlTerm_atom(n(i)), arg)))) ;
     else
-      tail.append(arg) ; // no name
+      PlCheck(tail.append(arg)) ; // no name
   }
   
-  tail.close() ;
+  PlCheck(tail.close()) ;
   return pl ;
 }
 
@@ -805,7 +805,7 @@ List RlQuery::bindings()
   PlTerm_var v ;
   for(int i=0 ; i<names.length() ; i++)
   {
-    tail.next(v) ;
+    PlCheck(tail.next(v)) ;
     RObject r = pl2r(v, names, vars, options) ;
     if(TYPEOF(r) == EXPRSXP && names[i] == as<Symbol>(as<ExpressionVector>(r)[0]).c_str())
     continue ;
@@ -928,9 +928,9 @@ RObject portray_(RObject query, List options)
   PlTermv pl(3) ;
   PlCheck(pl[0].unify_term(r2pl(query, names, vars, options))) ;
   PlTerm_tail tail(pl[2]) ;
-  tail.append(PlCompound("quoted", PlTermv(PlTerm_atom("false")))) ;
-  tail.append(PlCompound("spacing", PlTermv(PlTerm_atom("next_argument")))) ;
-  tail.close() ;
+  PlCheck(tail.append(PlCompound("quoted", PlTermv(PlTerm_atom("false"))))) ;
+  PlCheck(tail.append(PlCompound("spacing", PlTermv(PlTerm_atom("next_argument"))))) ;
+  PlCheck(tail.close()) ;
 
   PlFrame f ;
   PlQuery q("term_string", pl) ;
