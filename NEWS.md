@@ -1,3 +1,7 @@
+# rolog 0.9.8
+
+* Support for matrices
+
 # rolog 0.9.7
 
 * Represent R functions as ':-'/2 in Prolog

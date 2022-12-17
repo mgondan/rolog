@@ -70,16 +70,19 @@ query <- function(
   options <- c(options, rolog_options())
 
   # Hooks for preprocessing
-	query <- options$preproc(query)
+  query <- options$preproc(query)
 	
   # Decorate result with the prolog syntax of the query
   if(options$portray)
     q <- portray(query, options)
 
+  # Create query
   r <- .query(query, options)
-	
+
+  # Decorate result with the prolog syntax of the query
   if(options$portray)
-    attr(r, "query") <- q	
+    attr(r, "query") <- q
+
   return(r)
 }
 
@@ -121,6 +124,10 @@ clear <- function()
 
 #' Submit a query that has been opened with [query()] before.
 #'
+#' @param options
+#' This is a list of options controlling translation from and to Prolog. Here,
+#' only _postproc_ is relevant.
+#'
 #' @return
 #' If the query fails, `FALSE` is returned. If the query succeeds, a
 #' (possibly empty) list is returned that includes the bindings required to
@@ -130,6 +137,9 @@ clear <- function()
 #'
 #' @seealso [query()]
 #' for a opening a query.
+#' 
+#' @seealso [rolog_options()]
+#' for fine-grained control on the translation from R to Prolog and back.
 #' 
 #' @seealso [clear()]
 #' for a clearing a query.
@@ -154,13 +164,20 @@ clear <- function()
 #' submit() # X = "b"
 #' clear()
 #' 
-submit <- function()
+submit <- function(options=NULL)
 {
-  if(!options()$rolog.ok)
+	options <- c(options, rolog_options())
+	if(options$ok == FALSE)
   {
     warning("swipl not found in the PATH. Please set SWI_HOME_DIR accordingly or install R package rswipl.")
     return(FALSE)
   }
 
-  .submit()
+  r <- .submit()
+  
+  # Hooks for postprocessing
+  if(is.list(r))
+  	r <- lapply(r, FUN=options$postproc)
+  
+  return(r)
 }

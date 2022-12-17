@@ -90,8 +90,12 @@ once <- function(
   # Invoke C++ function that calls prolog
   r <- .once(query, options)
 	
+  # Hooks for postprocessing
+  if(is.list(r))
+  	r <- lapply(r, FUN=options$postproc)
+  
   if(options$portray)
-    attr(r, "query") <- q
-	
+  	attr(r, "query") <- q
+  
   return(r)
 }

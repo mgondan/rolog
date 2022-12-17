@@ -2,7 +2,7 @@
 title: "rolog: Prolog queries from R"
 author: "Matthias Gondan (Department of Psychology, University of Innsbruck, Austria) and Jan Wielemaker (Vrije Universiteit
    Amsterdam/SWI-Prolog Solutions b.v.)"
-date: "2022-04-28"
+date: "2022-11-27"
 bibliography: bibliography.bibtex
 output: rmarkdown::html_vignette
 vignette: >
@@ -28,9 +28,9 @@ library(DiagrammeRsvg)
   
 # Abstract
 
-Prolog is a classical logic programming language with many
-applications in expert systems, computer linguistics and traditional, that is,
-symbolic artificial intelligence. The main strength of Prolog is
+Prolog is a classical logic programming language with many applications in
+expert systems, computer linguistics and traditional, that is, symbolic 
+artificial intelligence. The main strength of Prolog is
 its concise representation of facts and rules for the representation of
 knowledge and grammar, as well as its efficient built-in search engine for
 closed world domains. R is a statistical programming language for
@@ -46,8 +46,8 @@ world applications, and there already exist two Prolog "packs" to
 invoke R (`rserve-client`, `real`) from SWI-Prolog. Given
 the large user community of R, there may also be a need for a
 connection in the reverse direction that allows invoking Prolog 
-queries in R computations. The R\ package `rolog`
-embeds the SWI-Prolog system, thus enabling deterministic and
+queries in R computations. The R\ package `rolog` connects to the
+SWI-Prolog system, thus enabling deterministic and
 non-deterministic queries to the Prolog interpreter. Usage
 of `rolog` is illustrated by a few examples.
 
@@ -125,7 +125,7 @@ graphs, parsing natural language and definite clause grammars. In addition,
 two Prolog predicates are provided that enable Prolog to
 ring back to the R system for bidirectional communication. Similar
 to `real`, tight communication between the two systems is established by
-linking to a shared library that embeds the current version of SWI-Prolog.
+linking to a shared library that embeds the current SWI-Prolog runtime.
 The exchange of data is facilitated by the C++ interfaces of the two
 languages [@Edelbuettel2018;@Wielemaker2021]. A less tight connection might
 be established using the recently developed machine query
@@ -149,7 +149,7 @@ Conclusions and further perspectives are summarized in Section 5.
 # 2. Basic syntax
 
 `rolog` has a rather minimalistic syntax, providing only some basic
-ingredients to establish communication with an embedded SWI-Prolog. The ways to
+ingredients to establish communication with the SWI-Prolog runtime. The ways to
 extend the interface are described in Section\ 3.
 
 After installation (in R, with `install.packages("rolog")`), the
@@ -257,6 +257,8 @@ Table\ 1
 |`c(1L, 2L, 3L)` or `1:3`|\'%\'(1, 2, 3)           |                         |
 |`c("a", "b", "c")`      |\$\$(\"a\", \"b\", \"c\")|                         |
 |`c(TRUE, FALSE, NA)`    |!(true, false, na)       |                         |
+|`function(x) {sin(x)}`  |lambda(x) :- sin(x)      |function name=attr(name) |
+|`matrix(1:4, nrow=2)`   |\'%%\'(\'%\'(1, 3), ...) |see also ##, \$\$\$, !!  |
 
 Moreover, R is mostly vectorized, lacking support for scalar
 entities (in R, scalar entities are treated as vectors of length\ 1.
@@ -271,6 +273,9 @@ solved in the following way:
 \item R vectors of length $N > 1$ are translated to Prolog
   terms `#/N`, `%/N`, `\$\$/N`, and `!/N` for floating
   point numbers, integers, strings and logicals, respectively.
+\item R matrices are translated to Prolog
+  terms `##/R`, `%%/R`, `\$\$\$/R`, and `!!/R` with the
+  respective vectors as arguments.
 \end{itemize}
 %
 In the reverse direction, Prolog terms like `#/N` are
@@ -293,11 +298,15 @@ the rules for translation between R and Prolog.
 
 * *realvec* (string): Name of the Prolog term for vectors of
   floats (default is `#`)
-* *intvec* (string): same for vectors of integers (default is `%`)
-* *boolvec* (string): same for vectors of logicals (default is `!`)
-* *charvec* (string): same for vectors of character strings (default
-  is `\$\$`). The single dollar cannot be used because it is the list
-  operator in R.
+* *realmat* (string): Name of the Prolog term for matrices of
+  floats (default is `##`)
+* *intvec*/*intmat* (string): same for vectors/matrices of 
+  integers (default is `%`/`%%`)
+* *boolvec*/*boolmat* (string): same for vectors/matrices of 
+  logicals (default is `!`/`!!`)
+* *charvec*/*charmat* (string): same for vectors/matrices of
+  character strings (default is `\$\$`/`\$\$\$`). The single 
+  dollar cannot be used because it is the list operator in R.
 * *scalar* (logical): if `TRUE` (default), R vectors of
   length\ 1 are translated to scalars in Prolog. 
   If `FALSE`, R\ vectors are always translated to `#/N`
@@ -305,15 +314,17 @@ the rules for translation between R and Prolog.
 * *portray* (logical): if `TRUE` (default in `query`), the
   result of `query`, `once` and `findall` includes an attribute 
   with a representation of the query in Prolog.
+* *preproc* (function with one argument): hook that can be used
+  to preprocess R terms before translation (default is dontCheck)
 
 The command `rolog_options()` returns a list with all the options. The 
 options can be globally modified with `options()` or in the optional
 argument of `query`, `once`, and `findall`.
 
 ```{r}
-options(rolog.intvec="%%")
+options(rolog.intvec="%i%")
 Q <- call("member", expression(X), list(1:3, 4:6))
-once(Q, options=list(intvec="%%"))
+once(Q, options=list(intvec="%i%"))
 ```
 
 ## Prolog interface
@@ -934,7 +945,7 @@ data science, but is currently lacking support for traditional, symbolic
 artificial intelligence. There are already two add-ons for SWI-Prolog that allow
 to run R calculations from Prolog [@Angelopoulos2013;@Rserve],
 but a connection in the other direction was missing, so far. `rolog` bridges
-this gap by providing an interface to a SWI-Prolog distribution embedded into
+this gap by providing an interface to a SWI-Prolog distribution in
 an R package. The communication between the two systems is mainly in
 the form of queries from R to Prolog, but two predicates
 allow Prolog to ring back and evaluate terms in R. The

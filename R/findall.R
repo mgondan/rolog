@@ -65,6 +65,9 @@ findall <- function(
   # Invoke C++ function that calls prolog
   r <- .findall(query, options)
 
+  # Hooks for postprocessing
+ 	r <- lapply(r, FUN=.postproc_list, postproc=options$postproc)
+  
   if(options$portray)
     attr(r, 'query') <- q
 	

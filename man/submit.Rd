@@ -4,7 +4,11 @@
 \alias{submit}
 \title{Submit a query that has been opened with \code{\link[=query]{query()}} before.}
 \usage{
-submit()
+submit(options = NULL)
+}
+\arguments{
+\item{options}{This is a list of options controlling translation from and to Prolog. Here,
+only \emph{postproc} is relevant.}
 }
 \value{
 If the query fails, \code{FALSE} is returned. If the query succeeds, a
@@ -32,6 +36,9 @@ clear()
 \seealso{
 \code{\link[=query]{query()}}
 for a opening a query.
+
+\code{\link[=rolog_options]{rolog_options()}}
+for fine-grained control on the translation from R to Prolog and back.
 
 \code{\link[=clear]{clear()}}
 for a clearing a query.

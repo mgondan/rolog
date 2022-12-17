@@ -260,17 +260,18 @@
     rolog.ok           = (length(libswipl) == 1),
     rolog.lib          = libswipl,
     rolog.message      = msg,
-    rolog.realvec      = "#",   # prolog representation of R numeric vectors
-    rolog.realmat      = "##",  # same for matrices
-    rolog.intvec       = "%",   # prolog representation of R integer vectors
-    rolog.intmat       = "%%",  # same for matrices
-    rolog.boolvec      = "!",   # prolog representation of R boolean vectors
-    rolog.boolmat      = "!!",  # same for matrices
-    rolog.charvec      = "$$",  # prolog representation of R character vectors
-    rolog.charmat      = "$$$", # same for matrices
-    rolog.portray      = TRUE,  # return prolog call, nicely formatted
-    rolog.preproc      = dontCheck, # preprocessing hook in R
-    rolog.scalar       = TRUE)  # convert R vectors of size 1 to prolog scalars
+    rolog.realvec      = "#",      # prolog representation of R numeric vectors
+    rolog.realmat      = "##",     # same for matrices
+    rolog.intvec       = "%",      # prolog representation of R integer vectors
+    rolog.intmat       = "%%",     # same for matrices
+    rolog.boolvec      = "!",      # prolog representation of R boolean vectors
+    rolog.boolmat      = "!!",     # same for matrices
+    rolog.charvec      = "$$",     # prolog representation of R char vectors
+    rolog.charmat      = "$$$",    # same for matrices
+    rolog.portray      = TRUE,     # query() pretty prints prolog call
+    rolog.preproc      = preproc,  # preprocessing hook in R
+    rolog.postproc     = postproc, # postprocessing hook in R
+    rolog.scalar       = TRUE)     # convert R singletons 1 to prolog scalars
 
   set <- !(names(op.rolog) %in% names(options()))
   if(any(set))
@@ -391,7 +392,7 @@ rolog_done <- function()
 #' @md
 # 
 #' @details
-#' Translation of R to Prolog
+#' Translation from R to Prolog
 #' 
 #' * numeric vector of size N -> _realvec_/N (default is #)
 #' * integer vector of size N -> _intvec_/N (default is %)
@@ -418,6 +419,7 @@ rolog_options <- function()
     charvec=getOption("rolog.charvec", default="$$"),
     charmat=getOption("rolog.charmat", default="$$$"),
     portray=getOption("rolog.portray", default=TRUE),
-    preproc=getOption("rolog.preproc", default=dontCheck),
+    preproc=getOption("rolog.preproc", default=preproc),
+    postproc=getOption("rolog.postproc", default=postproc),
     scalar=getOption("rolog.scalar", default=TRUE))
 }

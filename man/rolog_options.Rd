@@ -13,7 +13,7 @@ list with some options for translating R expressions to prolog
 Quick access the package options
 }
 \details{
-Translation of R to Prolog
+Translation from R to Prolog
 \itemize{
 \item numeric vector of size N -> \emph{realvec}/N (default is #)
 \item integer vector of size N -> \emph{intvec}/N (default is \%)
