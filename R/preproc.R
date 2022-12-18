@@ -14,22 +14,24 @@
 #' 
 preproc <- function(query=quote(1 <= 2))
 {
-	if(is.call(query))
-	{
-		args <- as.list(query)
-		
-		index <- which(args[[1]] == names(.table))
-		if(length(index) == 1)
-			args[[1]] <- as.name(.table[index])
-		
-		args[-1] <- lapply(args[-1], FUN=preproc)
-		return(as.call(args))
-	}
+  if(is.call(query))
+  {
+    args <- as.list(query)
+    index <- which(args[[1]] == names(.table))
+    if(length(index) == 1)
+      args[[1]] <- as.name(.table[index])
+
+    args[-1] <- lapply(args[-1], FUN=preproc)
+      return(as.call(args))
+  }
+
+  if(is.function(query))
+    body(query) <- preproc(body(query))
+
+  if(is.list(query))
+    return(lapply(query, FUN=preproc))
 	
-	if(is.list(query))
-		return(lapply(query, FUN=preproc))
-	
-	return(query)
+  return(query)
 }
 
 #' Default hook for postprocessing
