@@ -25,7 +25,7 @@ jobs:
 
     strategy:
       matrix:
-        r-version: ['4.2.0']
+        r-version: ['4.2.1']
         config:
           - {os: macOS-10.15, r: 'release'}
           - {os: macOS-11, r: 'release'}
