@@ -68,10 +68,8 @@ query <- function(
   }
 
   options <- c(options, rolog_options())
+  query <- .preprocess(query, options$preproc)
 
-  # Hooks for preprocessing
-  query <- options$preproc(query)
-	
   # Decorate result with the prolog syntax of the query
   if(options$portray)
     q <- portray(query, options)
@@ -166,18 +164,14 @@ clear <- function()
 #' 
 submit <- function(options=NULL)
 {
-	options <- c(options, rolog_options())
-	if(options$ok == FALSE)
+  options <- c(options, rolog_options())
+  if(options$ok == FALSE)
   {
     warning("swipl not found in the PATH. Please set SWI_HOME_DIR accordingly or install R package rswipl.")
     return(FALSE)
   }
 
   r <- .submit()
-  
-  # Hooks for postprocessing
-  if(is.list(r))
-  	r <- lapply(r, FUN=options$postproc)
-  
+  r <- .postprocess(r, options$postproc)
   return(r)
 }

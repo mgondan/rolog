@@ -34,6 +34,22 @@ preproc <- function(query=quote(1 <= 2))
   return(query)
 }
 
+.preprocess <- function(query, preproc)
+{
+  if(is.function(preproc))
+    return(preproc(query))
+  
+  if(is.list(preproc))
+  {
+    for(pp in preproc)
+      query <- pp(query)
+    return(query)
+  }
+
+  warning("Use dontCheck to skip preprocessing, otherwise give a function or a list of functions.")
+  return(query)
+}
+
 #' Default hook for postprocessing
 #' 
 #' @param query 
@@ -45,30 +61,45 @@ preproc <- function(query=quote(1 <= 2))
 #'
 #' @seealso [rolog_options()] for fine-grained control over the translation
 #' 
-postproc <- function(query=call("=<", 1, 2))
+postproc <- function(constraint=call("=<", 1, 2))
 {
-	if(is.call(query))
-	{
-		args <- as.list(query)
-		
-		index <- which(args[[1]] == .table)
-		if(length(index) == 1)
-			args[[1]] <- as.name(names(.table)[index])
-		
-		args[-1] <- lapply(args[-1], FUN=preproc)
-		return(as.call(args))
-	}
-	
-	if(is.list(query))
-		return(lapply(query, FUN=preproc))
-	
-	return(query)
+  if(is.call(constraint))
+  {
+    args <- as.list(constraint)
+
+    index <- which(args[[1]] == .table)
+    if(length(index) == 1)
+      args[[1]] <- as.name(names(.table)[index])
+
+    args[-1] <- lapply(args[-1], FUN=postproc)
+    return(as.call(args))
+  }
+
+  if(is.function(constraint))
+    body(constraint) <- postproc(body(constraint))
+
+  if(is.list(constraint))
+    return(lapply(constraint, FUN=postproc))
+
+  return(constraint)
 }
 
-.postproc_list <- function(constraints=list(call("=<", 1, 2)), postproc=postproc)
+.postprocess <- function(constraint, postproc)
 {
-	if(is.list(constraints))
-		return(lapply(constraints, FUN=postproc))
-	
-	return(constraints)
+  if(is.function(postproc))
+    return(postproc(constraint))
+
+  if(is.list(postproc))
+    for(pp in postproc)
+      constraint <- pp(constraint)
+
+  return(constraint)
+}
+
+.postprocess_list <- function(constraints=list(call("=<", 1, 2)), postproc=postproc)
+{
+  if(is.list(constraints))
+    return(lapply(constraints, FUN=postproc))
+
+  return(constraints)
 }

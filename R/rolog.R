@@ -318,8 +318,12 @@
   }
 
   packageStartupMessage(options()$rolog.message)
-  W <- once(call("message_to_string", quote(welcome), expression(W)))
-  packageStartupMessage(W$W)
+  W1 <- once(call("message_to_string", quote(threads), expression(W)))
+  W2 <- once(call("message_to_string", quote(address_bits), expression(W)))
+  W3 <- once(call("message_to_string", quote(version), expression(W)))
+
+  packageStartupMessage(
+    sprintf("Welcome to SWI-Prolog (%s%sversion %s)", W1$W, W2$W, W3$W))
   invisible()
 }
 
