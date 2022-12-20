@@ -4,7 +4,7 @@
 \alias{postproc}
 \title{Default hook for postprocessing}
 \usage{
-postproc(query = call("=<", 1, 2))
+postproc(constraint = call("=<", 1, 2))
 }
 \arguments{
 \item{query}{the R call representing the Prolog query.}
