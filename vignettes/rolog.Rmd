@@ -1,8 +1,10 @@
 ---
 title: "rolog: Prolog queries from R"
-author: "Matthias Gondan (Department of Psychology, University of Innsbruck, Austria)
-    and Jan Wielemaker (Vrije Universiteit Amsterdam/SWI-Prolog Solutions b.v.)"
-date: "2022-11-27"
+author: "Matthias Gondan
+         (Department of Psychology, Universität Innsbruck, Austria)
+         and Jan Wielemaker
+         (Vrije Universiteit Amsterdam/SWI-Prolog Solutions b.v.)"
+date: "2022-12-21"
 bibliography: bibliography.bibtex
 output: rmarkdown::html_vignette
 vignette: >
@@ -247,23 +249,26 @@ In R, the basic elements such as integers, floating point numbers, character
 strings, and logicals are vectorized, and scalar entities are treated like
 vectors with one element. Conversely, Prolog does not natively support vectors
 or matrices. The problem is solved in the following way: 
-%
-\begin{itemize}
-\item R vectors of length 0 are translated to Prolog's empty list.
-\item R vectors of length 1 are translated to Prolog scalars.
-\item R vectors of length $N > 1$ are translated to Prolog
-  terms `#/N`, `%/N`, `\$\$/N`, and `!/N` for floating point numbers, integers,
+
+* R vectors of length 0 are translated to Prolog's empty list.
+* R vectors of length 1 are translated to Prolog scalars.
+* R vectors of length $N > 1$ are translated to Prolog
+  terms `#/N`, `%/N`, `$$/N`, and `!/N` for floating point numbers, integers,
   strings and logicals, respectively.
-\item R matrices are translated to Prolog
-  terms `##/R`, `%%/R`, `\$\$\$/R`, and `!!/R` with the respective row vectors
+* R matrices are translated to Prolog
+  terms `##/R`, `%%/R`, `$$$/R`, and `!!/R` with the respective row vectors
   as arguments.
-\end{itemize}
-%
+
 In the reverse direction, Prolog terms like `#/N` are translated back to R 
 vectors of length _N_, including the terms `#/0` and `#/1` that map to R vectors
 of length 0 and 1, respectively. Translation of a polymorphic Prolog term such
 as `#(a, 1.5)` to R will fail, since `rolog` expects the arguments to be
 numeric.
+
+If a Prolog object cannot be translated to R (e.g., a cyclic term), an error is
+raised. If an R object that lacks a suitable representation in
+Prolog (e.g., S4 class), a warning is printed and the result is unified
+with `na`.
 
 To summarize, the rules for translation are not fully symmetrical. A quick check
 for symmetry of the representation is obtained by a query to `=/2` or
@@ -294,7 +299,7 @@ the rules for translation between R and Prolog.
   used because it is the list operator in R.
 * *scalar* (logical): if `TRUE` (default), R vectors of length\ 1 are translated
   to scalars in Prolog. If `FALSE` (rarely used), R\ vectors are always
-  translated to `#/N`, or `%/N`, `!/N`, `\$\$/N`, even if they have only one
+  translated to `#/N`, or `%/N`, `!/N`, `$$/N`, even if they have only one
   element.
 * *portray* (logical): if `TRUE` (default in `query`), the result
   of `query`, `once` and `findall` includes an attribute with a text
@@ -320,7 +325,7 @@ submit()
 clear()
 ```
 
-## Prolog interface
+## Prolog interface to R
 
 `rolog` offers some basic support to call R from Prolog, that is, connecting the
 two systems in the reverse direction. Two predicates can be used for this
@@ -329,6 +334,22 @@ R with the command `Call` (ignoring the result); the latter evaluates `Function`
 and unifies the result with `Result`. Note that proper quoting of R functions is
 needed at the Prolog end, especially with R functions that start with uppercase
 letters and/or contain a dot in their name (see Section\ 4).
+
+## Exceptions
+
+Package `rolog` has limited support for exception handling. If Prolog raises an
+exception, the error string is forwarded to R using the `stop(...)` function.
+The examples below illustrate this by querying an undefined Prolog predicate.
+
+```{r}
+Q <- call("membr", expression(X), list(1, 2, 3))
+query(Q)
+try(submit())
+clear()
+```
+
+See Section\ 4 for one more example with an error resulting from a malformed
+query to `r_eval/2`.
 
 # 3. Extending the package
 
@@ -344,7 +365,7 @@ syntax.
 In particular, Prolog variables are translated from and to
 R *expressions* (not to be confused with R symbols), and R vectors of
 length greater than 1 are translated to the Prolog terms `#/N`, `%/N`, `!/N`, 
-and `\$\$/N`, as mentioned above. These rules are, in principle, arbitrary
+and `$$/N`, as mentioned above. These rules are, in principle, arbitrary
 and can be intercepted at several stages.
 
 * R functions that may be used to pre-process specific R elements before
@@ -834,7 +855,7 @@ The extra R function `canonical()` applies `match.call()` to non-primitive R
 calls, basically cleaning up the arguments and bringing them into the correct
 order.
 
-## Calling Prolog from R
+## Calling R from Prolog
 
 The basic workflow of the bridge from R to Prolog is to (A)\ translate an
 R\ expression into a Prolog term (i.e., a predicate), (B)\ query the predicate,
@@ -862,16 +883,33 @@ Listing\ 6
 
 ```{r}
 consult(system.file(file.path("pl", "r_eval.pl"), package="rolog"))
-invisible(once(call("r_seed", 1234)))
+invisible(once(call("r_seed", 123L)))
 once(call("r_norm", 3L, expression(X)))
 ```
 
 The example in Listing\ 6 is a bit trivial, basically illustrating the syntax
-and the workflow. More serious applications of `r_eval/1,2` are illustrated in
-the example on mathematical expressions where `r_eval/2` is used to obtain the
-name of a function argument, as well as in the next example on interval
-arithmetic, where `r_eval/2` is used to evaluate monotonically behaving
-R\ functions.
+and the workflow. More serious applications of are shown in the next two
+sections where `r_eval/2` is used to evaluate monotonically behaving
+R\ functions and to obtain the names of function arguments in R.
+
+As show below, R and `rolog` share the same environment.
+
+```{r}
+# Set variable in R, read in Prolog
+a <- 1
+once(call("r_eval", quote(a), expression(X)))
+
+# Set R variable in Prolog, read in R
+invisible(once(call("r_eval", call("<-", quote(b), 2))))
+cat("b =", b)
+```
+
+If the R call raises an exception, the error is properly propagated to Prolog
+and finally to the `rolog` package:
+
+```{r}
+try(once(quote(r_eval(r_sedd(123L))))) # typo
+```
 
 ## Interval arithmetic
 

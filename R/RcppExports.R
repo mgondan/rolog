@@ -29,10 +29,6 @@
     .Call('_rolog_portray_', PACKAGE = 'rolog', query, options)
 }
 
-.call <- function(query) {
-    .Call('_rolog_call_', PACKAGE = 'rolog', query)
-}
-
 .init <- function(argv0) {
     .Call('_rolog_init_', PACKAGE = 'rolog', argv0)
 }
