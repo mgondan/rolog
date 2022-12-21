@@ -7,7 +7,7 @@
 postproc(constraint = call("=<", 1, 2))
 }
 \arguments{
-\item{query}{the R call representing the Prolog query.}
+\item{constraint}{the R call representing constraints of the Prolog query.}
 }
 \value{
 The default hook translates the inequality and smaller-than-or-equal-to back

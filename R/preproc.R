@@ -52,8 +52,8 @@ preproc <- function(query=quote(1 <= 2))
 
 #' Default hook for postprocessing
 #' 
-#' @param query 
-#' the R call representing the Prolog query. 
+#' @param constraint
+#' the R call representing constraints of the Prolog query. 
 #'
 #' @return
 #' The default hook translates the inequality and smaller-than-or-equal-to back
