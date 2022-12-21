@@ -1,6 +1,7 @@
 # rolog 0.9.8
 
 * Support for matrices
+* Support for exceptions
 
 # rolog 0.9.7
 
