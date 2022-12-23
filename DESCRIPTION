@@ -2,14 +2,16 @@ Package: rolog
 Type: Package
 Title: Query 'SWI'-'Prolog' from R
 Version: 0.9.8
-Date: 2022-12-21
+Date: 2022-12-23
 Author: Matthias Gondan
 Maintainer: Matthias Gondan <Matthias.Gondan-Rochon@uibk.ac.at>
 Description: This R package connects to 'SWI'-'Prolog', <https://www.swi-prolog.org/>, so that R can send deterministic and non-deterministic queries to 'prolog' ('consult', 'query'/'submit', 'once', 'findall').
 License: FreeBSD
-Imports: Rcpp (>= 1.0.7)
-Depends: R (>= 4.2),
+Imports:
+    Rcpp (>= 1.0.7),
+    methods,
     utils
+Depends: R (>= 4.2)
 URL: https://github.com/mgondan/rolog
 BugReports: https://github.com/mgondan/rolog/issues
 LinkingTo:

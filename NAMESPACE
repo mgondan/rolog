@@ -1,4 +1,6 @@
 # useDynLib(rolog) # see .onLoad in R/rolog.R
 exportPattern("^[[:alpha:]]+")
+importFrom(methods, formalArgs)
 importFrom(Rcpp, evalCpp)
 importFrom(utils, read.table)
+importFrom(utils, tail)
