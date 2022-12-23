@@ -870,7 +870,7 @@ PlTerm r2pl_function(Function r, CharacterVector& names, PlTerm& vars, List opti
   if(len == 0)
   {
     PlTermv pl(3) ;
-    pl[1] = PlAtom("$function") ;
+    pl[1] = PlAtom("function") ;
     pl[2] = (long) 0 ;
     PlCall("compound_name_arity", pl) ;
 
@@ -883,7 +883,7 @@ PlTerm r2pl_function(Function r, CharacterVector& names, PlTerm& vars, List opti
   for(size_t i=0 ; i<len ; i++)
     pl[i] = PlAtom(n(i)) ;
 
-  fun[0] = PlCompound("$function", pl) ;
+  fun[0] = PlCompound("function", pl) ;
   return PlCompound(":-", fun) ;
 }
 
@@ -898,7 +898,7 @@ PlTerm r2pl_builtin(Function r, CharacterVector& names, PlTerm& vars, List optio
   if(len == 0)
   {
     PlTermv pl(3) ;
-    pl[1] = PlAtom("$function") ;
+    pl[1] = PlAtom("function") ;
     pl[2] = (long) 0 ;
     PlCall("compound_name_arity", pl) ;
 
@@ -911,7 +911,7 @@ PlTerm r2pl_builtin(Function r, CharacterVector& names, PlTerm& vars, List optio
   for(size_t i=0 ; i<len ; i++)
     pl[i] = PlAtom(n(i)) ;
 
-  fun[0] = PlCompound("$function", pl) ;
+  fun[0] = PlCompound("function", pl) ;
   return PlCompound(":-", fun) ;
 }
 

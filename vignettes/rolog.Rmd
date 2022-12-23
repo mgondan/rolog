@@ -242,8 +242,8 @@ Table\ 1
 |`c(1L, 2L, 3L)` or `1:3`|\'%\'(1, 2, 3)           |                         |
 |`c("a", "b", "c")`      |\$\$(\"a\", \"b\", \"c\")|                         |
 |`c(TRUE, FALSE, NA)`    |!(true, false, na)       |                         |
-|`sin`                   |\$function(x) :- sin(x)  |primitive function       |
-|`function(x) sin(x)`    |\$function(x) :- sin(x)  |                         |
+|`sin`                   |function(x) :- sin(x)    |primitive function       |
+|`function(x) sin(x)`    |function(x) :- sin(x)    |self-written function    |
 |`matrix(1:4, nrow=2)`   |\'%%\'(\'%\'(1, 3), ...) |see also ##, \$\$\$, !!  |
 
 In R, the basic elements such as integers, floating point numbers, character
