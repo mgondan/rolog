@@ -281,8 +281,8 @@ RObject pl2r_function(PlTerm pl, CharacterVector& names, PlTerm& vars, List opti
       }
     }
 
-    // the argument is the name
-    head.push_back(Named((char*) arg) = pl2r_symbol(PlAtom(""))) ;
+    // just the name, no argument like in alist(a=, b=)
+    head.push_back(Named((char*) arg) = Function("substitute")()) ;
   }
 
   RObject body = pl2r_compound(plbody, names, vars, options) ;
@@ -887,6 +887,34 @@ PlTerm r2pl_function(Function r, CharacterVector& names, PlTerm& vars, List opti
   return PlCompound(":-", fun) ;
 }
 
+// Translate R primitive to :- ("neck")
+PlTerm r2pl_builtin(Function r, CharacterVector& names, PlTerm& vars, List options)
+{
+  PlTermv fun(2) ;
+  fun[1] = r2pl_null() ;
+  
+  List formals = as<List>(FORMALS(r)) ;
+  size_t len = (size_t) formals.size() ;
+  if(len == 0)
+  {
+    PlTermv pl(3) ;
+    pl[1] = PlAtom("$function") ;
+    pl[2] = (long) 0 ;
+    PlCall("compound_name_arity", pl) ;
+
+    fun[0] = pl[0] ;
+    return PlCompound(":-", fun) ;
+  }
+  
+  CharacterVector n = formals.names() ;
+  PlTermv pl(len) ;
+  for(size_t i=0 ; i<len ; i++)
+    pl[i] = PlAtom(n(i)) ;
+
+  fun[0] = PlCompound("$function", pl) ;
+  return PlCompound(":-", fun) ;
+}
+
 PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, List options)
 {
   if(TYPEOF(r) == LANGSXP)
@@ -918,8 +946,11 @@ PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, List options)
   
   if(TYPEOF(r) == CLOSXP)
     return r2pl_function(r, names, vars, options) ;
-  
-  warning("Cannot translate R object of class %s, returning NA.\n", 
+
+  if(TYPEOF(r) == BUILTINSXP)
+    return r2pl_builtin(r, names, vars, options) ;
+
+  warning("r2pl: cannot translate R object of class %s, returning NA\n", 
     as<CharacterVector>(Function("class")(r))) ;
   return r2pl_na() ;
 }

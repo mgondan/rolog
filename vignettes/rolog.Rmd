@@ -151,7 +151,7 @@ library(rolog)
 ```
 
 We can see a welcome message from SWI-Prolog. The message can be silenced by the
-usual option `quietly=TRUE` of the `library(...)` command.
+usual option `quietly=TRUE` of the `library` command.
 
 ## R interface
 
@@ -184,7 +184,7 @@ query that will be submitted in the later course. The creation of such
 predicates and Prolog terms is described below and can become quite
 contrived (see the examples in Section\ 4). The second argument, `options`, may
 be used for ad hoc modifications of the translation between R and Prolog, see
-the section below. The function returns `TRUE` on success. Note that `query(...)`
+the section below. The function returns `TRUE` on success. Note that `query`
 does not check if a Prolog predicate corresponding to `call` actually
 exists (see `submit()` below). Only a single query can be opened at a given
 time. If a new query _Q_ is created while another query _R_ is still open, a
@@ -238,11 +238,12 @@ Table\ 1
 |`call("term", 1L, 2L)`  |term(1, 2)               |                         |
 |`list(1L, 2L, 3L)`      |List [1, 2, 3]           |                         |
 |`list(a=1, b=2, c=3)`   |List [a-1, b-2, c-3]     |                         |
-|`c(1, 2, 3)`            |#(1.0, 2.0, 3.0)         |vectors of length > 1    |
+|`c(1, 2, 3, Inf)`       |#(1.0, 2.0, 3.0, 1.0Inf) |vectors of length > 1    |
 |`c(1L, 2L, 3L)` or `1:3`|\'%\'(1, 2, 3)           |                         |
 |`c("a", "b", "c")`      |\$\$(\"a\", \"b\", \"c\")|                         |
 |`c(TRUE, FALSE, NA)`    |!(true, false, na)       |                         |
-|`function(x) {sin(x)}`  |lambda(x) :- sin(x)      |function name=attr(name) |
+|`sin`                   |\$function(x) :- sin(x)  |primitive function       |
+|`function(x) sin(x)`    |\$function(x) :- sin(x)  |                         |
 |`matrix(1:4, nrow=2)`   |\'%%\'(\'%\'(1, 3), ...) |see also ##, \$\$\$, !!  |
 
 In R, the basic elements such as integers, floating point numbers, character
@@ -306,16 +307,16 @@ the rules for translation between R and Prolog.
   representation of the query in Prolog.
 * *preproc* (function with one argument): R hook that can be used
   to preprocess R terms before translation. The default is `rolog`'s own
-  `preproc(...)` function that maps R's `x <= y` to Prolog's `x =< y` and `!=` to
+  `preproc` function that maps R's `x <= y` to Prolog's `x =< y` and `!=` to
   `\=`. Preprocessing can be turned off by assigning the R
-  function `dontCheck(...)` to the preproc option.
+  function `dontCheck` to the preproc option.
 * *postproc* (function with one argument): R hook that can be used
   to postprocess R terms after a query. The default is `rolog`'s own
-  `postproc(...)` function that reverses the mapping in `preproc(...)`.
+  `postproc` function that reverses the mapping from `preproc`.
 
 The command `rolog_options()` returns a list with all the options. The 
 options can be globally modified with `options()` or in the optional
-argument of `query(...)`, `once(...)`, and `findall(...)`.
+argument of `query`, `once`, and `findall`.
 
 ```{r}
 options(rolog.intvec="iv")
@@ -338,7 +339,7 @@ letters and/or contain a dot in their name (see Section\ 4).
 ## Exceptions
 
 Package `rolog` has limited support for exception handling. If Prolog raises an
-exception, the error string is forwarded to R using the `stop(...)` function.
+exception, the error string is forwarded to R using the `stop` function.
 The examples below illustrate this by querying an undefined Prolog predicate.
 
 ```{r}
@@ -369,7 +370,7 @@ and `$$/N`, as mentioned above. These rules are, in principle, arbitrary
 and can be intercepted at several stages.
 
 * R functions that may be used to pre-process specific R elements before
-  translation to Prolog (see, e.g., the R function `as.rolog(...)`)
+  translation to Prolog (see, e.g., the R function `as.rolog`)
 * Prolog wrappers that manipulate the term before it is called
   and afterwards (see the example with dicts below)
 * R functions that post-process the result of a query
@@ -406,12 +407,12 @@ HTML(export_svg(grViz(
      Result -> rolog2r [dir=back]
 
      Query [shape=Mdiamond;width=0.7;height=0.7]
-     r2rolog [shape=rect,label="preproc(...)"]
+     r2rolog [shape=rect,label="preproc"]
      forth [label="(rolog)"]
      rolog_pl [shape=rect,label="preproc/2"]
      Prolog [shape=Mcircle]
      pl_rolog [shape=rect,label="postproc/2"]
-     rolog2r [shape=rect,label="postproc(...)"]
+     rolog2r [shape=rect,label="postproc"]
      back [label="(rolog)"]
      Result [shape=Msquare]
    }')))
@@ -441,12 +442,12 @@ once(Q, options=list(preproc=list(as.rolog, preproc), portray=TRUE))
 ```
 
 Note that the name of the variable will still be `X` in the later course, 
-not "dot-X". As illustrated by the example above, `as.rolog(...)` treats the
+not "dot-X". As illustrated by the example above, `as.rolog` treats the
 argument `a` as a symbol; to evaluate the respective variable (i.e., "unquote"),
 it can be put in parentheses.
 
-Preprocessing can be turned off by setting the option `preproc`
-to `dontCheck` (basically the identity function).
+Preprocessing can be turned off by setting the option `preproc` to the identity
+function `dontCheck`.
 
 Section\ 3 includes an example for mathematical rendering of R expressions. In 
 that example, a preprocessing function is used to bring function calls with
@@ -546,7 +547,7 @@ Listing\ 2
 : A family tree in Prolog (see also family.pl)
 
 Listing\ 2 is included in the package and is accessed using the
-function `system.file(...)`. Within Prolog, the normal workflow is to consult
+function `system.file`. Within Prolog, the normal workflow is to consult
 the code with `[family]` and then to raise queries such
 as `ancestor(X, jim)`, which returns, one by one, four solutions for the
 variable *X*. In R, we obtain the following results:
@@ -560,8 +561,8 @@ submit()        # etc.
 clear()         # close the query
 ```
 
-As stated above, `consult(...)` loads the facts and rules of Listing\ 2 into the
-Prolog database. `query(...)` initializes a query, and the subsequent calls
+As stated above, `consult` loads the facts and rules of Listing\ 2 into the
+Prolog database. `query` initializes a query, and the subsequent calls
 to `submit` return the conditions under which the query succeeds. In this
 example, the query succeeds if `X` is either `pat`, `pam`, or `bob`. A query is
 closed with `clear()`, or automatically if the query fails. If we are interested
@@ -569,7 +570,7 @@ in just the first solution, we can use `once(Call)` as a shortcut
 to `query(Call)`, then `submit()`, then `clear()`. If we want to collect all
 solutions of a query with a finite set of solutions, we can use `findall(Call)`.
 
-As mentioned in Section\ 2, a simplified syntax is provided by `as.rolog(...)`
+As mentioned in Section\ 2, a simplified syntax is provided by `as.rolog`
 that accepts quoted expressions with dots indicating Prolog variables:
 
 ```r
@@ -779,7 +780,7 @@ mathml <- function(term)
 ```
 
 Listing 4
-: Using rolog to generate MathML from R expressions
+: Generate MathML from R expressions
 
 The first example is easy. At the Prolog end, there is a handler for `pbinom/3`
 that translates the term into a pretty MathML syntax like P_bi(X <= k; N, pi).
@@ -815,13 +816,12 @@ accepts only these three arguments in that particular order, and without names,
 that is, `integrate(sin, lower=0L, upper=2L * pi)` would not print the desired
 result.
 
-Therefore, `pl/mathml.pl` includes two handlers that accept terms with named
-arguments, `integrate(f=Fn, lower=Lower, upper=Upper)`, as well as terms of the
-form `$(integrate(Fn, Lower, Upper), value)` that are needed for the evaluation
-below.
+The extra R function `canonical()` applies `match.call()` to non-primitive R
+calls, basically cleaning up the arguments and bringing them into the correct
+order. Moreover, an extra handler maps the extractor function `$(Fn, "value")`
+to `Fn`.
 
 ```{r, results='asis'}
-# Apply match.call to all components of a term
 canonical <- function(term)
 {
   if(is.call(term))
@@ -837,11 +837,8 @@ canonical <- function(term)
   return(term)
 }
 
-# A custom function
 g <- function(u)
-{
   sin(u)
-}
 
 # Mixture of (partially) named and positional arguments in unusual order
 term <- quote(2L * integrate(low=-Inf, up=Inf, g)$value)
@@ -851,9 +848,15 @@ mathml(canonical(term))
 eval(term)
 ```
 
-The extra R function `canonical()` applies `match.call()` to non-primitive R
-calls, basically cleaning up the arguments and bringing them into the correct
-order.
+Note that both `sin` nor `g` in the above terms are R symbols, not R functions.
+In order to render something like `call("integrate", low=-Inf, up=Inf, g)`,
+or `call("integrate", low=-Inf, up=Inf, sin)`, with `g` and `sin` referring to
+the respective functions, one would need to determine its name, which is not
+possible in general.
+
+```{r}
+print(g)
+```
 
 ## Calling R from Prolog
 

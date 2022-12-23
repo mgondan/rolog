@@ -1,6 +1,23 @@
 # R-to-Prolog translation of not equal etc.
 .table = c("!=" = "\\=", "<=" = "=<")
 
+# Retrieve function call from builtin primitives
+.fcall <- function(fun)
+{
+  fun = sin
+
+  chunk <- tail(deparse(fun), 1)
+  name <- strsplit(chunk, "\"")[[1]][2]
+  args <- formalArgs(args(fun))
+  body <- as.call(lapply(FUN=as.name, c(name, args)))
+
+  head <- replicate(length(args), substitute())
+  names(head) <- args
+  head <- as.pairlist(head)
+  
+  eval(call("function", head, body))
+}
+
 #' Default hook for preprocessing
 #' 
 #' @param query 
@@ -26,11 +43,14 @@ preproc <- function(query=quote(1 <= 2))
   }
 
   if(is.function(query))
-    body(query) <- preproc(body(query))
+    if(is.primitive(query))
+      query <- .fcall(query)
+    else
+      body(query) <- preproc(body(query))
 
   if(is.list(query))
     return(lapply(query, FUN=preproc))
-	
+
   return(query)
 }
 
@@ -38,7 +58,7 @@ preproc <- function(query=quote(1 <= 2))
 {
   if(is.function(preproc))
     return(preproc(query))
-  
+
   if(is.list(preproc))
   {
     for(pp in preproc)
