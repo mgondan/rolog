@@ -4,8 +4,6 @@
 # Retrieve function call from builtin primitives
 .fcall <- function(fun)
 {
-  fun = sin
-
   chunk <- tail(deparse(fun), 1)
   name <- strsplit(chunk, "\"")[[1]][2]
   args <- formalArgs(args(fun))
@@ -25,11 +23,12 @@
 #'
 #' @return
 #' The default hook translates the inequality and smaller-than-or-equal-to from
-#' R (!=, <=) to Prolog (\=, =<).
+#' R (!=, <=) to Prolog (\=, =<). Moreover, primitive functions are converted to
+#' regular functions.
 #'
 #' @seealso [rolog_options()] for fine-grained control over the translation
 #' 
-preproc <- function(query=quote(1 <= 2))
+preproc <- function(query=quote(1 <= sin))
 {
   if(is.call(query))
   {

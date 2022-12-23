@@ -4,14 +4,15 @@
 \alias{preproc}
 \title{Default hook for preprocessing}
 \usage{
-preproc(query = quote(1 <= 2))
+preproc(query = quote(1 <= sin))
 }
 \arguments{
 \item{query}{the R call representing the Prolog query.}
 }
 \value{
 The default hook translates the inequality and smaller-than-or-equal-to from
-R (!=, <=) to Prolog (\=, =<).
+R (!=, <=) to Prolog (\=, =<). Moreover, primitive functions are converted to
+regular functions.
 }
 \description{
 Default hook for preprocessing
