@@ -1,3 +1,8 @@
+# rolog 0.9.9
+
+* Support for formulae (convert to call)
+* LinkingTo: rswipl
+
 # rolog 0.9.8
 
 * Support for matrices

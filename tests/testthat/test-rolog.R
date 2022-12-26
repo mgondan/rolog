@@ -1,6 +1,25 @@
 test_that("queries can be formed", 
 {
-  q <- query(call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y), NA, NaN, Inf, NULL)))
+  types <- list(
+    symbol    = quote(symbol), 
+    string    = "string", 
+    integer   = 3L,
+    float     = 4,
+    boolean   = TRUE,
+    variable  = expression(Y),
+    na        = NA,
+    nan       = NaN,
+    inf       = Inf,
+    empty     = NULL,
+    list      = list(1, 2, 3),
+    vector    = 1:3,
+    matrix    = matrix(1:6, nrow=2),
+    primitive = sin,
+    user      = function(x) sin(x),
+    curly     = {sin},
+    lm        = lm(speed ~ dist, data=cars))
+
+  q <- query(call("member", expression(X), types))
   submit()
   clear()
   expect_true(q)

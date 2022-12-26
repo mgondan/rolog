@@ -30,6 +30,13 @@
 #' 
 preproc <- function(query=quote(1 <= sin))
 {
+  if(inherits(query, "formula"))
+  {
+    for(i in 2:length(query))
+      query[[i]] <- preproc(query[[i]])
+    return(query)
+  }
+
   if(is.call(query))
   {
     args <- as.list(query)
@@ -38,7 +45,7 @@ preproc <- function(query=quote(1 <= sin))
       args[[1]] <- as.name(.table[index])
 
     args[-1] <- lapply(args[-1], FUN=preproc)
-      return(as.call(args))
+    return(as.call(args))
   }
 
   if(is.function(query))
@@ -65,7 +72,7 @@ preproc <- function(query=quote(1 <= sin))
     return(query)
   }
 
-  warning("Use dontCheck to skip preprocessing, otherwise give a function or a list of functions.")
+  warning("Use dontCheck to skip preprocessing, or give a (list of) functions.")
   return(query)
 }
 
