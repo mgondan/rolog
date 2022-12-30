@@ -283,6 +283,9 @@ Q <- call("r_eval", c(1, 2, NA, NaN, Inf), expression(X))
 once(Q)
 ```
 
+The optional argument `env` to query, once and findall allows to raise the
+query (and, as a consequence, r_eval/1,2 in a specific environment.
+
 ## Package options
 
 A few package-specific options have been defined to allow some fine-tuning of

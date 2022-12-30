@@ -1194,7 +1194,7 @@ PREDICATE(r_eval, 1)
   RObject Res = Expr ;
   try
   {
-    Environment env = Function("environment")() ;
+    Environment env = query_id->get_env() ;
     Res = Language("dontCheck", Expr).eval(env) ;
   }
 
@@ -1225,7 +1225,7 @@ PREDICATE(r_eval, 2)
   RObject Res = Expr ;
   try
   {
-    Environment env = Function("environment")() ;
+    Environment env = query_id->get_env() ;
     Res = Language("dontCheck", Expr).eval(env) ;
   }
   
