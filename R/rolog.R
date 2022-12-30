@@ -30,7 +30,7 @@
         libswipl <- dir(folder,
           pattern=paste("^", lib, .Platform$dynlib.ext, "$", sep=""),
           full.names=TRUE)
-  			
+
         if(length(libswipl))
           msg <- sprintf("Found SWI-Prolog at SWI_HOME_DIR: %s", home)
       }
@@ -98,25 +98,25 @@
   #
   if(msg == "" & .Platform$OS.type == "windows" & R.Version()$arch == "x86_64")
   {
-  	pl0 <- try(silent=TRUE, system2(c("swipl", "--dump-runtime-variables"),
-  	  stdout=TRUE, stderr=FALSE))
-  	if(!isa(pl0, "try-error"))
-  	{ 
-  		pl <- read.table(text=pl0, sep="=", row.names=1, comment.char=";")
-  		arch <- pl["PLARCH", ]
-  		if(arch == "x64-win64")
-  		{
-  			home <- pl["PLBASE", ]
-  			folder <- pl["PLLIBDIR", ]
-  			lib <- gsub("-l", "lib", pl["PLLIB", ])
-  			libswipl <- dir(folder, 
-  				pattern=paste("^", lib, .Platform$dynlib.ext, "$", sep=""),
-  				full.names=TRUE)
-  		
-	  		if(length(libswipl))
-  				msg <- sprintf("Found SWI-Prolog in the PATH: %s", home)
-  		}
-  	}
+    pl0 <- try(silent=TRUE, system2(c("swipl", "--dump-runtime-variables"),
+      stdout=TRUE, stderr=FALSE))
+    if(!isa(pl0, "try-error"))
+    { 
+      pl <- read.table(text=pl0, sep="=", row.names=1, comment.char=";")
+      arch <- pl["PLARCH", ]
+      if(arch == "x64-win64")
+      {
+        home <- pl["PLBASE", ]
+        folder <- pl["PLLIBDIR", ]
+        lib <- gsub("-l", "lib", pl["PLLIB", ])
+        libswipl <- dir(folder, 
+          pattern=paste("^", lib, .Platform$dynlib.ext, "$", sep=""),
+          full.names=TRUE)
+
+        if(length(libswipl))
+          msg <- sprintf("Found SWI-Prolog in the PATH: %s", home)
+      }
+    }
   }
 
   # Installed from sources
@@ -189,7 +189,7 @@
     {
       home = pl0$home
       pl1 <- try(system2(c(file.path(home, "bin", "swipl"),
-	"--dump-runtime-variables"), stdout=TRUE, stderr=FALSE))
+        "--dump-runtime-variables"), stdout=TRUE, stderr=FALSE))
       if(!isa(pl1, "try-error"))
       { 
         pl <- read.table(text=pl1, sep="=", row.names=1, comment.char=";")
@@ -221,7 +221,7 @@
       libswipl <- dir(file.path(home, "bin"),
         pattern=paste("libswipl", .Platform$dynlib.ext, "$", sep=""),
         full.names=TRUE)
-  		
+
       if(length(libswipl))
         msg <- sprintf("Found R package rswipl: %s", home)
     }

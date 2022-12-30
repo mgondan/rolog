@@ -16,7 +16,11 @@
 #' * If _scalar_ is `TRUE` (default), vectors of length 1 are translated to 
 #'   scalar prolog elements. If _scalar_ is `FALSE`, vectors of length 1 are
 #'   also translated to compounds.
-#'   
+#'
+#' @param env
+#' The R environment in which the query is run (default: globalenv()). This is
+#' mostly relevant for r_eval/2.
+#'
 #' @return
 #' If the query fails, an empty list is returned. If the query 
 #' succeeds _N_ >= 1 times, a list of length _N_ is returned, each element
@@ -45,7 +49,8 @@
 #' 
 findall <- function(
     query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))),
-    options=list(portray=FALSE))
+    options=list(portray=FALSE),
+    env=globalenv())
 {
   if(!options()$rolog.ok)
   {
@@ -61,7 +66,7 @@ findall <- function(
     q <- portray(query, options)
 
   # Invoke C++ function that calls prolog
-  r <- .findall(query, options)
+  r <- .findall(query, options, env)
 
   # Hooks for postprocessing
   r <- lapply(r, FUN=.postprocess, postproc=options$postproc)

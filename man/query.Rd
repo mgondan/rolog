@@ -6,7 +6,8 @@
 \usage{
 query(
   query = call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))),
-  options = NULL
+  options = NULL,
+  env = globalenv()
 )
 }
 \arguments{
@@ -26,6 +27,9 @@ integers, doubles and strings, respectively (defaults are \%, # and $$).
 scalar prolog elements. If \emph{scalar} is \code{FALSE}, vectors of length 1 are
 also translated to compounds.
 }}
+
+\item{env}{The R environment in which the query is run (default: globalenv()). This is
+mostly relevant for r_eval/2.}
 }
 \value{
 If the creation of the query succeeds, \code{TRUE}.

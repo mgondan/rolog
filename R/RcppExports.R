@@ -5,8 +5,8 @@
     .Call('_rolog_consult_', PACKAGE = 'rolog', files)
 }
 
-.query <- function(query, options) {
-    .Call('_rolog_query_', PACKAGE = 'rolog', query, options)
+.query <- function(query, options, env) {
+    .Call('_rolog_query_', PACKAGE = 'rolog', query, options, env)
 }
 
 .clear <- function() {
@@ -17,12 +17,12 @@
     .Call('_rolog_submit_', PACKAGE = 'rolog')
 }
 
-.once <- function(query, options) {
-    .Call('_rolog_once_', PACKAGE = 'rolog', query, options)
+.once <- function(query, options, env) {
+    .Call('_rolog_once_', PACKAGE = 'rolog', query, options, env)
 }
 
-.findall <- function(query, options) {
-    .Call('_rolog_findall_', PACKAGE = 'rolog', query, options)
+.findall <- function(query, options, env) {
+    .Call('_rolog_findall_', PACKAGE = 'rolog', query, options, env)
 }
 
 .portray <- function(query, options) {

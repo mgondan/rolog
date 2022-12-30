@@ -17,6 +17,10 @@
 #'   scalar prolog elements. If _scalar_ is `FALSE`, vectors of length 1 are
 #'   also translated to compounds.
 #'
+#' @param env
+#' The R environment in which the query is run (default: globalenv()). This is
+#' mostly relevant for r_eval/2.
+#' 
 #' @return
 #' If the creation of the query succeeds, `TRUE`.
 #'
@@ -59,7 +63,8 @@
 #' clear()
 query <- function(
   query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))),
-  options=NULL)
+  options=NULL,
+  env=globalenv())
 {
   if(!options()$rolog.ok)
   {
@@ -75,7 +80,7 @@ query <- function(
     q <- portray(query, options)
 
   # Create query
-  r <- .query(query, options)
+  r <- .query(query, options, env)
 
   # Decorate result with the prolog syntax of the query
   if(options$portray)

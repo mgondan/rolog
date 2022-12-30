@@ -17,6 +17,10 @@
 #'   scalar prolog elements. If _scalar_ is `FALSE`, vectors of length 1 are
 #'   also translated to compounds.
 #'   
+#' @param env
+#' The R environment in which the query is run (default: globalenv()). This is
+#' mostly relevant for r_eval/2.
+#'   
 #' @return
 #' If the query fails, `FALSE` is returned. If the query succeeds, a
 #' (possibly empty) list is returned that includes the bindings required to
@@ -70,7 +74,8 @@
 #'
 once <- function(
     query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))),
-    options=list(portray=FALSE))
+    options=list(portray=FALSE),
+    env=globalenv())
 {
   if(!options()$rolog.ok)
   {
@@ -86,7 +91,7 @@ once <- function(
     q <- portray(query, options)
 
   # Invoke C++ function that calls prolog
-  r <- .once(query, options)
+  r <- .once(query, options, env)
 
   # Hooks for postprocessing
   if(is.list(r))
