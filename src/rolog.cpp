@@ -532,6 +532,7 @@ RObject pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars, List options)
     return pl2r_variable(pl, names, vars) ;
 
   stop("pl2r: Cannot convert %s", (char*) pl) ;
+  return pl2r_null() ;
 }
 
 // Translate R expression to prolog
