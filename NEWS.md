@@ -1,3 +1,8 @@
+# rolog 0.9.10
+
+* Support for R environments (`r_eval`)
+* Backward compatible with swipl 8.4.2
+
 # rolog 0.9.9
 
 * Support for formulae (convert to call)
