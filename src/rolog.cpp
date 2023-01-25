@@ -1204,6 +1204,11 @@ PREDICATE(r_eval, 1)
     throw PlException(PlCompound("r_eval", PlTermv(A1, PlAtom(ex.what())))) ;
   }
 
+  catch(...)
+  {
+    throw PlException(PlCompound("r_eval", PlTermv(A1, PlString("exception occurred")))) ;
+  }
+
   return true ;
 }
 
@@ -1235,17 +1240,12 @@ PREDICATE(r_eval, 2)
     throw PlException(PlCompound("r_eval", PlTermv(A1, PlAtom(ex.what())))) ;
   }
 
-  PlTerm pl ;
-  try
+  catch(...)
   {
-    pl = r2pl(Res, names, vars, options) ;
-  }
-  
-  catch(std::exception& ex)
-  {
-    throw PlException(PlCompound("r_eval", PlTermv(A1, PlAtom(ex.what())))) ;
+    throw PlException(PlCompound("r_eval", PlTermv(A1, PlAtom("exception occurred")))) ;
   }
 
+  PlTerm pl = r2pl(Res, names, vars, options) ;
   return A2 = pl ;
 }
 
