@@ -1,3 +1,7 @@
+# rolog 0.9.11
+
+* Maintainance release: fix problems with exception handling
+
 # rolog 0.9.10
 
 * Support for R environments (`r_eval`)

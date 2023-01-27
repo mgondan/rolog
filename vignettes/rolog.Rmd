@@ -4,26 +4,25 @@ author: "Matthias Gondan
          (Department of Psychology, Universität Innsbruck, Austria)
          and Jan Wielemaker
          (Vrije Universiteit Amsterdam/SWI-Prolog Solutions b.v.)"
-date: "2022-12-21"
+date: "2023-01-27"
 bibliography: bibliography.bibtex
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{rolog}
+  %\VignetteIndexEntry{rolog: Prolog queries from R}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include=FALSE}
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-options(rmarkdown.html_vignette.check_title=FALSE)
+knitr::opts_chunk$set(collapse=TRUE, comment="#>")
 library(htmltools)
 library(DiagrammeR)
 library(DiagrammeRsvg)
 ```
 
   Matthias Gondan\
+  Universität Innsbruck\
   Department of Psychology\
-  University of Innsbruck\
   Innrain 9\
   A-6020 Innsbruck\
   Matthias.Gondan-Rochon@uibk.ac.at
@@ -150,8 +149,11 @@ the standard way.
 library(rolog)
 ```
 
-We can see a welcome message from SWI-Prolog. The message can be silenced by the
-usual option `quietly=TRUE` of the `library` command.
+We can see a short message telling the user which SWI-Prolog was found. The
+package searches for SWI-Prolog based on the environment
+variable `SWI_HOME_DIR`, the registry (Windows only), an executable `swipl` in
+the `PATH`, and if everything fails, R package `rswipl` [@rswipl]. The message
+can be silenced by the usual option `quietly=TRUE` of the `library` command.
 
 ## R interface
 
@@ -352,7 +354,7 @@ try(submit())
 clear()
 ```
 
-See Section\ 4 for one more example with an error resulting from a malformed
+See Section\ 4 for another example with an error resulting from a malformed
 query to `r_eval/2`.
 
 # 3. Extending the package
@@ -898,23 +900,26 @@ and the workflow. More serious applications of are shown in the next two
 sections where `r_eval/2` is used to evaluate monotonically behaving
 R\ functions and to obtain the names of function arguments in R.
 
-As show below, R and `rolog` share the same environment.
+As show below, the default environment of `rolog`'s `r_eval/2` is `.GlobalEnv`,
+this can be changed in an optional argument to `once()`, `findall()`,
+and `query()`.
 
 ```{r}
 # Set variable in R, read in Prolog
-a <- 1
-once(call("r_eval", quote(a), expression(X)))
+env <- new.env()
+with(env, a <- 1)
+once(call("r_eval", quote(a), expression(X)), env=env)
 
 # Set R variable in Prolog, read in R
 invisible(once(call("r_eval", call("<-", quote(b), 2))))
 cat("b =", b)
 ```
 
-If the R call raises an exception, the error is properly propagated to Prolog
+If the R call raises an exception, an error is propagated to Prolog
 and finally to the `rolog` package:
 
 ```{r}
-try(once(quote(r_eval(r_sedd(123L))))) # typo
+try(once(quote(r_eval(rnorm(-1))))) # return "-1 random numbers"
 ```
 
 ## Interval arithmetic
