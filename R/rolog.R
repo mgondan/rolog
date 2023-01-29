@@ -260,12 +260,12 @@
     rolog.ok           = (length(libswipl) == 1),
     rolog.lib          = libswipl,
     rolog.message      = msg,
-    rolog.realvec      = "#",      # prolog representation of R numeric vectors
-    rolog.realmat      = "##",     # same for matrices
-    rolog.intvec       = "%",      # prolog representation of R integer vectors
-    rolog.intmat       = "%%",     # same for matrices
-    rolog.boolvec      = "!",      # prolog representation of R boolean vectors
-    rolog.boolmat      = "!!",     # same for matrices
+    rolog.realvec      = "##",     # prolog representation of R numeric vectors
+    rolog.realmat      = "###",    # same for matrices
+    rolog.intvec       = "%%",     # prolog representation of R integer vectors
+    rolog.intmat       = "%%%",    # same for matrices
+    rolog.boolvec      = "!!",     # prolog representation of R boolean vectors
+    rolog.boolmat      = "!!!",    # same for matrices
     rolog.charvec      = "$$",     # prolog representation of R char vectors
     rolog.charmat      = "$$$",    # same for matrices
     rolog.portray      = TRUE,     # query() pretty prints prolog call
@@ -399,9 +399,9 @@ rolog_done <- function()
 #' @details
 #' Translation from R to Prolog
 #' 
-#' * numeric vector of size N -> _realvec_/N (default is #)
-#' * integer vector of size N -> _intvec_/N (default is %)
-#' * boolean vector of size N -> _boolvec_/N (default is !)
+#' * numeric vector of size N -> _realvec_/N (default is ##)
+#' * integer vector of size N -> _intvec_/N (default is %%)
+#' * boolean vector of size N -> _boolvec_/N (default is !!)
 #' * character vector of size N -> _charvec_/N (default is $$)
 #' * _scalar_: if `TRUE` (default), translate R vectors of length 1 to scalars
 #' * _portray_: if `TRUE` (default) whether to return the prolog translation 
@@ -415,12 +415,12 @@ rolog_options <- function()
     ok=getOption("rolog.ok", default=FALSE),
     lib=getOption("rolog.lib", default="unknown"),
     message=getOption("rolog.message", default=NA),
-    realvec=getOption("rolog.realvec", default="#"),
-    realmat=getOption("rolog.realmat", default="##"),
-    intvec=getOption("rolog.intvec", default="%"),
-    intmat=getOption("rolog.intmat", default="%%"),
-    boolvec=getOption("rolog.boolvec", default="!"),
-    boolmat=getOption("rolog.boolmat", default="!!"),
+    realvec=getOption("rolog.realvec", default="##"),
+    realmat=getOption("rolog.realmat", default="###"),
+    intvec=getOption("rolog.intvec", default="%%"),
+    intmat=getOption("rolog.intmat", default="%%%"),
+    boolvec=getOption("rolog.boolvec", default="!!"),
+    boolmat=getOption("rolog.boolmat", default="!!!"),
     charvec=getOption("rolog.charvec", default="$$"),
     charmat=getOption("rolog.charmat", default="$$$"),
     portray=getOption("rolog.portray", default=TRUE),
