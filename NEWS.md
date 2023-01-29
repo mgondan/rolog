@@ -1,3 +1,8 @@
+# rolog 0.9.12
+
+* represent vectors as double hash, dollar, !, %
+* matrices triple
+
 # rolog 0.9.11
 
 * Maintainance release: fix problems with exception handling
