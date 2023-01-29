@@ -447,12 +447,12 @@ int(dfrac(Num, Den), Res)
 int(pbinom(Q, Size, Prob, Tail, Log), Res),
     r_eval(Tail, true)
  => int(Prob, ProbL ... ProbU),
-    r_eval(pbinom(Q, Size, #(ProbU, ProbL), Tail, Log), #(L, U)),
+    r_eval(pbinom(Q, Size, ##(ProbU, ProbL), Tail, Log), ##(L, U)),
     Res = L ... U.
 
 int(pbinom(Q, Size, Prob, Tail, Log), Res)
  => int(Prob, ProbL ... ProbU),
-    r_eval(pbinom(Q, Size, #(ProbL, ProbU), Tail, Log), #(L, U)),
+    r_eval(pbinom(Q, Size, ##(ProbL, ProbU), Tail, Log), ##(L, U)),
     Res = L ... U.
 
 % For X < Prob*Size, dbinom is monotonically decreasing in Prob, above that
@@ -461,11 +461,11 @@ int(dbinom(X, Size, Prob, Log), Res)
  => r_eval(Size, SizeR),
     int(Prob, ProbL ... ProbU),
     (   X < ProbL*SizeR
-     -> r_eval(dbinom(X, Size, #(ProbU, ProbL), Log), #(L, U))
+     -> r_eval(dbinom(X, Size, ##(ProbU, ProbL), Log), ##(L, U))
       ; X > ProbU*SizeR
-     -> r_eval(dbinom(X, Size, #(ProbL, ProbU), Log), #(L, U))
+     -> r_eval(dbinom(X, Size, ##(ProbL, ProbU), Log), ##(L, U))
       ; r_eval(X/Size, ProbM),
-        r_eval(dbinom(X, Size, #(ProbL, ProbM, ProbU), Log), #(B1, B2, B3)),
+        r_eval(dbinom(X, Size, ##(ProbL, ProbM, ProbU), Log), ##(B1, B2, B3)),
         min_list([B1, B2, B3], L),
         max_list([B1, B2, B3], U)
     ),
