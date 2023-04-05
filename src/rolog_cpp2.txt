@@ -74,11 +74,15 @@ RObject pl2r_null()
   return R_NilValue ;
 }
 
+// TODO: use this and pl.eq_if_atom(ATOM_na) instead of
+//       pl.is_atom() && pl == "na"
+// PlAtom ATOM_na("na");
+
 // This helper function checks for na and then translates an individual PlTerm 
 // to a double.
 double pl2r_double(PlTerm pl)
 {
-  if(pl.is_atom() && pl == "na")
+  if(pl.is_atom() && pl.as_string() == "na")
     return NA_REAL ;
 
   try 
@@ -138,7 +142,7 @@ NumericMatrix pl2r_realmat(PlTerm pl)
 // See above for pl2r_double
 long pl2r_int(PlTerm pl)
 {
-  if(pl.is_atom() && pl == "na")
+  if(pl.is_atom() && pl.as_string() == "na")
     return NA_INTEGER ;
 
   try 
@@ -195,7 +199,7 @@ IntegerMatrix pl2r_intmat(PlTerm pl)
 // See above for pl2r_double
 String pl2r_string(PlTerm pl)
 {
-  if(pl.is_atom() && pl == "na")
+  if(pl.is_atom() && pl.as_string() == "na")
     return NA_STRING ;
   
   return pl.as_string(EncLocale) ;
@@ -241,17 +245,17 @@ CharacterMatrix pl2r_charmat(PlTerm pl)
 // Convert prolog atom to R symbol (handle na, true, false)
 RObject pl2r_symbol(PlTerm pl)
 {
-  if(pl == "na")
+  if(pl.as_string() == "na")
     return wrap(NA_LOGICAL) ;
   
-  if(pl == "true")
+  if(pl.as_string() == "true")
     return wrap(true) ;
   
-  if(pl == "false")
+  if(pl.as_string() == "false")
     return wrap(false) ;
 
   // Empty symbols
-  if(pl == "")
+  if(pl.as_string() == "")
     return Function("substitute")() ;
 
   return as<RObject>(Symbol(pl.as_string(EncUTF8))) ; // TODO: EncLocale?
@@ -272,7 +276,7 @@ RObject pl2r_function(PlTerm pl, CharacterVector& names, PlTerm& vars, List opti
     PlTerm arg = plhead[i] ;
 
     // Compounds like mean=100 are translated to named function arguments
-    if(arg.is_compound() && arg.name() == "=" && arg.arity() == 2)
+    if(arg.is_compound() && arg.name().as_string() == "=" && arg.arity() == 2)
     {
       PlTerm a1 = arg[1] ;
       PlTerm a2 = arg[2] ;
@@ -302,19 +306,19 @@ LogicalVector pl2r_boolvec(PlTerm pl)
     PlTerm t = pl[i+1] ;
     if(t.is_atom())
     {
-      if(t == "na")
+      if(t.as_string() == "na")
       {
         r(i) = NA_LOGICAL ;
         continue ;
       }
       
-      if(t == "true")
+      if(t.as_string() == "true")
       {
         r(i) = 1 ;
         continue ;
       }
       
-      if(t == "false")
+      if(t.as_string() == "false")
       {
         r(i) = 0 ;
         continue ;
@@ -364,7 +368,7 @@ RObject pl2r_variable(PlTerm pl, CharacterVector& names, PlTerm& vars)
   PlTerm_var v ;
   for(int i=0 ; i<names.length() ; i++)
   {
-    PlCheck(tail.next(v)) ;
+    PlCheckFail(tail.next(v)) ;
     if(v == pl)
       return ExpressionVector::create(Symbol(names(i))) ;
   }
@@ -419,7 +423,7 @@ RObject pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars, List opti
     return pl2r_boolvec(pl) ;
 
   // Convert :- to function
-  if(pl.name() == ":-")
+  if(pl.name().as_string() == ":-")
     return pl2r_function(pl, names, vars, options) ;
 
   // Other compounds
@@ -548,7 +552,7 @@ PlTerm r2pl_string(CharacterVector r, List options) ;
 PlTerm r2pl_null()
 {
   PlTerm_var pl ;
-  PlCheck(PlTerm_tail(pl).close()) ;
+  PlCheckFail(PlTerm_tail(pl).close()) ;
   return pl ;
 }
 
@@ -566,7 +570,7 @@ PlTerm r2pl_matrix(Matrix<REALSXP> r, List aoptions)
 
   PlTermv rows(r.nrow()) ;
   for(int i=0 ; i<r.nrow() ; i++)
-    PlCheck(rows[i].unify_term(r2pl_real(r.row(i), options))) ;
+    PlCheckFail(rows[i].unify_term(r2pl_real(r.row(i), options))) ;
 
   return PlCompound((const char*) options("realmat"), rows) ;
 }
@@ -598,9 +602,9 @@ PlTerm r2pl_real(NumericVector r, List options)
   for(size_t i=0 ; i<len ; i++)
   {
     if(na[i] && !nan[i])
-      PlCheck(args[i].unify_term(r2pl_na())) ;
+      PlCheckFail(args[i].unify_term(r2pl_na())) ;
     else
-      PlCheck(args[i].unify_float(r[i])) ;
+      PlCheckFail(args[i].unify_float(r[i])) ;
   }
 
   return PlCompound((const char*) options("realvec"), args) ;
@@ -614,7 +618,7 @@ PlTerm r2pl_matrix(Matrix<LGLSXP> r, List aoptions)
 
   PlTermv rows(r.nrow()) ;
   for(int i=0 ; i<r.nrow() ; i++)
-    PlCheck(rows[i].unify_term(r2pl_logical(r.row(i), options))) ;
+    PlCheckFail(rows[i].unify_term(r2pl_logical(r.row(i), options))) ;
 
   return PlCompound((const char*) options("boolmat"), rows) ;
 }
@@ -645,9 +649,9 @@ PlTerm r2pl_logical(LogicalVector r, List options)
   for(size_t i=0 ; i<len ; i++)
   {
     if(na[i])
-      PlCheck(args[i].unify_term(r2pl_na())) ;
+      PlCheckFail(args[i].unify_term(r2pl_na())) ;
     else
-      PlCheck(args[i].unify_atom(r[i] ? "true" : "false")) ;  // TODO: unify_bool()
+      PlCheckFail(args[i].unify_atom(r[i] ? "true" : "false")) ;  // TODO: unify_bool()
   }
 
   return PlCompound((const char*) options("boolvec"), args) ;
@@ -661,7 +665,7 @@ PlTerm r2pl_matrix(Matrix<INTSXP> r, List aoptions)
 
   PlTermv rows(r.nrow()) ;
   for(int i=0 ; i<r.nrow() ; i++)
-    PlCheck(rows[i].unify_term(r2pl_integer(r.row(i), options))) ;
+    PlCheckFail(rows[i].unify_term(r2pl_integer(r.row(i), options))) ;
 
   return PlCompound((const char*) options("intmat"), rows) ;
 }
@@ -692,9 +696,9 @@ PlTerm r2pl_integer(IntegerVector r, List options)
   for(size_t i=0 ; i<len ; i++)
   {
     if(na[i])
-      PlCheck(args[i].unify_term(r2pl_na())) ;
+      PlCheckFail(args[i].unify_term(r2pl_na())) ;
     else
-      PlCheck(args[i].unify_integer(r[i])) ;
+      PlCheckFail(args[i].unify_integer(r[i])) ;
   }
   
   return PlCompound((const char*) options("intvec"), args) ;
@@ -728,7 +732,7 @@ PlTerm r2pl_var(ExpressionVector r, CharacterVector& names, PlTerm& vars, List o
   PlTerm_var v ;
   for(R_xlen_t i=0 ; i<names.length() ; i++)
   {
-    PlCheck(tail.next(v)) ;
+    PlCheckFail(tail.next(v)) ;
     if(n == names(i))
       return v ;
   }
@@ -736,7 +740,7 @@ PlTerm r2pl_var(ExpressionVector r, CharacterVector& names, PlTerm& vars, List o
   // If no such variable exists, create a new one and remember the name
   names.push_back(n.c_str()) ;
   PlTerm_var pl ;
-  PlCheck(tail.append(pl)) ;
+  PlCheckFail(tail.append(pl)) ;
   return pl ;
 }
 
@@ -754,7 +758,7 @@ PlTerm r2pl_matrix(Matrix<STRSXP> r, List aoptions)
 
   PlTermv rows(r.nrow()) ;
   for(int i=0 ; i<r.nrow() ; i++)
-    PlCheck(rows[i].unify_term(r2pl_string(r.row(i), options))) ;
+    PlCheckFail(rows[i].unify_term(r2pl_string(r.row(i), options))) ;
 
   return PlCompound((const char*) options("charmat"), rows) ;
 }
@@ -785,9 +789,9 @@ PlTerm r2pl_string(CharacterVector r, List options)
   for(size_t i=0 ; i<len ; i++)
   {
     if(na[i])
-      PlCheck(args[i].unify_term(r2pl_na())) ;
+      PlCheckFail(args[i].unify_term(r2pl_na())) ;
     else
-      PlCheck(args[i].unify_term(PlTerm_string(r(i)))) ; // DO NOT SUBMIT - unify_string()
+      PlCheckFail(args[i].unify_term(PlTerm_string(r(i)))) ; // DO NOT SUBMIT - unify_string()
   }
 
   return PlCompound((const char*) options("charvec"), args) ;
@@ -805,8 +809,8 @@ PlTerm r2pl_compound(Language r, CharacterVector& names, PlTerm& vars, List opti
   if(len == 0)
   {
     PlTermv pl(3) ;
-    PlCheck(pl[1].unify_atom(as<Symbol>(CAR(r)).c_str())) ;
-    PlCheck(pl[2].unify_integer(0)) ;
+    PlCheckFail(pl[1].unify_atom(as<Symbol>(CAR(r)).c_str())) ;
+    PlCheckFail(pl[2].unify_integer(0)) ;
     PlCall("compound_name_arity", pl) ;
     return pl[0] ;
   }
@@ -824,9 +828,9 @@ PlTerm r2pl_compound(Language r, CharacterVector& names, PlTerm& vars, List opti
     
     // Convert named arguments to prolog compounds a=X
     if(n.length() && n(i) != "")
-      PlCheck(pl[i].unify_term(PlCompound("=", PlTermv(PlTerm_atom(n(i)), arg)))) ;
+      PlCheckFail(pl[i].unify_term(PlCompound("=", PlTermv(PlTerm_atom(n(i)), arg)))) ;
     else
-      PlCheck(pl[i].unify_term(arg)) ; // no name
+      PlCheckFail(pl[i].unify_term(arg)) ; // no name
   }
 
   return PlCompound(as<Symbol>(CAR(r)).c_str(), pl) ;
@@ -852,12 +856,12 @@ PlTerm r2pl_list(List r, CharacterVector& names, PlTerm& vars, List options)
     
     // Convert named argument to prolog pair a-X.
     if(n.length() && n(i) != "")
-      PlCheck(tail.append(PlCompound("-", PlTermv(PlTerm_atom(n(i)), arg)))) ;
+      PlCheckFail(tail.append(PlCompound("-", PlTermv(PlTerm_atom(n(i)), arg)))) ;
     else
-      PlCheck(tail.append(arg)) ; // no name
+      PlCheckFail(tail.append(arg)) ; // no name
   }
   
-  PlCheck(tail.close()) ;
+  PlCheckFail(tail.close()) ;
   return pl ;
 }
 
@@ -865,26 +869,26 @@ PlTerm r2pl_list(List r, CharacterVector& names, PlTerm& vars, List options)
 PlTerm r2pl_function(Function r, CharacterVector& names, PlTerm& vars, List options)
 {
   PlTermv fun(2) ;
-  PlCheck(fun[1].unify_term(r2pl_compound(BODY(r), names, vars, options))) ;
+  PlCheckFail(fun[1].unify_term(r2pl_compound(BODY(r), names, vars, options))) ;
   
   List formals = as<List>(FORMALS(r)) ;
   size_t len = (size_t) formals.size() ;
   if(len == 0)
   {
     PlTermv pl(3) ;
-    PlCheck(pl[1].unify_atom("$function")) ;
-    PlCheck(pl[2].unify_integer(0)) ;
+    PlCheckFail(pl[1].unify_atom("$function")) ;
+    PlCheckFail(pl[2].unify_integer(0)) ;
     PlCall("compound_name_arity", pl) ;
 
-    PlCheck(fun[0].unify_term(pl[0])) ;
+    PlCheckFail(fun[0].unify_term(pl[0])) ;
     return PlCompound(":-", fun) ;
   }
   
   CharacterVector n = formals.names() ;
   PlTermv pl(len) ;
   for(size_t i=0 ; i<len ; i++)
-    PlCheck(pl[i].unify_atom(n(i))) ;
-  PlCheck(fun[0].unify_term(PlCompound("$function", pl))) ;
+    PlCheckFail(pl[i].unify_atom(n(i))) ;
+  PlCheckFail(fun[0].unify_term(PlCompound("$function", pl))) ;
   return PlCompound(":-", fun) ;
 }
 
@@ -988,7 +992,7 @@ List RlQuery::bindings()
   PlTerm_var v ;
   for(int i=0 ; i<names.length() ; i++)
   {
-    PlCheck(tail.next(v)) ;
+    PlCheckFail(tail.next(v)) ;
     RObject r = pl2r(v, names, vars, options) ;
     if(TYPEOF(r) == EXPRSXP && names[i] == as<Symbol>(as<ExpressionVector>(r)[0]).c_str())
     continue ;
@@ -1109,11 +1113,11 @@ RObject portray_(RObject query, List options)
   PlTerm_var vars ;
   options("atomize") = true ; // translate variables to their R names
   PlTermv pl(3) ;
-  PlCheck(pl[0].unify_term(r2pl(query, names, vars, options))) ;
+  PlCheckFail(pl[0].unify_term(r2pl(query, names, vars, options))) ;
   PlTerm_tail tail(pl[2]) ;
-  PlCheck(tail.append(PlCompound("quoted", PlTermv(PlTerm_atom("false"))))) ;
-  PlCheck(tail.append(PlCompound("spacing", PlTermv(PlTerm_atom("next_argument"))))) ;
-  PlCheck(tail.close()) ;
+  PlCheckFail(tail.append(PlCompound("quoted", PlTermv(PlTerm_atom("false"))))) ;
+  PlCheckFail(tail.append(PlCompound("spacing", PlTermv(PlTerm_atom("next_argument"))))) ;
+  PlCheckFail(tail.close()) ;
 
   PlFrame f ;
   PlQuery q("term_string", pl) ;
@@ -1227,7 +1231,7 @@ PREDICATE(r_eval, 2)
   PlTerm_var pl ;
   try
   {
-    PlCheck(pl.unify_term(r2pl(Res, names, vars, options))) ;
+    PlCheckFail(pl.unify_term(r2pl(Res, names, vars, options))) ;
   }
   
   catch(std::exception& ex)
