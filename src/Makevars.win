@@ -10,14 +10,13 @@ SWI_INCLUDE=
 SWI_LIBDIR=
 
 $(info Searching for R package rswipl...)
-SWI_HOME4 := $(shell "${RSCRIPT}" -e "cat(gsub('\\\\\\\\', '/',\
-  shortPathName(file.path(find.package('rswipl'), 'swipl'))))")
+SWI_HOME4 := $(shell "${RSCRIPT}" -e "cat(normalizePath(file.path(find.package('rswipl'), 'swipl'), winslash='/'))")
 ifeq ("$(SWI_HOME4)","")
   $(info R package rswipl not found, moving on.)
 else
   $(info R package rswipl found at $(SWI_HOME4))
-  SWI_INCLUDE=-I$(SWI_HOME4)/include
-  SWI_LIBDIR=-L"$(SWI_HOME4)"/bin
+  SWI_INCLUDE=-I"$(SWI_HOME4)/include"
+  SWI_LIBDIR=-L"$(SWI_HOME4)/bin"
 endif
 
 $(info Searching for SWI-Prolog in the registry...)
@@ -27,8 +26,8 @@ ifeq ("$(SWI_HOME3)","")
   $(info Registry: SWI/Prolog not found, moving on.)
 else
   $(info SWI-Prolog found in registry at $(SWI_HOME3))
-  SWI_INCLUDE=-I$(SWI_HOME3)/include
-  SWI_LIBDIR=-L"$(SWI_HOME3)"/bin
+  SWI_INCLUDE=-I"$(SWI_HOME3)/include"
+  SWI_LIBDIR=-L"$(SWI_HOME3)/bin"
   ifneq ("$(SWI_HOME4)","")
     $(info Overriding R package rswipl)
   endif
@@ -42,8 +41,8 @@ ifeq ("$(SWI_HOME2)","")
 else
   ifeq ("$(SWI_ARCH)", "x64-win64")
     $(info swipl.exe found in PATH at $(SWI_HOME2))
-    SWI_INCLUDE=-I$(SWI_HOME2)/include
-    SWI_LIBDIR=-L$(SWI_HOME2)/bin
+    SWI_INCLUDE=-I"$(SWI_HOME2)/include"
+    SWI_LIBDIR=-L"$(SWI_HOME2)/bin"
     ifneq ("$(SWI_HOME3)$(SWI_HOME4)","")
       $(info Overriding registry information and rswipl.)
     endif
@@ -58,8 +57,8 @@ ifeq ("$(SWI_HOME1)","")
   $(info Environment: SWI_HOME_DIR not defined, moving on.)
 else
   $(info Environment: Environment: SWI_HOME_DIR=$(SWI_HOME1))
-  SWI_INCLUDE=-I"$(SWI_HOME1)"/include
-  SWI_LIBDIR=-L"$(SWI_HOME1)"/bin
+  SWI_INCLUDE=-I"$(SWI_HOME1)/include"
+  SWI_LIBDIR=-L"$(SWI_HOME1)/bin"
   ifneq ("$(SWI_HOME2)$(SWI_HOME3)$(SWI_HOME2)","")
     $(info Overriding PATH, registry, and rswipl.)
   endif
