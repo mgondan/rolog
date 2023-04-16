@@ -59,7 +59,7 @@ LogicalVector consult_(CharacterVector files)
     
     catch(PlException& ex)
     { 
-      String err(ex.as_string(EncLocale));
+      String err(ex.as_string(PlEncoding::Locale));
       PL_clear_exception() ;
       stop("failed to consult %s: %s", (char*) files(i), err.get_cstring()) ;
     }
@@ -93,7 +93,7 @@ double pl2r_double(PlTerm pl)
   catch(PlException& ex)
   { 
     warning("cannot convert %s to float: %s",
-            pl.as_string(EncLocale).c_str(), ex.as_string(EncLocale).c_str()) ;
+            pl.as_string(PlEncoding::Locale).c_str(), ex.as_string(PlEncoding::Locale).c_str()) ;
     PL_clear_exception() ;
     return NA_REAL ;
   }
@@ -153,7 +153,7 @@ long pl2r_int(PlTerm pl)
   catch(PlException& ex)
   { 
     warning("Cannot convert %s to integer: %s",
-            pl.as_string(EncLocale).c_str(), ex.as_string(EncLocale).c_str()) ;
+            pl.as_string(PlEncoding::Locale).c_str(), ex.as_string(PlEncoding::Locale).c_str()) ;
     PL_clear_exception() ;
     return NA_INTEGER ;
   }
@@ -202,7 +202,7 @@ String pl2r_string(PlTerm pl)
   if(pl.is_atom() && pl.as_string() == "na")
     return NA_STRING ;
   
-  return pl.as_string(EncLocale) ;
+  return pl.as_string(PlEncoding::Locale) ;
 }
 
 CharacterVector pl2r_char(PlTerm pl)
@@ -258,7 +258,7 @@ RObject pl2r_symbol(PlTerm pl)
   if(pl.as_string() == "")
     return Function("substitute")() ;
 
-  return as<RObject>(Symbol(pl.as_string(EncUTF8))) ; // TODO: EncLocale?
+  return as<RObject>(Symbol(pl.as_string(PlEncoding::UTF8))) ; // TODO: PlEncoding::Locale?
 }
 
 // Forward declaration, needed below
@@ -282,13 +282,13 @@ RObject pl2r_function(PlTerm pl, CharacterVector& names, PlTerm& vars, List opti
       PlTerm a2 = arg[2] ;
       if(a1.is_atom())
       {
-        head.push_back(Named(a1.as_string(EncUTF8)) = pl2r(a2, names, vars, options)) ;
+        head.push_back(Named(a1.as_string(PlEncoding::UTF8)) = pl2r(a2, names, vars, options)) ;
         continue ;
       }
     }
 
     // the argument is the name
-    head.push_back(Named(arg.as_string(EncUTF8)) = pl2r_symbol(PlTerm_atom(""))) ;
+    head.push_back(Named(arg.as_string(PlEncoding::UTF8)) = pl2r_symbol(PlTerm_atom(""))) ;
   }
 
   RObject body = pl2r_compound(plbody, names, vars, options) ;
@@ -325,7 +325,7 @@ LogicalVector pl2r_boolvec(PlTerm pl)
       }
     }
     
-    warning("r2pl_logical: invalid item %s, returning NA", t.as_string(EncLocale).c_str()) ;
+    warning("r2pl_logical: invalid item %s, returning NA", t.as_string(PlEncoding::Locale).c_str()) ;
     r(i) = NA_LOGICAL ;
   }
 
@@ -376,7 +376,7 @@ RObject pl2r_variable(PlTerm pl, CharacterVector& names, PlTerm& vars)
   // If the variable is not found, it's a new one created by Prolog, e.g., in
   // queries like member(1, Y), Y is unified with [1 | _NewVar ]. This variable
   // cannot be translated to a human-readable name, so it is returned as _1545.
-  return ExpressionVector::create(Symbol(pl.as_string(EncUTF8))) ; // TODO: EncLocale?
+  return ExpressionVector::create(Symbol(pl.as_string(PlEncoding::UTF8))) ; // TODO: PlEncoding::Locale?
 }
 
 // Translate prolog compound to R call
@@ -388,38 +388,38 @@ RObject pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars, List opti
 {
   // This function does not (yet) work for cyclic terms
   if(!PL_is_acyclic(pl.C_))
-    stop("pl2r: Cannot convert cyclic term %s", pl.as_string(EncLocale).c_str()) ;
+    stop("pl2r: Cannot convert cyclic term %s", pl.as_string(PlEncoding::Locale).c_str()) ;
 
   // Convert ##(#(...), ...) to NumericMatrix
-  if(!strcmp(pl.name().as_string(EncUTF8).c_str(), options("realmat")))
+  if(!strcmp(pl.name().as_string(PlEncoding::UTF8).c_str(), options("realmat")))
     return pl2r_realmat(pl) ;
 
   // Convert #(1.0, 2.0, 3.0) to DoubleVector (# given by options("realvec"))
-  if(!strcmp(pl.name().as_string(EncUTF8).c_str(), options("realvec")))
+  if(!strcmp(pl.name().as_string(PlEncoding::UTF8).c_str(), options("realvec")))
     return pl2r_realvec(pl) ;
 
   // Convert %%(%(...), ...) to IntegerMatrix
-  if(!strcmp(pl.name().as_string(EncUTF8).c_str(), options("intmat")))
+  if(!strcmp(pl.name().as_string(PlEncoding::UTF8).c_str(), options("intmat")))
     return pl2r_intmat(pl) ;
 
   // Convert %(1.0, 2.0, 3.0) to IntegerVector
-  if(!strcmp(pl.name().as_string(EncUTF8).c_str(), options("intvec")))
+  if(!strcmp(pl.name().as_string(PlEncoding::UTF8).c_str(), options("intvec")))
     return pl2r_intvec(pl) ;
 
   // Convert $$$($$(...), ...) to StringMatrix
-  if(!strcmp(pl.name().as_string(EncUTF8).c_str(), options("charmat")))
+  if(!strcmp(pl.name().as_string(PlEncoding::UTF8).c_str(), options("charmat")))
     return pl2r_charmat(pl) ;
 
   // Convert $$(1.0, 2.0, 3.0) to CharacterVector
-  if(!strcmp(pl.name().as_string(EncUTF8).c_str(), options("charvec")))
+  if(!strcmp(pl.name().as_string(PlEncoding::UTF8).c_str(), options("charvec")))
     return pl2r_charvec(pl) ;
 
   // Convert !!(!(...), ...) to LogicalMatrix
-  if(!strcmp(pl.name().as_string(EncUTF8).c_str(), options("boolmat")))
+  if(!strcmp(pl.name().as_string(PlEncoding::UTF8).c_str(), options("boolmat")))
     return pl2r_boolmat(pl) ;
 
   // Convert !(1.0, 2.0, 3.0) to LogicalVector
-  if(!strcmp(pl.name().as_string(EncUTF8).c_str(), options("boolvec")))
+  if(!strcmp(pl.name().as_string(PlEncoding::UTF8).c_str(), options("boolvec")))
     return pl2r_boolvec(pl) ;
 
   // Convert :- to function
@@ -427,19 +427,19 @@ RObject pl2r_compound(PlTerm pl, CharacterVector& names, PlTerm& vars, List opti
     return pl2r_function(pl, names, vars, options) ;
 
   // Other compounds
-  Language r(pl.name().as_string(EncUTF8).c_str()) ;
+  Language r(pl.name().as_string(PlEncoding::UTF8).c_str()) ;
   for(unsigned int i=1 ; i<=pl.arity() ; i++)
   {
     PlTerm arg = pl[i] ;
 
     // Compounds like mean=100 are translated to named function arguments
-    if(arg.is_compound() && !strcmp(arg.name().as_string(EncUTF8).c_str(), "=") && arg.arity() == 2)
+    if(arg.is_compound() && !strcmp(arg.name().as_string(PlEncoding::UTF8).c_str(), "=") && arg.arity() == 2)
     {
       PlTerm a1 = arg[1] ;
       PlTerm a2 = arg[2] ;
       if(a1.is_atom())
       {
-        r.push_back(Named(a1.name().as_string(EncUTF8).c_str()) = pl2r(a2, names, vars, options)) ;
+        r.push_back(Named(a1.name().as_string(PlEncoding::UTF8).c_str()) = pl2r(a2, names, vars, options)) ;
         continue ;
       }
     }
@@ -473,13 +473,13 @@ RObject pl2r_list(PlTerm pl, CharacterVector& names, PlTerm& vars, List options)
     List r = as<List>(tail) ;
     
     // convert prolog pair a-X to named list element
-    if(head.is_compound() && !strcmp(head.name().as_string(EncUTF8).c_str(), "-") && head.arity() == 2)
+    if(head.is_compound() && !strcmp(head.name().as_string(PlEncoding::UTF8).c_str(), "-") && head.arity() == 2)
     {
       PlTerm a1 = head[1] ;
       PlTerm a2 = head[2] ;
       if(a1.is_atom())
       {
-        r.push_front(pl2r(a2, names, vars, options), a1.name().as_string(EncUTF8).c_str()) ;
+        r.push_front(pl2r(a2, names, vars, options), a1.name().as_string(PlEncoding::UTF8).c_str()) ;
         return r ;
       }
     }
@@ -490,16 +490,16 @@ RObject pl2r_list(PlTerm pl, CharacterVector& names, PlTerm& vars, List options)
   }
     
   // if the tail is something else, return [|](head, tail)
-  Language r(pl.name().as_string(EncUTF8).c_str()) ;
+  Language r(pl.name().as_string(PlEncoding::UTF8).c_str()) ;
   
   // convert prolog pair a-X to named list element
-  if(head.is_compound() && !strcmp(head.name().as_string(EncUTF8).c_str(), "-") && head.arity() == 2)
+  if(head.is_compound() && !strcmp(head.name().as_string(PlEncoding::UTF8).c_str(), "-") && head.arity() == 2)
   {
     PlTerm a1 = head[1] ;
     PlTerm a2 = head[2] ;
     if(a1.is_atom())
     {
-      r.push_back(Named(a1.name().as_string(EncUTF8).c_str()) = pl2r(a2, names, vars, options)) ;
+      r.push_back(Named(a1.name().as_string(PlEncoding::UTF8).c_str()) = pl2r(a2, names, vars, options)) ;
       r.push_back(tail) ;
       return as<RObject>(r) ;
     }
@@ -537,7 +537,7 @@ RObject pl2r(PlTerm pl, CharacterVector& names, PlTerm& vars, List options)
   if(pl.is_variable())
     return pl2r_variable(pl, names, vars) ;
   
-  stop("pl2r: Cannot convert %s", pl.as_string(EncLocale).c_str()) ;
+  stop("pl2r: Cannot convert %s", pl.as_string(PlEncoding::Locale).c_str()) ;
 }
 
 // Translate R expression to prolog
@@ -976,7 +976,7 @@ int RlQuery::next_solution()
 
   catch(PlException& ex)
   {
-    warning(ex.as_string(EncLocale).c_str()) ;
+    warning(ex.as_string(PlEncoding::Locale).c_str()) ;
     PL_clear_exception() ;
     stop("Query failed") ;
   }
@@ -1129,9 +1129,9 @@ RObject portray_(RObject query, List options)
   
   catch(PlException& ex)
   {
-    warning(ex.as_string(EncLocale).c_str()) ;
+    warning(ex.as_string(PlEncoding::Locale).c_str()) ;
     PL_clear_exception() ;
-    stop("portray of %s failed.", pl[0].as_string(EncLocale).c_str()) ;
+    stop("portray of %s failed.", pl[0].as_string(PlEncoding::Locale).c_str()) ;
   }
   
   return pl2r(pl[1], names, vars, options) ;
@@ -1159,7 +1159,7 @@ RObject call_(String query)
   
   catch(PlException& ex)
   {
-    warning(ex.as_string(EncLocale).c_str()) ;
+    warning(ex.as_string(PlEncoding::Locale).c_str()) ;
     PL_clear_exception() ;
     stop("query failed: %s", query.get_cstring()) ;
   }
