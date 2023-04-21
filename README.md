@@ -6,6 +6,8 @@ logic programming has become an important driving force in research on artificia
 intelligence, natural language processing, program analysis, knowledge
 representation and theorem proving. 
 
+\(a + b^2\)
+
 SWI-Prolog (https://www.swi-prolog.org/) is an open-source implementation of the
 logic programming language Prolog. SWI-Prolog targets developers of applications,
 with many users in academia, research and industry. SWI-Prolog includes a 
@@ -52,7 +54,7 @@ optional: `install.packages("rswipl")`
 
 3. Please install the "rolog" pack for R
 
-`install.packages("rolog")
+`install.packages("rolog")`
 
 Then please move on to the examples.
 
