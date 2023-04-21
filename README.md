@@ -6,8 +6,6 @@ logic programming has become an important driving force in research on artificia
 intelligence, natural language processing, program analysis, knowledge
 representation and theorem proving. 
 
-$a + b^2$
-
 SWI-Prolog (https://www.swi-prolog.org/) is an open-source implementation of the
 logic programming language Prolog. SWI-Prolog targets developers of applications,
 with many users in academia, research and industry. SWI-Prolog includes a 
