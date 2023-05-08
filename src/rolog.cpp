@@ -557,7 +557,7 @@ PlTerm r2pl_na()
   return PlAtom("na") ;
 }
 
-// Translate to matrix ##(#(1.0, 2.0, 3.0), #(4.0, 5.0, 6.0))
+// Translate to matrix ###(##(1.0, 2.0, 3.0), ##(4.0, 5.0, 6.0))
 PlTerm r2pl_matrix(Matrix<REALSXP> r, List aoptions)
 {
   List options(aoptions) ;
@@ -567,10 +567,16 @@ PlTerm r2pl_matrix(Matrix<REALSXP> r, List aoptions)
   for(int i=0 ; i<r.nrow() ; i++)
     rows[i] = r2pl_real(r.row(i), options) ;
 
-  return PlCompound((const char*) options("realmat"), rows) ;
+  PlTermv matrix(5) ;
+  matrix[0] = PlTerm((long int) r.nrow()) ;
+  matrix[1] = PlTerm((long int) r.ncol()) ;
+  matrix[2] = r2pl_string(rownames(r), options) ;
+  matrix[3] = r2pl_string(colnames(r), options) ;
+  matrix[4] = PlCompound("data", rows) ;
+  return PlCompound((const char*) aoptions("realmat"), matrix) ;
 }
 
-// Translate to (scalar) real or compounds like #(1.0, 2.0, 3.0)
+// Translate to (scalar) real or compounds like ##(1.0, 2.0, 3.0)
 PlTerm r2pl_real(NumericVector r, List options)
 {
   if(Rf_isMatrix(r))
@@ -591,7 +597,7 @@ PlTerm r2pl_real(NumericVector r, List options)
     return PlTerm((double) r[0]);
   }
 
-  // Translate to vector #(1.0, 2.0, 3.0)
+  // Translate to vector ##(1.0, 2.0, 3.0)
   size_t len = (size_t) r.length() ;
   PlTermv args(len) ;
   for(size_t i=0 ; i<len ; i++)

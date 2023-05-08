@@ -1,3 +1,7 @@
+# rolog 0.9.13
+
+* Maintainance release: compatible with static libswipl.a from R package rswipl
+
 # rolog 0.9.12
 
 * represent vectors as double hash, dollar, !, %

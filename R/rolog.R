@@ -15,6 +15,8 @@
   libswipl = character(0)
   home <- Sys.getenv("SWI_HOME_DIR")
   msg <- ""
+  rolog.ok <- FALSE
+
   if(home != "" & .Platform$OS.type == "windows" & R.Version()$arch == "x86_64")
   {
     pl0 <- try(system2(c(file.path(home, "bin", "swipl"),
@@ -32,24 +34,30 @@
           full.names=TRUE)
 
         if(length(libswipl))
+        {
           msg <- sprintf("Found SWI-Prolog at SWI_HOME_DIR: %s", home)
+          rolog.ok <- TRUE
+        }
       }
     }
   }
 
   # SWI_HOME_DIR pointing to e.g. rswipl (no swipl.exe)
-  if(home != "" & msg == "" & .Platform$OS.type == "windows")
+  if(home != "" & !rolog.ok & .Platform$OS.type == "windows")
   {
     libswipl <- dir(file.path(home, "bin"),
       pattern=paste("libswipl", .Platform$dynlib.ext, "$", sep=""),
       full.names=TRUE)
   		
     if(length(libswipl))
+    {
       msg <- sprintf("Found SWI-Prolog at SWI_HOME_DIR: %s", home)
+      rolog.ok <- TRUE
+    }
   }
 
   # Typical installation in /usr/local/lib/swipl
-  if(home != "" & .Platform$OS.type == "unix" & R.Version()$arch == "x86_64")
+  if(home != "" & !rolog.ok & .Platform$OS.type == "unix" & R.Version()$arch == "x86_64")
   {
     lib <- dir(file.path(home, "lib"), pattern=R.Version()$arch, full.names=TRUE)
     if(R.Version()$os == "linux-gnu")
@@ -61,11 +69,12 @@
     {
       dyn.load(libswipl, local=FALSE)
       msg <- sprintf("Found SWI-Prolog at SWI_HOME_DIR: %s", home)
+      rolog.ok <- TRUE
     }
   }
 
   # Use ldd
-  if(home != "" & msg == "" & .Platform$OS.type == "unix")
+  if(home != "" & !rolog.ok & .Platform$OS.type == "unix")
   {
     pl0 <- dir(file.path(home, "bin"), pattern="swipl$", full.names=TRUE)
     if(length(pl0) == 0)
@@ -88,6 +97,7 @@
         {
           dyn.load(libswipl, local=FALSE)
           msg <- sprintf("Found SWI-Prolog at SWI_HOME_DIR: %s", home)
+          rolog.ok <- TRUE
         }
       }
     }
@@ -96,7 +106,7 @@
   #
   # Search SWI-Prolog in the PATH
   #
-  if(msg == "" & .Platform$OS.type == "windows" & R.Version()$arch == "x86_64")
+  if(!rolog.ok & .Platform$OS.type == "windows" & R.Version()$arch == "x86_64")
   {
     pl0 <- try(silent=TRUE, system2(c("swipl", "--dump-runtime-variables"),
       stdout=TRUE, stderr=FALSE))
@@ -114,13 +124,16 @@
           full.names=TRUE)
 
         if(length(libswipl))
+        {
           msg <- sprintf("Found SWI-Prolog in the PATH: %s", home)
+          rolog.ok <- TRUE
+        }
       }
     }
   }
 
   # Installed from sources
-  if(msg == "" & .Platform$OS.type == "unix")
+  if(!rolog.ok & .Platform$OS.type == "unix")
   {
     pl0 <- try(silent=TRUE, system2(c("swipl", "--dump-runtime-variables"),
       stdout=TRUE, stderr=FALSE))
@@ -142,12 +155,13 @@
       {
         dyn.load(libswipl, local=FALSE)
         msg <- sprintf("Found SWI-Prolog in the PATH: %s", home)
+        rolog.ok <- TRUE
       }
     }
   }
 
   # Use ldd to find libswipl
-  if(msg == "" & .Platform$OS.type == "unix")
+  if(!rolog.ok & .Platform$OS.type == "unix")
   {
     pl0 <- try(silent=TRUE, system2(c("swipl", "--dump-runtime-variables"),
       stdout=TRUE, stderr=FALSE))
@@ -172,6 +186,7 @@
           {
             dyn.load(libswipl, local=FALSE)
             msg <- sprintf("Found SWI-Prolog in the PATH: %s", home)
+            rolog.ok <- TRUE
           }
         }
       }
@@ -181,7 +196,7 @@
   #
   # Search SWI-Prolog in the registry
   #
-  if(msg == "" & .Platform$OS.type == "windows" & R.Version()$arch == "x86_64")
+  if(!rolog.ok & .Platform$OS.type == "windows" & R.Version()$arch == "x86_64")
   {
     pl0 <- try(silent=TRUE,
       utils::readRegistry("SOFTWARE\\SWI\\Prolog", hive="HLM", view="64-bit"))
@@ -203,7 +218,10 @@
             full.names=TRUE)
 
           if(length(libswipl))
+          {
             msg <- sprintf("Found SWI-Prolog in the registry: %s", home)
+            rolog.ok <- TRUE
+          }
         }
       }
     }
@@ -212,7 +230,7 @@
   #
   # Find R package rswipl
   #
-  if(msg == "" & .Platform$OS.type == "windows")
+  if(!rolog.ok & .Platform$OS.type == "windows")
   {
     pl0 <- try(silent=TRUE, find.package("rswipl"))
     if(!isa(pl0, "try-error"))
@@ -223,11 +241,14 @@
         full.names=TRUE)
 
       if(length(libswipl))
+      {
         msg <- sprintf("Found R package rswipl: %s", home)
+        rolog.ok <- TRUE
+      }
     }
   }
 
-  if(msg == "" & .Platform$OS.type == "unix")
+  if(!rolog.ok & .Platform$OS.type == "unix")
   {
     pl0 <- try(silent=TRUE, find.package("rswipl"))
     if(!isa(pl0, "try-error"))
@@ -247,17 +268,42 @@
       {
         dyn.load(libswipl, local=FALSE)
         msg <- sprintf("Found R package rswipl: %s", home)
+        rolog.ok <- TRUE
       }
     }
   }
 
-  if(length(libswipl) == 0)
+  if(!rolog.ok & .Platform$OS.type == "unix")
+  {
+    pl0 <- try(silent=TRUE, find.package("rswipl"))
+    if(!isa(pl0, "try-error"))
+    {
+      home <- dir(file.path(pl0, "swipl", "lib"), pattern="swipl$", full.names=TRUE)
+      arch <- R.Version()$arch
+      lib <- dir(file.path(home, "lib"), pattern=arch, full.names=TRUE)
+      if(length(lib) == 0 & arch == "aarch64")
+        lib <- dir(file.path(home, "lib"), pattern="arm64", full.names=TRUE)
+
+      if(R.Version()$os == "linux-gnu")
+      {
+        static <- dir(lib, pattern="libswipl.a$", full.names=TRUE)
+
+        if(length(static) == 1)
+        {
+          msg <- sprintf("Found R package rswipl: %s", home)
+          rolog.ok <- TRUE
+        }
+      }
+    }
+  }
+
+  if(!rolog.ok)
     msg <- "SWI-Prolog not found. Please set SWI_HOME_DIR accordingly, or add swipl to the PATH, or install the R package rswipl."
 
   op.rolog <- list(
     rolog.swi_home_dir = home,  # restore on .onUnload
     rolog.home         = home,
-    rolog.ok           = (length(libswipl) == 1),
+    rolog.ok           = rolog.ok,
     rolog.lib          = libswipl,
     rolog.message      = msg,
     rolog.realvec      = "##",     # prolog representation of R numeric vectors
@@ -296,7 +342,11 @@
   library.dynam.unload("rolog", libpath=libpath)
 
   if(options()$rolog.ok & .Platform$OS.type == "unix")
-    dyn.unload(options()$rolog.lib)
+  {
+    lib <- options()$rolog.lib
+    if(length(lib))
+      dyn.unload(lib)
+  }
 
   invisible()
 }

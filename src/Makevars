@@ -2,13 +2,19 @@ RBIN="${R_HOME}/bin/R"
 RSCRIPT="${R_HOME}/bin/Rscript"
 
 SWI_INCLUDE=
+SWI_LIBS=
 
+$(info "Searching for R package rswipl")
 SWI_HOME3:=$(shell "${RSCRIPT}" -e "cat(file.path(find.package('rswipl'), 'swipl', 'lib', 'swipl'))")
 ifeq ("$(SWI_HOME3)","")
   $(info "R: package rswipl not found")
 else
-  $(info "R/rswipl: $(SWI_HOME3)")
+  $(info "R package rswipl: $(SWI_HOME3)")
   SWI_INCLUDE=-I$(SWI_HOME3)/include
+  LIBPATH:=$(shell "${RSCRIPT}" -e "cat(dirname(dir(path=file.path(find.package('rswipl'), 'swipl', 'lib', 'swipl'), pattern='^libswipl.a', recursive=TRUE)))")
+  ifneq ("${LIBPATH}","")
+    SWI_LIBS=-L${SWI_HOME3}/${LIBPATH} -lswipl
+  endif
 endif
 
 $(info "Searching for swipl in the PATH")
@@ -22,6 +28,7 @@ else
     $(info "PATH: $(SWI_HOME2) (overriding rswipl and/or registry)")
   endif
   SWI_INCLUDE=-I$(SWI_HOME2)/include
+  SWI_LIBS=
 endif
 
 SWI_HOME1:=$(SWI_HOME_DIR)
@@ -34,6 +41,7 @@ else
     $(info "Environment: $(SWI_HOME1) (overriding PATH and/or registry and/or rswipl)")
   endif
   SWI_INCLUDE=-I$(SWI_HOME1)/include
+  SWI_LIBS=
 endif
 
 ifeq ("$(SWI_HOME1)$(SWI_HOME2)$(SWI_HOME3)","")
@@ -41,6 +49,7 @@ ifeq ("$(SWI_HOME1)$(SWI_HOME2)$(SWI_HOME3)","")
 endif
 
 PKG_CPPFLAGS=$(SWI_INCLUDE) -D_REENTRANT -D__SWI_PROLOG__
+PKG_LIBS=$(SWI_LIBS)
 
 all: $(SHLIB)
 
