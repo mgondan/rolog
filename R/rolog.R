@@ -353,7 +353,7 @@
 
 .onAttach <- function(libname, pkgname)
 {
-  if(!rolog_ok(warn=TRUE))
+  if(!rolog_ok())
     return(FALSE)
 
   Sys.setenv(SWI_HOME_DIR=options()$rolog.home)
