@@ -40,12 +40,6 @@ portray <- function(
   query=call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y))), 
   options=NULL)
 {
-  if(!options()$rolog.ok)
-  {
-    warning("swipl not found in the PATH. Please set SWI_HOME_DIR accordingly or install R package rswipl.")
-    return(FALSE)
-  }
-
   options = c(options, rolog_options())
   .portray(query, options)
 }

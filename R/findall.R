@@ -52,12 +52,6 @@ findall <- function(
     options=list(portray=FALSE),
     env=globalenv())
 {
-  if(!options()$rolog.ok)
-  {
-    warning("swipl not found in the PATH. Please set SWI_HOME_DIR accordingly or install R package rswipl.")
-    return(FALSE)
-  }
-
   options <- c(options, rolog_options())
   query <- .preprocess(query, preproc=options$preproc)
 

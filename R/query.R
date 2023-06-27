@@ -66,12 +66,6 @@ query <- function(
   options=NULL,
   env=globalenv())
 {
-  if(!options()$rolog.ok)
-  {
-    warning("swipl not found in the PATH. Please set SWI_HOME_DIR accordingly or install R package rswipl.")
-    return(FALSE)
-  }
-
   options <- c(options, rolog_options())
   query <- .preprocess(query, options$preproc)
 
@@ -116,12 +110,6 @@ query <- function(
 #'
 clear <- function()
 {
-  if(!options()$rolog.ok)
-  {
-    warning("swipl not found in the PATH. Please set SWI_HOME_DIR accordingly or install R package rswipl.")
-    return(FALSE)
-  }
-
   invisible(.clear())
 }
 
@@ -170,12 +158,6 @@ clear <- function()
 submit <- function(options=NULL)
 {
   options <- c(options, rolog_options())
-  if(options$ok == FALSE)
-  {
-    warning("swipl not found in the PATH. Please set SWI_HOME_DIR accordingly or install R package rswipl.")
-    return(FALSE)
-  }
-
   r <- .submit()
   r <- .postprocess(r, options$postproc)
   return(r)
