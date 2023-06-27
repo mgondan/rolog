@@ -298,7 +298,7 @@
   }
 
   if(!rolog.ok)
-    msg <- "SWI-Prolog not found. Please set SWI_HOME_DIR accordingly, or add swipl to the PATH, or install the R package rswipl."
+    msg <- "This package requires the SWI-Prolog runtime.\n\nIf SWI-Prolog is not on your system\n- You can install SWI-Prolog from https://swi-prolog.org.\n- Alternatively, install the R package rswipl.\n\nIf SWI-Prolog has been installed on your system\n- Please add swipl to the PATH.\n- Alternatively, let the environment variable SWI_HOME_DIR point to the correct folder."
 
   op.rolog <- list(
     rolog.swi_home_dir = home,  # restore on .onUnload
@@ -356,7 +356,7 @@
   ok <- options()$rolog.ok
   if(!options()$rolog.ok)
   {
-    warning("swipl not found in the PATH. Please set SWI_HOME_DIR accordingly or install R package rswipl.")
+    warning(options()$rolog.message)
     return(invisible())
   }
 
