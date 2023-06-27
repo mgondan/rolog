@@ -300,7 +300,7 @@
   if(!rolog.ok)
   {
     msg <- "This package requires the SWI-Prolog runtime.\n\nIf SWI-Prolog is not on your system\n- You can install SWI-Prolog from https://swi-prolog.org.\n- Alternatively, install the R package rswipl.\n\nIf SWI-Prolog has been installed on your system\n- Please add swipl to the PATH.\n- Alternatively, let the environment variable SWI_HOME_DIR point to the correct folder."
-    stop(msg)
+    warning(msg)
   }
 
   op.rolog <- list(
@@ -325,6 +325,9 @@
   set <- !(names(op.rolog) %in% names(options()))
   if(any(set))
     options(op.rolog[set])
+
+  if(!rolog.ok)
+    return(FALSE)
 
   if(.Platform$OS.type == "windows")
     library.dynam("rolog", package=pkgname, lib.loc=libname, 
@@ -353,6 +356,12 @@
 
 .onAttach <- function(libname, pkgname)
 {
+  if(!options()$rolog.ok)
+  {
+    warning(options()$message)
+    return(FALSE)
+  }
+
   Sys.setenv(SWI_HOME_DIR=options()$rolog.home)
   if(!rolog_init())
   {
