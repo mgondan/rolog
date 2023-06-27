@@ -1,3 +1,7 @@
+# rolog 0.9.14
+
+* Maintainance release: more informative error message if SWI-Prolog is missing
+
 # rolog 0.9.13
 
 * Maintainance release: compatible with static libswipl.a from R package rswipl
