@@ -1,45 +1,41 @@
 # rolog: Access SWI-Prolog from R
 
-The logic programming language Prolog was invented in the 1970ies by Alain
-Colmerauer, mostly for the purpose of natural language processing. Since then,
-logic programming has become an important driving force in research on artificial
-intelligence, natural language processing, program analysis, knowledge
-representation and theorem proving. 
+As the name says, rolog = Prolog for R. The logic programming language Prolog was
+invented in the 1970ies by Alain Colmerauer, mostly for the purpose of natural
+language processing. Since then, logic programming has become an important driving
+force in research on artificial intelligence, natural language processing, program
+analysis, knowledge representation and theorem proving. 
 
+This R package connects to an existing installation of SWI-Prolog.
 SWI-Prolog (https://www.swi-prolog.org/) is an open-source implementation of the
 logic programming language Prolog. SWI-Prolog targets developers of applications,
-with many users in academia, research and industry. SWI-Prolog includes a 
-large number of libraries for "the real world", for example, a web server,
-encryption, interfaces to C/C++ and other programming languages, as well as a
-development environment and debugger.
+with many users in academia, research and industry. SWI-Prolog includes a large
+number of libraries for "the real world", for example, a web server, encryption,
+interfaces to C/C++ and other programming languages, as well as a development
+environment and debugger.
 
-This R package connects to SWI-Prolog.
-
-## License
-
-This R package is distributed under a BSD-2 simplified license (see the file LICENSE).
-
-## Why is it called rolog?
-
-I guess the name is obvious, rolog = Prolog for R. The package only connects to the
-SWI-Prolog runtime and does not embed it. rolog supports the following installations
-of SWI-Prolog, with decreasing priority:
+rolog supports the following installations of SWI-Prolog, with decreasing priority:
 
 * If the environment variable `SWI_HOME_DIR` is set, the respective installation is
   used.
 * If swipl.exe is found on the PATH, that one is used.
 * (Windows only): If SWI-Prolog is installed in the system, a respective entry is
   found in the registry.
-* SWI-Prolog from the R package rswipl
+* R package rswipl that is an embedded SWI-Prolog runtime.
+
+## License
+
+This R package is distributed under a BSD-2 simplified license (see the file LICENSE).
 
 # Installation
 
 ## Linux
 
-1. Please install SWI-Prolog on your computer, see here: https://www.swi-prolog.org/build/PPA.html.
-   Alternatively, install the R package rswipl.
+1. Please install SWI-Prolog on your computer, see
+   here: https://www.swi-prolog.org/build/PPA.html. Alternatively, install
+   the R package rswipl.
 
-2. You obviously need R and a few packages on your computer, maybe also rmarkdown and pandoc
+3. You obviously need R and a few packages on your computer, maybe also rmarkdown and pandoc
    to render Rmd files to html (see Example 2).
 
 `sudo apt install r-base pandoc pandoc-citeproc`
@@ -137,7 +133,7 @@ returns bindings for X that satisfy member(X, [1, 2, 3]).
 
 ## Example 2
 
-The second example is the vignette with nice use cases in Section 4.
+The second example builds the vignette with nice use cases in Section 4.
 
 `rmarkdown::render(system.file("vignettes", "rolog.Rmd", package="rolog"), output_file="rolog.html", output_dir=getwd())`
 
