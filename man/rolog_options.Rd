@@ -15,9 +15,9 @@ Quick access the package options
 \details{
 Translation from R to Prolog
 \itemize{
-\item numeric vector of size N -> \emph{realvec}/N (default is #)
-\item integer vector of size N -> \emph{intvec}/N (default is \%)
-\item boolean vector of size N -> \emph{boolvec}/N (default is !)
+\item numeric vector of size N -> \emph{realvec}/N (default is ##)
+\item integer vector of size N -> \emph{intvec}/N (default is \%\%)
+\item boolean vector of size N -> \emph{boolvec}/N (default is !!)
 \item character vector of size N -> \emph{charvec}/N (default is $$)
 \item \emph{scalar}: if \code{TRUE} (default), translate R vectors of length 1 to scalars
 \item \emph{portray}: if \code{TRUE} (default) whether to return the prolog translation
