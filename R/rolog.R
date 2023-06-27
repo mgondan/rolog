@@ -416,11 +416,11 @@ rolog_done <- function()
 
 #' Check if rolog is properly loaded
 #'
-#' @param
-#' warn: raise a warning if problems occurred
+#' @param warn
+#' raise a warning if problems occurred
 #'
-#' @param
-#' stop: raise an error if problems occurred
+#' @param stop
+#' raise an error if problems occurred
 #'
 #' @return
 #' TRUE if rolog is properly loaded

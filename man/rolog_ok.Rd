@@ -7,9 +7,9 @@
 rolog_ok(warn = FALSE, stop = FALSE)
 }
 \arguments{
-\item{warn:}{raise a warning if problems occurred}
+\item{warn}{raise a warning if problems occurred}
 
-\item{stop:}{raise an error if problems occurred}
+\item{stop}{raise an error if problems occurred}
 }
 \value{
 TRUE if rolog is properly loaded
