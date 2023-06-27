@@ -298,10 +298,7 @@
   }
 
   if(!rolog.ok)
-  {
     msg <- "This package requires the SWI-Prolog runtime.\n\nIf SWI-Prolog is not on your system\n- You can install SWI-Prolog from https://swi-prolog.org.\n- Alternatively, install the R package rswipl.\n\nIf SWI-Prolog has been installed on your system\n- Please add swipl to the PATH.\n- Alternatively, let the environment variable SWI_HOME_DIR point to the correct folder."
-    warning(msg)
-  }
 
   op.rolog <- list(
     rolog.swi_home_dir = home,  # restore on .onUnload
@@ -326,7 +323,7 @@
   if(any(set))
     options(op.rolog[set])
 
-  if(!rolog.ok)
+  if(!rolog_ok(warn=TRUE))
     return(FALSE)
 
   if(.Platform$OS.type == "windows")
@@ -356,11 +353,8 @@
 
 .onAttach <- function(libname, pkgname)
 {
-  if(!options()$rolog.ok)
-  {
-    warning(options()$message)
+  if(!rolog_ok(warn=TRUE))
     return(FALSE)
-  }
 
   Sys.setenv(SWI_HOME_DIR=options()$rolog.home)
   if(!rolog_init())
@@ -418,6 +412,31 @@ rolog_init <- function(argv1=commandArgs()[1])
 rolog_done <- function()
 {
   .done()
+}
+
+#' Check if rolog is properly loaded
+#'
+#' @param
+#' warn: raise a warning if problems occurred
+#'
+#' @param
+#' stop: raise an error if problems occurred
+#'
+#' @return
+#' TRUE if rolog is properly loaded
+#'
+rolog_ok <- function(warn=FALSE, stop=FALSE)
+{
+  if(options()$rolog.ok)
+    return(TRUE)
+
+  if(warn)
+    warning(options()$rolog.message)
+
+  if(stop)
+    stop(options()$rolog.message)
+
+  return(FALSE)
 }
 
 #' Quick access the package options
