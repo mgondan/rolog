@@ -757,21 +757,23 @@ term_t r2pl_real(NumericVector r, List options)
   return vec ;
 }
 
-// Translate to matrix !!(!(true, false), !(false, true))
-PlTerm r2pl_matrix(Matrix<LGLSXP> r, List aoptions)
+// Translate to matrix !!!(!!(true, false), !(false, true))
+term_t r2pl_matrix(Matrix<LGLSXP> r, List aoptions)
 {
   List options(aoptions) ;
   options("scalar") = false ;
+  term_t rows = PL_new_term_refs(r.nrow()) ;
+  for(size_t i=0 ; i<r.nrow() ; i++)
+    PL_put_term(rows+i, r2pl_logical(r.row(i), options)) ;
 
-  PlTermv rows(r.nrow()) ;
-  for(int i=0 ; i<r.nrow() ; i++)
-    rows[i] = r2pl_logical(r.row(i), options) ;
-
-  return PlCompound((const char*) options("boolmat"), rows) ;
+  term_t matrix = PL_new_term_ref() ;
+  term_t matrix_functor = PL_new_functor(PL_new_atom((const char*) aoptions("boolmat")), r.nrow()) ;
+  PL_cons_functor_v(matrix, matrix_functor, rows) ;
+  return matrix ;
 }
 
-// Translate to (scalar) boolean or compounds like !(true, false, na)
-PlTerm r2pl_logical(LogicalVector r, List options)
+// Translate to (scalar) boolean or compounds like !!(true, false, na)
+term_t r2pl_logical(LogicalVector r, List options)
 {
   if(Rf_isMatrix(r))
     return r2pl_matrix(as<Matrix<LGLSXP>>(r), options) ;
@@ -787,38 +789,43 @@ PlTerm r2pl_logical(LogicalVector r, List options)
     if(na[0])
       return r2pl_na() ;
     
-    return PlAtom(r[0] ? "true" : "false") ;
+    return PL_new_atom(r[0] ? "true" : "false") ;
   }
 
-  // LogicalVector !(true, false, na)
+  // LogicalVector !!(true, false, na)
   size_t len = (size_t) r.length() ;
-  PlTermv args(len) ;
+  term_t args = PL_new_term_refs(len) ;
   for(size_t i=0 ; i<len ; i++)
   {
     if(na[i])
-      args[i] = r2pl_na() ;
+      PL_put_term(args+i, r2pl_na()) ;
     else
-      args[i] = PlAtom(r[i] ? "true" : "false") ;
+      PL_put_atom(args+i, PL_new_atom(r[i] ? "true" : "false")) ;
   }
 
-  return PlCompound((const char*) options("boolvec"), args) ;
+  term_t vec = PL_new_term_ref() ;
+  term_t vec_functor = PL_new_functor(PL_new_atom((const char*) options("boolvec")), len) ;
+  PL_cons_functor_v(vec, vec_functor, args) ;
+  return vec ;
 }
 
-// Translate to matrix %%(%(1, 2), %(3, 4))
-PlTerm r2pl_matrix(Matrix<INTSXP> r, List aoptions)
+// Translate to matrix %%%(%%(1, 2), %(3, 4))
+term_t r2pl_matrix(Matrix<INTSXP> r, List aoptions)
 {
   List options(aoptions) ;
   options("scalar") = false ;
+  term_t rows = PL_new_term_refs(r.nrow()) ;
+  for(size_t i=0 ; i<r.nrow() ; i++)
+    PL_put_term(rows+i, r2pl_integer(r.row(i), options)) ;
 
-  PlTermv rows(r.nrow()) ;
-  for(int i=0 ; i<r.nrow() ; i++)
-    rows[i] = r2pl_integer(r.row(i), options) ;
-
-  return PlCompound((const char*) options("intmat"), rows) ;
+  term_t matrix = PL_new_term_ref() ;
+  term_t matrix_functor = PL_new_functor(PL_new_atom((const char*) aoptions("intmat")), r.nrow()) ;
+  PL_cons_functor_v(matrix, matrix_functor, rows) ;
+  return matrix ;
 }
 
-// Translate to (scalar) integer or compounds like %(1, 2, 3)
-PlTerm r2pl_integer(IntegerVector r, List options)
+// Translate to (scalar) integer or compounds like %%(1, 2, 3)
+term_t r2pl_integer(IntegerVector r, List options)
 {
   if(Rf_isMatrix(r))
     return r2pl_matrix(as<Matrix<INTSXP>>(r), options) ;
@@ -833,22 +840,28 @@ PlTerm r2pl_integer(IntegerVector r, List options)
   {
     if(na[0])
       return r2pl_na() ;
-    
-    return PlTerm((long) r(0)) ;
+
+    term_t f = PL_new_term_ref() ;
+    PL_put_integer(f, (long) r[0]) ;
+    return f ;
   }
   
-  // IntegerVector %(1, 2, 3)
+  // IntegerVector %%(1, 2, 3)
   size_t len = (size_t) r.length() ;
-  PlTermv args(len) ;
+  term_t args = PL_new_term_refs(len) ;
   for(size_t i=0 ; i<len ; i++)
   {
     if(na[i])
-      args[i] = r2pl_na() ;
+      PL_put_term(args+i, r2pl_na()) ;
     else
-      args[i] = PlTerm((long) r[i]) ;
+      PL_put_integer(args+i, (long) r[i]) ;
   }
-  
-  return PlCompound((const char*) options("intvec"), args) ;
+
+  term_t vec_functor = PL_new_functor(PL_new_atom((const char*) options("intvec")), len) ;
+
+  term_t vec = PL_new_term_ref() ;
+  PL_cons_functor_v(vec, vec_functor, args) ;
+  return vec ;
 }
 
 // Translate R expression to prolog variable
@@ -861,57 +874,59 @@ PlTerm r2pl_integer(IntegerVector r, List options)
 //
 // If options("atomize") is true, no variable is created, but an atom is created 
 // with the variable name from R. This is only used for pretty printing.
-PlTerm r2pl_var(ExpressionVector r, CharacterVector& names, PlTerm& vars, List options)
+term_t r2pl_var(ExpressionVector r, CharacterVector& names, term_t& vars, List options)
 {
   // Variable name in R
   Symbol n = as<Symbol>(r[0]) ;
   
   // If the variable should be "atomized" for pretty printing
   if(as<LogicalVector>(options("atomize"))(0))
-    return PlAtom(n.c_str()) ;
+    return PL_new_atom(n.c_str()) ;
 
   // Do not map the anonymous variable to a known variable name
   if(n == "_")
-    return PlTerm() ;
+    return PL_new_term_ref() ;
 
   // Unify with existing variable of the same name
-  PlTail tail(vars) ;
-  PlTerm v ;
+  term_t head = PL_new_term_ref() ;
+  term_t tail = PL_copy_term_ref(vars) ;
   for(R_xlen_t i=0 ; i<names.length() ; i++)
   {
-    tail.next(v) ;
+    PL_get_list_ex(tail, head, tail) ;
     if(n == names(i))
-      return v ;
+      return head ;
   }
 
   // If no such variable exists, create a new one and remember the name
   names.push_back(n.c_str()) ;
-  PlTerm pl ;
-  tail.append(pl) ;
+  term_t pl = PL_new_term_ref() ;
+  PL_cons_list(tail, pl, tail) ; // tail should be [] at this stage
   return pl ;
 }
 
 // Translate R symbol to prolog atom
-PlTerm r2pl_atom(Symbol r)
+term_t r2pl_atom(Symbol r)
 {
-  return PlAtom(r.c_str()) ;
+  return PL_new_atom(r.c_str()) ;
 }
 
 // Translate to matrix $$$($$(1, 2), $$(3, 4))
-PlTerm r2pl_matrix(Matrix<STRSXP> r, List aoptions)
+term_t r2pl_matrix(Matrix<STRSXP> r, List aoptions)
 {
   List options(aoptions) ;
   options("scalar") = false ;
+  term_t rows = PL_new_term_refs(r.nrow()) ;
+  for(size_t i=0 ; i<r.nrow() ; i++)
+    PL_put_term(rows+i, r2pl_string(r.row(i), options)) ;
 
-  PlTermv rows(r.nrow()) ;
-  for(int i=0 ; i<r.nrow() ; i++)
-    rows[i] = r2pl_string(r.row(i), options) ;
-
-  return PlCompound((const char*) options("charmat"), rows) ;
+  term_t matrix = PL_new_term_ref() ;
+  term_t matrix_functor = PL_new_functor(PL_new_atom((const char*) aoptions("charmat")), r.nrow()) ;
+  PL_cons_functor_v(matrix, matrix_functor, rows) ;
+  return matrix ;
 }
 
-// Translate CharacterVector to (scalar) string or things like $("a", "b", "c")
-PlTerm r2pl_string(CharacterVector r, List options)
+// Translate CharacterVector to (scalar) string or things like $$("a", "b", "c")
+term_t r2pl_string(CharacterVector r, List options)
 {
   if(Rf_isMatrix(r))
     return r2pl_matrix(as<Matrix<STRSXP>>(r), options) ;
@@ -926,27 +941,32 @@ PlTerm r2pl_string(CharacterVector r, List options)
   {
     if(na[0])
       return r2pl_na() ;
-    
-    return PlString(r(0)) ;
+  
+    term_t f = PL_new_term_ref() ;
+    PL_put_string_chars(f, r(0)) ;
+    return f ;
   }
 
-  // compound like $("a", "b", "c")
+  // compound like $$("a", "b", "c")
   size_t len = (size_t) r.length() ;
-  PlTermv args(len) ;
+  term_t args = PL_new_term_refs(len) ;
   for(size_t i=0 ; i<len ; i++)
   {
     if(na[i])
-      args[i] = r2pl_na() ;
+      PL_put_term(args+i, r2pl_na()) ;
     else
-      args[i] = PlString(r(i)) ;
+      PL_put_string_chars(args+i, r(i)) ;
   }
 
-  return PlCompound((const char*) options("charvec"), args) ;
+  term_t vec_functor = PL_new_functor(PL_new_atom((const char*) options("charvec")), len) ;
+  term_t vec = PL_new_term_ref() ;
+  PL_cons_functor_v(vec, vec_functor, args) ;
+  return vec ;
 }
 
 // Translate R call to prolog compound, taking into account the names of the
 // arguments, e.g., rexp(50, rate=1) -> rexp(50, =(rate, 1))
-PlTerm r2pl_compound(Language r, CharacterVector& names, PlTerm& vars, List options)
+term_t r2pl_compound(Language r, CharacterVector& names, term_t& vars, List options)
 {
   // For convenience, collect arguments in a list
   List l = as<List>(CDR(r)) ;
@@ -955,11 +975,10 @@ PlTerm r2pl_compound(Language r, CharacterVector& names, PlTerm& vars, List opti
   size_t len = (size_t) l.size() ;
   if(len == 0)
   {
-    PlTermv pl(3) ;
-    pl[1] = as<Symbol>(CAR(r)).c_str() ;
-    pl[2] = (long) 0 ;
-    PlCall("compound_name_arity", pl) ;
-    return pl[0] ;
+    term_t functor = PL_new_functor(PL_new_atom(as<Symbol>(CAR(r)).c_str()), 0) ;
+    term_t pl = PL_new_term_ref() ;
+    PL_cons_functor(pl, functor) ;
+    return pl ;
   }
 
   // Extract names of arguments
@@ -968,19 +987,28 @@ PlTerm r2pl_compound(Language r, CharacterVector& names, PlTerm& vars, List opti
   if(TYPEOF(l.names()) == STRSXP)
     n = l.names() ;
   
-  PlTermv pl(len) ;
+  term_t functor = PL_new_functor(PL_new_atom(as<Symbol>(CAR(r)).c_str()), len) ;
+  term_t args = PL_new_term_refs(len) ;
   for(size_t i=0 ; i<len ; i++)
   {
-    PlTerm arg = r2pl(l(i), names, vars, options) ;
+    term_t arg = r2pl(l(i), names, vars, options) ;
     
     // Convert named arguments to prolog compounds a=X
     if(n.length() && n(i) != "")
-      pl[i] = PlCompound("=", PlTermv(PlAtom(n(i)), arg)) ;
+    {
+      term_t eq = PL_new_functor(PL_new_atom("="), 2) ;
+      term_t name = PL_new_atom(n(i)) ;
+      term_t named = PL_new_term_ref() ;
+      PL_cons_functor(named, eq, name, arg) ;
+      PL_put_term(args + i, named) ;
+    }
     else
-      pl[i] = arg ; // no name
+      PL_put_term(args + i, arg) ; // no name
   }
 
-  return PlCompound(as<Symbol>(CAR(r)).c_str(), pl) ;
+  term_t pl = PL_new_term_ref() ;
+  PL_cons_functor_v(pl, functor, args) ;
+  return pl ;
 }
 
 // Translate R list to prolog list, taking into account the names of the
@@ -988,38 +1016,44 @@ PlTerm r2pl_compound(Language r, CharacterVector& names, PlTerm& vars, List opti
 // minus sign is a bit specific to prolog, and the conversion in the reverse
 // direction may be ambiguous.
 //
-PlTerm r2pl_list(List r, CharacterVector& names, PlTerm& vars, List options)
+term_t r2pl_list(List r, CharacterVector& names, term_t& vars, List options)
 {
   // Names of list elements (empty vector if r.names() == NULL)  
   CharacterVector n ;
   if(TYPEOF(r.names()) == STRSXP)
     n = as<CharacterVector>(r.names()) ;
   
-  PlTerm pl ;
-  PlTail tail(pl) ;
-  for(R_xlen_t i=0; i<r.size() ; i++)
+  term_t pl = PL_new_term_ref() ;
+  PL_put_nil(pl) ;
+  for(R_xlen_t i=r.size()-1; i>=0; i--)
   {
-    PlTerm arg = r2pl(r(i), names, vars, options) ;
-    
+    term_t elem = r2pl(r(i), names, vars, options) ;
+
     // Convert named argument to prolog pair a-X.
     if(n.length() && n(i) != "")
-      tail.append(PlCompound("-", PlTermv(PlAtom(n(i)), arg))) ;
+    {
+      term_t eq = PL_new_functor(PL_new_atom("-"), 2) ;
+      term_t name = PL_new_atom(n(i)) ;
+      term_t named = PL_new_term_ref() ;
+      PL_cons_functor(named, eq, name, elem) ;
+      PL_cons_list(pl, named, pl) ;
+    }
     else
-      tail.append(arg) ; // no name
+      PL_cons_list(pl, elem, pl) ; // no name
   }
-  
-  tail.close() ;
+
   return pl ;
 }
 
 // Translate R function to :- ("neck")
-PlTerm r2pl_function(Function r, CharacterVector& names, PlTerm& vars, List options)
+term_t r2pl_function(Function r, CharacterVector& names, term_t& vars, List options)
 {
-  PlTermv fun(2) ;
-  fun[1] = r2pl_compound(BODY(r), names, vars, options) ;
+  term_t body = r2pl_compound(BODY(r), names, vars, options) ;
   
   List formals = as<List>(FORMALS(r)) ;
   size_t len = (size_t) formals.size() ;
+
+/*
   if(len == 0)
   {
     PlTermv pl(3) ;
@@ -1030,14 +1064,21 @@ PlTerm r2pl_function(Function r, CharacterVector& names, PlTerm& vars, List opti
     fun[0] = pl[0] ;
     return PlCompound(":-", fun) ;
   }
+*/
   
   CharacterVector n = formals.names() ;
-  PlTermv pl(len) ;
+  term_t args = PL_new_term_refs(len) ;
   for(size_t i=0 ; i<len ; i++)
-    pl[i] = PlAtom(n(i)) ;
+    PL_put_atom(args + i, PL_new_atom(n(i))) ;
 
-  fun[0] = PlCompound("function", pl) ;
-  return PlCompound(":-", fun) ;
+  term_t name = PL_new_functor(PL_new_atom("function"), len) ;
+  term_t function = PL_new_term_ref() ;
+  PL_cons_functor_v(function, name, args) ;
+
+  term_t neck = PL_new_functor(PL_new_atom(":-"), 2) ;
+  term_t pl = PL_new_term_ref() ;
+  PL_cons_functor(pl, neck, function, body) ;
+  return pl ;
 }
 
 // Translate R primitive to :- ("neck")
