@@ -1053,28 +1053,23 @@ term_t r2pl_function(Function r, CharacterVector& names, term_t& vars, List opti
   List formals = as<List>(FORMALS(r)) ;
   size_t len = (size_t) formals.size() ;
 
-/*
+  term_t function = PL_new_term_ref() ;
   if(len == 0)
   {
-    PlTermv pl(3) ;
-    pl[1] = PlAtom("function") ;
-    pl[2] = (long) 0 ;
-    PlCall("compound_name_arity", pl) ;
-
-    fun[0] = pl[0] ;
-    return PlCompound(":-", fun) ;
+    term_t name = PL_new_functor(PL_new_atom("function"), 0) ;
+    PL_cons_functor(function, name) ;
   }
-*/
-  
-  CharacterVector n = formals.names() ;
-  term_t args = PL_new_term_refs(len) ;
-  for(size_t i=0 ; i<len ; i++)
-    PL_put_atom(args + i, PL_new_atom(n(i))) ;
+  else
+  {
+    CharacterVector n = formals.names() ;
+    term_t args = PL_new_term_refs(len) ;
+    for(size_t i=0 ; i<len ; i++)
+      PL_put_atom(args + i, PL_new_atom(n(i))) ;
 
-  term_t name = PL_new_functor(PL_new_atom("function"), len) ;
-  term_t function = PL_new_term_ref() ;
-  PL_cons_functor_v(function, name, args) ;
-
+    term_t name = PL_new_functor(PL_new_atom("function"), len) ;
+    PL_cons_functor_v(function, name, args) ;
+  }
+ 
   term_t neck = PL_new_functor(PL_new_atom(":-"), 2) ;
   term_t pl = PL_new_term_ref() ;
   PL_cons_functor(pl, neck, function, body) ;
@@ -1082,34 +1077,37 @@ term_t r2pl_function(Function r, CharacterVector& names, term_t& vars, List opti
 }
 
 // Translate R primitive to :- ("neck")
-PlTerm r2pl_builtin(Function r, CharacterVector& names, PlTerm& vars, List options)
+term_t r2pl_builtin(Function r, CharacterVector& names, term_t& vars, List options)
 {
-  PlTermv fun(2) ;
-  fun[1] = r2pl_null() ;
-  
+  term_t body = r2pl_null() ;
+
   List formals = as<List>(FORMALS(r)) ;
   size_t len = (size_t) formals.size() ;
+
+  term_t function = PL_new_term_ref() ;
   if(len == 0)
   {
-    PlTermv pl(3) ;
-    pl[1] = PlAtom("function") ;
-    pl[2] = (long) 0 ;
-    PlCall("compound_name_arity", pl) ;
-
-    fun[0] = pl[0] ;
-    return PlCompound(":-", fun) ;
+    term_t name = PL_new_functor(PL_new_atom("function"), 0) ;
+    PL_cons_functor(function, name) ;
   }
-  
-  CharacterVector n = formals.names() ;
-  PlTermv pl(len) ;
-  for(size_t i=0 ; i<len ; i++)
-    pl[i] = PlAtom(n(i)) ;
+  else
+  {
+    CharacterVector n = formals.names() ;
+    term_t args = PL_new_term_refs(len) ;
+    for(size_t i=0 ; i<len ; i++)
+      PL_put_atom(args + i, PL_new_atom(n(i))) ;
 
-  fun[0] = PlCompound("function", pl) ;
-  return PlCompound(":-", fun) ;
+    term_t name = PL_new_functor(PL_new_atom("function"), len) ;
+    PL_cons_functor_v(function, name, args) ;
+  }
+
+  term_t neck = PL_new_functor(PL_new_atom(":-"), 2) ;
+  term_t pl = PL_new_term_ref() ;
+  PL_cons_functor(pl, neck, function, body) ;
+  return pl ;
 }
 
-PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, List options)
+term_t r2pl(SEXP r, CharacterVector& names, term_t& vars, List options)
 {
   if(TYPEOF(r) == LANGSXP)
     return r2pl_compound(r, names, vars, options) ;
@@ -1152,10 +1150,10 @@ PlTerm r2pl(SEXP r, CharacterVector& names, PlTerm& vars, List options)
 class RlQuery  
 {
   CharacterVector names ;
-  PlTerm vars ;
+  term_t vars ;
   List options ;
   Environment env ;
-  PlQuery* qid ;
+  qid_t qid ;
   
 public:
   RlQuery(RObject aquery, List aoptions, Environment aenv) ;
@@ -1178,38 +1176,50 @@ public:
 
 RlQuery::RlQuery(RObject aquery, List aoptions, Environment aenv)
   : names(),
-    vars(),
+    vars(PL_new_term_ref()),
     options(aoptions),
     env(aenv),
     qid(NULL)
 {
   options("atomize") = false ;
-  PlTerm pl = r2pl(aquery, names, vars, options) ;
-  qid = new PlQuery("call", PlTermv(PlTerm(pl))) ;
+  term_t pl = r2pl(aquery, names, vars, options) ;
+
+  predicate_t p = PL_predicate("call", 1, NULL) ;
+  qid = PL_open_query(NULL, PL_Q_EXT_STATUS, p, pl) ;
 }
 
 RlQuery::~RlQuery()
 {
   if(qid)
-    delete qid ;
+    PL_close_query(qid) ;
 }
 
 int RlQuery::next_solution()
 {
-  if(qid == NULL)
+  if(qid == 0)
     stop("next_solution: no open query.") ;
     
-  int q ;
-  try
+  int q = PL_next_solution(qid) ;
+  if(q == PL_S_TRUE)
+    return TRUE ;
+
+  if(q == PL_S_LAST)
+    return TRUE ;
+
+  if(q == PL_S_FALSE)
   {
-    q = qid->next_solution() ;
+    PL_cut_query(qid) ;
+    return FALSE ;
   }
 
-  catch(PlException& ex)
+  if(q == PL_S_EXCEPTION)
   {
-    char* err = (char*) ex ;
+    PL_close_query(qid) ;
+    term_t ex = PL_exception(0) ;
     PL_clear_exception() ;
-    warning("Prolog exception: %s", err) ;
+
+    char* err ;
+    PL_get_chars(ex, &err, BUF_DISCARDABLE) ;
     stop(err) ;
   }
 
@@ -1220,16 +1230,16 @@ List RlQuery::bindings()
 {
   List l ;
 
-  PlTail tail(vars) ;
-  PlTerm v ;
+  term_t head = PL_new_term_ref() ;
+  term_t tail = PL_copy_term_ref(vars) ;
   for(int i=0 ; i<names.length() ; i++)
   {
-    tail.next(v) ;
-    RObject r = pl2r(v, names, vars, options) ;
+    PL_get_list_ex(tail, head, tail) ;
+    RObject r = pl2r(head, names, vars, options) ;
     if(TYPEOF(r) == EXPRSXP && names[i] == as<Symbol>(as<ExpressionVector>(r)[0]).c_str())
-    continue ;
+      continue ;
 
-    l.push_back(r, (const char*) names[i]) ;
+     l.push_back(r, (const char*) names[i]) ;
   }
 
   return l ;
@@ -1298,12 +1308,17 @@ RObject submit_()
 // [[Rcpp::export(.once)]]
 RObject once_(RObject query, List options, Environment env)
 {
-  PlFrame f ;
+  fid_t f = PL_open_foreign_frame() ;
+
   if(!query_(query, options, env))
+  {
+    PL_discard_foreign_frame(f) ;
     stop("Could not create query.") ;
+  }
     
   RObject l = submit_() ;
   clear_() ;
+  PL_close_foreign_frame(f) ;
   return l ;
 }
 
@@ -1311,10 +1326,13 @@ RObject once_(RObject query, List options, Environment env)
 // [[Rcpp::export(.findall)]]
 List findall_(RObject query, List options, Environment env)
 {
-  PlFrame f ;
+  fid_t f = PL_open_foreign_frame() ;
   if(!query_(query, options, env))
+  {
+    PL_discard_foreign_frame(f) ;
     stop("Could not create query.") ;
-    
+  }
+
   List results ;
   while(true)
   {
@@ -1326,6 +1344,7 @@ List findall_(RObject query, List options, Environment env)
   }
   
   clear_() ;
+  PL_close_foreign_frame(f) ;
   return results ;
 }
 
@@ -1342,46 +1361,53 @@ RObject portray_(RObject query, List options)
   }
 
   CharacterVector names ;
-  PlTerm vars ;
+  term_t vars = PL_new_term_ref() ;
   options("atomize") = true ; // translate variables to their R names
-  PlTermv pl(3) ;
-  pl[0] = r2pl(query, names, vars, options) ;
-  PlTail tail(pl[2]) ;
-  tail.append(PlCompound("quoted", PlTermv(PlAtom("false")))) ;
-  tail.append(PlCompound("spacing", PlTermv(PlAtom("next_argument")))) ;
-  tail.close() ;
+  term_t pl = PL_new_term_refs(3) ;
+  PL_put_term(pl, r2pl(query, names, vars, options)) ;
 
-  PlFrame f ;
-  PlQuery q("term_string", pl) ;
-  try
+  term_t list = PL_new_term_ref() ;
+  PL_put_nil(list) ;
+
+  term_t quoted_functor = PL_new_functor(PL_new_atom("quoted"), 1) ;
+  term_t quoted = PL_new_term_ref() ;
+  PL_cons_functor(quoted, quoted_functor, PL_new_atom("false")) ;
+  PL_cons_list(list, quoted, list) ;
+
+  term_t spacing_functor = PL_new_functor(PL_new_atom("spacing"), 1) ;
+  term_t spacing = PL_new_term_ref() ;
+  PL_cons_functor(spacing, spacing_functor, PL_new_atom("next_argument")) ;
+  PL_cons_list(list, spacing, list) ;
+
+  PL_put_term(pl + 2, list) ;
+
+  fid_t f = PL_open_foreign_frame() ;
+  predicate_t p = PL_predicate("term_string", 3, NULL) ;
+  if(!PL_call_predicate(NULL, PL_Q_NORMAL, p, pl))
   {
-    if(!q.next_solution())
-      return wrap(false) ;
+    PL_close_foreign_frame(f) ;
+    return wrap(false) ;
   }
   
-  catch(PlException& ex)
-  {
-    char* err = (char*) ex ;
-    PL_clear_exception() ;
-    stop("portray of %s failed: %s", (char*) pl[0], err) ;
-  }
-  
-  return pl2r(pl[1], names, vars, options) ;
+  RObject r = pl2r(pl + 1, names, vars, options) ;
+  PL_close_foreign_frame(f) ;
+  return r ;
 }
 
 // Call R expression from Prolog
-PREDICATE(r_eval, 1)
+static foreign_t r_eval1(term_t A1) 
 {
   CharacterVector names ;
-  PlTerm vars ;
+  term_t vars ;
   List options ;
   if(query_id)
     options = query_id->get_options() ;
   else
-    options = List::create(Named("realvec") = "#", Named("realmat") = "##",
-      Named("boolvec") = "!", Named("boolmat") = "!!",
+    options = List::create(
+      Named("realvec") = "##", Named("realmat") = "###",
+      Named("boolvec") = "!!", Named("boolmat") = "!!!",
       Named("charvec") = "$$", Named("charmat") = "$$$",
-      Named("intvec") = "%", Named("intmat") = "%%", 
+      Named("intvec") = "%%", Named("intmat") = "%%%", 
       Named("atomize") = false, Named("scalar") = true) ;
 
   RObject Expr = pl2r(A1, names, vars, options) ;
@@ -1394,30 +1420,31 @@ PREDICATE(r_eval, 1)
 
   catch(std::exception& ex)
   {
-    throw PlException(PlCompound("r_eval", PlTermv(A1, PlAtom(ex.what())))) ;
+//    throw PlException(PlCompound("r_eval", PlTermv(A1, PlAtom(ex.what())))) ;
   }
 
   catch(...)
   {
-    throw PlException(PlCompound("r_eval", PlTermv(A1, PlString("exception occurred")))) ;
+//    throw PlException(PlCompound("r_eval", PlTermv(A1, PlString("exception occurred")))) ;
   }
 
   return true ;
 }
 
 // Evaluate R expression from Prolog
-PREDICATE(r_eval, 2)
+static foreign_t r_eval2(term_t A1, term_t A2)
 {
   CharacterVector names ;
-  PlTerm vars ;
+  term_t vars ;
   List options ;
   if(query_id)
     options = query_id->get_options() ;
   else
-    options = List::create(Named("realvec") = "#", Named("realmat") = "##",
-      Named("boolvec") = "!", Named("boolmat") = "!!",
+    options = List::create(
+      Named("realvec") = "##", Named("realmat") = "###",
+      Named("boolvec") = "!!", Named("boolmat") = "!!!",
       Named("charvec") = "$$", Named("charmat") = "$$$",
-      Named("intvec") = "%", Named("intmat") = "%%", 
+      Named("intvec") = "%%", Named("intmat") = "%%%", 
       Named("atomize") = false, Named("scalar") = true) ;
 
   RObject Expr = pl2r(A1, names, vars, options) ;
@@ -1430,16 +1457,25 @@ PREDICATE(r_eval, 2)
   
   catch(std::exception& ex)
   {
-    throw PlException(PlCompound("r_eval", PlTermv(A1, PlAtom(ex.what())))) ;
+//    throw PlException(PlCompound("r_eval", PlTermv(A1, PlAtom(ex.what())))) ;
   }
 
   catch(...)
   {
-    throw PlException(PlCompound("r_eval", PlTermv(A1, PlAtom("exception occurred")))) ;
+//    throw PlException(PlCompound("r_eval", PlTermv(A1, PlAtom("exception occurred")))) ;
   }
 
-  PlTerm pl = r2pl(Res, names, vars, options) ;
-  return A2 = pl ;
+  term_t pl = r2pl(Res, names, vars, options) ;
+  return PL_unify(A2, pl) ;
+}
+
+static foreign_t r_eval(term_t args, int arity, void* context)
+{
+  if(arity == 1)
+    return r_eval1(args) ;
+
+  if(arity == 2)
+    return r_eval2(args, args + 1) ;
 }
 
 // The SWI system should not be initialized twice; therefore, we keep track of
@@ -1466,6 +1502,8 @@ LogicalVector init_(String argv0)
   if(!PL_initialise(argc, (char**) argv))
     stop("rolog_init: initialization failed.") ;
 
+  PL_register_foreign("r_eval", 1, (void*) r_eval, PL_FA_VARARGS) ;
+  PL_register_foreign("r_eval", 2, (void*) r_eval, PL_FA_VARARGS) ;
   pl_initialized = true ;  
   return true ;
 }
