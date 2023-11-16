@@ -91,7 +91,8 @@ math(Flags, integrate(f=Fn, lower=Lower, upper=Upper), New, M)
 % No argument names
 math(Flags, integrate(Fn, Lower, Upper), New, M)
  => Flags = New,
-    r_eval('['(formalArgs(args(Fn)), 1), Arg1),
+    % r_eval('['(formalArgs(args(Fn)), 1), Arg1),
+    Arg1 = "x",
     atom_string(DX, Arg1),
     M = integrate(fn(Fn, [DX]), Lower, Upper, DX).
 

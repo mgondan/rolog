@@ -1,3 +1,4 @@
+// #include <SWI-cpp.h>
 #include <SWI-Prolog.h>
 #include "Rcpp.h"
 using namespace Rcpp ;
@@ -98,12 +99,18 @@ DoubleVector pl2r_real(term_t pl)
 // Convert vector of reals (e.g., #(1.0, 2.0, na)) to DoubleVector
 DoubleVector pl2r_realvec(term_t pl)
 {
-  size_t arity = PL_functor_arity(pl) ;
+  size_t arity ;
+  if(!PL_get_name_arity(pl, NULL, &arity))
+    stop("pl2r: cannot convert realvec") ;
+
   DoubleVector r(arity) ;
   for(size_t i=0; i<arity; i++)
   {
     term_t arg ;
-    PL_get_arg(pl, i+1, arg) ;
+    if(!(arg = PL_new_term_ref())
+        || !PL_get_arg(i + 1, pl, arg))
+      stop("pl2r: cannot convert realvec (argument %ld)", i + 1) ;
+
     r(i) = pl2r_double(arg) ;
   }
 
@@ -113,31 +120,43 @@ DoubleVector pl2r_realvec(term_t pl)
 // Convert matrix of reals (e.g., ##(#(1.0, 2.0), #(na, ...), ...))
 NumericMatrix pl2r_realmat(term_t pl)
 {
-  size_t nrow = PL_functor_arity(pl) ;
+  size_t nrow ;
+  if(!PL_get_name_arity(pl, NULL, &nrow))
+    stop("pl2r: cannot convert realmat") ;
+
   size_t ncol = 0 ;
   if(nrow > 0)
-  {
     for(size_t i=0; i<nrow; i++)
+    {
+      term_t row ;
+      if(!(row = PL_new_term_ref())
+          || !PL_get_arg(i + 1, pl, row))
+        stop("pl2r: Cannot convert realmat") ;
+
       if(i == 0)
       {
-        term_t row1 ;
-        PL_get_arg(pl, 1, row1) ;
-        ncol = PL_functor_arity(row1) ;
+        if(!PL_get_name_arity(row, NULL, &ncol))
+          stop("pl2r: cannot convert realmat") ;
       }
       else
       {
-        term_t row ;
-        PL_get_arg(pl, i+1, row) ;
-        if(PL_functor_arity(row) != ncol)
+        size_t col ;
+        if(!PL_get_name_arity(row, NULL, &col))
+          stop("pl2r: cannot convert realmat") ;
+
+        if(col != ncol)
           stop("cannot convert PlTerm to Matrix, inconsistent rows") ;
       }
-  }
+    }
 
   NumericMatrix r(nrow, ncol) ;
   for(size_t i=0; i<nrow; i++)
   {
     term_t row ;
-    PL_get_arg(pl, i+1, row) ;
+    if(!(row = PL_new_term_ref())
+        || !PL_get_arg(i + 1, pl, row))
+      stop("pl2r: cannot convert realmat") ;
+
     r.row(i) = pl2r_realvec(row) ;
   }
 
@@ -170,12 +189,18 @@ IntegerVector pl2r_integer(term_t pl)
 
 IntegerVector pl2r_intvec(term_t pl)
 {
-  size_t arity = PL_functor_arity(pl) ;
+  size_t arity ;
+  if(!PL_get_name_arity(pl, NULL, &arity))
+    stop("pl2r: cannot convert intvec") ;
+
   IntegerVector r(arity) ;
   for(size_t i=0; i<arity; i++)
   {
     term_t arg ;
-    PL_get_arg(pl, i+1, arg) ;
+    if(!(arg = PL_new_term_ref())
+        || !PL_get_arg(i + 1, pl, arg))
+      stop("pl2r: cannot convert intvec") ;
+
     r(i) = pl2r_int(arg) ;
   }
 
@@ -184,31 +209,43 @@ IntegerVector pl2r_intvec(term_t pl)
 
 IntegerMatrix pl2r_intmat(term_t pl)
 {
-  size_t nrow = PL_functor_arity(pl) ;
+  size_t nrow ;
+  if(!PL_get_name_arity(pl, NULL, &nrow))
+    stop("pl2r: cannot convert intmat") ;
+
   size_t ncol = 0 ;
   if(nrow > 0)
-  {
     for(size_t i=0; i<nrow; i++)
+    {
+      term_t row ;
+      if(!(row = PL_new_term_ref())
+          || !PL_get_arg(i + 1, pl, row))
+        stop("pl2r: Cannot convert intmat") ;
+
       if(i == 0)
       {
-        term_t row1 ;
-        PL_get_arg(pl, 1, row1) ;
-        ncol = PL_functor_arity(row1) ;
+        if(!PL_get_name_arity(row, NULL, &ncol))
+          stop("pl2r: cannot convert realmat") ;
       }
       else
       {
-        term_t row ;
-        PL_get_arg(pl, i+1, row) ;
-        if(PL_functor_arity(row) != ncol)
+        size_t col ;
+        if(!PL_get_name_arity(row, NULL, &col))
+          stop("pl2r: cannot convert intmat") ;
+
+        if(col != ncol)
           stop("cannot convert PlTerm to Matrix, inconsistent rows") ;
       }
-  }
+    }
 
   IntegerMatrix r(nrow, ncol) ;
   for(size_t i=0; i<nrow; i++)
   {
     term_t row ;
-    PL_get_arg(pl, i+1, row) ;
+    if(!(row = PL_new_term_ref())
+        || !PL_get_arg(i + 1, pl, row))
+      stop("pl2r: cannot convert intmat") ;
+
     r.row(i) = pl2r_intvec(row) ;
   }
 
@@ -236,12 +273,18 @@ CharacterVector pl2r_char(term_t pl)
 
 CharacterVector pl2r_charvec(term_t pl)
 {
-  size_t arity = PL_functor_arity(pl) ;
+  size_t arity ;
+  if(!PL_get_name_arity(pl, NULL, &arity))
+    stop("pl2r: cannot convert charvec") ;
+
   CharacterVector r(arity) ;
   for(size_t i=0; i<arity; i++)
   {
     term_t arg ;
-    PL_get_arg(pl, i+1, arg) ;
+    if(!(arg = PL_new_term_ref())
+        || !PL_get_arg(i + 1, pl, arg))
+      stop("pl2r: cannot convert charvec") ;
+
     r(i) = pl2r_string(arg) ;
   }
 
@@ -250,31 +293,43 @@ CharacterVector pl2r_charvec(term_t pl)
 
 CharacterMatrix pl2r_charmat(term_t pl)
 {
-  size_t nrow = PL_functor_arity(pl) ;
+  size_t nrow ;
+  if(!PL_get_name_arity(pl, NULL, &nrow))
+    stop("pl2r: cannot convert charmat") ;
+
   size_t ncol = 0 ;
   if(nrow > 0)
-  {
     for(size_t i=0; i<nrow; i++)
+    {
+      term_t row ;
+      if(!(row = PL_new_term_ref())
+          || !PL_get_arg(i + 1, pl, row))
+        stop("pl2r: Cannot convert boolmat") ;
+
       if(i == 0)
       {
-        term_t row1 ;
-        PL_get_arg(pl, 1, row1) ;
-        ncol = PL_functor_arity(row1) ;
+        if(!PL_get_name_arity(row, NULL, &ncol))
+          stop("pl2r: cannot convert realmat") ;
       }
       else
       {
-        term_t row ;
-        PL_get_arg(pl, i+1, row) ;
-        if(PL_functor_arity(row) != ncol)
+        size_t col ;
+        if(!PL_get_name_arity(row, NULL, &col))
+          stop("pl2r: cannot convert intmat") ;
+
+        if(col != ncol)
           stop("cannot convert PlTerm to Matrix, inconsistent rows") ;
       }
-  }
+    }
 
   CharacterMatrix r(nrow, ncol) ;
   for(size_t i=0; i<nrow; i++)
   {
     term_t row ;
-    PL_get_arg(pl, i+1, row) ;
+    if(!(row = PL_new_term_ref())
+        || !PL_get_arg(i + 1, pl, row))
+      stop("pl2r: cannot convert charmat") ;
+
     r.row(i) = pl2r_charvec(row) ;
   }
 
@@ -306,32 +361,44 @@ RObject pl2r_compound(term_t pl, CharacterVector& names, term_t& vars, List opti
 // Convert prolog neck to R function
 RObject pl2r_function(term_t pl, CharacterVector& names, term_t& vars, List options)
 {
-  term_t plhead ;
-  PL_get_arg(pl, 1, plhead) ;
-
-  term_t plbody ;
-  PL_get_arg(pl, 2, plbody) ;
+  term_t plhead, plbody ;
+  if(!(plhead = PL_new_term_ref())
+      || !PL_get_arg(1, pl, plhead)
+      || !(plbody = PL_new_term_ref())
+      || !PL_get_arg(2, pl, plbody))
+    stop("Cannot convert pl compound") ;
 
   Language head("alist") ;
-  for(size_t i=1 ; i<=PL_functor_arity(plhead) ; i++)
+  size_t arity ;
+  if(!PL_get_name_arity(plhead, NULL, &arity))
+    stop("Cannot convert pl compound") ;
+
+  for(size_t i=1 ; i<=arity ; i++)
   {
     term_t arg ;
-    PL_get_arg(plhead, i, arg) ;
+    if(!(arg = PL_new_term_ref())
+        || !PL_get_arg(i, plhead, arg))
+      stop("Cannot convert pl compound") ;
 
     // Compounds like mean=100 are translated to named function arguments
-    term_t arg_name = PL_new_term_ref() ;
+    term_t arg_name ;
     size_t arg_arity ;
+    if(!(arg_name = PL_new_term_ref()))
+      stop("Cannot convert pl compound") ;
+
     if(PL_is_compound(arg) && PL_get_name_arity(arg, &arg_name, &arg_arity)
        && !strcmp(PL_atom_nchars(arg_name, NULL), "=") && arg_arity == 2)
     {
-      term_t a1 ;
-      PL_get_arg(arg, 1, a1) ;
+      term_t arg1, arg2 ;
+      if(!(arg1 = PL_new_term_ref())
+          || !PL_get_arg(1, arg, arg1)
+          || !(arg2 = PL_new_term_ref())
+          || !PL_get_arg(2, arg, arg2))
+        stop("Cannot convert pl compound") ;
 
-      term_t a2 ;
-      PL_get_arg(arg, 2, a2) ;
-      if(PL_is_atom(a1))
+      if(PL_is_atom(arg1))
       {
-        head.push_back(Named(PL_atom_nchars(a1, NULL)) = pl2r(a2, names, vars, options)) ;
+        head.push_back(Named(PL_atom_nchars(arg1, NULL)) = pl2r(arg2, names, vars, options)) ;
         continue ;
       }
     }
@@ -349,12 +416,18 @@ RObject pl2r_function(term_t pl, CharacterVector& names, term_t& vars, List opti
 
 LogicalVector pl2r_boolvec(term_t pl)
 {
-  size_t arity = PL_functor_arity(pl) ;
+  size_t arity ;
+  if(!PL_get_name_arity(pl, NULL, &arity))
+    stop("pl2r: cannot convert boolvec") ;
+
   LogicalVector r(arity) ;
   for(size_t i=0; i<arity; i++)
   {
     term_t t ;
-    PL_get_arg(pl, i+1, t) ;
+    if(!(t = PL_new_term_ref())
+        || !PL_get_arg(i + 1, pl, t))
+      stop("r2pl: cannot convert boolvec") ;
+
     if(PL_is_atom(t))
     {
       if(!strcmp(PL_atom_nchars(t, NULL), "na"))
@@ -376,7 +449,7 @@ LogicalVector pl2r_boolvec(term_t pl)
       }
     }
     
-    warning("r2pl_logical: invalid item %s, returning NA", PL_atom_nchars(t, NULL)) ;
+    warning("pl2r_logical: invalid item %s, returning NA", PL_atom_nchars(t, NULL)) ;
     r(i) = NA_LOGICAL ;
   }
 
@@ -385,47 +458,49 @@ LogicalVector pl2r_boolvec(term_t pl)
 
 LogicalMatrix pl2r_boolmat(term_t pl)
 {
-  size_t nrow = PL_functor_arity(pl) ;
+  size_t nrow ;
+  if(!PL_get_name_arity(pl, NULL, &nrow))
+    stop("pl2r: cannot convert charmat") ;
+
   size_t ncol = 0 ;
   if(nrow > 0)
   {
     for(size_t i=0; i<nrow; i++)
+    {
+      term_t row ;
+      if(!(row = PL_new_term_ref())
+          || !PL_get_arg(i + 1, pl, row))
+        stop("pl2r: Cannot convert boolmat") ;
+
       if(i == 0)
       {
-        term_t row1 ;
-        PL_get_arg(pl, 1, row1) ;
-        ncol = PL_functor_arity(row1) ;
+        if(!PL_get_name_arity(row, NULL, &ncol))
+          stop("pl2r: cannot convert realmat") ;
       }
       else
       {
-        term_t row ;
-        PL_get_arg(pl, i+1, row) ;
-        if(PL_functor_arity(row) != ncol)
+        size_t col ;
+        if(!PL_get_name_arity(row, NULL, &col))
+          stop("pl2r: cannot convert intmat") ;
+
+        if(col != ncol)
           stop("cannot convert PlTerm to Matrix, inconsistent rows") ;
       }
+    }
   }
 
   LogicalMatrix r(nrow, ncol) ;
   for(size_t i=0; i<nrow; i++)
   {
     term_t row ;
-    PL_get_arg(pl, i+1, row) ;
+    if(!(row = PL_new_term_ref())
+        || !PL_get_arg(i + 1, pl, row))
+      stop("pl2r: Cannot convert boolmat") ;
+
     r.row(i) = pl2r_boolvec(row) ;
   }
 
   return r ;
-}
-
-
-void
-put_list(term_t l, int n, char **words)
-{ term_t a = PL_new_term_ref();
-
-  PL_put_nil(l);
-  while( --n >= 0 )
-  { PL_put_atom_chars(a, words[n]);
-    PL_cons_list(l, a, l);
-  }
 }
 
 // Translate prolog variables to R expressions.
@@ -438,32 +513,32 @@ RObject pl2r_variable(term_t pl, CharacterVector& names, term_t& vars)
   // Search for the variable (e.g., _1545) in names and return its R name as an
   // expression (say, X).
   char* n ;
-  PL_get_chars(pl, &n, CVT_ALL|BUF_MALLOC|CVT_EXCEPTION) ;
-  
-  term_t head = PL_new_term_ref() ;
-  term_t tail = PL_copy_term_ref(vars) ;
+  if(!PL_get_chars(pl, &n, CVT_VARIABLE|BUF_MALLOC|CVT_EXCEPTION|REP_UTF8))
+    stop("pl2r: Cannot convert variable") ;
+
+  term_t head, tail ;
+  if(!(head = PL_new_term_ref())
+      || !(tail = PL_copy_term_ref(vars)))
+    stop("pl2r: Cannot convert variable") ;
+
   for(size_t i=0 ; i<names.length() ; i++)
   {
     PL_get_list_ex(tail, head, tail) ;
     char *s ;
-    PL_get_chars(head, &s, CVT_ATOM|BUF_MALLOC|CVT_EXCEPTION) ;
+    if(!PL_get_chars(head, &s, CVT_VARIABLE|BUF_DISCARDABLE|CVT_EXCEPTION|REP_UTF8))
+      stop("pl2r: Cannot convert variable") ;
+
     if(!strcmp(s, n))
     {
       ExpressionVector Symb((char*) names(i)) ;
-      PL_free(s) ;
       PL_free(n) ;
       return Symb ;
     }
-
-    PL_free(s) ;
   }
-
-  PL_free(n) ;
 
   // If the variable is not found, it's a new one created by Prolog, e.g., in
   // queries like member(1, Y), Y is unified with [1 | _NewVar ]. This variable
   // cannot be translated to a human-readable name, so it is returned as _1545.
-  PL_get_chars(pl, &n, CVT_ALL|BUF_MALLOC|REP_UTF8) ;
   ExpressionVector Symb(n) ;
   PL_free(n) ;
   return Symb ;
@@ -480,14 +555,19 @@ RObject pl2r_compound(term_t pl, CharacterVector& names, term_t& vars, List opti
   if(!PL_is_acyclic(pl))
   {
     char* n ;
-    PL_get_chars(pl, &n, CVT_ALL|BUF_DISCARDABLE|REP_UTF8) ;
-    stop("pl2r: Cannot convert cyclic term %s", n) ;
+    if(PL_get_chars(pl, &n, CVT_ALL|BUF_DISCARDABLE|REP_UTF8))
+      stop("pl2r: Cannot convert cyclic term %s", n) ;
+
+    stop("pl2r: Cannot convert cyclic term") ;
   }
 
   // Convert ###(##(...), ...) to NumericMatrix
-  term_t name = PL_new_term_ref() ;
+  term_t name ; 
   size_t arity ;
-  PL_get_name_arity(pl, &name, &arity) ;
+  if(!(name = PL_new_term_ref())
+      || !PL_get_name_arity(pl, &name, &arity))
+    stop("Cannot convert R call 1") ;
+
   if(!strcmp(PL_atom_nchars(name, NULL), options("realmat")))
     return pl2r_realmat(pl) ;
 
@@ -527,27 +607,39 @@ RObject pl2r_compound(term_t pl, CharacterVector& names, term_t& vars, List opti
   Language r(PL_atom_nchars(name, NULL)) ;
   for(size_t i=1 ; i<=arity ; i++)
   {
-    term_t arg = PL_new_term_ref() ;
-    PL_get_arg(pl, i, arg) ;
-
-    term_t arg_name = PL_new_term_ref() ;
-    size_t arg_arity ;
-    PL_get_name_arity(arg, &arg_name, &arg_arity) ;
+    term_t arg ;
+    if(!(arg = PL_new_term_ref())
+        || !PL_get_arg(i, pl, arg))    
+      stop("Cannot convert R call 2") ;
 
     // Compounds like mean=100 are translated to named function arguments
-    if(PL_is_compound(arg) && !strcmp(PL_atom_nchars(arg_name, NULL), "=") && arg_arity == 2)
+    if(PL_is_compound(arg))
     {
-      term_t a1 = PL_new_term_ref() ;
-      PL_get_arg(arg, 1, a1) ;
-      
-      term_t a2 = PL_new_term_ref() ;
-      PL_get_arg(arg, 2, a2) ;
-      if(PL_is_atom(a1))
+      term_t arg_name ;
+      size_t arg_arity ;
+      if(!(arg_name = PL_new_term_ref())
+          || !PL_get_name_arity(arg, &arg_name, &arg_arity))
+        stop("Cannot convert R call 3") ;
+
+      if(!strcmp(PL_atom_nchars(arg_name, NULL), "=") && arg_arity == 2)
       {
-        term_t name = PL_new_term_ref() ;
-        PL_get_name_arity(a1, &name, NULL) ;
-        r.push_back(Named(PL_atom_nchars(name, NULL)) = pl2r(a2, names, vars, options)) ;
-        continue ;
+        term_t arg1, arg2 ;
+        if(!(arg1 = PL_new_term_ref())
+            || !PL_get_arg(1, arg, arg1)
+            || !(arg2 = PL_new_term_ref())
+            || !PL_get_arg(2, arg, arg2))
+          stop("Cannot convert R call 4") ;
+
+        if(PL_is_atom(arg1))
+        {
+          term_t name ;
+          if(!(name = PL_new_term_ref())
+              || !PL_get_name_arity(arg1, &name, NULL))
+            stop("Cannot convert R call 5") ;
+
+          r.push_back(Named(PL_atom_nchars(name, NULL)) = pl2r(arg2, names, vars, options)) ;
+          continue ;
+        }
       }
     }
 
@@ -571,33 +663,45 @@ RObject pl2r_compound(term_t pl, CharacterVector& names, term_t& vars, List opti
 //
 RObject pl2r_list(term_t pl, CharacterVector& names, term_t& vars, List options)
 {
-  term_t head = PL_new_term_ref() ;
-  PL_get_arg(pl, 1, head) ;
-  term_t head_name = PL_new_term_ref() ;
-  size_t head_arity ;
-  PL_get_name_arity(head, &head_name, &head_arity) ;
+  term_t head ;
+  if(!(head = PL_new_term_ref())
+      || !PL_get_arg(1, pl, head))
+    stop("Cannot convert list 1") ;
 
   // if the tail is a list or empty, return a normal list
-  term_t tail = PL_new_term_ref() ;
-  PL_get_arg(pl, 2, tail) ;
+  term_t tail ;
+  if(!(tail = PL_new_term_ref())
+      || !PL_get_arg(2, pl, tail))
+    stop("Cannot convert list 2") ;
+
   RObject rest = pl2r(tail, names, vars, options) ;
   if(TYPEOF(rest) == VECSXP || TYPEOF(rest) == NILSXP)
   {
     List r = as<List>(rest) ;
-    
+
     // convert prolog pair a-X to named list element
-    if(PL_is_compound(head) && !strcmp(PL_atom_nchars(head_name, NULL), "-") && head_arity == 2)
+    if(PL_is_compound(head))
     {
-      term_t a1 = PL_new_term_ref() ;
-      PL_get_arg(head, 1, a1) ;
+      term_t head_name ;
+      size_t head_arity ;
+      if(!(head_name = PL_new_term_ref())
+          || !PL_get_name_arity(head, &head_name, &head_arity))
+        stop("Cannot convert list 3") ;
 
-      term_t a2 = PL_new_term_ref() ;
-      PL_get_arg(head, 2, a2) ;
-
-      if(PL_is_atom(a1))
+      if(!strcmp(PL_atom_nchars(head_name, NULL), "-") && head_arity == 2)
       {
-        r.push_front(pl2r(a2, names, vars, options), PL_atom_nchars(a1, NULL)) ;
-        return r ;
+        term_t arg1, arg2 ;
+        if(!(arg1 = PL_new_term_ref())
+            || !PL_get_arg(1, head, arg1)
+            || !(arg2 = PL_new_term_ref())
+            || !PL_get_arg(2, head, arg2))
+          stop("Cannot convert list 4") ;
+
+        if(PL_is_atom(arg1))
+        {
+          r.push_front(pl2r(arg2, names, vars, options), PL_atom_nchars(arg1, NULL)) ;
+          return r ;
+        }
       }
     }
     
@@ -607,22 +711,26 @@ RObject pl2r_list(term_t pl, CharacterVector& names, term_t& vars, List options)
   }
     
   // if the tail is something else, return [|](head, tail)
-  term_t name = PL_new_term_ref() ;
+  term_t name ;
   size_t arity ;
-  PL_get_name_arity(pl, &name, &arity) ;
+  if(!(name = PL_new_term_ref())
+      || !PL_get_name_arity(pl, &name, &arity))
+    stop("Cannot convert list 5") ;
+
   Language r(PL_atom_nchars(name, NULL)) ;
-  
   // convert prolog pair a-X to named list element
   if(PL_is_compound(head) && !strcmp(PL_atom_nchars(name, NULL), "-") && arity == 2)
   {
-    term_t a1 = PL_new_term_ref() ;
-    PL_get_arg(head, 1, a1) ;
+    term_t arg1, arg2 ;
+    if(!(arg1 = PL_new_term_ref())
+        || !PL_get_arg(1, head, arg1)
+        || !(arg2 = PL_new_term_ref())
+        || !PL_get_arg(2, head, arg2))
+      stop("Cannot convert list 6") ;
 
-    term_t a2 = PL_new_term_ref() ;
-    PL_get_arg(head, 2, a2) ;
-    if(PL_is_atom(a1))
+    if(PL_is_atom(arg1))
     {
-      r.push_back(Named(PL_atom_nchars(a1, NULL)) = pl2r(a2, names, vars, options)) ;
+      r.push_back(Named(PL_atom_nchars(arg1, NULL)) = pl2r(arg2, names, vars, options)) ;
       r.push_back(rest) ;
       return as<RObject>(r) ;
     }
@@ -660,11 +768,13 @@ RObject pl2r(term_t pl, CharacterVector& names, term_t& vars, List options)
   if(PL_is_variable(pl))
     return pl2r_variable(pl, names, vars) ;
 
-  term_t name = PL_new_term_ref() ;
+  term_t name ;
   size_t arity ;
-  PL_get_name_arity(pl, &name, &arity) ;
-  stop("pl2r: Cannot convert %s/%ld", PL_atom_nchars(name, NULL), arity) ;
-  return pl2r_null() ;
+  if((name = PL_new_term_ref())
+      && PL_get_name_arity(pl, &name, &arity))
+    stop("pl2r: Cannot convert %s/%ld", PL_atom_nchars(name, NULL), arity) ;
+
+  stop("pl2r: Cannot convert") ;
 }
 
 // Translate R expression to prolog
@@ -684,7 +794,12 @@ term_t r2pl_null()
 // Prolog representation of R's NA.
 term_t r2pl_na()
 {
-  return PL_new_atom("na") ;
+  term_t na ;
+  if(!(na = PL_new_term_ref())
+      || !PL_put_atom_chars(na, "na"))
+    stop("r2pl: cannot create na") ;
+
+  return na ;
 }
 
 // Translate to matrix ###(##(1.0, 2.0, 3.0), ##(4.0, 5.0, 6.0))
@@ -692,27 +807,21 @@ term_t r2pl_matrix(Matrix<REALSXP> r, List aoptions)
 {
   List options(aoptions) ;
   options("scalar") = false ;
+  term_t rows ;
+  if(!(rows = PL_new_term_refs(r.nrow())))
+    stop("Could not convert R realmat") ;
 
-  term_t data_functor = PL_new_functor(PL_new_atom("data"), r.nrow()) ;
-
-  term_t rows = PL_new_term_refs(r.nrow()) ;
   for(size_t i=0 ; i<r.nrow() ; i++)
-    PL_put_term(rows+i, r2pl_real(r.row(i), options)) ;
+    if(!PL_put_term(rows + i, r2pl_real(r.row(i), options)))
+      stop("Could not convert R realmat") ;
 
-  term_t data = PL_new_term_ref() ;
-  PL_cons_functor_v(data, data_functor, rows) ;
+  functor_t functor ;
+  term_t matrix ;
+  if(!(functor = PL_new_functor(PL_new_atom((const char*) aoptions("realmat")), r.nrow()))
+      || !(matrix = PL_new_term_ref())
+      || !PL_cons_functor_v(matrix, functor, rows))
+    stop("Could not convert R realmat") ;
 
-  term_t matrix_functor = PL_new_functor(PL_new_atom((const char*) aoptions("realmat")), 5) ;
-
-  term_t dim = PL_new_term_refs(5) ;
-  PL_put_integer(dim, r.nrow()) ;
-  PL_put_integer(dim+1, r.ncol()) ;
-  PL_put_term(dim+2, r2pl_string(rownames(r), options)) ;
-  PL_put_term(dim+3, r2pl_string(colnames(r), options)) ;
-  PL_put_term(dim+4, data) ;
-
-  term_t matrix = PL_new_term_ref() ;
-  PL_cons_functor_v(matrix, matrix_functor, dim) ;
   return matrix ;
 }
 
@@ -734,26 +843,39 @@ term_t r2pl_real(NumericVector r, List options)
     if(na[0] && !nan[0])
       return r2pl_na() ;
     
-    term_t f = PL_new_term_ref() ;
-    PL_put_float(f, (double) r[0]) ;
+    term_t f ;
+    if(!(f = PL_new_term_ref())
+        || !PL_put_float(f, (double) r(0)))
+      stop("Could not convert R realvec") ;
+
     return f ;
   }
 
   // Translate to vector ##(1.0, 2.0, 3.0)
   size_t len = (size_t) r.length() ;
-  term_t args = PL_new_term_refs(len) ;
+  term_t args ;
+  if(!(args = PL_new_term_refs(len)))
+    stop("Could not convert R realvec") ;
+
   for(size_t i=0 ; i<len ; i++)
-  {
     if(na[i] && !nan[i])
-      PL_put_term(args+i, r2pl_na()) ;
+    {
+      if(!PL_put_term(args + i, r2pl_na()))
+        stop("Could not convert R realvec") ;
+    }
     else
-      PL_put_float(args+i, (double) r[i]) ;
-  }
+    {
+      if(!PL_put_float(args + i, (double) r(i)))
+        stop("Could not convert R realvec") ;
+    }
 
-  term_t vec_functor = PL_new_functor(PL_new_atom((const char*) options("realvec")), len) ;
+  term_t vec ;
+  functor_t functor ;
+  if(!(functor = PL_new_functor(PL_new_atom((const char*) options("realvec")), len))
+      || !(vec = PL_new_term_ref())
+      || !PL_cons_functor_v(vec, functor, args))
+    stop("Could not convert R realvec") ;
 
-  term_t vec = PL_new_term_ref() ;
-  PL_cons_functor_v(vec, vec_functor, args) ;
   return vec ;
 }
 
@@ -762,13 +884,21 @@ term_t r2pl_matrix(Matrix<LGLSXP> r, List aoptions)
 {
   List options(aoptions) ;
   options("scalar") = false ;
-  term_t rows = PL_new_term_refs(r.nrow()) ;
-  for(size_t i=0 ; i<r.nrow() ; i++)
-    PL_put_term(rows+i, r2pl_logical(r.row(i), options)) ;
+  term_t rows ;
+  if(!(rows = PL_new_term_refs(r.nrow())))
+    stop("Could not convert R boolmat") ;
 
-  term_t matrix = PL_new_term_ref() ;
-  term_t matrix_functor = PL_new_functor(PL_new_atom((const char*) aoptions("boolmat")), r.nrow()) ;
-  PL_cons_functor_v(matrix, matrix_functor, rows) ;
+  for(size_t i=0 ; i<r.nrow() ; i++)
+    if(!PL_put_term(rows+i, r2pl_logical(r.row(i), options)))
+      stop("Could not convert R boolmat") ;
+
+  term_t matrix ;
+  functor_t functor ;
+  if(!(functor = PL_new_functor(PL_new_atom((const char*) aoptions("boolmat")), r.nrow()))
+      || !(matrix = PL_new_term_ref())
+      || !PL_cons_functor_v(matrix, functor, rows))
+    stop("Could not convert R boolmat") ;
+
   return matrix ;
 }
 
@@ -789,23 +919,39 @@ term_t r2pl_logical(LogicalVector r, List options)
     if(na[0])
       return r2pl_na() ;
     
-    return PL_new_atom(r[0] ? "true" : "false") ;
+    term_t pl ;
+    if(!(pl = PL_new_term_ref())
+        || !PL_put_atom_chars(pl, r[0] ? "true" : "false"))
+      stop("r2pl: cannot create boolean") ;
+
+    return pl ;
   }
 
   // LogicalVector !!(true, false, na)
   size_t len = (size_t) r.length() ;
-  term_t args = PL_new_term_refs(len) ;
-  for(size_t i=0 ; i<len ; i++)
-  {
-    if(na[i])
-      PL_put_term(args+i, r2pl_na()) ;
-    else
-      PL_put_atom(args+i, PL_new_atom(r[i] ? "true" : "false")) ;
-  }
+  term_t args ;
+  if(!(args = PL_new_term_refs(len)))
+    stop("Could not convert R boolvec") ;
 
-  term_t vec = PL_new_term_ref() ;
-  term_t vec_functor = PL_new_functor(PL_new_atom((const char*) options("boolvec")), len) ;
-  PL_cons_functor_v(vec, vec_functor, args) ;
+  for(size_t i=0 ; i<len ; i++)
+    if(na[i])
+    {
+      if(!PL_put_term(args+i, r2pl_na()))
+        stop("Could not convert R boolvec") ;
+    }
+    else
+    {
+      if(!PL_put_atom_chars(args + i, r(i) ? "true" : "false"))
+        stop("Could not convert R boolvec") ;
+    }
+
+  term_t vec ;
+  functor_t functor ;
+  if(!(functor = PL_new_functor(PL_new_atom((const char*) options("boolvec")), len))
+      || !(vec = PL_new_term_ref())
+      || !PL_cons_functor_v(vec, functor, args))
+    stop("Could not convert R boolvec") ;
+
   return vec ;
 }
 
@@ -814,13 +960,21 @@ term_t r2pl_matrix(Matrix<INTSXP> r, List aoptions)
 {
   List options(aoptions) ;
   options("scalar") = false ;
-  term_t rows = PL_new_term_refs(r.nrow()) ;
-  for(size_t i=0 ; i<r.nrow() ; i++)
-    PL_put_term(rows+i, r2pl_integer(r.row(i), options)) ;
+  term_t rows ;
+  if(!(rows = PL_new_term_refs(r.nrow())))
+    stop("Could not convert R intmat") ;
 
-  term_t matrix = PL_new_term_ref() ;
-  term_t matrix_functor = PL_new_functor(PL_new_atom((const char*) aoptions("intmat")), r.nrow()) ;
-  PL_cons_functor_v(matrix, matrix_functor, rows) ;
+  for(size_t i=0 ; i<r.nrow() ; i++)
+    if(!PL_put_term(rows+i, r2pl_integer(r.row(i), options)))
+      stop("Could not convert R intmat") ;
+
+  term_t matrix ;
+  functor_t functor ;
+  if(!(functor = PL_new_functor(PL_new_atom((const char*) aoptions("intmat")), r.nrow()))
+      || !(matrix = PL_new_term_ref())
+      || !PL_cons_functor_v(matrix, functor, rows))
+    stop("Could not convert R intmat") ;
+
   return matrix ;
 }
 
@@ -842,72 +996,38 @@ term_t r2pl_integer(IntegerVector r, List options)
       return r2pl_na() ;
 
     term_t f = PL_new_term_ref() ;
-    PL_put_integer(f, (long) r[0]) ;
+    if(!PL_put_integer(f, (long) r(0)))
+      stop("Could not convert R intvec") ;
+
     return f ;
   }
   
   // IntegerVector %%(1, 2, 3)
   size_t len = (size_t) r.length() ;
-  term_t args = PL_new_term_refs(len) ;
+  term_t args ;
+  if(!(args = PL_new_term_refs(len)))
+    stop("Could not convert R intvec") ;
+
   for(size_t i=0 ; i<len ; i++)
-  {
     if(na[i])
-      PL_put_term(args+i, r2pl_na()) ;
+    {
+      if(!PL_put_term(args + i, r2pl_na()))
+        stop("Could not convert R intvec") ;
+    }
     else
-      PL_put_integer(args+i, (long) r[i]) ;
-  }
+    {
+      if(!PL_put_integer(args + i, (long) r[i]))
+        stop("Could not convert R intvec") ;
+    }
 
-  term_t vec_functor = PL_new_functor(PL_new_atom((const char*) options("intvec")), len) ;
+  functor_t functor ;
+  term_t vec ;
+  if(!(functor = PL_new_functor(PL_new_atom((const char*) options("intvec")), len))
+      || !(vec = PL_new_term_ref())
+      || !PL_cons_functor_v(vec, functor, args))
+    stop("Could not convert R intvec") ;
 
-  term_t vec = PL_new_term_ref() ;
-  PL_cons_functor_v(vec, vec_functor, args) ;
   return vec ;
-}
-
-// Translate R expression to prolog variable
-//
-// This function keeps a record of the names of the variables in 
-// use (e.g., _1545) as well as the corresponding R names (e.g., X). If a new
-// variable is encountered, its name is looked up in the list of known 
-// variables, and it is unified with it if the name is found. Otherwise, a new
-// variable is created.
-//
-// If options("atomize") is true, no variable is created, but an atom is created 
-// with the variable name from R. This is only used for pretty printing.
-term_t r2pl_var(ExpressionVector r, CharacterVector& names, term_t& vars, List options)
-{
-  // Variable name in R
-  Symbol n = as<Symbol>(r[0]) ;
-  
-  // If the variable should be "atomized" for pretty printing
-  if(as<LogicalVector>(options("atomize"))(0))
-    return PL_new_atom(n.c_str()) ;
-
-  // Do not map the anonymous variable to a known variable name
-  if(n == "_")
-    return PL_new_term_ref() ;
-
-  // Unify with existing variable of the same name
-  term_t head = PL_new_term_ref() ;
-  term_t tail = PL_copy_term_ref(vars) ;
-  for(R_xlen_t i=0 ; i<names.length() ; i++)
-  {
-    PL_get_list_ex(tail, head, tail) ;
-    if(n == names(i))
-      return head ;
-  }
-
-  // If no such variable exists, create a new one and remember the name
-  names.push_back(n.c_str()) ;
-  term_t pl = PL_new_term_ref() ;
-  PL_cons_list(tail, pl, tail) ; // tail should be [] at this stage
-  return pl ;
-}
-
-// Translate R symbol to prolog atom
-term_t r2pl_atom(Symbol r)
-{
-  return PL_new_atom(r.c_str()) ;
 }
 
 // Translate to matrix $$$($$(1, 2), $$(3, 4))
@@ -915,13 +1035,21 @@ term_t r2pl_matrix(Matrix<STRSXP> r, List aoptions)
 {
   List options(aoptions) ;
   options("scalar") = false ;
-  term_t rows = PL_new_term_refs(r.nrow()) ;
-  for(size_t i=0 ; i<r.nrow() ; i++)
-    PL_put_term(rows+i, r2pl_string(r.row(i), options)) ;
+  term_t rows ;
+  if(!(rows = PL_new_term_refs(r.nrow())))
+    stop("Could not convert R matrix") ;
 
-  term_t matrix = PL_new_term_ref() ;
-  term_t matrix_functor = PL_new_functor(PL_new_atom((const char*) aoptions("charmat")), r.nrow()) ;
-  PL_cons_functor_v(matrix, matrix_functor, rows) ;
+  for(size_t i=0 ; i<r.nrow() ; i++)
+    if(!PL_put_term(rows+i, r2pl_string(r.row(i), options)))
+      stop("Could not convert R matrix") ;
+
+  functor_t functor ;
+  term_t matrix ;
+  if(!(functor = PL_new_functor(PL_new_atom((const char*) aoptions("charmat")), r.nrow()))
+      || !(matrix = PL_new_term_ref())
+      || !PL_cons_functor_v(matrix, functor, rows))
+    stop("Could not convert R matrix") ;
+
   return matrix ;
 }
 
@@ -942,26 +1070,108 @@ term_t r2pl_string(CharacterVector r, List options)
     if(na[0])
       return r2pl_na() ;
   
-    term_t f = PL_new_term_ref() ;
-    PL_put_string_chars(f, r(0)) ;
+    term_t f ;
+    if(!(f = PL_new_term_ref())
+        || !PL_put_string_chars(f, r(0)))
+      stop("Could not convert R charvec") ;
+
     return f ;
   }
 
   // compound like $$("a", "b", "c")
   size_t len = (size_t) r.length() ;
-  term_t args = PL_new_term_refs(len) ;
+  term_t args ;
+  if(!(args = PL_new_term_refs(len)))
+    stop("Could not convert R charvec") ;
+
   for(size_t i=0 ; i<len ; i++)
-  {
     if(na[i])
-      PL_put_term(args+i, r2pl_na()) ;
+    {
+      if(!PL_put_term(args + i, r2pl_na()))
+        stop("Could not convert R charvec") ;
+    }
     else
-      PL_put_string_chars(args+i, r(i)) ;
+    {
+      if(!PL_put_string_chars(args + i, r(i)))
+        stop("Could not convert R charvec") ;
+    }
+
+  functor_t functor ;
+  term_t vec ;
+  if(!(functor = PL_new_functor(PL_new_atom((const char*) options("charvec")), len))
+      || !(vec = PL_new_term_ref())
+      || !PL_cons_functor_v(vec, functor, args))
+    stop("Could not convert R charvec") ;
+
+  return vec ;
+}
+
+// Translate R expression to prolog variable
+//
+// This function keeps a record of the names of the variables in 
+// use (e.g., _1545) as well as the corresponding R names (e.g., X). If a new
+// variable is encountered, its name is looked up in the list of known 
+// variables, and it is unified with it if the name is found. Otherwise, a new
+// variable is created.
+//
+// If options("atomize") is true, no variable is created, but an atom is created 
+// with the variable name from R. This is only used for pretty printing.
+term_t r2pl_var(ExpressionVector r, CharacterVector& names, term_t& vars, List options)
+{
+  // Variable name in R
+  Symbol n = as<Symbol>(r[0]) ;
+  
+  // If the variable should be "atomized" for pretty printing
+  if(as<LogicalVector>(options("atomize"))(0))
+  {
+    term_t pl ;
+    if(!(pl = PL_new_term_ref())
+        || !PL_put_atom_chars(pl, n.c_str()))
+      stop("r2pl: cannot create variable name") ;
+
+    return pl ;
   }
 
-  term_t vec_functor = PL_new_functor(PL_new_atom((const char*) options("charvec")), len) ;
-  term_t vec = PL_new_term_ref() ;
-  PL_cons_functor_v(vec, vec_functor, args) ;
-  return vec ;
+  // Do not map the anonymous variable to a known variable name
+  if(n == "_")
+  {
+    term_t pl ;
+    if(!(pl = PL_new_term_ref()))
+      stop("r2pl: cannot create variable") ;
+
+    return pl ;
+  }
+
+  // Unify with existing variable of the same name
+  term_t head = PL_new_term_ref() ;
+  term_t tail = PL_copy_term_ref(vars) ;
+  for(R_xlen_t i=0 ; i<names.length() ; i++)
+  {
+    PL_get_list_ex(tail, head, tail) ;
+    if(n == names(i))
+      return head ;
+  }
+
+  // If no such variable exists, create a new one and remember the name
+  names.push_front(n.c_str()) ;
+
+  term_t pl ;
+  if(!(pl = PL_new_term_ref())
+      || !PL_cons_list(vars, pl, vars))
+    stop("Could not convert R expression") ;
+
+  return pl ;
+}
+
+// Translate R symbol to prolog atom
+term_t r2pl_atom(Symbol r)
+{
+  term_t pl ;
+  if(!(pl = PL_new_term_ref())
+      || !PL_put_atom_chars(pl, r.c_str()))
+    stop("r2pl: cannot create atom from symbol") ;
+
+  return pl ;
 }
 
 // Translate R call to prolog compound, taking into account the names of the
@@ -975,9 +1185,13 @@ term_t r2pl_compound(Language r, CharacterVector& names, term_t& vars, List opti
   size_t len = (size_t) l.size() ;
   if(len == 0)
   {
-    term_t functor = PL_new_functor(PL_new_atom(as<Symbol>(CAR(r)).c_str()), 0) ;
-    term_t pl = PL_new_term_ref() ;
-    PL_cons_functor(pl, functor) ;
+    functor_t functor ;
+    term_t pl ;
+    if(!(functor = PL_new_functor(PL_new_atom(as<Symbol>(CAR(r)).c_str()), 0))
+        || !(pl = PL_new_term_ref())
+        || !PL_cons_functor(pl, functor))
+      stop("Could not convert R call") ;
+
     return pl ;
   }
 
@@ -987,8 +1201,12 @@ term_t r2pl_compound(Language r, CharacterVector& names, term_t& vars, List opti
   if(TYPEOF(l.names()) == STRSXP)
     n = l.names() ;
   
-  term_t functor = PL_new_functor(PL_new_atom(as<Symbol>(CAR(r)).c_str()), len) ;
-  term_t args = PL_new_term_refs(len) ;
+  functor_t functor ;
+  term_t args ;
+  if(!(functor = PL_new_functor(PL_new_atom(as<Symbol>(CAR(r)).c_str()), len))
+      || !(args = PL_new_term_refs(len)))
+    stop("Could not convert R call") ;
+
   for(size_t i=0 ; i<len ; i++)
   {
     term_t arg = r2pl(l(i), names, vars, options) ;
@@ -996,18 +1214,29 @@ term_t r2pl_compound(Language r, CharacterVector& names, term_t& vars, List opti
     // Convert named arguments to prolog compounds a=X
     if(n.length() && n(i) != "")
     {
-      term_t eq = PL_new_functor(PL_new_atom("="), 2) ;
-      term_t name = PL_new_atom(n(i)) ;
-      term_t named = PL_new_term_ref() ;
-      PL_cons_functor(named, eq, name, arg) ;
-      PL_put_term(args + i, named) ;
+      functor_t eq ;
+      term_t name, named ;
+      if(!(eq = PL_new_functor(PL_new_atom("="), 2))
+          || !(name = PL_new_term_ref())
+          || !PL_put_atom_chars(name, n(i))
+          || !(named = PL_new_term_ref())
+          || !PL_cons_functor(named, eq, name, arg)
+          || !PL_put_term(args + i, named))
+        stop("Could not convert R call") ;
     }
     else
-      PL_put_term(args + i, arg) ; // no name
+    {
+      // no name
+      if(!PL_put_term(args + i, arg))
+        stop("Could not convert R call") ;
+    }
   }
 
-  term_t pl = PL_new_term_ref() ;
-  PL_cons_functor_v(pl, functor, args) ;
+  term_t pl ;
+  if(!(pl = PL_new_term_ref())
+      || !PL_cons_functor_v(pl, functor, args))
+    stop("Could not convert R call") ;
+
   return pl ;
 }
 
@@ -1032,14 +1261,22 @@ term_t r2pl_list(List r, CharacterVector& names, term_t& vars, List options)
     // Convert named argument to prolog pair a-X.
     if(n.length() && n(i) != "")
     {
-      term_t eq = PL_new_functor(PL_new_atom("-"), 2) ;
-      term_t name = PL_new_atom(n(i)) ;
-      term_t named = PL_new_term_ref() ;
-      PL_cons_functor(named, eq, name, elem) ;
-      PL_cons_list(pl, named, pl) ;
+      functor_t eq ;
+      term_t name, named ;
+      if(!(eq = PL_new_functor(PL_new_atom("-"), 2))
+          || !(name = PL_new_term_ref())
+          || !PL_put_atom_chars(name, n(i))
+          || !(named = PL_new_term_ref())
+          || !PL_cons_functor(named, eq, name, elem)
+          || !PL_cons_list(pl, named, pl))
+        stop("Could not convert R list") ;
     }
     else
-      PL_cons_list(pl, elem, pl) ; // no name
+    {
+      // no name
+      if(!PL_cons_list(pl, elem, pl))
+        stop("Could not convert R list") ;
+    }
   }
 
   return pl ;
@@ -1056,23 +1293,31 @@ term_t r2pl_function(Function r, CharacterVector& names, term_t& vars, List opti
   term_t function = PL_new_term_ref() ;
   if(len == 0)
   {
-    term_t name = PL_new_functor(PL_new_atom("function"), 0) ;
-    PL_cons_functor(function, name) ;
+    functor_t functor ;
+    if(!(functor = PL_new_functor(PL_new_atom("function"), 0))
+        || !PL_cons_functor(function, functor))
+      stop("Could not convert R function") ;
   }
   else
   {
     CharacterVector n = formals.names() ;
     term_t args = PL_new_term_refs(len) ;
     for(size_t i=0 ; i<len ; i++)
-      PL_put_atom(args + i, PL_new_atom(n(i))) ;
+      PL_put_atom_chars(args + i, n(i)) ;
 
-    term_t name = PL_new_functor(PL_new_atom("function"), len) ;
-    PL_cons_functor_v(function, name, args) ;
+    functor_t functor ;
+    if(!(functor = PL_new_functor(PL_new_atom("function"), len))
+        || !PL_cons_functor_v(function, functor, args))
+      stop("Could not convert R function") ;
   }
- 
-  term_t neck = PL_new_functor(PL_new_atom(":-"), 2) ;
-  term_t pl = PL_new_term_ref() ;
-  PL_cons_functor(pl, neck, function, body) ;
+
+  functor_t neck ;
+  term_t pl ;
+  if(!(neck = PL_new_functor(PL_new_atom(":-"), 2))
+      || !(pl = PL_new_term_ref())
+      || !PL_cons_functor(pl, neck, function, body))
+    stop("Could not convert R function") ;
+
   return pl ;
 }
 
@@ -1084,26 +1329,36 @@ term_t r2pl_builtin(Function r, CharacterVector& names, term_t& vars, List optio
   List formals = as<List>(FORMALS(r)) ;
   size_t len = (size_t) formals.size() ;
 
-  term_t function = PL_new_term_ref() ;
+  functor_t functor ;
+  term_t function ;
+  if(!(function = PL_new_term_ref()))
+    stop("Could not convert R builtin function") ;
+
   if(len == 0)
   {
-    term_t name = PL_new_functor(PL_new_atom("function"), 0) ;
-    PL_cons_functor(function, name) ;
+    if(!(functor = PL_new_functor(PL_new_atom("function"), 0))
+        || !PL_cons_functor(function, functor))
+      stop("Could not convert R builtin function") ;
   }
   else
   {
     CharacterVector n = formals.names() ;
     term_t args = PL_new_term_refs(len) ;
     for(size_t i=0 ; i<len ; i++)
-      PL_put_atom(args + i, PL_new_atom(n(i))) ;
+      PL_put_atom_chars(args + i, n(i)) ;
 
-    term_t name = PL_new_functor(PL_new_atom("function"), len) ;
-    PL_cons_functor_v(function, name, args) ;
+    if(!(functor = PL_new_functor(PL_new_atom("function"), len))
+        || !PL_cons_functor_v(function, functor, args))
+      stop("Could not convert R builtin function") ;
   }
 
-  term_t neck = PL_new_functor(PL_new_atom(":-"), 2) ;
-  term_t pl = PL_new_term_ref() ;
-  PL_cons_functor(pl, neck, function, body) ;
+  functor_t neck ;
+  term_t pl ;
+  if(!(neck = PL_new_functor(PL_new_atom(":-"), 2))
+      || !(PL_new_term_ref())
+      || !PL_cons_functor(pl, neck, function, body))
+    stop("Could not convert R builtin function") ;
+
   return pl ;
 }
 
@@ -1147,23 +1402,23 @@ term_t r2pl(SEXP r, CharacterVector& names, term_t& vars, List options)
   return r2pl_na() ;
 }
 
-class RlQuery  
+class RlQuery
 {
   CharacterVector names ;
   term_t vars ;
   List options ;
   Environment env ;
   qid_t qid ;
-  
+
 public:
   RlQuery(RObject aquery, List aoptions, Environment aenv) ;
   ~RlQuery() ;
-  
+
   int next_solution() ;
 
   List bindings() ;
 
-  const List& get_options() const 
+  const List& get_options() const
   {
     return options ;
   }
@@ -1179,10 +1434,12 @@ RlQuery::RlQuery(RObject aquery, List aoptions, Environment aenv)
     vars(PL_new_term_ref()),
     options(aoptions),
     env(aenv),
-    qid(NULL)
+    qid(0)
 {
   options("atomize") = false ;
-  term_t pl = r2pl(aquery, names, vars, options) ;
+  term_t pl = PL_new_term_ref() ;
+  if(!PL_put_term(pl, r2pl(aquery, names, vars, options)))
+    stop("cannot create query") ;
 
   predicate_t p = PL_predicate("call", 1, NULL) ;
   qid = PL_open_query(NULL, PL_Q_EXT_STATUS, p, pl) ;
@@ -1208,19 +1465,27 @@ int RlQuery::next_solution()
 
   if(q == PL_S_FALSE)
   {
-    PL_cut_query(qid) ;
+    // PL_close_query(qid) ;
+    // qid = 0 ;
     return FALSE ;
   }
 
   if(q == PL_S_EXCEPTION)
   {
-    PL_close_query(qid) ;
     term_t ex = PL_exception(0) ;
     PL_clear_exception() ;
 
     char* err ;
-    PL_get_chars(ex, &err, BUF_DISCARDABLE) ;
-    stop(err) ;
+    if(PL_get_chars(ex, &err, BUF_DISCARDABLE))
+    {
+      PL_close_query(qid) ;
+      qid = 0 ;
+      stop(err) ;
+    }
+
+    PL_close_query(qid) ;
+    qid = 0 ;
+    stop("query: exception occurred") ;
   }
 
   return q ;
@@ -1348,8 +1613,7 @@ List findall_(RObject query, List options, Environment env)
   return results ;
 }
 
-// Pretty print query. Maybe simplify to something like this:
-// with_output_to(string(S), write_term(member(X), [variable_names(['X'=X])])).
+// Pretty print query
 //
 // [[Rcpp::export(.portray)]]
 RObject portray_(RObject query, List options)
@@ -1360,26 +1624,34 @@ RObject portray_(RObject query, List options)
     clear_() ;
   }
 
+  // translate variables to their R names
+  options("atomize") = true ;
   CharacterVector names ;
-  term_t vars = PL_new_term_ref() ;
-  options("atomize") = true ; // translate variables to their R names
-  term_t pl = PL_new_term_refs(3) ;
-  PL_put_term(pl, r2pl(query, names, vars, options)) ;
+  term_t vars, pl ;
+  if(!(vars = PL_new_term_ref())
+      || !PL_put_nil(vars)
+      || !(pl = PL_new_term_refs(3))
+      || !PL_put_term(pl, r2pl(query, names, vars, options)))
+    stop("cannot portray") ;
 
-  term_t list = PL_new_term_ref() ;
-  PL_put_nil(list) ;
-
-  term_t quoted_functor = PL_new_functor(PL_new_atom("quoted"), 1) ;
-  term_t quoted = PL_new_term_ref() ;
-  PL_cons_functor(quoted, quoted_functor, PL_new_atom("false")) ;
-  PL_cons_list(list, quoted, list) ;
-
-  term_t spacing_functor = PL_new_functor(PL_new_atom("spacing"), 1) ;
-  term_t spacing = PL_new_term_ref() ;
-  PL_cons_functor(spacing, spacing_functor, PL_new_atom("next_argument")) ;
-  PL_cons_list(list, spacing, list) ;
-
-  PL_put_term(pl + 2, list) ;
+  functor_t quoted_functor, spacing_functor ;
+  term_t list, quoted, quoted_arg, spacing, spacing_arg ;
+  if(!(list = PL_new_term_ref())
+      || !PL_put_nil(list)
+      || !(quoted_functor = PL_new_functor(PL_new_atom("quoted"), 1))
+      || !(quoted_arg = PL_new_term_ref())
+      || !PL_put_atom_chars(quoted_arg, "false")
+      || !(quoted = PL_new_term_ref())
+      || !PL_cons_functor(quoted, quoted_functor, quoted_arg)
+      || !PL_cons_list(list, quoted, list)
+      || !(spacing_functor = PL_new_functor(PL_new_atom("spacing"), 1))
+      || !(spacing_arg = PL_new_term_ref())
+      || !(PL_put_atom_chars(spacing_arg, "next_argument"))
+      || !(spacing = PL_new_term_ref())
+      || !PL_cons_functor(spacing, spacing_functor, spacing_arg)
+      || !PL_cons_list(list, spacing, list)
+      || !PL_put_term(pl + 2, list))
+    stop("cannot portray") ;
 
   fid_t f = PL_open_foreign_frame() ;
   predicate_t p = PL_predicate("term_string", 3, NULL) ;
@@ -1395,10 +1667,11 @@ RObject portray_(RObject query, List options)
 }
 
 // Call R expression from Prolog
-static foreign_t r_eval1(term_t A1) 
+static foreign_t r_eval1(term_t arg1) 
 {
   CharacterVector names ;
-  term_t vars ;
+  term_t vars = PL_new_term_ref() ;
+  PL_put_nil(vars) ;
   List options ;
   if(query_id)
     options = query_id->get_options() ;
@@ -1410,7 +1683,7 @@ static foreign_t r_eval1(term_t A1)
       Named("intvec") = "%%", Named("intmat") = "%%%", 
       Named("atomize") = false, Named("scalar") = true) ;
 
-  RObject Expr = pl2r(A1, names, vars, options) ;
+  RObject Expr = pl2r(arg1, names, vars, options) ;
   RObject Res = Expr ;
   try
   {
@@ -1420,22 +1693,23 @@ static foreign_t r_eval1(term_t A1)
 
   catch(std::exception& ex)
   {
-//    throw PlException(PlCompound("r_eval", PlTermv(A1, PlAtom(ex.what())))) ;
+//    throw PlException(PlCompound("r_eval", PlTermv(PlTerm(arg1), PlAtom(ex.what())))) ;
   }
 
   catch(...)
   {
-//    throw PlException(PlCompound("r_eval", PlTermv(A1, PlString("exception occurred")))) ;
+//    throw PlException(PlCompound("r_eval", PlTermv(PlTerm(arg1), PlString("exception occurred")))) ;
   }
 
   return true ;
 }
 
 // Evaluate R expression from Prolog
-static foreign_t r_eval2(term_t A1, term_t A2)
+static foreign_t r_eval2(term_t arg1, term_t arg2)
 {
   CharacterVector names ;
-  term_t vars ;
+  term_t vars = PL_new_term_ref() ;
+  PL_put_nil(vars) ;
   List options ;
   if(query_id)
     options = query_id->get_options() ;
@@ -1447,7 +1721,7 @@ static foreign_t r_eval2(term_t A1, term_t A2)
       Named("intvec") = "%%", Named("intmat") = "%%%", 
       Named("atomize") = false, Named("scalar") = true) ;
 
-  RObject Expr = pl2r(A1, names, vars, options) ;
+  RObject Expr = pl2r(arg1, names, vars, options) ;
   RObject Res = Expr ;
   try
   {
@@ -1457,16 +1731,20 @@ static foreign_t r_eval2(term_t A1, term_t A2)
   
   catch(std::exception& ex)
   {
-//    throw PlException(PlCompound("r_eval", PlTermv(A1, PlAtom(ex.what())))) ;
+//    throw PlException(PlCompound("r_eval", PlTermv(arg1, arg2, PlAtom(ex.what())))) ;
   }
 
   catch(...)
   {
-//    throw PlException(PlCompound("r_eval", PlTermv(A1, PlAtom("exception occurred")))) ;
+//    throw PlException(PlCompound("r_eval", PlTermv(arg1, arg2, PlAtom("exception occurred")))) ;
   }
 
-  term_t pl = r2pl(Res, names, vars, options) ;
-  return PL_unify(A2, pl) ;
+  term_t pl ;
+  if(!(pl = PL_new_term_ref())
+      || !PL_put_term(pl, r2pl(Res, names, vars, options)))
+    stop("cannot r_eval/2") ;
+
+  return PL_unify(arg2, pl) ;
 }
 
 static foreign_t r_eval(term_t args, int arity, void* context)
@@ -1476,6 +1754,11 @@ static foreign_t r_eval(term_t args, int arity, void* context)
 
   if(arity == 2)
     return r_eval2(args, args + 1) ;
+
+  term_t ex ;
+  return (ex = PL_new_term_ref()) 
+    && PL_unify_term(ex, PL_FUNCTOR_CHARS, "domain_error", 2, PL_CHARS, "1, 2", PL_CHARS, "arity") 
+    && PL_raise_exception(ex) ;
 }
 
 // The SWI system should not be initialized twice; therefore, we keep track of

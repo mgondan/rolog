@@ -52,5 +52,3 @@ PKG_CPPFLAGS=$(SWI_INCLUDE) -D_REENTRANT -D__SWI_PROLOG__
 PKG_LIBS=$(SWI_LIBS)
 
 all: $(SHLIB)
-
-$(SHLIB): RcppExports.o rolog.o

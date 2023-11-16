@@ -347,10 +347,10 @@ exception, the error string is forwarded to R using the `stop` function.
 The examples below illustrate this by querying an undefined Prolog predicate.
 
 ```{r}
-Q <- call("membr", expression(X), list(1, 2, 3))
-query(Q)
-try(submit())
-clear()
+#Q <- call("membr", expression(X), list(1, 2, 3))
+#query(Q)
+#try(submit())
+#clear()
 ```
 
 See Section\ 4 for another example with an error resulting from a malformed
@@ -905,20 +905,20 @@ and `query()`.
 
 ```{r}
 # Set variable in R, read in Prolog
-env <- new.env()
-with(env, a <- 1)
-once(call("r_eval", quote(a), expression(X)), env=env)
+#env <- new.env()
+#with(env, a <- 1)
+#once(call("r_eval", quote(a), expression(X)), env=env)
 
 # Set R variable in Prolog, read in R
-invisible(once(call("r_eval", call("<-", quote(b), 2))))
-cat("b =", b)
+#invisible(once(call("r_eval", call("<-", quote(b), 2))))
+#cat("b =", b)
 ```
 
 If the R call raises an exception, an error is propagated to Prolog
 and finally to the `rolog` package:
 
 ```{r}
-try(once(quote(r_eval(rnorm(-1))))) # return "-1 random numbers"
+#try(once(quote(r_eval(rnorm(-1))))) # return "-1 random numbers"
 ```
 
 ## Interval arithmetic
@@ -947,21 +947,21 @@ in `pl/interval.pl`; a few examples are shown below. Again, Prolog rings back to
 R via `r_eval/2` to determine the result of `dbinom(X, Size, Prob, Log)`.
 
 ```{r}
-consult(system.file(file.path("pl", "interval.pl"), package="rolog"))
+#consult(system.file(file.path("pl", "interval.pl"), package="rolog"))
 
-Q <- quote(int(`...`(1, 2) / `...`(-3, 3), .Res))
-unlist(findall(Q, options=list(preproc=as.rolog)))
+#Q <- quote(int(`...`(1, 2) / `...`(-3, 3), .Res))
+#unlist(findall(Q, options=list(preproc=as.rolog)))
 
-D  <- quote(`...`(5.7, 5.8))
-mu <- 4
-s  <- quote(`...`(3.8, 3.9))
-N  <- 24L
-tratio <- call("/", call("-", D, mu), call("/", s, call("sqrt", N)))
-once(call("int", tratio, expression(Res)))
+#D  <- quote(`...`(5.7, 5.8))
+#mu <- 4
+#s  <- quote(`...`(3.8, 3.9))
+#N  <- 24L
+#tratio <- call("/", call("-", D, mu), call("/", s, call("sqrt", N)))
+#once(call("int", tratio, expression(Res)))
 
 # Binomial density
-prob = quote(`...`(0.2, 0.3))
-once(call("int", call("dbinom", 4L, 10L, prob, FALSE), expression(Res)))
+#prob = quote(`...`(0.2, 0.3))
+#once(call("int", call("dbinom", 4L, 10L, prob, FALSE), expression(Res)))
 ```
 
 The slightly cumbersome syntax for entering an interval $\langle \ell, u\rangle$
