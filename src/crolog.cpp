@@ -1,3 +1,4 @@
+#include <SWI-cpp.h>
 #include <SWI-Prolog.h>
 #include "Rcpp.h"
 using namespace Rcpp ;
@@ -56,7 +57,7 @@ LogicalVector consult_(CharacterVector files)
     PL_put_atom_chars(fname, files(i)) ;
 
     predicate_t p = PL_predicate("consult", 1, NULL) ;
-    if(PL_call_predicate(NULL, PL_Q_NORMAL, p, fname) == FALSE)
+    if(!PL_call_predicate(NULL, PL_Q_NORMAL, p, fname))
       stop("failed to consult %s", (char*) files(i)) ;
   }
 
@@ -339,7 +340,8 @@ CharacterMatrix pl2r_charmat(term_t pl)
 RObject pl2r_symbol(term_t pl)
 {
   char *s ;
-  PL_get_atom_chars(pl, &s) ;
+  if(!PL_get_atom_chars(pl, &s))
+    stop("pl2r: cannot create symbol") ;
 
   if(!strcmp(s, "na"))
     return wrap(NA_LOGICAL) ;
@@ -1459,16 +1461,16 @@ int RlQuery::next_solution()
     
   int q = PL_next_solution(qid) ;
   if(q == PL_S_TRUE)
-    return TRUE ;
+    return true ;
 
   if(q == PL_S_LAST)
-    return TRUE ;
+    return true ;
 
   if(q == PL_S_FALSE)
   {
     PL_close_query(qid) ;
     qid = 0 ;
-    return FALSE ;
+    return false ;
   }
 
   if(q == PL_S_EXCEPTION)
@@ -1481,13 +1483,16 @@ int RlQuery::next_solution()
     if(PL_get_chars(ex, &err, BUF_DISCARDABLE|CVT_WRITE|REP_UTF8))
     {
       PL_clear_exception() ;
-      stop(err) ;
+      warning(err) ;
+      return false ;
     }
 
     PL_clear_exception() ;
-    stop("query: unknown exception occurred") ;
+    warning("query: unknown exception occurred") ;
+    return false ;
   }
 
+  // should not be reached
   return q ;
 }
 
@@ -1691,14 +1696,26 @@ static foreign_t r_eval1(term_t arg1)
     Res = Language("dontCheck", Expr).eval(env) ;
   }
 
-  catch(std::exception& ex)
+  catch(std::exception& cex)
   {
-//    throw PlException(PlCompound("r_eval", PlTermv(PlTerm(arg1), PlAtom(ex.what())))) ;
+    term_t ex ;
+    if((ex = PL_new_term_ref())
+        && PL_unify_term(ex, PL_FUNCTOR_CHARS, "r_eval1_error", 2, 
+             PL_TERM, arg1, PL_CHARS, cex.what()))
+      PL_raise_exception(ex) ;
+
+    return false ;
   }
 
   catch(...)
   {
-//    throw PlException(PlCompound("r_eval", PlTermv(PlTerm(arg1), PlString("exception occurred")))) ;
+    term_t ex ;
+    if((ex = PL_new_term_ref())
+        && PL_unify_term(ex, PL_FUNCTOR_CHARS, "r_eval1_error", 1, 
+             PL_TERM, arg1))
+      PL_raise_exception(ex) ;
+
+    return false ;
   }
 
   return true ;
@@ -1728,22 +1745,30 @@ static foreign_t r_eval2(term_t arg1, term_t arg2)
     Environment env = query_id->get_env() ;
     Res = Language("dontCheck", Expr).eval(env) ;
   }
-  
-  catch(std::exception& ex)
+
+  catch(std::exception& cex)
   {
-//    throw PlException(PlCompound("r_eval", PlTermv(arg1, arg2, PlAtom(ex.what())))) ;
+    term_t ex ;
+    if((ex = PL_new_term_ref())
+        && PL_unify_term(ex, PL_FUNCTOR_CHARS, "r_eval2_error", 3, 
+             PL_TERM, arg1, PL_TERM, arg2, PL_CHARS, cex.what()))
+      PL_raise_exception(ex) ;
+
+    return false ;
   }
 
   catch(...)
   {
-//    throw PlException(PlCompound("r_eval", PlTermv(arg1, arg2, PlAtom("exception occurred")))) ;
+    term_t ex ;
+    if((ex = PL_new_term_ref())
+        && PL_unify_term(ex, PL_FUNCTOR_CHARS, "r_eval2_error", 2,
+             PL_TERM, arg1, PL_TERM, arg2))
+      PL_raise_exception(ex) ;
+
+    return false ;
   }
-
-  term_t pl ;
-  if(!(pl = PL_new_term_ref())
-      || !PL_put_term(pl, r2pl(Res, names, vars, options)))
-    stop("cannot r_eval/2") ;
-
+  
+  term_t pl = r2pl(Res, names, vars, options) ;
   return PL_unify(arg2, pl) ;
 }
 
@@ -1756,9 +1781,12 @@ static foreign_t r_eval(term_t args, int arity, void* context)
     return r_eval2(args, args + 1) ;
 
   term_t ex ;
-  return (ex = PL_new_term_ref()) 
-    && PL_unify_term(ex, PL_FUNCTOR_CHARS, "domain_error", 2, PL_CHARS, "1, 2", PL_CHARS, "arity") 
-    && PL_raise_exception(ex) ;
+  if((ex = PL_new_term_ref()) 
+      && PL_unify_term(ex, PL_FUNCTOR_CHARS, "domain_error", 2, 
+           PL_CHARS, "1, 2", PL_CHARS, "arity"))
+    PL_raise_exception(ex) ;
+
+  return false ;
 }
 
 // The SWI system should not be initialized twice; therefore, we keep track of
