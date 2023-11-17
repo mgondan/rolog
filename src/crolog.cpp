@@ -521,61 +521,26 @@ RObject pl2r_variable(term_t pl, CharacterVector& names, term_t& vars)
   //
   // Search for the variable (e.g., _1545) in names and return its R name as an
   // expression (say, X).
-  PlTail tail(vars) ;
-  PlTerm v ;
-  for(int i=0 ; i<names.length() ; i++)
-  {
-    tail.next(v) ;
-    if(v == PlTerm(pl))
-      return ExpressionVector::create(Symbol(names(i))) ;
-  }
-  
-  // If the variable is not found, it's a new one created by Prolog, e.g., in
-  // queries like member(1, Y), Y is unified with [1 | _NewVar ]. This variable
-  // cannot be translated to a human-readable name, so it is returned as _1545.
-  return ExpressionVector::create(Symbol((char*) PlTerm(pl))) ;
-}
-
-// Translate prolog variables to R expressions.
-RObject pl2r_variable1(term_t pl, CharacterVector& names, term_t& vars)
-{
-  // names and vars is a list of all the variables from the R query,
-  // a typical member of names is something like X, a member of vars 
-  // is something like _1545.
-  //
-  // Search for the variable (e.g., _1545) in names and return its R name as an
-  // expression (say, X).
-  char* n ;
-  if(!PL_get_chars(pl, &n, CVT_VARIABLE|BUF_MALLOC|CVT_EXCEPTION|REP_UTF8))
-    stop("pl2r: Cannot convert variable 1") ;
-
   term_t head, tail ;
   if(!(head = PL_new_term_ref())
       || !(tail = PL_copy_term_ref(vars)))
-    stop("pl2r: Cannot convert variable 2") ;
+    stop("pl2r: Cannot convert variable 1") ;
 
-  for(size_t i=0 ; i<names.length() ; i++)
+  for(int i=0 ; i<names.length() ; i++)
   {
     PL_get_list_ex(tail, head, tail) ;
-    char *s ;
-    if(!PL_get_chars(head, &s, CVT_VARIABLE|BUF_DISCARDABLE|CVT_EXCEPTION|REP_UTF8))
-      stop("pl2r: Cannot convert variable 3 (i=%d)", i) ;
-    warning("s: %s", s) ;
-
-    if(!strcmp(s, n))
-    {
-      ExpressionVector Symb((char*) names(i)) ;
-      PL_free(n) ;
-      return Symb ;
-    }
+    if(PL_compare(pl, head) == 0)
+      return ExpressionVector::create(Symbol(names(i))) ;
   }
 
   // If the variable is not found, it's a new one created by Prolog, e.g., in
   // queries like member(1, Y), Y is unified with [1 | _NewVar ]. This variable
   // cannot be translated to a human-readable name, so it is returned as _1545.
-  ExpressionVector Symb(n) ;
-  PL_free(n) ;
-  return Symb ;
+  char* name ;
+  if(!PL_get_chars(pl, &name, CVT_VARIABLE|BUF_DISCARDABLE|REP_UTF8))
+    stop("pl2r: Cannot convert variable 2") ;
+
+  return ExpressionVector::create(Symbol(name)) ;
 }
 
 // Translate prolog compound to R call
