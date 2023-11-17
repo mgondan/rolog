@@ -338,20 +338,24 @@ CharacterMatrix pl2r_charmat(term_t pl)
 // Convert prolog atom to R symbol (handle na, true, false)
 RObject pl2r_symbol(term_t pl)
 {
-  if(!strcmp(PL_atom_nchars(pl, NULL), "na"))
+  char *s ;
+  PL_get_atom_chars(pl, &s) ;
+
+  if(!strcmp(s, "na"))
     return wrap(NA_LOGICAL) ;
   
-  if(!strcmp(PL_atom_nchars(pl, NULL), "true"))
+  if(!strcmp(s, "true"))
     return wrap(true) ;
   
-  if(!strcmp(PL_atom_nchars(pl, NULL), "false"))
+  if(!strcmp(s, "false"))
     return wrap(false) ;
 
   // Empty symbols
-  if(!strcmp(PL_atom_nchars(pl, NULL), ""))
+  if(!strcmp(s, ""))
     return Function("substitute")() ;
 
-  return wrap(Symbol(PL_atom_nchars(pl, NULL))) ;
+  // general atoms
+  return wrap(Symbol(s)) ;
 }
 
 // Forward declaration, needed below

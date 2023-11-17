@@ -905,20 +905,20 @@ and `query()`.
 
 ```{r}
 # Set variable in R, read in Prolog
-#env <- new.env()
-#with(env, a <- 1)
-#once(call("r_eval", quote(a), expression(X)), env=env)
+env <- new.env()
+with(env, a <- 1)
+once(call("r_eval", quote(a), expression(X)), env=env)
 
 # Set R variable in Prolog, read in R
-#invisible(once(call("r_eval", call("<-", quote(b), 2))))
-#cat("b =", b)
+invisible(once(call("r_eval", call("<-", quote(b), 2))))
+cat("b =", b)
 ```
 
 If the R call raises an exception, an error is propagated to Prolog
 and finally to the `rolog` package:
 
 ```{r}
-#try(once(quote(r_eval(rnorm(-1))))) # return "-1 random numbers"
+#try(once(quote(r_eval(rnorm(-1))))) # return "-1" random normals
 ```
 
 ## Interval arithmetic
