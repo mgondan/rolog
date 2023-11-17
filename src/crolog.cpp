@@ -409,7 +409,11 @@ RObject pl2r_function(term_t pl, CharacterVector& names, term_t& vars, List opti
     }
 
     // just the name, no argument like in alist(a=, b=)
-    head.push_back(Named(PL_atom_nchars(arg, NULL)) = Function("substitute")()) ;
+    char* s ;
+    if(!PL_get_atom_chars(arg, &s))
+      stop("Cannot convert pl compound") ;
+
+    head.push_back(Named(s) = Function("substitute")()) ;
   }
 
   RObject body = pl2r_compound(plbody, names, vars, options) ;
