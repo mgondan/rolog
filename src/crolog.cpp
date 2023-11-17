@@ -521,21 +521,46 @@ RObject pl2r_variable(term_t pl, CharacterVector& names, term_t& vars)
   //
   // Search for the variable (e.g., _1545) in names and return its R name as an
   // expression (say, X).
+  PlTail tail(vars) ;
+  PlTerm v ;
+  for(int i=0 ; i<names.length() ; i++)
+  {
+    tail.next(v) ;
+    if(v == PlTerm(pl))
+      return ExpressionVector::create(Symbol(names(i))) ;
+  }
+  
+  // If the variable is not found, it's a new one created by Prolog, e.g., in
+  // queries like member(1, Y), Y is unified with [1 | _NewVar ]. This variable
+  // cannot be translated to a human-readable name, so it is returned as _1545.
+  return ExpressionVector::create(Symbol((char*) PlTerm(pl))) ;
+}
+
+// Translate prolog variables to R expressions.
+RObject pl2r_variable1(term_t pl, CharacterVector& names, term_t& vars)
+{
+  // names and vars is a list of all the variables from the R query,
+  // a typical member of names is something like X, a member of vars 
+  // is something like _1545.
+  //
+  // Search for the variable (e.g., _1545) in names and return its R name as an
+  // expression (say, X).
   char* n ;
   if(!PL_get_chars(pl, &n, CVT_VARIABLE|BUF_MALLOC|CVT_EXCEPTION|REP_UTF8))
-    stop("pl2r: Cannot convert variable") ;
+    stop("pl2r: Cannot convert variable 1") ;
 
   term_t head, tail ;
   if(!(head = PL_new_term_ref())
       || !(tail = PL_copy_term_ref(vars)))
-    stop("pl2r: Cannot convert variable") ;
+    stop("pl2r: Cannot convert variable 2") ;
 
   for(size_t i=0 ; i<names.length() ; i++)
   {
     PL_get_list_ex(tail, head, tail) ;
     char *s ;
     if(!PL_get_chars(head, &s, CVT_VARIABLE|BUF_DISCARDABLE|CVT_EXCEPTION|REP_UTF8))
-      stop("pl2r: Cannot convert variable") ;
+      stop("pl2r: Cannot convert variable 3 (i=%d)", i) ;
+    warning("s: %s", s) ;
 
     if(!strcmp(s, n))
     {
@@ -1130,17 +1155,17 @@ term_t r2pl_string(CharacterVector r, List options)
 //
 // If options("atomize") is true, no variable is created, but an atom is created 
 // with the variable name from R. This is only used for pretty printing.
-term_t r2pl_var(ExpressionVector r, CharacterVector& names, term_t& vars, List options)
+term_t r2pl_variable(ExpressionVector r, CharacterVector& names, term_t& vars, List options)
 {
   // Variable name in R
   Symbol n = as<Symbol>(r[0]) ;
   
   // If the variable should be "atomized" for pretty printing
-  if(as<LogicalVector>(options("atomize"))(0))
+  if(as<LogicalVector>(options("atomize"))(0) == true)
   {
     term_t pl ;
     if(!(pl = PL_new_term_ref())
-        || !PL_put_atom_chars(pl, n.c_str()))
+        || !PL_unify_atom_chars(pl, n.c_str()))
       stop("r2pl: cannot create variable name") ;
 
     return pl ;
@@ -1167,11 +1192,11 @@ term_t r2pl_var(ExpressionVector r, CharacterVector& names, term_t& vars, List o
   }
 
   // If no such variable exists, create a new one and remember the name
-  names.push_front(n.c_str()) ;
+  names.push_back(n.c_str()) ;
 
   term_t pl ;
   if(!(pl = PL_new_term_ref())
-      || !PL_cons_list(vars, pl, vars))
+      || !PL_unify_list(tail, pl, tail))
     stop("Could not convert R expression") ;
 
   return pl ;
@@ -1265,10 +1290,11 @@ term_t r2pl_list(List r, CharacterVector& names, term_t& vars, List options)
   CharacterVector n ;
   if(TYPEOF(r.names()) == STRSXP)
     n = as<CharacterVector>(r.names()) ;
-  
+
   term_t pl = PL_new_term_ref() ;
-  PL_put_nil(pl) ;
-  for(R_xlen_t i=r.size()-1; i>=0; i--)
+  term_t tail = PL_copy_term_ref(pl) ;
+  term_t item = PL_new_term_ref() ;
+  for(R_xlen_t i=0; i<r.size(); i++)
   {
     term_t elem = r2pl(r(i), names, vars, options) ;
 
@@ -1280,18 +1306,21 @@ term_t r2pl_list(List r, CharacterVector& names, term_t& vars, List options)
       if(!(eq = PL_new_functor(PL_new_atom("-"), 2))
           || !(name = PL_new_term_ref())
           || !PL_put_atom_chars(name, n(i))
-          || !(named = PL_new_term_ref())
-          || !PL_cons_functor(named, eq, name, elem)
-          || !PL_cons_list(pl, named, pl))
+          || !PL_unify_list(tail, item, tail)
+          || !PL_cons_functor(item, eq, name, elem))
         stop("Could not convert R list") ;
     }
     else
     {
       // no name
-      if(!PL_cons_list(pl, elem, pl))
+      if(!PL_unify_list(tail, item, tail)
+          || !PL_unify(item, elem))
         stop("Could not convert R list") ;
-    }
+    }         
   }
+
+  if(!PL_unify_nil(tail))
+    stop("Could not convert R list") ;
 
   return pl ;
 }
@@ -1391,7 +1420,7 @@ term_t r2pl(SEXP r, CharacterVector& names, term_t& vars, List options)
     return r2pl_integer(r, options) ;
   
   if(TYPEOF(r) == EXPRSXP)
-    return r2pl_var(r, names, vars, options) ;
+    return r2pl_variable(r, names, vars, options) ;
 
   if(TYPEOF(r) == SYMSXP)
     return r2pl_atom(r) ;
@@ -1452,7 +1481,6 @@ RlQuery::RlQuery(RObject aquery, List aoptions, Environment aenv)
 {
   options("atomize") = false ;
   term_t pl = r2pl(aquery, names, vars, options) ;
-
   predicate_t p = PL_predicate("call", 1, NULL) ;
   qid = PL_open_query(NULL, PL_Q_PASS_EXCEPTION|PL_Q_EXT_STATUS, p, pl) ;
 }
@@ -1467,7 +1495,7 @@ int RlQuery::next_solution()
 {
   if(qid == 0)
     stop("next_solution: no open query.") ;
-    
+
   int q = PL_next_solution(qid) ;
   if(q == PL_S_TRUE)
     return true ;
@@ -1518,7 +1546,7 @@ List RlQuery::bindings()
     if(TYPEOF(r) == EXPRSXP && names[i] == as<Symbol>(as<ExpressionVector>(r)[0]).c_str())
       continue ;
 
-     l.push_back(r, (const char*) names[i]) ;
+    l.push_back(r, (const char*) names[i]) ;
   }
 
   return l ;
@@ -1643,7 +1671,6 @@ RObject portray_(RObject query, List options)
   CharacterVector names ;
   term_t vars, pl ;
   if(!(vars = PL_new_term_ref())
-      || !PL_put_nil(vars)
       || !(pl = PL_new_term_refs(3))
       || !PL_put_term(pl, r2pl(query, names, vars, options)))
     stop("cannot portray") ;
@@ -1685,7 +1712,6 @@ static foreign_t r_eval1(term_t arg1)
 {
   CharacterVector names ;
   term_t vars = PL_new_term_ref() ;
-  PL_put_nil(vars) ;
   List options ;
   if(query_id)
     options = query_id->get_options() ;
@@ -1735,7 +1761,6 @@ static foreign_t r_eval2(term_t arg1, term_t arg2)
 {
   CharacterVector names ;
   term_t vars = PL_new_term_ref() ;
-  PL_put_nil(vars) ;
   List options ;
   if(query_id)
     options = query_id->get_options() ;
