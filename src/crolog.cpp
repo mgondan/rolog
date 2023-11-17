@@ -793,7 +793,12 @@ term_t r2pl_string(CharacterVector r, List options) ;
 // This returns an empty list
 term_t r2pl_null()
 {
-  return ATOM_nil ;
+  term_t null ;
+  if(!(null = PL_new_term_ref())
+      || !PL_put_nil(null))
+    stop("r2pl: cannot create null") ;
+
+  return null ;
 }
 
 // Prolog representation of R's NA.
