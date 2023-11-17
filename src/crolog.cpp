@@ -1,4 +1,3 @@
-// #include <SWI-cpp.h>
 #include <SWI-Prolog.h>
 #include "Rcpp.h"
 using namespace Rcpp ;
@@ -1437,12 +1436,10 @@ RlQuery::RlQuery(RObject aquery, List aoptions, Environment aenv)
     qid(0)
 {
   options("atomize") = false ;
-  term_t pl = PL_new_term_ref() ;
-  if(!PL_put_term(pl, r2pl(aquery, names, vars, options)))
-    stop("cannot create query") ;
+  term_t pl = r2pl(aquery, names, vars, options) ;
 
   predicate_t p = PL_predicate("call", 1, NULL) ;
-  qid = PL_open_query(NULL, PL_Q_EXT_STATUS, p, pl) ;
+  qid = PL_open_query(NULL, PL_Q_PASS_EXCEPTION|PL_Q_EXT_STATUS, p, pl) ;
 }
 
 RlQuery::~RlQuery()
@@ -1465,27 +1462,26 @@ int RlQuery::next_solution()
 
   if(q == PL_S_FALSE)
   {
-    // PL_close_query(qid) ;
-    // qid = 0 ;
+    PL_close_query(qid) ;
+    qid = 0 ;
     return FALSE ;
   }
 
   if(q == PL_S_EXCEPTION)
   {
-    term_t ex = PL_exception(0) ;
-    PL_clear_exception() ;
+    PL_close_query(qid) ;
+    qid = 0 ;
 
+    term_t ex = PL_exception(0) ;
     char* err ;
-    if(PL_get_chars(ex, &err, BUF_DISCARDABLE))
+    if(PL_get_chars(ex, &err, BUF_DISCARDABLE|CVT_WRITE|REP_UTF8))
     {
-      PL_close_query(qid) ;
-      qid = 0 ;
+      PL_clear_exception() ;
       stop(err) ;
     }
 
-    PL_close_query(qid) ;
-    qid = 0 ;
-    stop("query: exception occurred") ;
+    PL_clear_exception() ;
+    stop("query: unknown exception occurred") ;
   }
 
   return q ;
@@ -1510,13 +1506,13 @@ List RlQuery::bindings()
   return l ;
 }
 
-RlQuery* query_id = NULL ;
+static RlQuery* query_id = NULL ;
 
 // Open a query for later use.
 // [[Rcpp::export(.query)]]
 RObject query_(RObject query, List options, Environment env)
 {
-  if(PL_current_query() != 0)
+  if(query_id || PL_current_query())
   {
     warning("Cannot raise simultaneous queries. Please invoke clear()") ;
     return wrap(false) ;

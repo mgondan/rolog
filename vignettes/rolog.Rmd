@@ -347,10 +347,10 @@ exception, the error string is forwarded to R using the `stop` function.
 The examples below illustrate this by querying an undefined Prolog predicate.
 
 ```{r}
-#Q <- call("membr", expression(X), list(1, 2, 3))
-#query(Q)
-#try(submit())
-#clear()
+Q <- call("membr", expression(X), list(1, 2, 3))
+query(Q)
+try(submit())
+clear()
 ```
 
 See Section\ 4 for another example with an error resulting from a malformed
