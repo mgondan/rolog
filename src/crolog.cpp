@@ -1,4 +1,4 @@
-#include <SWI-cpp.h>
+// #include <SWI-cpp.h>
 #include <SWI-Prolog.h>
 #include "Rcpp.h"
 using namespace Rcpp ;
@@ -815,7 +815,7 @@ term_t r2pl_matrix(Matrix<REALSXP> r, List aoptions)
   if(!(rows = PL_new_term_refs(r.nrow())))
     stop("Could not convert R realmat") ;
 
-  for(size_t i=0 ; i<r.nrow() ; i++)
+  for(int i=0 ; i<r.nrow() ; i++)
     if(!PL_put_term(rows + i, r2pl_real(r.row(i), options)))
       stop("Could not convert R realmat") ;
 
@@ -892,7 +892,7 @@ term_t r2pl_matrix(Matrix<LGLSXP> r, List aoptions)
   if(!(rows = PL_new_term_refs(r.nrow())))
     stop("Could not convert R boolmat") ;
 
-  for(size_t i=0 ; i<r.nrow() ; i++)
+  for(int i=0 ; i<r.nrow() ; i++)
     if(!PL_put_term(rows+i, r2pl_logical(r.row(i), options)))
       stop("Could not convert R boolmat") ;
 
@@ -1043,7 +1043,7 @@ term_t r2pl_matrix(Matrix<STRSXP> r, List aoptions)
   if(!(rows = PL_new_term_refs(r.nrow())))
     stop("Could not convert R matrix") ;
 
-  for(size_t i=0 ; i<r.nrow() ; i++)
+  for(int i=0 ; i<r.nrow() ; i++)
     if(!PL_put_term(rows+i, r2pl_string(r.row(i), options)))
       stop("Could not convert R matrix") ;
 
@@ -1267,7 +1267,7 @@ term_t r2pl_list(List r, CharacterVector& names, term_t& vars, List options)
     if(n.length() && n(i) != "")
     {
       functor_t eq ;
-      term_t name, named ;
+      term_t name ;
       if(!(eq = PL_new_functor(PL_new_atom("-"), 2))
           || !(name = PL_new_term_ref())
           || !PL_put_atom_chars(name, n(i))
