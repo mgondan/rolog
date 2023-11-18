@@ -968,7 +968,7 @@ term_t r2pl_matrix(Matrix<INTSXP> r, List aoptions)
   if(!(rows = PL_new_term_refs(r.nrow())))
     stop("Could not convert R intmat") ;
 
-  for(size_t i=0 ; i<r.nrow() ; i++)
+  for(int i=0 ; i<r.nrow() ; i++)
     if(!PL_put_term(rows+i, r2pl_integer(r.row(i), options)))
       stop("Could not convert R intmat") ;
 
