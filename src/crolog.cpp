@@ -1363,7 +1363,7 @@ term_t r2pl_builtin(Function r, CharacterVector& names, term_t& vars, List optio
   functor_t neck ;
   term_t pl ;
   if(!(neck = PL_new_functor(PL_new_atom(":-"), 2))
-      || !(PL_new_term_ref())
+      || !(pl = PL_new_term_ref())
       || !PL_cons_functor(pl, neck, function, body))
     stop("Could not convert R builtin function") ;
 
