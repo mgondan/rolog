@@ -72,5 +72,3 @@ PKG_CPPFLAGS=$(SWI_INCLUDE) -D_REENTRANT -D__SWI_PROLOG__ -D__WINDOWS__ -D_WINDO
 PKG_LIBS=$(SWI_LIBDIR) -lswipl
 
 all: $(SHLIB)
-
-$(SHLIB): RcppExports.o rolog.o
