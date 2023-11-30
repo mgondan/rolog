@@ -1267,12 +1267,14 @@ term_t r2pl_list(List r, CharacterVector& names, term_t& vars, List options)
     if(n.length() && n(i) != "")
     {
       functor_t eq ;
-      term_t name ;
+      term_t name, named ;
       if(!(eq = PL_new_functor(PL_new_atom("-"), 2))
           || !(name = PL_new_term_ref())
+          || !(named = PL_new_term_ref())
           || !PL_put_atom_chars(name, n(i))
+          || !PL_cons_functor(named, eq, name, elem)
           || !PL_unify_list(tail, item, tail)
-          || !PL_cons_functor(item, eq, name, elem))
+          || !PL_unify(item, named))
         stop("Could not convert R list") ;
     }
     else
