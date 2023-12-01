@@ -7,3 +7,4 @@ zlib1.dll
 libgmp-10.dll
 libswipl.dll
 CMakeFiles
+crolog.o

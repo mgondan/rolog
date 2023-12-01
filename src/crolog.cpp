@@ -662,83 +662,90 @@ RObject pl2r_compound(term_t pl, CharacterVector& names, term_t& vars, List opti
 //
 RObject pl2r_list(term_t pl, CharacterVector& names, term_t& vars, List options)
 {
-  term_t head ;
-  if(!(head = PL_new_term_ref())
-      || !PL_get_arg(1, pl, head))
-    stop("Cannot convert list 1") ;
-
-  // if the tail is a list or empty, return a normal list
-  term_t tail ;
-  if(!(tail = PL_new_term_ref())
+ 	term_t head, tail ;
+ 	if(!(head = PL_new_term_ref())
+      || !PL_get_arg(1, pl, head)
+      || !(tail = PL_new_term_ref())
       || !PL_get_arg(2, pl, tail))
-    stop("Cannot convert list 2") ;
+	 	  stop("Cannot convert list 1") ;
 
-  RObject rest = pl2r(tail, names, vars, options) ;
-  if(TYPEOF(rest) == VECSXP || TYPEOF(rest) == NILSXP)
-  {
-    List r = as<List>(rest) ;
-
-    // convert prolog pair a-X to named list element
-    if(PL_is_compound(head))
-    {
-      term_t head_name ;
-      size_t head_arity ;
-      if(!(head_name = PL_new_term_ref())
-          || !PL_get_name_arity(head, &head_name, &head_arity))
-        stop("Cannot convert list 3") ;
-
-      if(!strcmp(PL_atom_nchars(head_name, NULL), "-") && head_arity == 2)
-      {
-        term_t arg1, arg2 ;
-        if(!(arg1 = PL_new_term_ref())
-            || !PL_get_arg(1, head, arg1)
-            || !(arg2 = PL_new_term_ref())
-            || !PL_get_arg(2, head, arg2))
+	 RObject rest = pl2r(tail, names, vars, options) ;
+	 if(TYPEOF(rest) == VECSXP || TYPEOF(rest) == NILSXP)
+	 {
+		  List r = as<List>(rest) ;
+		
+  		// convert prolog pair a-X to named list element
+		  if(PL_is_compound(head))
+		  {
+			   term_t name ;
+			   size_t arity ;
+			   if(!(name = PL_new_term_ref())
+          || !PL_get_name_arity(head, &name, &arity))
+    				stop("Cannot convert list 3") ;
+			
+			   if(!strcmp(PL_atom_nchars(name, NULL), "-") && arity == 2)
+			   {
+				    term_t arg1, arg2 ;
+				    if(!(arg1 = PL_new_term_ref())
+           || !PL_get_arg(1, head, arg1)
+           || !(arg2 = PL_new_term_ref())
+           || !PL_get_arg(2, head, arg2))
           stop("Cannot convert list 4") ;
+				
+    				char* s ;
+				    if(PL_is_atom(arg1) && PL_get_atom_chars(arg1, &s))
+				    {
+					     r.push_front(pl2r(arg2, names, vars, options), s) ;
+					     return r ;
+				    }
+			   }
+		  }
 
-        if(PL_is_atom(arg1))
-        {
-          r.push_front(pl2r(arg2, names, vars, options), PL_atom_nchars(arg1, NULL)) ;
-          return r ;
-        }
-      }
-    }
-    
     // element has no name
     r.push_front(pl2r(head, names, vars, options)) ; 
     return r ;
   }
-    
-  // if the tail is something else, return [|](head, tail)
-  term_t name ;
-  size_t arity ;
-  if(!(name = PL_new_term_ref())
-      || !PL_get_name_arity(pl, &name, &arity))
-    stop("Cannot convert list 5") ;
 
-  Language r(PL_atom_nchars(name, NULL)) ;
-  // convert prolog pair a-X to named list element
-  if(PL_is_compound(head) && !strcmp(PL_atom_nchars(name, NULL), "-") && arity == 2)
-  {
-    term_t arg1, arg2 ;
-    if(!(arg1 = PL_new_term_ref())
-        || !PL_get_arg(1, head, arg1)
-        || !(arg2 = PL_new_term_ref())
-        || !PL_get_arg(2, head, arg2))
+	 // if the tail is something else, return [|](head, tail)
+	 term_t name ;
+	 if(!(name = PL_new_term_ref())
+       || !PL_get_name_arity(pl, &name, NULL))
+	   stop("Cannot convert list 5") ;
+	 
+	 Language r(PL_atom_nchars(name, NULL)) ;
+	 
+	 // convert prolog pair a-X to named list element
+	 if(PL_is_compound(head))
+	 {
+	   term_t name ;
+	   size_t arity ;
+	   if(!(name = PL_new_term_ref())
+        || !PL_get_name_arity(head, &name, &arity))
       stop("Cannot convert list 6") ;
+	   
+	   if(!strcmp(PL_atom_nchars(name, NULL), "-") && arity == 2)
+	   {
+	     term_t arg1, arg2 ;
+	     if(!(arg1 = PL_new_term_ref())
+          || !PL_get_arg(1, head, arg1)
+          || !(arg2 = PL_new_term_ref())
+          || !PL_get_arg(2, head, arg2))
+        stop("Cannot convert list 7") ;
 
-    if(PL_is_atom(arg1))
-    {
-      r.push_back(Named(PL_atom_nchars(arg1, NULL)) = pl2r(arg2, names, vars, options)) ;
-      r.push_back(rest) ;
-      return as<RObject>(r) ;
-    }
-  }
+	     char* s ;
+	     if(PL_is_atom(arg1) && PL_get_atom_chars(arg1, &s))
+	     {
+	       r.push_back(Named(s) = pl2r(arg2, names, vars, options)) ;
+	       r.push_back(rest) ;
+	       return as<RObject>(r) ;
+	     }
+	   }
+	 }
 
-  // element has no name
-  r.push_back(pl2r(head, names, vars, options)) ; 
-  r.push_back(rest) ;
-  return as<RObject>(r) ;
+	 // element has no name
+	 r.push_back(pl2r(head, names, vars, options)) ; 
+	 r.push_back(rest) ;
+	 return as<RObject>(r) ;
 }
 
 RObject pl2r(term_t pl, CharacterVector& names, term_t& vars, List options)
