@@ -9,16 +9,6 @@ CXXPICFLAGS=$(shell "${RBIN}" CMD config CXXPICFLAGS)
 SWI_INCLUDE=
 SWI_LIBDIR=
 
-$(info Searching for R package rswipl...)
-SWI_HOME4 := $(shell "${RSCRIPT}" -e "cat(normalizePath(file.path(find.package('rswipl'), 'swipl'), winslash='/'))")
-ifeq ("$(SWI_HOME4)","")
-  $(info R package rswipl not found, moving on.)
-else
-  $(info R package rswipl found at $(SWI_HOME4))
-  SWI_INCLUDE=-I"$(SWI_HOME4)/include"
-  SWI_LIBDIR=-L"$(SWI_HOME4)/bin"
-endif
-
 $(info Searching for SWI-Prolog in the registry...)
 SWI_HOME3 := $(shell "${RSCRIPT}" -e "cat(gsub('\\\\\\\\', '/', shortPathName(\
   file.path(readRegistry('SOFTWARE\\\\\\\\SWI\\\\\\\\Prolog', hive='HLM')[['home']]))))")
@@ -49,6 +39,16 @@ else
   else
     $(info PATH: swipl.exe (arch x64-win64) not found, moving on.)
   endif
+endif
+
+$(info Searching for R package rswipl...)
+SWI_HOME4 := $(shell "${RSCRIPT}" -e "cat(normalizePath(file.path(find.package('rswipl'), 'swipl'), winslash='/'))")
+ifeq ("$(SWI_HOME4)","")
+  $(info R package rswipl not found, moving on.)
+else
+  $(info R package rswipl found at $(SWI_HOME4))
+  SWI_INCLUDE=-I"$(SWI_HOME4)/include"
+  SWI_LIBDIR=-L"$(SWI_HOME4)/bin"
 endif
 
 $(info Searching for SWI_HOME_DIR in the environment...)

@@ -56,6 +56,76 @@
     }
   }
 
+  #
+  # Find R package rswipl
+  #
+  if(!rolog.ok & .Platform$OS.type == "windows")
+  {
+    pl0 <- try(silent=TRUE, find.package("rswipl"))
+    if(!isa(pl0, "try-error"))
+    {
+      home <- dir(pl0, pattern="swipl$", full.names=TRUE)
+      libswipl <- dir(file.path(home, "bin"),
+                      pattern=paste("libswipl", .Platform$dynlib.ext, "$", sep=""),
+                      full.names=TRUE)
+      
+      if(length(libswipl))
+      {
+        msg <- sprintf("Found R package rswipl: %s", home)
+        rolog.ok <- TRUE
+      }
+    }
+  }
+  
+  if(!rolog.ok & .Platform$OS.type == "unix")
+  {
+    pl0 <- try(silent=TRUE, find.package("rswipl"))
+    if(!isa(pl0, "try-error"))
+    {
+      home <- dir(file.path(pl0, "swipl", "lib"), pattern="swipl$", full.names=TRUE)
+      arch <- R.Version()$arch
+      lib <- dir(file.path(home, "lib"), pattern=arch, full.names=TRUE)
+      if(length(lib) == 0 & arch == "aarch64")
+        lib <- dir(file.path(home, "lib"), pattern="arm64", full.names=TRUE)
+      
+      if(R.Version()$os == "linux-gnu")
+        libswipl <- dir(lib, pattern="libswipl.so$", full.names=TRUE)
+      else
+        libswipl <- dir(lib, pattern="libswipl.dylib$", full.names=TRUE)
+      
+      if(length(libswipl) == 1)
+      {
+        dyn.load(libswipl, local=FALSE)
+        msg <- sprintf("Found R package rswipl: %s", home)
+        rolog.ok <- TRUE
+      }
+    }
+  }
+  
+  if(!rolog.ok & .Platform$OS.type == "unix")
+  {
+    pl0 <- try(silent=TRUE, find.package("rswipl"))
+    if(!isa(pl0, "try-error"))
+    {
+      home <- dir(file.path(pl0, "swipl", "lib"), pattern="swipl$", full.names=TRUE)
+      arch <- R.Version()$arch
+      lib <- dir(file.path(home, "lib"), pattern=arch, full.names=TRUE)
+      if(length(lib) == 0 & arch == "aarch64")
+        lib <- dir(file.path(home, "lib"), pattern="arm64", full.names=TRUE)
+      
+      if(R.Version()$os == "linux-gnu")
+      {
+        static <- dir(lib, pattern="libswipl.a$", full.names=TRUE)
+        
+        if(length(static) == 1)
+        {
+          msg <- sprintf("Found R package rswipl: %s", home)
+          rolog.ok <- TRUE
+        }
+      }
+    }
+  }
+  
   # Typical installation in /usr/local/lib/swipl
   if(home != "" & !rolog.ok & .Platform$OS.type == "unix" & R.Version()$arch == "x86_64")
   {
@@ -222,76 +292,6 @@
             msg <- sprintf("Found SWI-Prolog in the registry: %s", home)
             rolog.ok <- TRUE
           }
-        }
-      }
-    }
-  }
-
-  #
-  # Find R package rswipl
-  #
-  if(!rolog.ok & .Platform$OS.type == "windows")
-  {
-    pl0 <- try(silent=TRUE, find.package("rswipl"))
-    if(!isa(pl0, "try-error"))
-    {
-      home <- dir(pl0, pattern="swipl$", full.names=TRUE)
-      libswipl <- dir(file.path(home, "bin"),
-        pattern=paste("libswipl", .Platform$dynlib.ext, "$", sep=""),
-        full.names=TRUE)
-
-      if(length(libswipl))
-      {
-        msg <- sprintf("Found R package rswipl: %s", home)
-        rolog.ok <- TRUE
-      }
-    }
-  }
-
-  if(!rolog.ok & .Platform$OS.type == "unix")
-  {
-    pl0 <- try(silent=TRUE, find.package("rswipl"))
-    if(!isa(pl0, "try-error"))
-    {
-      home <- dir(file.path(pl0, "swipl", "lib"), pattern="swipl$", full.names=TRUE)
-      arch <- R.Version()$arch
-      lib <- dir(file.path(home, "lib"), pattern=arch, full.names=TRUE)
-      if(length(lib) == 0 & arch == "aarch64")
-        lib <- dir(file.path(home, "lib"), pattern="arm64", full.names=TRUE)
-
-      if(R.Version()$os == "linux-gnu")
-        libswipl <- dir(lib, pattern="libswipl.so$", full.names=TRUE)
-      else
-        libswipl <- dir(lib, pattern="libswipl.dylib$", full.names=TRUE)
-
-      if(length(libswipl) == 1)
-      {
-        dyn.load(libswipl, local=FALSE)
-        msg <- sprintf("Found R package rswipl: %s", home)
-        rolog.ok <- TRUE
-      }
-    }
-  }
-
-  if(!rolog.ok & .Platform$OS.type == "unix")
-  {
-    pl0 <- try(silent=TRUE, find.package("rswipl"))
-    if(!isa(pl0, "try-error"))
-    {
-      home <- dir(file.path(pl0, "swipl", "lib"), pattern="swipl$", full.names=TRUE)
-      arch <- R.Version()$arch
-      lib <- dir(file.path(home, "lib"), pattern=arch, full.names=TRUE)
-      if(length(lib) == 0 & arch == "aarch64")
-        lib <- dir(file.path(home, "lib"), pattern="arm64", full.names=TRUE)
-
-      if(R.Version()$os == "linux-gnu")
-      {
-        static <- dir(lib, pattern="libswipl.a$", full.names=TRUE)
-
-        if(length(static) == 1)
-        {
-          msg <- sprintf("Found R package rswipl: %s", home)
-          rolog.ok <- TRUE
         }
       }
     }
