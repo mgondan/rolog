@@ -3,7 +3,11 @@
 {
   plbase <- .find.swipl64()
   if(!is.na(plbase))
-    cat(shortPathName(plbase))
+  {
+    if(.Platform$OS.type == "windows")
+      plbase = shortPathName(plbase)
+    cat(plbase)
+  }
 }
 
 # Search for swipl in the various places
@@ -21,9 +25,12 @@
   if(!is.na(plbase))
     return(plbase)
 
-  plbase <- .registry()
-  if(!is.na(plbase))
-    return(plbase)
+  if(.Platform$OS.type == windows)
+  {
+    plbase <- .registry()
+    if(!is.na(plbase))
+      return(plbase)
+  }
 
   warning("plbase.R: SWI-Prolog not found")
   return(NA)
@@ -50,9 +57,18 @@
     return(NA)
   }
 
-  vars <- shell("swipl --dump-runtime-variables=cmd", intern=TRUE)
-  plbase <- grep("^SET PLBASE=", vars, value=TRUE)
-  plbase <- gsub("^SET PLBASE=", "", plbase)
+  if(.Platform$OS.type == "windows")
+  {
+    vars <- shell("swipl --dump-runtime-variables=cmd", intern=TRUE)
+    plbase <- grep("^SET PLBASE=", vars, value=TRUE)
+    plbase <- gsub("^SET PLBASE=", "", plbase)
+    return(plbase)
+  }
+  
+  vars <- shell("swipl --dump-runtime-variables=sh", intern=TRUE)
+  plbase <- grep("^PLBASE=", vars, value=TRUE)
+  plbase <- gsub("^PLBASE=", "", plbase)
+  plbase <- gsub("\\;$", "", plbase)
   return(plbase)
 }
 
@@ -97,6 +113,8 @@
   }
 
   plbase <- file.path(rswipl, "swipl")
+  if(.Platform$OS.type == "unix")
+    plbase <- file.path(plbase, "lib", "swipl")
   return(plbase)
 }
 
