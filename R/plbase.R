@@ -1,52 +1,58 @@
-# This function is invoked by Makevars.win
-.cat.swipl64 <- function()
+# This function is invoked by Makevars
+.cat.swipl64 <- function(warn=FALSE)
 {
-  plbase <- .find.swipl64()
+  plbase <- .find.swipl64(warn)
   if(!is.na(plbase))
   {
     if(.Platform$OS.type == "windows")
       plbase = shortPathName(plbase)
     cat(plbase)
   }
+  
+  if(warn)
+    warning("plbase.R: SWI-Prolog not found")
 }
 
 # Search for swipl in the various places
-.find.swipl64 <- function()
+.find.swipl64 <- function(warn=FALSE)
 {
-  plbase <- .env()
+  plbase <- .env(warn)
   if(!is.na(plbase))
     return(plbase)
 
-  plbase <- .rswipl()
+  plbase <- .rswipl(warn)
   if(!is.na(plbase))
     return(plbase)
 
-  plbase <- .path()
+  plbase <- .path(warn)
   if(!is.na(plbase))
     return(plbase)
 
   if(.Platform$OS.type == "windows")
   {
-    plbase <- .registry()
+    plbase <- .registry(warn)
     if(!is.na(plbase))
       return(plbase)
   }
 
-  warning("plbase.R: SWI-Prolog not found")
+  if(warn)
+    warning("plbase.R: SWI-Prolog not found")
   return(NA)
 }
 
-.path <- function()
+.path <- function(warn=FALSE)
 {
   if(Sys.getenv("SWI_HOME_DIR") != "")
   {
-    warning("plbase.R: SWI_HOME_DIR is set, autodetection skipped")
+    if(warn)
+      warning("plbase.R: SWI_HOME_DIR is set, autodetection skipped")
     return(NA)
   }
 
   if(Sys.which("swipl") == "")
   {
-    warning("plbase.R: swipl not found in PATH")
+    if(warn)
+      warning("plbase.R: swipl not found in PATH")
     return(NA)
   }
 
@@ -76,11 +82,12 @@
 }
 
 # Search for swipl in the registry, return PLBASE
-.registry <- function()
+.registry <- function(warn=FALSE)
 {
   if(Sys.getenv("SWI_HOME_DIR") != "")
   {
-    warning("plbase.R: SWI_HOME_DIR is set, autodetection skipped")
+    if(warn)
+      warning("plbase.R: SWI_HOME_DIR is set, autodetection skipped")
     return("")
   }
 
@@ -91,7 +98,8 @@
 
   if(is.na(reg))
   {
-    warning("plbase.R: swipl not found in registry")
+    if(warn)
+      warning("plbase.R: swipl not found in registry")
     return(NA)
   }
 
@@ -100,18 +108,20 @@
 }
 
 # Search for R package rswipl
-.rswipl <- function()
+.rswipl <- function(warn=FALSE)
 {
   if(Sys.getenv("SWI_HOME_DIR") != "")
   {
-    warning("plbase.R: SWI_HOME_DIR is set, autodetection skipped")
+    if(warn)
+      warning("plbase.R: SWI_HOME_DIR is set, autodetection skipped")
     return(NA)
   }
 
   rswipl <- find.package("rswipl", quiet=TRUE)
   if(length(rswipl) == 0)
   {
-    warning("plbase.R: R package rswipl not found")
+    if(warn)
+      warning("plbase.R: R package rswipl not found")
     return(NA)
   }
 
@@ -122,11 +132,14 @@
 }
 
 # Search for SWI_HOME_DIR
-.env <- function()
+.env <- function(warn=FALSE)
 {
   plbase <- Sys.getenv("SWI_HOME_DIR")
   if(plbase == "")
+  {
+    if(warn)
+      warning("plbase.R: SWI_HOME_DIR is not set")
     return(NA)
-
+  }
   return(plbase)
 }
