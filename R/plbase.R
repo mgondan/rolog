@@ -50,7 +50,7 @@
     return(NA)
   }
 
-  arch <- shell("swipl --arch", intern=TRUE)
+  arch <- system("swipl --arch", intern=TRUE)
   if(arch != "x64-win64")
   {
     warning("plbase.R: swipl in PATH is not x64-win64")
@@ -59,13 +59,13 @@
 
   if(.Platform$OS.type == "windows")
   {
-    vars <- shell("swipl --dump-runtime-variables=cmd", intern=TRUE)
+    vars <- system("swipl --dump-runtime-variables=cmd", intern=TRUE)
     plbase <- grep("^SET PLBASE=", vars, value=TRUE)
     plbase <- gsub("^SET PLBASE=", "", plbase)
     return(plbase)
   }
   
-  vars <- shell("swipl --dump-runtime-variables=sh", intern=TRUE)
+  vars <- system("swipl --dump-runtime-variables=sh", intern=TRUE)
   plbase <- grep("^PLBASE=", vars, value=TRUE)
   plbase <- gsub("^PLBASE=", "", plbase)
   plbase <- gsub("\\;$", "", plbase)
@@ -81,12 +81,12 @@
     return("")
   }
 
-  tryCatch(
+  reg <- tryCatch(
   {
-    reg <- readRegistry("SOFTWARE\\SWI\\Prolog1", hive="HLM")
-  }, error=NA)
+    readRegistry("SOFTWARE\\SWI\\Prolog", hive="HLM")
+  }, error=function(e) NA)
 
-  if(is.na(plbase))
+  if(is.na(reg))
   {
     warning("plbase.R: swipl not found in registry")
     return(NA)
