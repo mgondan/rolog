@@ -50,11 +50,14 @@
     return(NA)
   }
 
-  arch <- system("swipl --arch", intern=TRUE)
-  if(arch != "x64-win64")
+  if(.Platform$OS.type == "windows")
   {
-    warning("plbase.R: swipl in PATH is not x64-win64")
-    return(NA)
+    arch <- system("swipl --arch", intern=TRUE)
+    if(arch != "x64-win64")
+    {
+      warning("plbase.R: swipl in PATH is not x64-win64")
+      return(NA)
+    }
   }
 
   if(.Platform$OS.type == "windows")
