@@ -1,54 +1,11 @@
 RBIN="${R_HOME}/bin/R"
 RSCRIPT="${R_HOME}/bin/Rscript"
 
-SWI_INCLUDE=
-SWI_LIBS=
-
-$(info "Searching for R package rswipl")
-SWI_HOME3:=$(shell "${RSCRIPT}" -e "cat(file.path(find.package('rswipl'), 'swipl', 'lib', 'swipl'))")
-ifeq ("$(SWI_HOME3)","")
-  $(info "R: package rswipl not found")
+SWI_HOME=$(shell "${RSCRIPT}" -e "source('../R/plbase.R'); .cat.swipl64()")
+ifeq ("$(SWI_HOME),"")
+  $(error Please install R package rswipl or SWI-Prolog from https://swi-prolog.org)
 else
-  $(info "R package rswipl: $(SWI_HOME3)")
-  SWI_INCLUDE=-I$(SWI_HOME3)/include
-  LIBPATH:=$(shell "${RSCRIPT}" -e "cat(dirname(dir(path=file.path(find.package('rswipl'), 'swipl', 'lib', 'swipl'), pattern='^libswipl.a', recursive=TRUE)))")
-  ifneq ("${LIBPATH}","")
-    SWI_LIBS=-L${SWI_HOME3}/${LIBPATH} -lswipl
-  endif
+  $(info Found SWI-Prolog at $(SWI_HOME))
 endif
 
-$(info "Searching for swipl in the PATH")
-SWI_HOME2:=$(shell swipl --dump-runtime-variables | grep PLBASE | sed "s/\\;//" | sed "s/PLBASE=//")
-ifeq ("$(SWI_HOME2)","")
-  $(info "PATH: swipl not found")
-else
-  ifeq ("$(SWI_HOME3)","")
-    $(info "PATH: $(SWI_HOME2)")
-  else
-    $(info "PATH: $(SWI_HOME2) (overriding rswipl and/or registry)")
-  endif
-  SWI_INCLUDE=-I$(SWI_HOME2)/include
-  SWI_LIBS=
-endif
-
-SWI_HOME1:=$(SWI_HOME_DIR)
-ifeq ("$(SWI_HOME1)","")
-  $(info "Environment: SWI_HOME_DIR not defined")
-else
-  ifeq ("$(SWI_HOME2)$(SWI_HOME3)","")
-    $(info "Environment: $(SWI_HOME1)")
-  else
-    $(info "Environment: $(SWI_HOME1) (overriding PATH and/or registry and/or rswipl)")
-  endif
-  SWI_INCLUDE=-I$(SWI_HOME1)/include
-  SWI_LIBS=
-endif
-
-ifeq ("$(SWI_HOME1)$(SWI_HOME2)$(SWI_HOME3)","")
-  $(warning "SWI-Prolog not found. Please install it and/or set SWI_HOME_DIR accordingly and/or install R package rswipl.")
-endif
-
-PKG_CPPFLAGS=$(SWI_INCLUDE) -D_REENTRANT -D__SWI_PROLOG__
-PKG_LIBS=$(SWI_LIBS)
-
-all: $(SHLIB)
+PKG_CPPFLAGS=-I"$(SWI_HOME)/include" -D_REENTRANT -D__SWI_PROLOG__
