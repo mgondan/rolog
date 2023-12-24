@@ -25,7 +25,7 @@
   if(!is.na(plbase))
     return(plbase)
 
-  if(.Platform$OS.type == windows)
+  if(.Platform$OS.type == "windows")
   {
     plbase <- .registry()
     if(!is.na(plbase))
