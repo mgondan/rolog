@@ -35,9 +35,6 @@
       cat(sprintf("-L%s -lswipl", swipllib))
     }
   }
-
-  if(warn)
-    warning("plbase.R: SWI-Prolog not found")
 }
 
 # Search for swipl in the various places
