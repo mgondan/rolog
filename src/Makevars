@@ -9,3 +9,6 @@ else
 endif
 
 PKG_CPPFLAGS=-I"$(SWI_HOME)/include" -D_REENTRANT -D__SWI_PROLOG__
+
+SWI_LIBS=$(shell "${RSCRIPT}" -e "source('../R/plbase.R'); .cat.swilibs()")
+PKG_LIBS=$(SWI_LIBS)

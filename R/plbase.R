@@ -13,6 +13,33 @@
     warning("plbase.R: SWI-Prolog not found")
 }
 
+.cat.swilibs <- function(warn=FALSE)
+{
+  plbase <- .find.swipl64(warn)
+  if(is.na(plbase))
+  {
+    if(warn)
+      warning("plbase.R: SWI-Prolog not found")
+    return()
+  }
+
+  if(.Platform$OS.type == "windows")
+    plbase = shortPathName(plbase)
+
+  if(.Platform$OS.type == "unix")
+  {
+    swipllib <- dir(file.path(plbase, "lib"), pattern="libswipl.a", recursive=TRUE)
+    if(length(swipllib))
+    {
+      swipllib <- dir(file.path(plbase, "lib"), full.names=TRUE)
+      cat(sprintf("-L%s -lswipl", swipllib))
+    }
+  }
+
+  if(warn)
+    warning("plbase.R: SWI-Prolog not found")
+}
+
 # Search for swipl in the various places
 .find.swipl64 <- function(warn=FALSE)
 {
