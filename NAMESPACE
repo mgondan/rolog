@@ -2,7 +2,4 @@
 exportPattern("^[[:alpha:]]+")
 importFrom(methods, formalArgs)
 importFrom(Rcpp, evalCpp)
-importFrom(utils, read.table)
-importFrom(utils, tail)
-importFrom(utils, readRegistry)
-importFrom(utils, shortPathName)
+import(utils)
