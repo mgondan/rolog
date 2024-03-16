@@ -1,3 +1,7 @@
+# rolog 0.9.15
+
+* Migrate to C functions (prepare wrapper library for rswipl)
+
 # rolog 0.9.14
 
 * Maintainance release: more informative error message if SWI-Prolog is missing
