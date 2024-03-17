@@ -120,15 +120,12 @@
     readRegistry("SOFTWARE\\SWI\\Prolog", hive="HLM")
   }, error=function(e) NA)
 
-  if(is.na(reg))
-  {
-    if(warn)
-      warning("plbase.R: swipl not found in registry")
-    return(NA)
-  }
+  if(is.list(reg))
+    return(reg$home)
 
-  plbase <- reg$home
-  return(plbase)
+  if(warn)
+    warning("plbase.R: swipl not found in registry")
+  return(NA)
 }
 
 # Search for R package rswipl
@@ -166,4 +163,239 @@
     return(NA)
   }
   return(plbase)
+}
+
+# Search for libswipl.dll
+.find.libswipl <- function(warn=FALSE)
+{
+  plbase <- .env(warn)
+  if(!is.na(plbase))
+    return(.env.libswipl(plbase, warn))
+  
+  plbase <- .rswipl(warn)
+  if(!is.na(plbase))
+    return(.rswipl.libswipl(plbase, warn))
+  
+  plbase <- .path(warn)
+  if(!is.na(plbase))
+    return(.path.libswipl(plbase, warn))
+  
+  if(.Platform$OS.type == "windows")
+  {
+    plbase <- .registry(warn)
+    if(!is.na(plbase))
+      return(.registry.libswipl(plbase, warn))
+  }
+  
+  if(warn)
+    warning("plbase.R: SWI-Prolog not found")
+  return(NA)
+}
+
+.env.libswipl <- function(plbase, warn=FALSE)
+{
+  if(.Platform$OS.type == "windows" & R.Version()$arch == "x86_64")
+  {
+    pl0 <- try(system2(c(file.path(plbase, "bin", "swipl"),
+      "--dump-runtime-variables"), stdout=TRUE, stderr=FALSE), silent=TRUE)
+    if(!isa(pl0, "try-error"))
+    {
+      pl <- read.table(text=pl0, sep="=", row.names=1, comment.char=";")
+      arch <- pl["PLARCH", ]
+      if(arch == "x64-win64")
+      {
+        folder <- pl["PLLIBDIR", ]
+        lib <- gsub("-l", "lib", pl["PLLIB", ])
+        libswipl <- dir(folder, full.names=TRUE,
+          pattern=paste("^", lib, .Platform$dynlib.ext, "$", sep=""))
+        
+        if(length(libswipl))
+          return(libswipl)
+      }
+    }
+  }
+  
+  # SWI_HOME_DIR pointing to rswipl
+  if(.Platform$OS.type == "windows")
+  {
+    libswipl = dir(file.path(plbase, "bin"), full.names=TRUE,
+                   pattern=paste("libswipl", .Platform$dynlib.ext, "$", sep=""))
+    
+    if(length(libswipl))
+      return(libswipl)
+
+    if(warn)
+      warning("plbase.R: libswipl.dll not found in rswipl")
+    return(NA)
+  }
+  
+  arch <- R.Version()$arch
+  lib <- dir(file.path(plbase, "lib"), pattern=arch, full.names=TRUE)
+  if(length(lib) == 0 & arch == "aarch64")
+    lib <- dir(file.path(plbase, "lib"), pattern="arm64", full.names=TRUE)
+  
+  if(R.Version()$os == "linux-gnu")
+    libswipl <- dir(lib, pattern="libswipl.so$", full.names=TRUE)
+  else
+    libswipl <- dir(lib, pattern="libswipl.dylib$", full.names=TRUE)
+  
+  if(length(libswipl))
+    return(libswipl)
+  
+  lib <- dir(file.path(plbase, "lib"), pattern=arch, full.names=TRUE)
+  if(length(lib) == 0 & arch == "aarch64")
+    lib <- dir(file.path(plbase, "lib"), pattern="arm64", full.names=TRUE)
+  
+  if(R.Version()$os == "linux-gnu")
+  {
+    static <- dir(lib, pattern="libswipl.a$", full.names=TRUE)
+    if(length(static) == 1)
+    {
+      if(warn)
+        message("plbase.R: found static libswipl.a in rswipl")
+      return("")
+    }
+  }
+  
+  if(warn)
+    warning("plbase.R: libswipl.dll not found in rswipl")
+  return(NA)
+}
+
+.rswipl.libswipl <- function(plbase, warn=FALSE)
+{
+  if(.Platform$OS.type == "windows")
+  {
+    libswipl = dir(file.path(plbase, "bin"), full.names=TRUE,
+      pattern=paste("libswipl", .Platform$dynlib.ext, "$", sep=""))
+    
+    if(length(libswipl))
+      return(libswipl)
+
+    if(warn)
+      warning("plbase.R: libswipl.dll not found in rswipl")
+    return(NA)
+  }
+  
+  arch <- R.Version()$arch
+  lib <- dir(file.path(plbase, "lib"), pattern=arch, full.names=TRUE)
+  if(length(lib) == 0 & arch == "aarch64")
+    lib <- dir(file.path(plbase, "lib"), pattern="arm64", full.names=TRUE)
+  
+  if(R.Version()$os == "linux-gnu")
+    libswipl <- dir(lib, pattern="libswipl.so$", full.names=TRUE)
+  else
+    libswipl <- dir(lib, pattern="libswipl.dylib$", full.names=TRUE)
+  
+  if(length(libswipl))
+    return(libswipl)
+
+  # Check if static library
+  lib <- dir(file.path(plbase, "lib"), pattern=arch, full.names=TRUE)
+  if(length(lib) == 0 & arch == "aarch64")
+    lib <- dir(file.path(plbase, "lib"), pattern="arm64", full.names=TRUE)
+  
+  if(R.Version()$os == "linux-gnu")
+  {
+    static <- dir(lib, pattern="libswipl.a$", full.names=TRUE)
+    if(length(static) == 1)
+    {
+      if(warn)
+        message("plbase.R: found static libswipl.a in rswipl")
+      return("")
+    }
+  }
+  
+  if(warn)
+    warning("plbase.R: libswipl.dll not found in rswipl")
+  return(NA)
+}
+
+.registry.libswipl <- function(plbase, warn=FALSE)
+{
+  pl0 <- try(system2(c(file.path(plbase, "bin", "swipl"),
+    "--dump-runtime-variables"), stdout=TRUE, stderr=FALSE), silent=TRUE)
+  if(!isa(pl0, "try-error"))
+  {
+    pl <- read.table(text=pl0, sep="=", row.names=1, comment.char=";")
+    arch <- pl["PLARCH", ]
+    if(arch == "x64-win64")
+    {
+      folder <- pl["PLLIBDIR", ]
+      lib <- gsub("-l", "lib", pl["PLLIB", ])
+      libswipl <- dir(folder, full.names=TRUE,
+        pattern=paste("^", lib, .Platform$dynlib.ext, "$", sep=""))
+      
+      if(length(libswipl))
+        return(libswipl)
+    }
+  }
+
+  if(warn)
+    warning("plbase.R: libswipl.dll not found in rswipl")
+  return(NA)
+}
+
+.path.libswipl <- function(plbase, warn=FALSE)
+{
+  if(.Platform$OS.type == "windows")
+  {
+    pl0 <- try(system2(c("swipl", "--dump-runtime-variables"), 
+      stdout=TRUE, stderr=FALSE), silent=TRUE)
+    if(!isa(pl0, "try-error"))
+    {
+      pl <- read.table(text=pl0, sep="=", row.names=1, comment.char=";")
+      arch <- pl["PLARCH", ]
+      if(arch == "x64-win64")
+      {
+        folder <- pl["PLLIBDIR", ]
+        lib <- gsub("-l", "lib", pl["PLLIB", ])
+        libswipl <- dir(folder, full.names=TRUE,
+          pattern=paste("^", lib, .Platform$dynlib.ext, "$", sep=""))
+      
+        if(length(libswipl))
+          return(libswipl)
+      }
+    }
+
+    if(warn)
+      warning("plbase.R: libswipl.dll not found in rswipl")
+    return(NA)
+  }
+  
+  # Typical installation in, say, /usr/local/lib
+  pl0 <- try(silent=TRUE, system2(c("swipl", "--dump-runtime-variables"),
+    stdout=TRUE, stderr=FALSE))
+  if(!isa(pl0, "try-error"))
+  {
+    pl <- read.table(text=pl0, sep="=", row.names=1, comment.char=";")
+    arch <- pl["PLARCH", ]
+    home <- pl["PLBASE", ]
+    folder <- pl["PLLIBDIR", ]
+    lib <- gsub("-l", "lib", pl["PLLIB", ])
+    if(R.version$os == "linux-gnu")
+      libswipl <- dir(folder, full.names=TRUE,
+        pattern=paste("^", lib, .Platform$dynlib.ext, "$", sep=""))
+    else
+      libswipl <- dir(folder, full.names=TRUE,
+        pattern=paste("^", lib, ".dylib$", sep=""))
+  
+    if(length(libswipl))
+      return(libswipl)
+
+    if(R.Version()$os == "linux-gnu")
+    {
+      static <- dir(folder, pattern="libswipl.a$", full.names=TRUE)
+      if(length(static) == 1)
+      {
+        if(warn)
+          message("plbase.R: found static libswipl.a in rswipl")
+        return("")
+      }
+    }
+  }
+  
+  if(warn)
+    warning("plbase.R: libswipl.dll not found in rswipl")
+  return(NA)
 }
