@@ -100,8 +100,8 @@
   
   vars <- system("swipl --dump-runtime-variables=sh", intern=TRUE)
   plbase <- grep("^PLBASE=", vars, value=TRUE)
-  plbase <- gsub("^PLBASE=", "", plbase)
-  plbase <- gsub("\\;$", "", plbase)
+  plbase <- gsub("^PLBASE=\"", "", plbase)
+  plbase <- gsub("\"\\;$", "", plbase)
   return(plbase)
 }
 
@@ -201,16 +201,22 @@
     if(!isa(pl0, "try-error"))
     {
       pl <- read.table(text=pl0, sep="=", row.names=1, comment.char=";")
-      arch <- pl["PLARCH", ]
-      if(arch == "x64-win64")
+      bits <- pl["PLBITS", ]
+      if(bits == "64")
       {
-        folder <- pl["PLLIBDIR", ]
-        lib <- gsub("-l", "lib", pl["PLLIB", ])
-        libswipl <- dir(folder, full.names=TRUE,
-          pattern=paste("^", lib, .Platform$dynlib.ext, "$", sep=""))
-        
-        if(length(libswipl))
-          return(libswipl)
+        shared <- pl["PLSHARED", ]
+        if(shared == "no")
+        {
+	  message("plbase.R: found static libswipl.a in PATH")
+          return("")
+        }
+
+        if(shared == "yes")
+        {
+          libswipl <- pl["PLLIBSWIPL", ]
+          if(length(libswipl) == 1 & !is.na(libswipl))
+            return(libswipl)
+        }
       }
     }
   }
@@ -318,84 +324,57 @@
   if(!isa(pl0, "try-error"))
   {
     pl <- read.table(text=pl0, sep="=", row.names=1, comment.char=";")
-    arch <- pl["PLARCH", ]
-    if(arch == "x64-win64")
+    bits <- pl["PLBITS", ]
+    if(bits == "64")
     {
-      folder <- pl["PLLIBDIR", ]
-      lib <- gsub("-l", "lib", pl["PLLIB", ])
-      libswipl <- dir(folder, full.names=TRUE,
-        pattern=paste("^", lib, .Platform$dynlib.ext, "$", sep=""))
-      
-      if(length(libswipl))
-        return(libswipl)
+      shared <- pl["PLSHARED", ]
+      if(shared == "no")
+      {
+	message("plbase.R: found static libswipl.a in PATH")
+        return("")
+      }
+
+      if(shared == "yes")
+      {
+        libswipl <- pl["PLLIBSWIPL", ]
+        if(length(libswipl) == 1 & !is.na(libswipl))
+          return(libswipl)
+      }
     }
   }
 
   if(warn)
-    warning("plbase.R: libswipl.dll not found in rswipl")
+    warning("plbase.R: libswipl.dll not found in registry")
   return(NA)
 }
 
 .path.libswipl <- function(plbase, warn=FALSE)
 {
-  if(.Platform$OS.type == "windows")
-  {
-    pl0 <- try(system2(c("swipl", "--dump-runtime-variables"), 
-      stdout=TRUE, stderr=FALSE), silent=TRUE)
-    if(!isa(pl0, "try-error"))
-    {
-      pl <- read.table(text=pl0, sep="=", row.names=1, comment.char=";")
-      arch <- pl["PLARCH", ]
-      if(arch == "x64-win64")
-      {
-        folder <- pl["PLLIBDIR", ]
-        lib <- gsub("-l", "lib", pl["PLLIB", ])
-        libswipl <- dir(folder, full.names=TRUE,
-          pattern=paste("^", lib, .Platform$dynlib.ext, "$", sep=""))
-      
-        if(length(libswipl))
-          return(libswipl)
-      }
-    }
-
-    if(warn)
-      warning("plbase.R: libswipl.dll not found in rswipl")
-    return(NA)
-  }
-  
-  # Typical installation in, say, /usr/local/lib
-  pl0 <- try(silent=TRUE, system2(c("swipl", "--dump-runtime-variables"),
-    stdout=TRUE, stderr=FALSE))
+  pl0 <- try(system2(c("swipl", "--dump-runtime-variables"), 
+    stdout=TRUE, stderr=FALSE), silent=TRUE)
   if(!isa(pl0, "try-error"))
   {
     pl <- read.table(text=pl0, sep="=", row.names=1, comment.char=";")
-    arch <- pl["PLARCH", ]
-    home <- pl["PLBASE", ]
-    folder <- pl["PLLIBDIR", ]
-    lib <- gsub("-l", "lib", pl["PLLIB", ])
-    if(R.version$os == "linux-gnu")
-      libswipl <- dir(folder, full.names=TRUE,
-        pattern=paste("^", lib, .Platform$dynlib.ext, "$", sep=""))
-    else
-      libswipl <- dir(folder, full.names=TRUE,
-        pattern=paste("^", lib, ".dylib$", sep=""))
-  
-    if(length(libswipl))
-      return(libswipl)
-
-    if(R.Version()$os == "linux-gnu")
+    bits <- pl["PLBITS", ]
+    if(bits == "64")
     {
-      static <- dir(folder, pattern="libswipl.a$", full.names=TRUE)
-      if(length(static) == 1)
+      shared <- pl["PLSHARED", ]
+      if(shared == "no")
       {
-        if(warn)
-          message("plbase.R: found static libswipl.a in rswipl")
+	message("plbase.R: found static libswipl.a in PATH")
         return("")
+      }
+
+      if(shared == "yes")
+      {
+        libswipl <- pl["PLLIBSWIPL", ]
+        if(length(libswipl) == 1 & !is.na(libswipl))
+          return(libswipl)
       }
     }
   }
-  
+
   if(warn)
-    warning("plbase.R: libswipl.dll not found in rswipl")
+    warning("plbase.R: shared libswipl not found in PATH")
   return(NA)
 }
