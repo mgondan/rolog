@@ -44,11 +44,11 @@
   if(!is.na(plbase))
     return(plbase)
 
-  plbase <- .rswipl(warn)
+  plbase <- .path(warn)
   if(!is.na(plbase))
     return(plbase)
 
-  plbase <- .path(warn)
+  plbase <- .rswipl(warn)
   if(!is.na(plbase))
     return(plbase)
 
@@ -97,8 +97,23 @@
     plbase <- gsub("^SET PLBASE=", "", plbase)
     return(plbase)
   }
-  
-  vars <- system("swipl --dump-runtime-variables=sh", intern=TRUE)
+
+  # Use ldd
+  swipl <- Sys.which("swipl")
+  warning(swipl)
+  if(.Platform$OS.type == "unix")
+  {
+    pl <- try(silent=TRUE, system2(c("objdump", "-x", swipl), stdout=TRUE, stderr=FALSE))
+    if(!isa(pl, "try-error"))
+    {
+      pl1=grep("RUNPATH", pl, value=TRUE)
+      rpath=gsub("^ *RUNPATH +", "", pl1)
+      if(length(rpath) == 1)
+        Sys.setenv(LD_LIBRARY_PATH=rpath)
+    }
+  }
+
+  vars <- system2(c("swipl", "--dump-runtime-variables=sh"), stdout=TRUE, stderr=FALSE)
   plbase <- grep("^PLBASE=", vars, value=TRUE)
   plbase <- gsub("^PLBASE=\"", "", plbase)
   plbase <- gsub("\"\\;$", "", plbase)
@@ -172,13 +187,13 @@
   if(!is.na(plbase))
     return(.env.libswipl(plbase, warn))
   
-  plbase <- .rswipl(warn)
-  if(!is.na(plbase))
-    return(.rswipl.libswipl(plbase, warn))
-  
   plbase <- .path(warn)
   if(!is.na(plbase))
     return(.path.libswipl(plbase, warn))
+  
+  plbase <- .rswipl(warn)
+  if(!is.na(plbase))
+    return(.rswipl.libswipl(plbase, warn))
   
   if(.Platform$OS.type == "windows")
   {
@@ -350,6 +365,31 @@
 
 .path.libswipl <- function(plbase, warn=FALSE)
 {
+  # Use ldd
+  if(.Platform$OS.type == "unix")
+  {
+    pl0 <- dir(file.path(plbase, "bin"), pattern="swipl$", full.names=TRUE)
+    if(length(pl0) == 0)
+    {
+      arch <- dir(file.path(plbase, "bin"), pattern=R.Version()$arch, full.names=TRUE)
+      if(length(arch) == 1)
+        pl0 <- dir(arch, pattern="swipl$", full.names=TRUE)
+    }
+
+    if(length(pl0) == 1)
+    {
+      pl1 <- try(silent=TRUE, system2(c("ldd", pl0), stdout=TRUE, stderr=FALSE))
+      if(!isa(pl1, "try-error"))
+      {
+        pl <- read.table(text=pl1, sep=" ", row.names=1, fill=TRUE)
+        pl <- pl[pl[, 1] == "=>", ]
+        libswipl <- pl[grep("^\\tlibswipl.so", rownames(pl)), 2]
+        if(length(libswipl) == 1)
+          return(libswipl)
+      }
+    }
+  }
+
   pl0 <- try(system2(c("swipl", "--dump-runtime-variables"), 
     stdout=TRUE, stderr=FALSE), silent=TRUE)
   if(!isa(pl0, "try-error"))
