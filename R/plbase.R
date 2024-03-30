@@ -100,16 +100,18 @@
 
   # Use ldd
   swipl <- Sys.which("swipl")
-  warning(swipl)
   if(.Platform$OS.type == "unix")
   {
     pl <- try(silent=TRUE, system2(c("objdump", "-x", swipl), stdout=TRUE, stderr=FALSE))
     if(!isa(pl, "try-error"))
     {
-      pl1=grep("RUNPATH", pl, value=TRUE)
-      rpath=gsub("^ *RUNPATH +", "", pl1)
-      if(length(rpath) == 1)
-        Sys.setenv(LD_LIBRARY_PATH=rpath)
+      pl1 <- grep("RUNPATH", pl, value=TRUE)
+      if(length(pl1))
+      {
+	rpath <- gsub("^ *RUNPATH +", "", pl1)
+        if(length(rpath) == 1)
+          Sys.setenv(LD_LIBRARY_PATH=rpath)
+      }
     }
   }
 
