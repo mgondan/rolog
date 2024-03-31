@@ -20,10 +20,8 @@
     libswipl <- .find.libswipl()
     if(!is.na(libswipl))
       rolog.ok <- TRUE
-    warning(libswipl)
   }
 
-  warning("123")
   if(rolog.ok & libswipl != "")
     dyn.load(libswipl, local=FALSE)
   
