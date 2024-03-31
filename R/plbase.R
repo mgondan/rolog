@@ -40,6 +40,7 @@
 # Search for swipl in the various places
 .find.swipl64 <- function(warn=FALSE)
 {
+  stop("find.swipl64")
   plbase <- .env(warn)
   if(!is.na(plbase))
     return(plbase)
