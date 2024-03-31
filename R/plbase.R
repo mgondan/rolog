@@ -115,7 +115,10 @@
     }
   }
 
-  vars <- system2(c("swipl", "--dump-runtime-variables=sh"), stdout=TRUE, stderr=FALSE)
+  vars <- try(silent=TRUE, system2(c("swipl", "--dump-runtime-variables=sh"), stdout=TRUE, stderr=FALSE))
+  if(isa(vars, "try-error"))
+    return(NA)
+
   plbase <- grep("^PLBASE=", vars, value=TRUE)
   plbase <- gsub("^PLBASE=\"", "", plbase)
   plbase <- gsub("\"\\;$", "", plbase)
@@ -129,7 +132,7 @@
   {
     if(warn)
       warning("plbase.R: SWI_HOME_DIR is set, autodetection skipped")
-    return("")
+    return(NA)
   }
 
   reg <- tryCatch(
