@@ -123,7 +123,7 @@
     system2(c("swipl", "--dump-runtime-variables=sh"), stdout=TRUE, stderr=FALSE))
   if(isa(vars, "try-error"))
     return(NA)
-  Sys.setenv(ld_path)
+  Sys.setenv(LD_LIBRARY_PATH=ld_path)
 
   plbase <- grep("^PLBASE=", vars, value=TRUE)
   plbase <- gsub("^PLBASE=\"", "", plbase)
