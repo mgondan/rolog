@@ -48,11 +48,11 @@
   if(!is.na(plbase))
     return(plbase)
 
-  stop("find3")
   plbase <- .rswipl(warn)
   if(!is.na(plbase))
     return(plbase)
 
+  stop("find4")
   if(.Platform$OS.type == "windows")
   {
     plbase <- .registry(warn)
