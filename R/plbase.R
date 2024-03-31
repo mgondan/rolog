@@ -166,10 +166,10 @@
     return(NA)
   }
 
-  stop(".rswipl: %s", rswipl)
   plbase <- file.path(rswipl, "swipl")
   if(.Platform$OS.type == "unix")
     plbase <- file.path(plbase, "lib", "swipl")
+  stop(dir(plbase))
   return(plbase)
 }
 
