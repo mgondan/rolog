@@ -2,15 +2,16 @@
 .cat.swipl64 <- function(warn=FALSE)
 {
   plbase <- .find.swipl64(warn)
-  if(!is.na(plbase))
+  if(is.na(plbase))
   {
-    if(.Platform$OS.type == "windows")
-      plbase = shortPathName(plbase)
-    cat(plbase)
+    if(warn)
+      warning("plbase.R: SWI-Prolog not found")
+    return(invisible())
   }
-  
-  if(warn)
-    warning("plbase.R: SWI-Prolog not found")
+
+  if(.Platform$OS.type == "windows")
+    plbase = shortPathName(plbase)
+  cat(plbase)
 }
 
 .cat.swilibs <- function(warn=FALSE)
@@ -169,7 +170,6 @@
   plbase <- file.path(rswipl, "swipl")
   if(.Platform$OS.type == "unix")
     plbase <- file.path(plbase, "lib", "swipl")
-  stop(dir(plbase))
   return(plbase)
 }
 
