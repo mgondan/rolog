@@ -44,11 +44,11 @@
   if(!is.na(plbase))
     return(plbase)
 
-  stop("find2")
   plbase <- .path(warn)
   if(!is.na(plbase))
     return(plbase)
 
+  stop("find3")
   plbase <- .rswipl(warn)
   if(!is.na(plbase))
     return(plbase)
