@@ -389,6 +389,7 @@
         swipl <- dir(arch, pattern="swipl$", full.names=TRUE)
     }
 
+    ld_path <- Sys.getenv("LD_LIBRARY_PATH")
     if(length(swipl) == 1)
     {
       pl <- try(silent=TRUE,
@@ -406,6 +407,7 @@
 
       pl1 <- try(silent=TRUE, 
         system2(c("ldd", swipl), stdout=TRUE, stderr=FALSE))
+      Sys.setenv(LD_LIBRARY_PATH=ld_path)
       if(!isa(pl1, "try-error"))
       {
         pl <- read.table(text=pl1, sep=" ", row.names=1, fill=TRUE)
