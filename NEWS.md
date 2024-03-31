@@ -1,3 +1,7 @@
+# rolog 0.9.17
+
+* Maintainance release: improve behavior with parallel make
+
 # rolog 0.9.16
 
 * Maintainance release: improve detection of swi-prolog at runtime

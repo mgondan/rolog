@@ -93,7 +93,8 @@
 
   if(.Platform$OS.type == "windows")
   {
-    vars <- system("swipl --dump-runtime-variables=cmd", intern=TRUE)
+    vars <- try(silent=TRUE, 
+      system2(c("swipl", "--dump-runtime-variables=cmd"), stdout=TRUE, stderr=FALSE))
     plbase <- grep("^SET PLBASE=", vars, value=TRUE)
     plbase <- gsub("^SET PLBASE=", "", plbase)
     return(plbase)
@@ -101,9 +102,11 @@
 
   # Use ldd
   swipl <- Sys.which("swipl")
+  ld_path <- Sys.getenv("LD_LIBRARY_PATH")
   if(.Platform$OS.type == "unix")
   {
-    pl <- try(silent=TRUE, system2(c("objdump", "-x", swipl), stdout=TRUE, stderr=FALSE))
+    pl <- try(silent=TRUE,
+      system2(c("objdump", "-x", swipl), stdout=TRUE, stderr=FALSE))
     if(!isa(pl, "try-error"))
     {
       pl1 <- grep("RUNPATH", pl, value=TRUE)
@@ -116,9 +119,11 @@
     }
   }
 
-  vars <- try(silent=TRUE, system2(c("swipl", "--dump-runtime-variables=sh"), stdout=TRUE, stderr=FALSE))
+  vars <- try(silent=TRUE,
+    system2(c("swipl", "--dump-runtime-variables=sh"), stdout=TRUE, stderr=FALSE))
   if(isa(vars, "try-error"))
     return(NA)
+  Sys.setenv(ld_path)
 
   plbase <- grep("^PLBASE=", vars, value=TRUE)
   plbase <- gsub("^PLBASE=\"", "", plbase)
@@ -217,8 +222,9 @@
 {
   if(.Platform$OS.type == "windows" & R.Version()$arch == "x86_64")
   {
-    pl0 <- try(system2(c(file.path(plbase, "bin", "swipl"),
-      "--dump-runtime-variables"), stdout=TRUE, stderr=FALSE), silent=TRUE)
+    pl0 <- try(silent=TRUE, 
+      system2(c(file.path(plbase, "bin", "swipl"), "--dump-runtime-variables"),
+        stdout=TRUE, stderr=FALSE))
     if(!isa(pl0, "try-error"))
     {
       pl <- read.table(text=pl0, sep="=", row.names=1, comment.char=";")
@@ -340,8 +346,9 @@
 
 .registry.libswipl <- function(plbase, warn=FALSE)
 {
-  pl0 <- try(system2(c(file.path(plbase, "bin", "swipl"),
-    "--dump-runtime-variables"), stdout=TRUE, stderr=FALSE), silent=TRUE)
+  pl0 <- try(silent=TRUE, 
+    system2(c(file.path(plbase, "bin", "swipl"), "--dump-runtime-variables"),
+      stdout=TRUE, stderr=FALSE))
   if(!isa(pl0, "try-error"))
   {
     pl <- read.table(text=pl0, sep="=", row.names=1, comment.char=";")
@@ -384,7 +391,8 @@
 
     if(length(pl0) == 1)
     {
-      pl1 <- try(silent=TRUE, system2(c("ldd", pl0), stdout=TRUE, stderr=FALSE))
+      pl1 <- try(silent=TRUE, 
+        system2(c("ldd", pl0), stdout=TRUE, stderr=FALSE))
       if(!isa(pl1, "try-error"))
       {
         pl <- read.table(text=pl1, sep=" ", row.names=1, fill=TRUE)
@@ -396,8 +404,8 @@
     }
   }
 
-  pl0 <- try(system2(c("swipl", "--dump-runtime-variables"), 
-    stdout=TRUE, stderr=FALSE), silent=TRUE)
+  pl0 <- try(silent=TRUE,
+    system2(c("swipl", "--dump-runtime-variables"), stdout=TRUE, stderr=FALSE))
   if(!isa(pl0, "try-error"))
   {
     pl <- read.table(text=pl0, sep="=", row.names=1, comment.char=";")
