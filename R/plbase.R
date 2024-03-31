@@ -381,18 +381,31 @@
   # Use ldd
   if(.Platform$OS.type == "unix")
   {
-    pl0 <- dir(file.path(plbase, "bin"), pattern="swipl$", full.names=TRUE)
-    if(length(pl0) == 0)
+    swipl <- dir(file.path(plbase, "bin"), pattern="swipl$", full.names=TRUE)
+    if(length(swipl) == 0)
     {
       arch <- dir(file.path(plbase, "bin"), pattern=R.Version()$arch, full.names=TRUE)
       if(length(arch) == 1)
-        pl0 <- dir(arch, pattern="swipl$", full.names=TRUE)
+        swipl <- dir(arch, pattern="swipl$", full.names=TRUE)
     }
 
-    if(length(pl0) == 1)
+    if(length(swipl) == 1)
     {
+      pl <- try(silent=TRUE,
+        system2(c("objdump", "-x", swipl), stdout=TRUE, stderr=FALSE))
+      if(!isa(pl, "try-error"))
+      {
+        pl1 <- grep("RUNPATH", pl, value=TRUE)
+        if(length(pl1))
+        {
+	  rpath <- gsub("^ *RUNPATH +", "", pl1)
+          if(length(rpath) == 1)
+            Sys.setenv(LD_LIBRARY_PATH=rpath)
+        }
+      }
+
       pl1 <- try(silent=TRUE, 
-        system2(c("ldd", pl0), stdout=TRUE, stderr=FALSE))
+        system2(c("ldd", swipl), stdout=TRUE, stderr=FALSE))
       if(!isa(pl1, "try-error"))
       {
         pl <- read.table(text=pl1, sep=" ", row.names=1, fill=TRUE)
