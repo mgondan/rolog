@@ -16,7 +16,6 @@
   if(!is.na(home))
   {
     msg <- sprintf("Found SWI-Prolog at %s", home)
-    warning(msg)
     libswipl <- .find.libswipl()
     if(!is.na(libswipl))
       rolog.ok <- TRUE
