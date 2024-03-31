@@ -114,16 +114,16 @@
       {
 	rpath <- gsub("^ *RUNPATH +", "", pl1)
         if(length(rpath) == 1)
-          Sys.setenv(LD_LIBRARY_PATH=rpath)
+          Sys.setenv(LD_LIBRARY_PATH=paste(rpath, ld_path, sep=":"))
       }
     }
   }
 
   vars <- try(silent=TRUE,
     system2(c("swipl", "--dump-runtime-variables=sh"), stdout=TRUE, stderr=FALSE))
+  Sys.setenv(LD_LIBRARY_PATH=ld_path)
   if(isa(vars, "try-error"))
     return(NA)
-  Sys.setenv(LD_LIBRARY_PATH=ld_path)
 
   plbase <- grep("^PLBASE=", vars, value=TRUE)
   plbase <- gsub("^PLBASE=\"", "", plbase)
@@ -401,7 +401,7 @@
         {
 	  rpath <- gsub("^ *RUNPATH +", "", pl1)
           if(length(rpath) == 1)
-            Sys.setenv(LD_LIBRARY_PATH=rpath)
+            Sys.setenv(LD_LIBRARY_PATH=paste(rpath, ld_path, sep=":"))
         }
       }
 
