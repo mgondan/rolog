@@ -52,7 +52,6 @@
   if(!is.na(plbase))
     return(plbase)
 
-  stop("find4")
   if(.Platform$OS.type == "windows")
   {
     plbase <- .registry(warn)
@@ -167,6 +166,7 @@
     return(NA)
   }
 
+  stop(".rswipl: %s", rswipl)
   plbase <- file.path(rswipl, "swipl")
   if(.Platform$OS.type == "unix")
     plbase <- file.path(plbase, "lib", "swipl")
