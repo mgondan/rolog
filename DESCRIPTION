@@ -19,8 +19,7 @@ Depends: R (>= 4.2)
 URL: https://github.com/mgondan/rolog
 BugReports: https://github.com/mgondan/rolog/issues
 LinkingTo:
-    Rcpp,
-    rswipl
+    Rcpp
 RoxygenNote: 7.2.3
 Encoding: UTF-8
 SystemRequirements:
