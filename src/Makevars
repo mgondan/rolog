@@ -1,14 +1,19 @@
 RBIN="${R_HOME}/bin/R"
 RSCRIPT="${R_HOME}/bin/Rscript"
 
-SWI_HOME=$(shell "${RSCRIPT}" -e "source('../R/plbase.R'); .cat.swipl64()")
-ifeq ("$(SWI_HOME)","")
-  $(error Please install R package rswipl or SWI-Prolog from https://swi-prolog.org)
+SWI_HOME := $(shell "${RSCRIPT}" -e "source('../R/plbase.R'); .cat.swipl64()")
+PKG_CPPFLAGS := -I"$(SWI_HOME)/include" -D_REENTRANT -D__SWI_PROLOG__
+
+SWI_LIBS := $(shell "${RSCRIPT}" -e "source('../R/plbase.R'); .cat.swilibs()")
+PKG_LIBS = $(SWI_LIBS)
+
+ifeq ($(strip $(SWI_HOME)),)
+  $(error Please install R package rswipl or SWI-Prolog from https://swi-prolog.org...)
 else
   $(info Found SWI-Prolog at $(SWI_HOME))
 endif
 
-PKG_CPPFLAGS=-I"$(SWI_HOME)/include" -D_REENTRANT -D__SWI_PROLOG__
+$(SHLIB): crolog.o RcppExports.o
 
-SWI_LIBS=$(shell "${RSCRIPT}" -e "source('../R/plbase.R'); .cat.swilibs()")
-PKG_LIBS=$(SWI_LIBS)
+clean:
+	-rm -f crolog.o rolog.so RcppExports.o

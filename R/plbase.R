@@ -2,15 +2,16 @@
 .cat.swipl64 <- function(warn=FALSE)
 {
   plbase <- .find.swipl64(warn)
-  if(!is.na(plbase))
+  if(is.na(plbase))
   {
-    if(.Platform$OS.type == "windows")
-      plbase = shortPathName(plbase)
-    cat(plbase)
+    if(warn)
+      warning("plbase.R: SWI-Prolog not found")
+    return(invisible())
   }
-  
-  if(warn)
-    warning("plbase.R: SWI-Prolog not found")
+
+  if(.Platform$OS.type == "windows")
+    plbase = shortPathName(plbase)
+  cat(plbase)
 }
 
 .cat.swilibs <- function(warn=FALSE)
@@ -44,11 +45,11 @@
   if(!is.na(plbase))
     return(plbase)
 
-  plbase <- .rswipl(warn)
+  plbase <- .path(warn)
   if(!is.na(plbase))
     return(plbase)
 
-  plbase <- .path(warn)
+  plbase <- .rswipl(warn)
   if(!is.na(plbase))
     return(plbase)
 
@@ -92,13 +93,38 @@
 
   if(.Platform$OS.type == "windows")
   {
-    vars <- system("swipl --dump-runtime-variables=cmd", intern=TRUE)
+    vars <- try(silent=TRUE, 
+      system2(c("swipl", "--dump-runtime-variables=cmd"), stdout=TRUE, stderr=FALSE))
     plbase <- grep("^SET PLBASE=", vars, value=TRUE)
     plbase <- gsub("^SET PLBASE=", "", plbase)
     return(plbase)
   }
-  
-  vars <- system("swipl --dump-runtime-variables=sh", intern=TRUE)
+
+  # Use ldd
+  swipl <- Sys.which("swipl")
+  ld_path <- Sys.getenv("LD_LIBRARY_PATH")
+  if(.Platform$OS.type == "unix")
+  {
+    pl <- try(silent=TRUE,
+      system2(c("objdump", "-x", swipl), stdout=TRUE, stderr=FALSE))
+    if(!isa(pl, "try-error"))
+    {
+      pl1 <- grep("RUNPATH", pl, value=TRUE)
+      if(length(pl1))
+      {
+	rpath <- gsub("^ *RUNPATH +", "", pl1)
+        if(length(rpath) == 1)
+          Sys.setenv(LD_LIBRARY_PATH=paste(rpath, ld_path, sep=":"))
+      }
+    }
+  }
+
+  vars <- try(silent=TRUE,
+    system2(c("swipl", "--dump-runtime-variables=sh"), stdout=TRUE, stderr=FALSE))
+  Sys.setenv(LD_LIBRARY_PATH=ld_path)
+  if(isa(vars, "try-error"))
+    return(NA)
+
   plbase <- grep("^PLBASE=", vars, value=TRUE)
   plbase <- gsub("^PLBASE=\"", "", plbase)
   plbase <- gsub("\"\\;$", "", plbase)
@@ -112,7 +138,7 @@
   {
     if(warn)
       warning("plbase.R: SWI_HOME_DIR is set, autodetection skipped")
-    return("")
+    return(NA)
   }
 
   reg <- tryCatch(
@@ -172,13 +198,13 @@
   if(!is.na(plbase))
     return(.env.libswipl(plbase, warn))
   
-  plbase <- .rswipl(warn)
-  if(!is.na(plbase))
-    return(.rswipl.libswipl(plbase, warn))
-  
   plbase <- .path(warn)
   if(!is.na(plbase))
     return(.path.libswipl(plbase, warn))
+  
+  plbase <- .rswipl(warn)
+  if(!is.na(plbase))
+    return(.rswipl.libswipl(plbase, warn))
   
   if(.Platform$OS.type == "windows")
   {
@@ -196,8 +222,9 @@
 {
   if(.Platform$OS.type == "windows" & R.Version()$arch == "x86_64")
   {
-    pl0 <- try(system2(c(file.path(plbase, "bin", "swipl"),
-      "--dump-runtime-variables"), stdout=TRUE, stderr=FALSE), silent=TRUE)
+    pl0 <- try(silent=TRUE, 
+      system2(c(file.path(plbase, "bin", "swipl"), "--dump-runtime-variables"),
+        stdout=TRUE, stderr=FALSE))
     if(!isa(pl0, "try-error"))
     {
       pl <- read.table(text=pl0, sep="=", row.names=1, comment.char=";")
@@ -319,8 +346,9 @@
 
 .registry.libswipl <- function(plbase, warn=FALSE)
 {
-  pl0 <- try(system2(c(file.path(plbase, "bin", "swipl"),
-    "--dump-runtime-variables"), stdout=TRUE, stderr=FALSE), silent=TRUE)
+  pl0 <- try(silent=TRUE, 
+    system2(c(file.path(plbase, "bin", "swipl"), "--dump-runtime-variables"),
+      stdout=TRUE, stderr=FALSE))
   if(!isa(pl0, "try-error"))
   {
     pl <- read.table(text=pl0, sep="=", row.names=1, comment.char=";")
@@ -350,8 +378,49 @@
 
 .path.libswipl <- function(plbase, warn=FALSE)
 {
-  pl0 <- try(system2(c("swipl", "--dump-runtime-variables"), 
-    stdout=TRUE, stderr=FALSE), silent=TRUE)
+  # Use ldd
+  if(.Platform$OS.type == "unix")
+  {
+    swipl <- dir(file.path(plbase, "bin"), pattern="swipl$", full.names=TRUE)
+    if(length(swipl) == 0)
+    {
+      arch <- dir(file.path(plbase, "bin"), pattern=R.Version()$arch, full.names=TRUE)
+      if(length(arch) == 1)
+        swipl <- dir(arch, pattern="swipl$", full.names=TRUE)
+    }
+
+    ld_path <- Sys.getenv("LD_LIBRARY_PATH")
+    if(length(swipl) == 1)
+    {
+      pl <- try(silent=TRUE,
+        system2(c("objdump", "-x", swipl), stdout=TRUE, stderr=FALSE))
+      if(!isa(pl, "try-error"))
+      {
+        pl1 <- grep("RUNPATH", pl, value=TRUE)
+        if(length(pl1))
+        {
+	  rpath <- gsub("^ *RUNPATH +", "", pl1)
+          if(length(rpath) == 1)
+            Sys.setenv(LD_LIBRARY_PATH=paste(rpath, ld_path, sep=":"))
+        }
+      }
+
+      pl1 <- try(silent=TRUE, 
+        system2(c("ldd", swipl), stdout=TRUE, stderr=FALSE))
+      Sys.setenv(LD_LIBRARY_PATH=ld_path)
+      if(!isa(pl1, "try-error"))
+      {
+        pl <- read.table(text=pl1, sep=" ", row.names=1, fill=TRUE)
+        pl <- pl[pl[, 1] == "=>", ]
+        libswipl <- pl[grep("^\\tlibswipl.so", rownames(pl)), 2]
+        if(length(libswipl) == 1)
+          return(libswipl)
+      }
+    }
+  }
+
+  pl0 <- try(silent=TRUE,
+    system2(c("swipl", "--dump-runtime-variables"), stdout=TRUE, stderr=FALSE))
   if(!isa(pl0, "try-error"))
   {
     pl <- read.table(text=pl0, sep="=", row.names=1, comment.char=";")
