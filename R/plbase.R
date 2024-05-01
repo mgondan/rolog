@@ -267,10 +267,10 @@
   if(length(lib) == 0 & arch == "aarch64")
     lib <- dir(file.path(plbase, "lib"), pattern="arm64", full.names=TRUE)
   
-  if(R.Version()$os == "linux-gnu")
-    libswipl <- dir(lib, pattern="libswipl.so$", full.names=TRUE)
-  else
+  if(grepl("darwin", R.version$os))
     libswipl <- dir(lib, pattern="libswipl.dylib$", full.names=TRUE)
+  else
+    libswipl <- dir(lib, pattern="libswipl.so$", full.names=TRUE)
   
   if(length(libswipl))
     return(libswipl)
@@ -279,7 +279,7 @@
   if(length(lib) == 0 & arch == "aarch64")
     lib <- dir(file.path(plbase, "lib"), pattern="arm64", full.names=TRUE)
   
-  if(R.Version()$os == "linux-gnu")
+  if(!grepl("darwin", R.version$os))
   {
     static <- dir(lib, pattern="libswipl.a$", full.names=TRUE)
     if(length(static) == 1)
@@ -310,16 +310,27 @@
     return(NA)
   }
   
+  # swipl/lib/swipl/lib/x86_64 etc.
   arch <- R.Version()$arch
   lib <- dir(file.path(plbase, "lib"), pattern=arch, full.names=TRUE)
   if(length(lib) == 0 & arch == "aarch64")
     lib <- dir(file.path(plbase, "lib"), pattern="arm64", full.names=TRUE)
   
-  if(R.Version()$os == "linux-gnu")
-    libswipl <- dir(lib, pattern="libswipl.so$", full.names=TRUE)
-  else
+  if(grepl("darwin", R.version$os))
     libswipl <- dir(lib, pattern="libswipl.dylib$", full.names=TRUE)
+  else
+    libswipl <- dir(lib, pattern="libswipl.so$", full.names=TRUE)
   
+  if(length(libswipl))
+    return(libswipl)
+
+  # swipl/lib
+  lib <- file.path(plbase, "..")
+  if(grepl("darwin", R.version$os))
+    libswipl <- dir(lib, pattern="libswipl.dylib$", full.names=TRUE)
+  else
+    libswipl <- dir(lib, pattern="libswipl.so$", full.names=TRUE)
+
   if(length(libswipl))
     return(libswipl)
 
@@ -328,7 +339,7 @@
   if(length(lib) == 0 & arch == "aarch64")
     lib <- dir(file.path(plbase, "lib"), pattern="arm64", full.names=TRUE)
   
-  if(R.Version()$os == "linux-gnu")
+  if(!grepl("darwin" ,R.version$os))
   {
     static <- dir(lib, pattern="libswipl.a$", full.names=TRUE)
     if(length(static) == 1)
