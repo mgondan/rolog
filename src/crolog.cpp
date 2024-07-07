@@ -73,14 +73,14 @@ RObject pl2r_null()
 // to a double.
 double pl2r_double(term_t pl)
 {
-  if(PL_is_atom(pl) && !strcmp("na", PL_atom_nchars(pl, NULL)))
+  char* s ;
+  if(PL_is_atom(pl) && PL_get_atom_chars(pl, &s) && !strcmp("na", s))
     return NA_REAL ;
 
   double f ;
   if(PL_get_float(pl, &f))
     return f ;
 
-  char* s ;
   if(PL_get_chars(pl, &s, CVT_ALL|BUF_STACK|REP_UTF8))
     warning("cannot convert %s to float", s) ;
   else
