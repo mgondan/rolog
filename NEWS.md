@@ -1,3 +1,7 @@
+# rolog 0.9.18
+
+* Bugfix: PL-get-atom-chars
+
 # rolog 0.9.17
 
 * Maintainance release: improve behavior with parallel make
