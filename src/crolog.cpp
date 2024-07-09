@@ -605,7 +605,8 @@ RObject pl2r_compound(term_t pl, CharacterVector& names, term_t& vars, List opti
     return pl2r_function(pl, names, vars, options) ;
 
   // Other compounds
-  Language r(s) ;
+  List r ;
+  r.push_back(Symbol(s)) ;
   for(size_t i=1 ; i<=arity ; i++)
   {
     term_t arg ;
@@ -640,7 +641,7 @@ RObject pl2r_compound(term_t pl, CharacterVector& names, term_t& vars, List opti
             stop("Cannot convert R call 5 %s", s) ;
 
           s = PL_atom_nchars(name, NULL) ;
-          r.push_back(Named(s) = pl2r(arg2, names, vars, options)) ;
+          r.push_back(pl2r(arg2, names, vars, options), s) ;
           continue ;
         }
       }
@@ -650,7 +651,8 @@ RObject pl2r_compound(term_t pl, CharacterVector& names, term_t& vars, List opti
     r.push_back(pl2r(arg, names, vars, options)) ;
   }
 
-  return as<RObject>(r) ;
+  Function as_call("as.call") ;
+  return as_call(r) ;
 }
 
 // Translate prolog list to R list
@@ -717,7 +719,9 @@ RObject pl2r_list(term_t pl, CharacterVector& names, term_t& vars, List options)
     stop("Cannot convert list 5") ;
  
   const char* s = PL_atom_nchars(name, NULL) ;
-  Language r(s) ;
+  List r ;
+  r.push_back(Symbol(s)) ;
+
   // convert prolog pair a-X to named list element
   if(PL_is_compound(head))
   {
@@ -739,9 +743,11 @@ RObject pl2r_list(term_t pl, CharacterVector& names, term_t& vars, List options)
 
       if(PL_is_atom(arg1) && PL_get_atom_chars(arg1, &s))
       {
-        r.push_back(Named(s) = pl2r(arg2, names, vars, options)) ;
+        r.push_back(pl2r(arg2, names, vars, options), s) ;
         r.push_back(rest) ;
-        return as<RObject>(r) ;
+
+	Function as_call("as.call") ;
+        return as_call(r) ;
       }
     }
   }
@@ -749,7 +755,9 @@ RObject pl2r_list(term_t pl, CharacterVector& names, term_t& vars, List options)
   // element has no name
   r.push_back(pl2r(head, names, vars, options)) ; 
   r.push_back(rest) ;
-  return as<RObject>(r) ;
+
+  Function as_call("as.call") ;
+  return as_call(r) ;
 }
 
 RObject pl2r(term_t pl, CharacterVector& names, term_t& vars, List options)
@@ -1193,7 +1201,7 @@ term_t r2pl_atom(Symbol r)
 
 // Translate R call to prolog compound, taking into account the names of the
 // arguments, e.g., rexp(50, rate=1) -> rexp(50, =(rate, 1))
-term_t r2pl_compound(Language r, CharacterVector& names, term_t& vars, List options)
+term_t r2pl_compound(DottedPair r, CharacterVector& names, term_t& vars, List options)
 {
   // For convenience, collect arguments in a list
   List l = as<List>(CDR(r)) ;
@@ -1704,10 +1712,16 @@ static foreign_t r_eval1(term_t arg1)
 
   RObject Expr = pl2r(arg1, names, vars, options) ;
   RObject Res = Expr ;
+
   try
   {
     Environment env = query_id->get_env() ;
-    Res = Language("dontCheck", Expr).eval(env) ;
+    List Expr1 ;
+    Expr1.push_back(Symbol("dontCheck")) ;
+    Expr1.push_back(Expr) ;
+    Function as_call("as.call") ;
+    Function eval("eval") ;
+    Res = eval(as_call(Expr1), env) ;
   }
 
   catch(std::exception& cex)
@@ -1756,7 +1770,12 @@ static foreign_t r_eval2(term_t arg1, term_t arg2)
   try
   {
     Environment env = query_id->get_env() ;
-    Res = Language("dontCheck", Expr).eval(env) ;
+    List Expr1 ;
+    Expr1.push_back(Symbol("dontCheck")) ;
+    Expr1.push_back(Expr) ;
+    Function as_call("as.call") ;
+    Function eval("eval") ;
+    Res = eval(as_call(Expr1), env) ;
   }
 
   catch(std::exception& cex)
@@ -1780,7 +1799,7 @@ static foreign_t r_eval2(term_t arg1, term_t arg2)
 
     return false ;
   }
-  
+
   term_t pl = r2pl(Res, names, vars, options) ;
   return PL_unify(arg2, pl) ;
 }
