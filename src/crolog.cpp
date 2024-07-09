@@ -372,11 +372,11 @@ RObject pl2r_function(term_t pl, CharacterVector& names, term_t& vars, List opti
       || !PL_get_arg(2, pl, plbody))
     stop("Cannot convert pl compound") ;
 
-  Language head("alist") ;
   size_t arity ;
   if(!PL_get_name_arity(plhead, NULL, &arity))
     stop("Cannot convert pl compound") ;
 
+  DottedPair head ;
   char* s ;
   for(size_t i=1 ; i<=arity ; i++)
   {
@@ -419,7 +419,8 @@ RObject pl2r_function(term_t pl, CharacterVector& names, term_t& vars, List opti
   head.push_back(body) ;
 
   Function as_function("as.function") ;
-  return wrap(as_function(head)) ;
+  Function as_list("as.list") ;
+  return wrap(as_function(as_list(head))) ;
 }
 
 LogicalVector pl2r_boolvec(term_t pl)
