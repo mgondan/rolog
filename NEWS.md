@@ -1,6 +1,7 @@
 # rolog 0.9.18
 
-* Bugfix: PL-get-atom-chars
+* bugfix: PL-get-atom-chars
+* workaround for Rcpp::Language
 
 # rolog 0.9.17
 
