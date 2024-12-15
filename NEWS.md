@@ -1,3 +1,7 @@
+# rolog 0.9.19
+
+* Maintainance release: fixes problems reported by UBSAN
+
 # rolog 0.9.18
 
 * bugfix: PL-get-atom-chars

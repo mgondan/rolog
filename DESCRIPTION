@@ -1,10 +1,10 @@
 Package: rolog
 Type: Package
 Title: Query 'SWI'-'Prolog' from R
-Version: 0.9.18
-Date: 2024-07-09
+Version: 0.9.19
+Date: 2024-12-15
 Authors@R: c(person("Matthias", "Gondan", role=c("aut", "com", "cre"),
-  email="Matthias.Gondan-Rochon@uibk.ac.at", comment="Universität Innsbruck"),
+  email="Matthias.Gondan-Rochon@uibk.ac.at", comment="University of Innsbruck"),
   person("European Commission", role="fnd",
   comment="Erasmus+ Programme, 2019-1-EE01-KA203-051708"))
 Maintainer: Matthias Gondan <Matthias.Gondan-Rochon@uibk.ac.at>
