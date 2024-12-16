@@ -1804,7 +1804,7 @@ static foreign_t r_eval2(term_t arg1, term_t arg2)
   return PL_unify(arg2, pl) ;
 }
 
-static foreign_t r_eval(term_t args, unsigned long arity, void* context)
+static foreign_t r_eval(term_t args, unsigned long arity, struct foreign_context* context)
 {
   if(arity == 1)
     return r_eval1(args) ;
