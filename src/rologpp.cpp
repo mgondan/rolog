@@ -1,3 +1,4 @@
+#ifdef __SWI_PROLOG__
 #include "SWI-cpp.h"
 
 #include "Rcpp.h"
@@ -641,3 +642,12 @@ PREDICATE(r_eval_, 2)
 
   return A2 = a2 ;
 }
+
+#endif // __SWI_PROLOG__
+
+#ifndef __SWI_PROLOG__
+
+void noop()
+{}
+
+#endif
