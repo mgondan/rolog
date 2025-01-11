@@ -17,3 +17,7 @@
 ^Meta$
 ^CRAN-SUBMISSION$
 ^cran-comments\.md$
+^pack.pl$
+^Makefile$
+^src/rologpp.cpp$
+^prolog/rologpp.pl$
