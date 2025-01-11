@@ -17,5 +17,3 @@ $(SHLIB): crolog.o RcppExports.o
 
 clean:
 	-rm -f crolog.o rolog.so RcppExports.o
-
-.IGNORE: rologpp.o
