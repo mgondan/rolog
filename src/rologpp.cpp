@@ -576,7 +576,7 @@ PlTerm r2pl(SEXP r)
 
 RInside* r_instance = NULL ;
 
-PREDICATE(r_init, 1)
+static foreign_t r_init1(term_t A1)
 {
   if(r_instance)
     return true ;
@@ -588,7 +588,7 @@ PREDICATE(r_init, 1)
 
 LibExtern char *R_TempDir;    
 
-PREDICATE(r_eval_, 1)
+static foreign_t r_eval1(term_t A1)
 {
   if(!R_TempDir)
     throw PlException(PlTerm("R not initialized. Please invoke r_init.")) ;
@@ -610,7 +610,7 @@ PREDICATE(r_eval_, 1)
   return true ;
 }
 
-PREDICATE(r_eval_, 2)
+static foreign_t r_eval2(term_t A1, term_t A2)
 {
   if(!R_TempDir)
     throw PlException(PlTerm("R not initialized. Please invoke r_init.")) ;
@@ -641,6 +641,13 @@ PREDICATE(r_eval_, 2)
   }
 
   return A2 = a2 ;
+}
+
+install_t install_rolog()
+{ 
+  PL_register_foreign("r_init_", 1, r_init1, 0);
+  PL_register_foreign("r_eval_", 1, r_eval1, 0);
+  PL_register_foreign("r_eval_", 2, r_eval2, 0);
 }
 
 #endif // ROLOGPP
