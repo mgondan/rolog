@@ -16,6 +16,3 @@ endif
 PKG_CPPFLAGS=-I"$(SWI_HOME)/include" -D_REENTRANT -D__SWI_PROLOG__\
   -D__WINDOWS__ -D_WINDOWS
 PKG_LIBS=-L"$(SWI_HOME)/bin" -lswipl
-
-rologpp.o:
-	touch rologpp.o
