@@ -1,4 +1,5 @@
-SOBJ=$(PACKSODIR)/rolog.$(SOEXT)
+SOBJ=rolog.$(SOEXT)
+SPATH=$(PACKSODIR)/$(SOBJ)
 
 ifeq ($(R_HOME),)
 	R_PATH=''
@@ -16,7 +17,7 @@ INCLUDES2=-I$(shell $(R_PATH)Rscript -e "cat(shQuote(system.file('include', pack
 RINSIDECFLAGS=$(shell $(R_PATH)Rscript -e "RInside:::CFlags()")
 RINSIDELIBS=$(shell $(R_PATH)Rscript -e "RInside:::LdFlags()")
 
-CP=rologpp.$(SOEXT)
+CP=$(SOBJ)
 
 ifeq ($(SWIARCH),x64-win64)
 	ifeq ($(R_PATH),'')
@@ -36,21 +37,21 @@ ifeq ($(SWIARCH),x64-win64)
 	CP+=$(RDLL) $(RBLASSDLL) $(RGRAPHAPPDLL) $(RICONVDLL) $(RLAPACKDLL)
 endif
 
-all: $(SOBJ)
+all: $(SPATH)
 
 OBJ=rologpp.o
 
 ifeq ($(SWIARCH),x64-win64)
 %.o: src/%.cpp
-	$(CXX) $(CFLAGS) -D_REENTRANT -D__WINDOWS__ -D_WINDOWS -D__SWI_PROLOG__ -DROLOGPP $(RCPPFLAGS) $(INCLUDES2) $(RINSIDECFLAGS) $(LDSOFLAGS) -o $*.$(SOEXT) src/$*.cpp $(RLIBS) $(RINSIDELIBS) $(SWILIB)
+	$(CXX) $(CFLAGS) -D_REENTRANT -D__WINDOWS__ -D_WINDOWS -D__SWI_PROLOG__ -DROLOGPP $(RCPPFLAGS) $(INCLUDES2) $(RINSIDECFLAGS) $(LDSOFLAGS) -o $(SOBJ) src/$*.cpp $(RLIBS) $(RINSIDELIBS) $(SWILIB)
 endif
 
 ifeq ($(SWIARCH),x86_64-linux)
 %.o: src/%.cpp
-	$(CC) $(CFLAGS) $(RCPPFLAGS) $(INCLUDES2) $(RINSIDECFLAGS) -DROLOGPP $(LDSOFLAGS) -o $*.$(SOEXT) src/$*.cpp $(RLIBS) $(RINSIDELIBS)
+	$(CC) $(CFLAGS) $(RCPPFLAGS) $(INCLUDES2) $(RINSIDECFLAGS) -DROLOGPP $(LDSOFLAGS) -o $(SOBJ) src/$*.cpp $(RLIBS) $(RINSIDELIBS)
 endif
 
-$(SOBJ): $(OBJ)
+$(SPATH): $(OBJ)
 	mkdir -p $(PACKSODIR)
 
 install:
