@@ -1,4 +1,4 @@
-:- module(rolog, 
+⁸:- module(rolog, 
   [
     r_init/0,
     r_init/1,
@@ -12,7 +12,7 @@
     '<-'/1
   ]).
 
-:- use_foreign_library(foreign(rologpp)).
+:- use_foreign_library(foreign(rolog)).
 :- use_module(library(terms)).
 
 r_init :-
