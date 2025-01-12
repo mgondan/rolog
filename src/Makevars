@@ -2,7 +2,7 @@ RBIN="${R_HOME}/bin/R"
 RSCRIPT="${R_HOME}/bin/Rscript"
 
 SWI_HOME := $(shell "${RSCRIPT}" -e "source('../R/plbase.R'); .cat.swipl64()")
-PKG_CPPFLAGS := -I"$(SWI_HOME)/include" -D_REENTRANT -D__SWI_PROLOG__
+PKG_CPPFLAGS := -I"$(SWI_HOME)/include" -D_REENTRANT -D__SWI_PROLOG__ -DRPACKAGE
 
 SWI_LIBS := $(shell "${RSCRIPT}" -e "source('../R/plbase.R'); .cat.swilibs()")
 PKG_LIBS = $(SWI_LIBS)
