@@ -1,4 +1,4 @@
-SOBJ=$(PACKSODIR)/rologpp.$(SOEXT)
+SOBJ=$(PACKSODIR)/rolog.$(SOEXT)
 
 ifeq ($(R_HOME),)
 	R_PATH=''
