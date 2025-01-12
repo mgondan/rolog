@@ -1,4 +1,4 @@
-⁸:- module(rolog, 
+:- module(rolog, 
   [
     r_init/0,
     r_init/1,
