@@ -1,4 +1,4 @@
-#ifdef ROLOGPP
+#ifndef RPACKAGE
 #include "SWI-cpp.h"
 
 #include "Rcpp.h"
@@ -576,7 +576,7 @@ PlTerm r2pl(SEXP r)
 
 RInside* r_instance = NULL ;
 
-static foreign_t r_init1(term_t A1)
+PREDICATE(r_init_, 1)
 {
   if(r_instance)
     return true ;
@@ -588,7 +588,7 @@ static foreign_t r_init1(term_t A1)
 
 LibExtern char *R_TempDir;    
 
-static foreign_t r_eval1(term_t A1)
+PREDICATE(r_eval_, 1)
 {
   if(!R_TempDir)
     throw PlException(PlTerm("R not initialized. Please invoke r_init.")) ;
@@ -610,7 +610,7 @@ static foreign_t r_eval1(term_t A1)
   return true ;
 }
 
-static foreign_t r_eval2(term_t A1, term_t A2)
+PREDICATE(r_eval_, 2)
 {
   if(!R_TempDir)
     throw PlException(PlTerm("R not initialized. Please invoke r_init.")) ;
@@ -643,16 +643,9 @@ static foreign_t r_eval2(term_t A1, term_t A2)
   return A2 = a2 ;
 }
 
-install_t install_rolog()
-{ 
-  PL_register_foreign("r_init_", 1, r_init1, 0);
-  PL_register_foreign("r_eval_", 1, r_eval1, 0);
-  PL_register_foreign("r_eval_", 2, r_eval2, 0);
-}
+#endif // RPACKAGE
 
-#endif // ROLOGPP
-
-#ifndef ROLOGPP
+#ifdef RPACKAGE
 
 void noop()
 {}
