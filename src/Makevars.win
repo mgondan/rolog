@@ -14,5 +14,5 @@ else
 endif
 
 PKG_CPPFLAGS=-I"$(SWI_HOME)/include" -D_REENTRANT -D__SWI_PROLOG__\
-  -D__WINDOWS__ -D_WINDOWS
+  -D__WINDOWS__ -D_WINDOWS -DRPACKAGE
 PKG_LIBS=-L"$(SWI_HOME)/bin" -lswipl
