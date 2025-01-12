@@ -1,3 +1,8 @@
+# rolog 0.9.20
+
+* Bidirectional support: Access SWI-Prolog from R and vice-versa.
+* Changed license to BSD-2
+
 # rolog 0.9.19
 
 * Maintainance release: fixes problems reported by UBSAN
