@@ -576,7 +576,7 @@ PlTerm r2pl(SEXP r)
 
 RInside* r_instance = NULL ;
 
-PREDICATE(r_init_, 1)
+PREDICATE(r_init, 1)
 {
   if(r_instance)
     return true ;
@@ -588,7 +588,7 @@ PREDICATE(r_init_, 1)
 
 LibExtern char *R_TempDir;    
 
-PREDICATE(r_eval_, 1)
+PREDICATE(r_eval, 1)
 {
   if(!R_TempDir)
     throw PlException(PlTerm("R not initialized. Please invoke r_init.")) ;
@@ -610,7 +610,7 @@ PREDICATE(r_eval_, 1)
   return true ;
 }
 
-PREDICATE(r_eval_, 2)
+PREDICATE(r_eval, 2)
 {
   if(!R_TempDir)
     throw PlException(PlTerm("R not initialized. Please invoke r_init.")) ;
