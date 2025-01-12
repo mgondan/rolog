@@ -56,12 +56,12 @@ $(SPATH): $(OBJ)
 
 install:
 	cp $(CP) $(PACKSODIR)
-	rm $(SOOBJ)
+	rm $(SOBJ)
 
 check::
 
 clean:
 	rm -f $(OBJ)
-	rm -f $(SOOBJ)
+	rm -f $(SOBJ)
 
 distclean: clean
