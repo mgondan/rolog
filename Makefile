@@ -56,12 +56,12 @@ $(SPATH): $(OBJ)
 
 install:
 	cp $(CP) $(PACKSODIR)
-	rm rologpp.$(SOEXT)
+	rm $(SOOBJ)
 
 check::
 
 clean:
 	rm -f $(OBJ)
-	rm -f rologpp.$(SOEXT)
+	rm -f $(SOOBJ)
 
 distclean: clean
