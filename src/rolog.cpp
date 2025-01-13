@@ -576,13 +576,24 @@ PlTerm r2pl(SEXP r)
 
 RInside* r_instance = NULL ;
 
-PREDICATE(r_init, 1)
+PREDICATE(r_init, 0)
 {
   if(r_instance)
     return true ;
 
-  const char* const argv[] = {(const char*) A1} ;
-  r_instance = new RInside(1, argv) ;
+  static int argc ;
+  static char** argv ;
+  if(!PL_is_initialised(&argc, &argv))
+  {
+    printf("PL_is_initialized returned false\n") ;
+    return false ;
+  }
+
+  printf("argc: %d\n", argc) ;
+  for(int i=0 ; i<argc ; i++)
+    printf("argv: %s\n", argv[i]) ;
+
+  r_instance = new RInside(argc, argv) ;
   return true ;
 }
 

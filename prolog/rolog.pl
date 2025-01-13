@@ -1,7 +1,6 @@
 :- module(rolog, 
   [
     r_init/0,
-    r_init/1,
     r_call/1,
     r_eval/2,
     op(600, xfy, ::),
@@ -14,17 +13,14 @@
 
 :- (   current_prolog_flag(windows, true),
        getenv('R_HOME', RHOME)
-    -> directory_file_path(RHOME, bin, BIN),
+   ->  directory_file_path(RHOME, bin, BIN),
        directory_file_path(BIN, x64, X64),
        win_add_dll_directory(X64)
+   ;   true
    ),
    use_foreign_library(foreign(rolog)).
 
 :- use_module(library(terms)).
-
-r_init :-
-    current_prolog_flag(os_argv, [Argv0 | _]),
-    r_init(Argv0).
 
 :- op(800, xfx, <-).
 :- op(800, fx, <-).
