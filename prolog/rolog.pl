@@ -12,7 +12,14 @@
     '<-'/1
   ]).
 
-:- use_foreign_library(foreign(rolog)).
+:- (   current_prolog_flag(windows, true),
+       getenv('R_HOME', RHOME)
+    -> directory_file_path(RHOME, bin, BIN),
+       directory_file_path(BIN, x64, X64),
+       win_add_dll_directory(X64)
+   ),
+   use_foreign_library(foreign(rolog)).
+
 :- use_module(library(terms)).
 
 r_init :-

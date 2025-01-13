@@ -8,6 +8,41 @@ CC?=$(SWIPL_CC)
 CXX?=$(SWIPL_CXX)
 SWIPL?=swipl
 
+ifeq ("$(R_HOME)","")
+        RPATH=""
+else
+        ifeq ("$(SWIPL_ARCH)","x64-win64")
+                RPATH="$(subst \,/,$(R_HOME))/bin/x64/"
+        else
+                RPATH="$(subst \,/,$(R_HOME))/bin/"
+        endif
+endif
+
+RCPPFLAGS=$(shell "$(RPATH)R" CMD config --cppflags)
+RLIBS=$(shell "$(RPATH)R" CMD config --ldflags)
+INCLUDES2=-I$(shell "$(RPATH)Rscript" -e "cat(shQuote(system.file('include', package='Rcpp')))")
+RINSIDECFLAGS=$(shell "$(RPATH)Rscript" -e "RInside:::CFlags()")
+RINSIDELIBS=$(shell "$(RPATH)Rscript" -e "RInside:::LdFlags()")
+
+ifeq ("$(SWIPL_ARCH)","x64-win64")
+        ifeq ("$(RPATH)","")
+                RDLL=$(shell which R.dll)
+                RBLASSDLL=$(shell which Rblas.dll)
+                RGRAPHAPPDLL=$(shell which Rgraphapp.dll)
+                RICONVDLL=$(shell which Riconv.dll)
+                RLAPACKDLL=$(shell which Rlapack.dll)
+        else
+                RDLL=$(RPATH)R.dll
+                RBLASSDLL=$(RPATH)Rblas.dll
+                RGRAPHAPPDLL=$(RPATH)Rgraphapp.dll
+                RICONVDLL=$(RPATH)Riconv.dll
+                RLAPACKDLL=$(RPATH)Rlapack.dll
+        endif
+
+        RSTUFF=$(RDLL) $(RBLASSDLL) $(RGRAPHAPPDLL) $(RICONVDLL) $(RLAPACKDLL)
+endif
+
+
 OBJ=src/rolog.o
 
 all:	$(SOBJ)
@@ -17,53 +52,19 @@ $(SOBJ): $(OBJ)
 	$(CXX) $(SWIPL_MODULE_LDFLAGS) -o $@ $(OBJ) $(LIBS) $(SWIPL_MODULE_LIB) $(RLIBS) $(RINSIDELIBS)
 
 src/rolog.o: src/rolog.cpp Makefile
+	echo $(R_HOME)
 	$(CXX) $(SWIPL_CFLAGS) $(COFLAGS) $(SWICPPFLAGS) $(RCPPFLAGS) $(INCLUDES2) $(RINSIDECFLAGS) -DPROLOGPACK -c -o $@ $<
 
 clean:
-	$(RM) cc/rolog.o *~
+	$(RM) src/rolog.o *~
 
 distclean: clean
 	$(RM) $(SOBJ) status.db buildenv.sh
 
 check::
-install::
 
-ifeq ($(R_HOME),)
-	R_PATH=''
+install:
+ifeq ("$(RSTUFF)","")
 else
-	ifeq ($(SWIARCH),x64-win64)
-		R_PATH='$(R_HOME)/bin/x64/'
-	else
-		R_PATH='$(R_HOME)/bin/'
-	endif	
+	cp $(RSTUFF) $(SWIPL_MODULE_DIR)
 endif
-	
-RCPPFLAGS=$(shell $(R_PATH)R CMD config --cppflags)
-RLIBS=$(shell $(R_PATH)R CMD config --ldflags)
-INCLUDES2=-I$(shell $(R_PATH)Rscript -e "cat(shQuote(system.file('include', package='Rcpp')))")
-RINSIDECFLAGS=$(shell $(R_PATH)Rscript -e "RInside:::CFlags()")
-RINSIDELIBS=$(shell $(R_PATH)Rscript -e "RInside:::LdFlags()")
-
-ifeq ($(SWIARCH),x64-win64)
-	ifeq ($(R_PATH),'')
-		RDLL="$(shell which R.dll)"
-		RBLASSDLL="$(shell which Rblas.dll)"
-		RGRAPHAPPDLL="$(shell which Rgraphapp.dll)"
-		RICONVDLL="$(shell which Riconv.dll)"
-		RLAPACKDLL="$(shell which Rlapack.dll)"
-	else
-		RDLL=$(R_PATH)R.dll
-		RBLASSDLL=$(R_PATH)Rblas.dll
-		RGRAPHAPPDLL=$(R_PATH)Rgraphapp.dll
-		RICONVDLL=$(R_PATH)Riconv.dll
-		RLAPACKDLL=$(R_PATH)Rlapack.dll
-	endif
-
-	CP+=$(RDLL) $(RBLASSDLL) $(RGRAPHAPPDLL) $(RICONVDLL) $(RLAPACKDLL)
-endif
-
-ifeq ($(SWIARCH),x64-win64)
-%.o: src/%.cpp
-	$(CXX) $(CFLAGS) -D_REENTRANT -D__WINDOWS__ -D_WINDOWS -D__SWI_PROLOG__ -DROLOGPP $(RCPPFLAGS) $(INCLUDES2) $(RINSIDECFLAGS) $(LDSOFLAGS) -o $(SOBJ) src/$*.cpp $(RLIBS) $(RINSIDELIBS) $(SWILIB)
-endif
-
