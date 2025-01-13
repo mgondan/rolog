@@ -645,7 +645,7 @@ PREDICATE(r_eval_, 2)
 
 #endif // RPACKAGE
 
-#ifdef RPACKAGE
+#ifdef PROLOGPACK
 
 void noop()
 {}

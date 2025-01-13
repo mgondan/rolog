@@ -1,5 +1,32 @@
-SOBJ=rolog.$(SOEXT)
-SPATH=$(PACKSODIR)/$(SOBJ)
+CPPFLAGS=-std=c++17 -fPIC
+SOBJ=$(SWIPL_MODULE_DIR)/rolog.$(SWIPL_MODULE_EXT)
+SWICPPFLAGS=-std=c++17
+COFLAGS=-O2 -gdwarf-2 -g3
+LIBS=
+
+CC?=$(SWIPL_CC)
+CXX?=$(SWIPL_CXX)
+SWIPL?=swipl
+
+OBJ=src/rolog.o
+
+all:	$(SOBJ)
+
+$(SOBJ): $(OBJ)
+	mkdir -p $(SWIPL_MODULE_DIR)
+	$(CXX) $(SWIPL_MODULE_LDFLAGS) -o $@ $(OBJ) $(LIBS) $(SWIPL_MODULE_LIB) $(RLIBS) $(RINSIDELIBS)
+
+src/rolog.o: src/rolog.cpp Makefile
+	$(CXX) $(SWIPL_CFLAGS) $(COFLAGS) $(SWICPPFLAGS) $(RCPPFLAGS) $(INCLUDES2) $(RINSIDECFLAGS) -DPROLOGPACK -c -o $@ $<
+
+clean:
+	$(RM) cc/rolog.o *~
+
+distclean: clean
+	$(RM) $(SOBJ) status.db buildenv.sh
+
+check::
+install::
 
 ifeq ($(R_HOME),)
 	R_PATH=''
@@ -16,8 +43,6 @@ RLIBS=$(shell $(R_PATH)R CMD config --ldflags)
 INCLUDES2=-I$(shell $(R_PATH)Rscript -e "cat(shQuote(system.file('include', package='Rcpp')))")
 RINSIDECFLAGS=$(shell $(R_PATH)Rscript -e "RInside:::CFlags()")
 RINSIDELIBS=$(shell $(R_PATH)Rscript -e "RInside:::LdFlags()")
-
-CP=$(SOBJ)
 
 ifeq ($(SWIARCH),x64-win64)
 	ifeq ($(R_PATH),'')
@@ -37,31 +62,8 @@ ifeq ($(SWIARCH),x64-win64)
 	CP+=$(RDLL) $(RBLASSDLL) $(RGRAPHAPPDLL) $(RICONVDLL) $(RLAPACKDLL)
 endif
 
-all: $(SPATH)
-
-OBJ=rologpp.o
-
 ifeq ($(SWIARCH),x64-win64)
 %.o: src/%.cpp
 	$(CXX) $(CFLAGS) -D_REENTRANT -D__WINDOWS__ -D_WINDOWS -D__SWI_PROLOG__ -DROLOGPP $(RCPPFLAGS) $(INCLUDES2) $(RINSIDECFLAGS) $(LDSOFLAGS) -o $(SOBJ) src/$*.cpp $(RLIBS) $(RINSIDELIBS) $(SWILIB)
 endif
 
-ifeq ($(SWIARCH),x86_64-linux)
-%.o: src/%.cpp
-	$(CC) $(CFLAGS) $(RCPPFLAGS) $(INCLUDES2) $(RINSIDECFLAGS) -DROLOGPP $(LDSOFLAGS) -o $(SOBJ) src/$*.cpp $(RLIBS) $(RINSIDELIBS)
-endif
-
-$(SPATH): $(OBJ)
-	mkdir -p $(PACKSODIR)
-
-install:
-	cp $(CP) $(PACKSODIR)
-	rm $(SOBJ)
-
-check::
-
-clean:
-	rm -f $(OBJ)
-	rm -f $(SOBJ)
-
-distclean: clean
