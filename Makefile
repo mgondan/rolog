@@ -52,7 +52,6 @@ $(SOBJ): $(OBJ)
 	$(CXX) $(SWIPL_MODULE_LDFLAGS) -o $@ $(OBJ) $(LIBS) $(SWIPL_MODULE_LIB) $(RLIBS) $(RINSIDELIBS)
 
 src/rolog.o: src/rolog.cpp Makefile
-	echo $(R_HOME)
 	$(CXX) $(SWIPL_CFLAGS) $(COFLAGS) $(SWICPPFLAGS) $(RCPPFLAGS) $(INCLUDES2) $(RINSIDECFLAGS) -DPROLOGPACK -c -o $@ $<
 
 clean:
