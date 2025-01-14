@@ -585,13 +585,9 @@ PREDICATE(r_init, 0)
   static char** argv ;
   if(!PL_is_initialised(&argc, &argv))
   {
-    printf("PL_is_initialized returned false\n") ;
+    throw PlException(PlTerm("Prolog not initialized. Exiting.")) ;
     return false ;
   }
-
-  printf("argc: %d\n", argc) ;
-  for(int i=0 ; i<argc ; i++)
-    printf("argv: %s\n", argv[i]) ;
 
   r_instance = new RInside(argc, argv) ;
   return true ;
