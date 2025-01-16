@@ -19,6 +19,7 @@
 ^cran-comments\.md$
 ^pack.pl$
 ^CMakeLists.txt$
+^cmake/.*\.cmake$
 ^Makefile$
 ^LICENSE$
 ^src/rologpp.cpp$

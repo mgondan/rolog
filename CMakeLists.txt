@@ -13,7 +13,8 @@ list(INSERT CMAKE_MODULE_PATH 0 $ENV{SWIPL_HOME_DIR}/cmake)
 include(swipl)
 
 # Create the library as a CMake module
-add_library(rolog MODULE src/rolog.cpp)
+add_library(rolog MODULE src/crolog.cpp)
+target_compile_options(rolog PRIVATE -DPROLOGPACK)
 include_directories(${R_INCLUDE_DIR})
 include_directories(${RCPP_INCLUDE_DIR})
 include_directories(${RINSIDE_INCLUDE_DIR})

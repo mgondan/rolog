@@ -1433,6 +1433,8 @@ term_t r2pl(SEXP r, CharacterVector& names, term_t& vars, List options)
   return r2pl_na() ;
 }
 
+#ifdef RPACKAGE
+
 class RlQuery
 {
   CharacterVector names ;
@@ -1867,3 +1869,106 @@ LogicalVector done_()
   pl_initialized = false ;
   return true ;
 }
+
+#endif // RPACKAGE
+ 
+#ifdef PROLOGPACK
+
+#include "SWI-cpp.h"
+#include "RInside.h"
+
+RInside* r_instance = NULL ;
+
+PREDICATE(r_init, 0)
+{
+  if(r_instance)
+    return true ;
+
+  static int argc ;
+  static char** argv ;
+  if(!PL_is_initialised(&argc, &argv))
+  {
+    throw PlException(PlTerm("Prolog not initialized. Exiting.")) ;
+    return false ;
+  }
+
+  r_instance = new RInside(argc, argv) ;
+  return true ;
+}
+
+PREDICATE(r_eval_, 1)
+{
+  if(!R_TempDir)
+    throw PlException(PlTerm("R not initialized. Please invoke r_init.")) ;
+
+  CharacterVector names ;
+  term_t vars = PL_new_term_ref() ;
+  List options ;
+  options = List::create(
+    Named("realvec") = "##", Named("realmat") = "###",
+    Named("boolvec") = "!!", Named("boolmat") = "!!!",
+    Named("charvec") = "$$", Named("charmat") = "$$$",
+    Named("intvec") = "%%", Named("intmat") = "%%%",
+    Named("atomize") = false, Named("scalar") = true) ;
+
+  RObject Expr = pl2r(A1, names, vars, options) ;
+  RObject Res = Expr ;
+  try
+  {
+    Language id("identity") ;
+    id.push_back(Expr) ;
+    Res = id.eval() ;
+  }
+  catch(std::exception& ex)
+  {
+    throw PlException(PlTerm(ex.what())) ;
+    return false ;
+  }
+
+  return true ;
+}
+
+PREDICATE(r_eval_, 2)
+{
+  if(!R_TempDir)
+    throw PlException(PlTerm("R not initialized. Please invoke r_init.")) ;
+
+  CharacterVector names ;
+  term_t vars = PL_new_term_ref() ;
+  List options ;
+  options = List::create(
+    Named("realvec") = "##", Named("realmat") = "###",
+    Named("boolvec") = "!!", Named("boolmat") = "!!!",
+    Named("charvec") = "$$", Named("charmat") = "$$$",
+    Named("intvec") = "%%", Named("intmat") = "%%%",
+    Named("atomize") = false, Named("scalar") = true) ;
+
+  RObject Expr = pl2r(A1, names, vars, options) ;
+  RObject Res = Expr ;
+  try
+  {
+    Language id("identity") ;
+    id.push_back(Expr) ;
+    Res = id.eval() ;
+  }
+  catch(std::exception& ex)
+  {
+    throw PlException(PlTerm(ex.what())) ;
+    return false ;
+  }
+
+  PlTerm a2 ;
+  try
+  {
+    a2 = PlTerm(r2pl(Res, names, vars, options)) ;
+  }
+  catch(std::exception& ex)
+  {
+    throw PlException(PlTerm(ex.what())) ;
+    return false ;
+  }
+
+  return A2 = a2 ;
+}
+
+#endif // PROLOGPACK
