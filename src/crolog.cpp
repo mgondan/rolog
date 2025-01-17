@@ -1874,7 +1874,7 @@ LogicalVector done_()
  
 #ifdef PROLOGPACK
 
-#include "SWI-cpp.h"
+#include "SWI-cpp2.h"
 #include "RInside.h"
 
 RInside* r_instance = NULL ;
@@ -1888,7 +1888,7 @@ PREDICATE(r_init, 0)
   static char** argv ;
   if(!PL_is_initialised(&argc, &argv))
   {
-    throw PlException(PlTerm("Prolog not initialized. Exiting.")) ;
+    throw PlException(PlTerm_string("Prolog not initialized. Exiting.")) ;
     return false ;
   }
 
@@ -1899,7 +1899,7 @@ PREDICATE(r_init, 0)
 PREDICATE(r_eval_, 1)
 {
   if(!R_TempDir)
-    throw PlException(PlTerm("R not initialized. Please invoke r_init.")) ;
+    throw PlException(PlTerm_string("R not initialized. Please invoke r_init.")) ;
 
   CharacterVector names ;
   term_t vars = PL_new_term_ref() ;
@@ -1911,7 +1911,7 @@ PREDICATE(r_eval_, 1)
     Named("intvec") = "%%", Named("intmat") = "%%%",
     Named("atomize") = false, Named("scalar") = true) ;
 
-  RObject Expr = pl2r(A1, names, vars, options) ;
+  RObject Expr = pl2r(A1.unwrap(), names, vars, options) ;
   RObject Res = Expr ;
   try
   {
@@ -1921,7 +1921,7 @@ PREDICATE(r_eval_, 1)
   }
   catch(std::exception& ex)
   {
-    throw PlException(PlTerm(ex.what())) ;
+    throw PlException(PlTerm_string(ex.what())) ;
     return false ;
   }
 
@@ -1931,7 +1931,7 @@ PREDICATE(r_eval_, 1)
 PREDICATE(r_eval_, 2)
 {
   if(!R_TempDir)
-    throw PlException(PlTerm("R not initialized. Please invoke r_init.")) ;
+    throw PlException(PlTerm_string("R not initialized. Please invoke r_init.")) ;
 
   CharacterVector names ;
   term_t vars = PL_new_term_ref() ;
@@ -1943,7 +1943,7 @@ PREDICATE(r_eval_, 2)
     Named("intvec") = "%%", Named("intmat") = "%%%",
     Named("atomize") = false, Named("scalar") = true) ;
 
-  RObject Expr = pl2r(A1, names, vars, options) ;
+  RObject Expr = pl2r(A1.unwrap(), names, vars, options) ;
   RObject Res = Expr ;
   try
   {
@@ -1953,22 +1953,25 @@ PREDICATE(r_eval_, 2)
   }
   catch(std::exception& ex)
   {
-    throw PlException(PlTerm(ex.what())) ;
+    throw PlException(PlTerm_string(ex.what())) ;
     return false ;
   }
 
-  PlTerm a2 ;
   try
   {
-    a2 = PlTerm(r2pl(Res, names, vars, options)) ;
+    if(!A2.unify_term(PlTerm_term_t(r2pl(Res, names, vars, options))))
+    {
+      throw PlException(PlTerm_string("r_eval/2: Cannot unify R object.")) ;
+      return false ;
+    }
   }
   catch(std::exception& ex)
   {
-    throw PlException(PlTerm(ex.what())) ;
+    throw PlException(PlTerm_string(ex.what())) ;
     return false ;
   }
 
-  return A2 = a2 ;
+  return true ;
 }
 
 #endif // PROLOGPACK
