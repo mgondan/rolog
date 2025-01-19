@@ -1,0 +1,49 @@
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+name: prolog_pack
+ 
+jobs:
+  run-tests:
+    runs-on: ${{ matrix.os }}-latest
+    name: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install R
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt update
+          sudo apt install -y r-base
+          sudo apt install -y r-base libtirpc-dev
+          mkdir -p $HOME/Rlibs 
+          R -e "install.packages('RInside', lib='$HOME/Rlibs'); install.packages('Rcpp', lib='$HOME/Rlibs')"
+          echo "R_LIBS=$HOME/Rlibs" >> ~/.Renviron
+          R -e "library(RInside); library(Rcpp)"
+          echo "R_LIBS_USER=$HOME/Rlibs" >> $GITHUB_ENV
+          
+      - name: Install SWI-Prolog on Linux
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-add-repository ppa:swi-prolog/devel
+          sudo apt-get update
+          sudo apt-get install swi-prolog
+        shell: bash
+
+      - name: Check installation
+        run: swipl -t check_installation
+        shell: bash
+
+      - name: Install rolog pack
+        run: |
+          export R_LIBS_USER=$HOME/Rlibs
+          swipl -t "pack_install(rolog, [interactive(false)])"
+        shell: bash
+
+
