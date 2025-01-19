@@ -45,7 +45,7 @@ pl2r_(A[B], X)
  => pl2r_('['(A, B), X).
 
 pl2r_({}, X)
- => X = 'NULL'.
+ => X = [].
  
 pl2r_({A; B}, X)
  => pl2r_curly({A; B}, C),
