@@ -7,7 +7,7 @@
 :- use_module(library(rolog)).
 
 test_rolog :-
-    run_tests([basic, assignment, vector, indexing]).
+    run_tests([basic, assignment, vector, indexing, empty]).
 
 :- begin_tests(basic).
 
@@ -67,8 +67,10 @@ test(indexing1) :-
 
 :- end_tests(indexing).
 
-%fails
-/* test(empty_brackets) :-
-    r_eval({}, Res),
-    assertion(Res =@= 'NULL'). */
+:- begin_tests(empty).
 
+test(empty_brackets) :-
+    r_eval({}, Res),
+    assertion(Res =@= []).
+
+:- end_tests(empty).
