@@ -7,8 +7,26 @@
 #  R_INCLUDE_DIR - the R include directory
 #  R_LIBRARIES - Link these to use R
 
+# Check if R_HOME is defined in the environment
+MACRO(SUBDIRLIST result curdir)
+  FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
+  SET(dirlist "")
+  FOREACH(child ${children})
+    IF(IS_DIRECTORY ${curdir}/${child})
+      LIST(APPEND dirlist ${curdir}/${child})
+    ENDIF()
+  ENDFOREACH()
+  SET(${result} ${dirlist})
+ENDMACRO()
+
 # find the R binary
-FIND_PROGRAM(R_EXECUTABLE R)
+SET(R_HOME $ENV{R_HOME})
+IF(R_HOME)
+  SUBDIRLIST(SUBDIRS ${R_HOME})
+  FIND_PROGRAM(R_EXECUTABLE R HINTS SUBDIRS)
+ELSE()
+  FIND_PROGRAM(R_EXECUTABLE R)
+ENDIF()
 
 SET(ABORT_CONFIG FALSE)
 IF(R_EXECUTABLE)
