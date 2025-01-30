@@ -1924,6 +1924,11 @@ PREDICATE(r_eval_, 1)
     throw PlException(PlTerm_string(ex.what())) ;
     return false ;
   }
+  catch(...)
+  {
+    throw PlException(PlTerm_string("unknown exception")) ;
+    return false ;
+  }
 
   return true ;
 }
@@ -1956,6 +1961,11 @@ PREDICATE(r_eval_, 2)
     throw PlException(PlTerm_string(ex.what())) ;
     return false ;
   }
+  catch(...)
+  {
+    throw PlException(PlTerm_string("unknown exception")) ;
+    return false ;
+  }
 
   try
   {
@@ -1968,6 +1978,11 @@ PREDICATE(r_eval_, 2)
   catch(std::exception& ex)
   {
     throw PlException(PlTerm_string(ex.what())) ;
+    return false ;
+  }
+  catch(...)
+  {
+    throw PlException(PlTerm_string("unknown exception")) ;
     return false ;
   }
 
