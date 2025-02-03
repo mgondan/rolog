@@ -1917,13 +1917,25 @@ PREDICATE(r_eval_, 1)
   {
     Language id("identity") ;
     id.push_back(Expr) ;
-    Res = id.eval() ;
+    Res = Rcpp_eval(id, Environment::global_env()) ;
   }
+
+  catch(const Rcpp::eval_error& ex)
+  {
+    throw PlException(PlTerm_string(ex.what())) ;
+  }
+  
+  catch(std::runtime_error& ex)
+  {
+    throw PlException(PlTerm_string(ex.what())) ;
+  }
+
   catch(std::exception& ex)
   {
     throw PlException(PlTerm_string(ex.what())) ;
     return false ;
   }
+
   catch(...)
   {
     throw PlException(PlTerm_string("unknown exception")) ;
@@ -1954,13 +1966,25 @@ PREDICATE(r_eval_, 2)
   {
     Language id("identity") ;
     id.push_back(Expr) ;
-    Res = id.eval() ;
+    Res = Rcpp_eval(id, Environment::global_env()) ;
   }
+
+  catch(const Rcpp::eval_error& ex)
+  {
+    throw PlException(PlTerm_string(ex.what())) ;
+  }
+
+  catch(std::runtime_error& ex)
+  {
+    throw PlException(PlTerm_string(ex.what())) ;
+  }
+
   catch(std::exception& ex)
   {
     throw PlException(PlTerm_string(ex.what())) ;
     return false ;
   }
+
   catch(...)
   {
     throw PlException(PlTerm_string("unknown exception")) ;
@@ -1975,14 +1999,16 @@ PREDICATE(r_eval_, 2)
       return false ;
     }
   }
+
   catch(std::exception& ex)
   {
     throw PlException(PlTerm_string(ex.what())) ;
     return false ;
   }
+
   catch(...)
   {
-    throw PlException(PlTerm_string("unknown exception")) ;
+    throw PlException(PlTerm_string("unknown exception1")) ;
     return false ;
   }
 
