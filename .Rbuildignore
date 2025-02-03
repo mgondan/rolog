@@ -25,3 +25,5 @@
 ^src/rologpp.cpp$
 ^prolog/rologpp.pl$
 ^test/*\.pl$
+^prolog
+^test
