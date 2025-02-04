@@ -1922,18 +1922,16 @@ PREDICATE(r_eval_, 1)
 
   catch(const Rcpp::eval_error& ex)
   {
-    throw PlException(PlTerm_string(ex.what())) ;
+    PlCompound syntax("evaluation_error", PlTermv(A1)) ;
+    PlCompound context("context", PlTermv(PlTerm_string("foreign r_eval_/2"), PlTerm_string(ex.what()))) ;
+    throw PlException(PlCompound("error", PlTermv(syntax, context))) ;
   }
   
-  catch(std::runtime_error& ex)
+  catch(const std::exception& ex)
   {
-    throw PlException(PlTerm_string(ex.what())) ;
-  }
-
-  catch(std::exception& ex)
-  {
-    throw PlException(PlTerm_string(ex.what())) ;
-    return false ;
+    PlCompound syntax("evaluation_error", PlTermv(A1)) ;
+    PlCompound context("context", PlTermv(PlTerm_string("foreign r_eval_/2"), PlTerm_string(ex.what()))) ;
+    throw PlException(PlCompound("error", PlTermv(syntax, context))) ;
   }
 
   catch(...)
@@ -1971,18 +1969,16 @@ PREDICATE(r_eval_, 2)
 
   catch(const Rcpp::eval_error& ex)
   {
-    throw PlException(PlTerm_string(ex.what())) ;
+    PlCompound syntax("evaluation_error", PlTermv(A1)) ;
+    PlCompound context("context", PlTermv(PlTerm_string("foreign r_eval_/2"), PlTerm_string(ex.what()))) ;
+    throw PlException(PlCompound("error", PlTermv(syntax, context))) ;
   }
 
-  catch(std::runtime_error& ex)
+  catch(const std::exception& ex)
   {
-    throw PlException(PlTerm_string(ex.what())) ;
-  }
-
-  catch(std::exception& ex)
-  {
-    throw PlException(PlTerm_string(ex.what())) ;
-    return false ;
+    PlCompound syntax("evaluation_error", PlTermv(A1)) ;
+    PlCompound context("context", PlTermv(PlTerm_string("foreign r_eval_/2"), PlTerm_string(ex.what()))) ;
+    throw PlException(PlCompound("error", PlTermv(syntax, context))) ;
   }
 
   catch(...)
