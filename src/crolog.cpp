@@ -768,11 +768,11 @@ RObject pl2r(term_t pl, CharacterVector& names, term_t& vars, List options)
   if(PL_is_integer(pl))
     return pl2r_integer(pl) ;
 
-  if(PL_is_float(pl))
-    return pl2r_real(pl) ;
-
   if(PL_is_string(pl))
     return pl2r_char(pl) ;
+
+  if(PL_is_float(pl))
+    return pl2r_real(pl) ;
 
   if(PL_is_atom(pl))
     return pl2r_symbol(pl) ;
