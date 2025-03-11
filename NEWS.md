@@ -1,3 +1,9 @@
+# rolog 0.9.21
+
+* Migrate back to cpp2
+* fix https://github.com/mgondan/rolog/issues/10
+* Avoids the use of non-API calls BODY, FORMALS.
+
 # rolog 0.9.20
 
 * Bidirectional support: Access SWI-Prolog from R and vice-versa.
