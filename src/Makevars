@@ -13,7 +13,7 @@ else
   $(info Found SWI-Prolog at $(SWI_HOME))
 endif
 
-$(SHLIB): crolog.o RcppExports.o
+$(SHLIB): rolog.o RcppExports.o
 
 clean:
-	-rm -f crolog.o rolog.so RcppExports.o
+	-rm -f rolog.o rolog.so RcppExports.o

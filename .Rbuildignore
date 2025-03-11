@@ -3,6 +3,7 @@
 ^jss/
 ^inst/swipl
 ^src/rolog_cpp2.txt$
+^src/crolog_cpp2.txt$
 ^.*\.git$
 ^.*\.plrc$
 ^.*\.fileheader$
