@@ -1382,7 +1382,7 @@ PREDICATE(r_eval_, 1)
     throw PlException(PlTerm_string("R not initialized. Please invoke r_init.")) ;
 
   CharacterVector names ;
-  term_t vars = PL_new_term_ref() ;
+  PlTerm_var vars ;
   List options ;
   options = List::create(
     Named("realvec") = "##", Named("realmat") = "###",
@@ -1391,7 +1391,7 @@ PREDICATE(r_eval_, 1)
     Named("intvec") = "%%", Named("intmat") = "%%%",
     Named("atomize") = false, Named("scalar") = true) ;
 
-  RObject Expr = pl2r(A1.unwrap(), names, vars, options) ;
+  RObject Expr = pl2r(A1, names, vars, options) ;
   RObject Res = Expr ;
   try
   {
@@ -1429,7 +1429,7 @@ PREDICATE(r_eval_, 2)
     throw PlException(PlTerm_string("R not initialized. Please invoke r_init.")) ;
 
   CharacterVector names ;
-  term_t vars = PL_new_term_ref() ;
+  PlTerm_var vars ;
   List options ;
   options = List::create(
     Named("realvec") = "##", Named("realmat") = "###",
@@ -1438,7 +1438,7 @@ PREDICATE(r_eval_, 2)
     Named("intvec") = "%%", Named("intmat") = "%%%",
     Named("atomize") = false, Named("scalar") = true) ;
 
-  RObject Expr = pl2r(A1.unwrap(), names, vars, options) ;
+  RObject Expr = pl2r(A1, names, vars, options) ;
   RObject Res = Expr ;
   try
   {
@@ -1469,7 +1469,7 @@ PREDICATE(r_eval_, 2)
 
   try
   {
-    if(!A2.unify_term(PlTerm_term_t(r2pl(Res, names, vars, options))))
+    if(!A2.unify_term(r2pl(Res, names, vars, options)))
     {
       throw PlException(PlTerm_string("r_eval/2: Cannot unify R object.")) ;
       return false ;
