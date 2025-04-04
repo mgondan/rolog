@@ -1,7 +1,8 @@
 # - Try to find RInside
 # Once done this will define
 #
-#  RINSIDE_INCLUDE_DIR - the Rcpp include directory
+# RINSIDE_INCLUDE_DIR - the RInside include directory
+# RINSIDE_LIB_DIR - the RInside shared library directory
 
 IF(R_EXECUTABLE)
   EXECUTE_PROCESS(
@@ -18,6 +19,9 @@ IF(R_EXECUTABLE)
 	  COMMAND ${R_EXECUTABLE} "--slave" "--no-save" "-e" "cat(system.file('lib', package='RInside'))"
     OUTPUT_VARIABLE RINSIDE_LIB_DIR)
   IF(RINSIDE_LIB_DIR)
+    IF(WIN32)
+      SET(RINSIDE_LIB_DIR ${RINSIDE_LIB_DIR}/x64)
+    ENDIF()
     MESSAGE(STATUS "RINSIDE_LIB_DIR at ${RINSIDE_LIB_DIR}")
   ELSE()
     MESSAGE(STATUS "Could not determine RINSIDE_LIB_DIR.")

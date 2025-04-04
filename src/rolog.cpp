@@ -1359,7 +1359,7 @@ LogicalVector done_()
 
 RInside* r_instance = NULL ;
 
-PREDICATE(r_init, 0)
+PREDICATE(r_init_, 0)
 {
   if(r_instance)
     return true ;

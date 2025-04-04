@@ -23,8 +23,10 @@ include_directories(${RINSIDE_INCLUDE_DIR})
 # from the target on systems that define a common library file prefix
 target_link_swipl(rolog)
 target_link_directories(rolog PRIVATE ${RINSIDE_LIB_DIR})
-target_link_libraries(rolog R RInside)
-list(APPEND CMAKE_INSTALL_RPATH ${RINSIDE_LIB_DIR})
+target_link_libraries(rolog PRIVATE RInside)
+target_link_directories(rolog PRIVATE ${R_LIBRARIES})
+target_link_libraries(rolog PRIVATE R)
+list(APPEND CMAKE_INSTALL_RPATH ${RINSIDE_LIB_DIR} ${R_LIBRARIES})
 
 # Install the foreign taget. `${swipl_module_dir}` contains the
 # directory for installing modules for this architecture.

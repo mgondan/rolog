@@ -85,3 +85,6 @@ pl2r_curly({A}, X)
     format('~w <- ~w~n', [Var, Expr]).
 
 :- initialization(r_init).
+
+r_init :-
+    r_init_.

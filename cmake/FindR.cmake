@@ -20,7 +20,8 @@ MACRO(SUBDIRLIST result curdir)
 ENDMACRO()
 
 # find the R binary
-SET(R_HOME $ENV{R_HOME})
+CMAKE_PATH(SET R_HOME $ENV{R_HOME})
+MESSAGE(${R_HOME})
 IF(R_HOME)
   SUBDIRLIST(SUBDIRS ${R_HOME})
   FIND_PROGRAM(R_EXECUTABLE R HINTS ${SUBDIRS})
@@ -65,9 +66,13 @@ IF(R_EXECUTABLE)
 
   FIND_LIBRARY(R_R_LIBRARY
     R
-    HINTS ${R_HOME}/lib ${R_SHARED_LIB_DIR} ${R_HOME}/bin )
+    HINTS ${R_HOME}/lib ${R_SHARED_LIB_DIR} ${R_HOME}/bin ${R_HOME}/bin/x64)
   IF(NOT R_R_LIBRARY)
-    MESSAGE(STATUS "libR not found. Make sure the location of R was detected correctly, above, and R was compiled with the --enable-shlib option")
+    IF(WIN32)
+      SET(R_LIBRARIES ${R_HOME}/bin/x64)
+    ELSE()
+      MESSAGE(STATUS "libR not found. Make sure the location of R was detected correctly, above, and R was compiled with the --enable-shlib option")
+    ENDIF()
   ELSE(NOT R_R_LIBRARY)
     GET_FILENAME_COMPONENT(R_SHARED_LIB_DIR ${R_R_LIBRARY}
       PATH)
