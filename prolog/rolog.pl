@@ -86,5 +86,18 @@ pl2r_curly({A}, X)
 
 :- initialization(r_init).
 
+% Windows: R not in PATH
+r_init :-
+    current_prolog_flag(windows, true),
+    \+ process_which(path('R'), _),
+    !,
+    resource_error('R.exe not in PATH').
+
+r_init :-
+    current_prolog_flag(windows, true),
+    \+ getenv('R_HOME', _),
+    !,
+    resource_error('R_HOME not set.').
+
 r_init :-
     r_init_.
