@@ -1,3 +1,7 @@
+# rolog 0.9.22
+
+* Prolog pack now running on MSYS2 (requires R in PATH and R\_HOME)
+
 # rolog 0.9.21
 
 * Migrate back to cpp2
