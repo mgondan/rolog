@@ -1,3 +1,7 @@
+# rolog 0.9.23
+
+* as.rolog evaluates symbols in (a), not in (a + 1)
+
 # rolog 0.9.22
 
 * Prolog pack now running on MSYS2 (requires R in PATH and R\_HOME)

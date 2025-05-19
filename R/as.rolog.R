@@ -3,9 +3,9 @@
 #' @param query
 #' an R call representing a Prolog query with prolog-like syntax,
 #' e.g., `member(.X, ""[a, b, .Y])` for use in [query()], [once()], 
-#' and [findall()]. The argument is translated to Rolog's representation, 
+#' and [findall()]. The argument is translated to rolog's representation, 
 #' with R calls corresponding to Prolog terms and R expressions corresponding to
-#' Prolog variables. Variables and expressions in parentheses are evaluated.
+#' Prolog variables. Single expressions in parentheses are evaluated.
 #'
 #' @seealso [query()], [once()], [findall()]
 #'
@@ -33,10 +33,13 @@ as.rolog <- function(query=quote(member(.X, ""[a, "b", 3L, 4, (pi), TRUE, .Y])))
   {
     args <- as.list(query)
 
-    # Things like (2 + 3) or (a) are evaluated
-    if(args[[1]] == "(")
+    # Things like (a) are evaluated
+    if(args[[1]] == "(" & is.symbol(args[[2]]))
       return(as.rolog(eval(args[[2]])))
-
+    
+    if(args[[1]] == "(")
+      return(as.rolog(args[[2]]))
+    
     # `[`("", 1, 2, 3), aka. ""[1, 2, 3] is a list
     if(args[[1]] == "[" & length(args[[2]]) == 1 & args[[2]] == "")
       return(lapply(args[c(-1, -2)], FUN=as.rolog))
