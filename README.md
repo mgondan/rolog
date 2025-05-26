@@ -1,4 +1,6 @@
-# rolog: Access SWI-Prolog from R. Access R from SWI-Prolog.
+# rolog
+
+_Access SWI-Prolog from R. Access R from SWI-Prolog._
 
 ## Access SWI-Prolog from R
 
@@ -69,10 +71,13 @@ returns bindings for X that satisfy member(X, [1, 2, 3]).
 
 The second example builds the vignette with nice use cases in Section 4.
 
-`rmarkdown::render(system.file("vignettes", "rolog.Rmd", package="rolog"), output_file="rolog.html", output_dir=getwd())`
+````
+rmarkdown::render(system.file("vignettes", "rolog.Rmd", package="rolog"),
+    output_file="rolog.html", output_dir=getwd())
+````
 
-You should find an HTML page in `rolog.html` of the current folder. Note that it includes equations with MathML, which look
-best in the Firefox browser.
+You should find an HTML page in `rolog.html` of the current folder. Please note that it includes
+equations with MathML, which some browsers do not render in a pretty way.
 
 ## Access R from SWI-Prolog
 
