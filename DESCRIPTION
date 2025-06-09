@@ -1,8 +1,8 @@
 Package: rolog
 Type: Package
 Title: Query 'SWI'-'Prolog' from R
-Version: 0.9.23
-Date: 2025-05-19
+Version: 0.9.24
+Date: 2025-06-09
 Authors@R: c(person("Matthias", "Gondan", role=c("aut", "com", "cre"),
   email="Matthias.Gondan-Rochon@uibk.ac.at", comment="University of Innsbruck"),
   person("European Commission", role="fnd",

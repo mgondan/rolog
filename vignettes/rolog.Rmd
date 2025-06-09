@@ -104,12 +104,13 @@ Earlier approaches to connect Prolog and R have been published as SWI-Prolog
 packs [real, rserve_client, @Angelopoulos2013;@Rserve] and as a YAP
 module [YapR, @YapR]. Whereas `real` establishes a direct link to an embedded
 instance of R, `rserve-client` communicates with a local or remote R
-service [@Urbanek2021]. The former approach emphasizes speed, the latter might
-be preferred from a security perspective, especially in systems such as
-SWISH [@SWISH] that accept only a set of sandboxed commands for Prolog, but do
-not impose restrictions on R. A common feature of the two packages is that they
-provide an interface for R calls from Prolog, but not the other way round, that
-is, querying Prolog from R is not possible, so far.
+service [@Urbanek2021]. The former approach emphasizes speed, the latter allows
+for multithreading and might be preferred from a security perspective,
+especially in systems such as SWISH [@SWISH] that accept only a set of
+sandboxed commands for Prolog, but do not impose restrictions on R. A common
+feature of the two packages is that they provide an interface for R calls from
+Prolog, but not the other way round, that is, querying Prolog from R is not
+possible, so far.
 
 The present package fills this gap through Prolog queries in R scripts, for
 example, to perform efficient symbolic computations, searches in complex graphs,
@@ -118,7 +119,7 @@ predicates are provided that enable Prolog to ring back to the R system for
 bidirectional communication. Similar to `real`, tight communication between the
 two systems is established by linking to a shared library that embeds the
 current SWI-Prolog runtime. The exchange of data is facilitated by the C++
-interfaces of the two languages [@Edelbuettel2018;@Wielemaker2021]. A less tight
+interfaces of the two languages [@Eddelbuettel2018;@Wielemaker2021]. A less tight
 connection might be established using the recently developed machine query
 interface [@Zinda2021] that allows socket-based communication between foreign
 languages and SWI-Prolog (and, in fact, the `MQI` documentation includes an
@@ -1006,7 +1007,7 @@ pretty mathematical output, interval arithmetic, see Section\ 3).
 At its present stage, a major limitation of `rolog` is its relatively slow
 speed. For example, translation of R lists or vectors to the respective elements
 of the Prolog language (also lists, `#/N`) is done element-wise, in both
-directions. The translation is optimized by using `Rcpp` [@Edelbuettel2018], but
+directions. The translation is optimized by using `Rcpp` [@Eddelbuettel2018], but
 there remains an upper bound in the efficiency, because Prolog does not support
 vectors or matrices. Since Prolog's primary purpose is not vector or matrix
 calculation, this limitation may not show up in real-world applications. Another
@@ -1015,8 +1016,8 @@ with the need for quoted calls and R expressions for representing Prolog
 variables. `rolog` was deliberately chosen to be minimalistic and, so far, only
 depends on base R. A more concise representation might be obtained by tools from
 the "Tidyverse" ecosystem, as described in Chapter\ 19 of
-Advanced\ R [@Wickham2019]. Finally, at this stage, `rolog` is unable to deal
-with cyclic
+Advanced\ R [@Wickham2019]. As R, `rolog` is single-threaded, and at this stage,
+`rolog` is unable to deal with cyclic
 terms (e.g., `once(call("=", expression(A), call("f", expression(A))))`,
 i.e., `A = f(A)` raises an error message).
 

@@ -1,3 +1,7 @@
+# rolog 0.9.24
+
+* add mutex to prevent simultaneous calls to R
+
 # rolog 0.9.23
 
 * as.rolog evaluates symbols in (a), not in (a + 1)

@@ -27,11 +27,11 @@
 
 r_call(Expr) :-
     pl2r_(Expr, R),
-    r_eval_(R).
+    with_mutex(rolog, r_eval_(R)).
 
 r_eval(X, Y) :-
     pl2r_(X, R),
-    r_eval_(R, Y).
+    with_mutex(rolog, r_eval_(R, Y)).
 
 pl2r_('::'(Namespace, Compound), X)
  => term_string(Namespace, Ns),
