@@ -7,8 +7,8 @@
     op(800, xfx, <-),
     op(800, fx, <-),
     op(100, yf, []),
-    '<-'/2,
-    '<-'/1
+    '<-'/1,
+    '<-'/2
   ]).
 
 :- (   current_prolog_flag(windows, true),
@@ -21,9 +21,6 @@
    use_foreign_library(foreign(rolog)).
 
 :- use_module(library(terms)).
-
-:- op(800, xfx, <-).
-:- op(800, fx, <-).
 
 r_call(Expr) :-
     pl2r_(Expr, R),
@@ -78,11 +75,18 @@ pl2r_curly({A}, X)
  => pl2r_(A, H),
     X = [H].
 
-<-(Call) :-
-    format('<- ~w~n', [Call]).
-    
+<-(Expr) :-
+    r_call(Expr).
+
+% Assign variable in R
 <-(Var, Expr) :-
-    format('~w <- ~w~n', [Var, Expr]).
+    atom(Var),
+    !,
+    r_call('<-'(Var, Expr)).
+
+% Assign variable in Prolog
+<-(Res, Expr) :-
+    r_eval(Expr, Res).
 
 :- initialization(r_init).
 
