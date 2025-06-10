@@ -1,11 +1,29 @@
-:- module(rs_rolog, [rs_init/1, rs_eval/3, rs_submit/3, rs_close/1]).
+:-  module(rs_rolog, 
+    [
+      rs_init/1,
+      rs_call/2,
+      rs_eval/3,
+      rs_submit/3,
+      rs_close/1,
+      rx_call/1,
+      rx_eval/2,
+      rx_submit/2
+    ]).
 
-:- reexport(library(rolog)).
-:- use_module(library(broadcast)).
+:-  reexport(library(rolog)).
+:-  use_module(library(broadcast)).
+
+:-  dynamic rs_session/2.
 
 rs_init(Session) :-
     <- library('RSclient'),
-    Session <- 'RS.connect'().
+    Session <- 'RS.connect'(),
+    thread_self(Me),
+    assert(rs_session(Me, Session)).
+
+rs_call(Session, Expr) :-
+    idle(Session),
+    <- 'RS.eval'(Session, Expr, wait=true).
 
 rs_eval(Session, Expr, Result) :-
     idle(Session),
@@ -27,7 +45,9 @@ rs_collect(Session, Alias, Expr) :-
     ).
 
 rs_close(Session) :-
-    <- 'RS.close'(Session).
+    <- 'RS.close'(Session),
+    thread_self(Me),
+    retract(Me, Session).
 
 :- dynamic lock/1.
 
@@ -37,6 +57,31 @@ idle(Session) :-
 
 idle(Session) :-
     thread_wait(\+ lock(Session), [wait_preds([-(lock/1)])]).
+
+% if a session is found, use session
+rx_call(Expr) :-
+    thread_self(Me),
+    rs_session(Me, Session),
+    !,
+    rs_call(Session, Expr).
+
+% default: rolog
+rx_call(Expr) :-
+    r_call(Expr).
+
+rx_eval(Expr, Result) :-
+    thread_self(Me),
+    rs_session(Me, Session),
+    !,
+    rs_eval(Session, Expr, Result).
+
+rx_eval(Expr, Result) :-
+    r_eval(Expr, Result).
+
+rx_submit(Alias, Expr) :-
+    thread_self(Me),
+    rs_session(Me, Session),
+    rs_submit(Session, Alias, Expr).
 
 test :-
     rs_init(s1),
