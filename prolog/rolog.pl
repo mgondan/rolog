@@ -1,26 +1,26 @@
-:- module(rolog, 
-  [
-    r_init/0,
-    r_call/1,
-    r_eval/2,
-    op(600, xfy, ::),
-    op(800, xfx, <-),
-    op(800, fx, <-),
-    op(100, yf, []),
-    '<-'/1,
-    '<-'/2
-  ]).
+:-  module(rolog, 
+    [
+      r_init/0,
+      r_call/1,
+      r_eval/2,
+      op(600, xfy, ::),
+      op(800, xfx, <-),
+      op(800, fx, <-),
+      op(100, yf, []),
+      '<-'/1,
+      '<-'/2
+    ]).
 
-:- (   current_prolog_flag(windows, true),
-       getenv('R_HOME', RHOME)
-   ->  directory_file_path(RHOME, bin, BIN),
-       directory_file_path(BIN, x64, X64),
-       win_add_dll_directory(X64)
-   ;   true
-   ),
-   use_foreign_library(foreign(rolog)).
+:-  (   current_prolog_flag(windows, true),
+        getenv('R_HOME', RHOME)
+    ->  directory_file_path(RHOME, bin, BIN),
+        directory_file_path(BIN, x64, X64),
+        win_add_dll_directory(X64)
+    ;   true
+    ),
+    use_foreign_library(foreign(rolog)).
 
-:- use_module(library(terms)).
+:-  use_module(library(terms)).
 
 r_call(Expr) :-
     pl2r_(Expr, R),
@@ -88,7 +88,7 @@ pl2r_curly({A}, X)
 <-(Res, Expr) :-
     r_eval(Expr, Res).
 
-:- initialization(r_init).
+:-  initialization(r_init).
 
 % Windows: R not in PATH
 r_init :-
