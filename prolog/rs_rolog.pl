@@ -79,7 +79,7 @@ rx_eval(Expr, Result) :-
 
 rx_submit(Alias, Expr) :-
     http_in_session(Session),
-    rs_session(Me, Session),
+    rs_session(Session),
     !,
     rs_submit(Session, Alias, Expr).
 
