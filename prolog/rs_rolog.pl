@@ -12,14 +12,14 @@
 
 :-  reexport(library(rolog)).
 :-  use_module(library(broadcast)).
+:-  use_module(library(http/http_session)).
 
-:-  dynamic rs_session/2.
+:-  dynamic rs_session/1.
 
 rs_init(Session) :-
     <- library('RSclient'),
     Session <- 'RS.connect'(),
-    thread_self(Me),
-    assert(rs_session(Me, Session)).
+    assert(rs_session(Session)).
 
 rs_call(Session, Expr) :-
     idle(Session),
@@ -46,8 +46,7 @@ rs_collect(Session, Alias, Expr) :-
 
 rs_close(Session) :-
     <- 'RS.close'(Session),
-    thread_self(Me),
-    retract(Me, Session).
+    retract(Session).
 
 :- dynamic lock/1.
 
@@ -60,8 +59,8 @@ idle(Session) :-
 
 % if a session is found, use session
 rx_call(Expr) :-
-    thread_self(Me),
-    rs_session(Me, Session),
+    http_in_session(Session),
+    rs_session(Session),
     !,
     rs_call(Session, Expr).
 
@@ -70,8 +69,8 @@ rx_call(Expr) :-
     r_call(Expr).
 
 rx_eval(Expr, Result) :-
-    thread_self(Me),
-    rs_session(Me, Session),
+    http_in_session(Session),
+    rs_session(Session),
     !,
     rs_eval(Session, Expr, Result).
 
@@ -79,9 +78,13 @@ rx_eval(Expr, Result) :-
     r_eval(Expr, Result).
 
 rx_submit(Alias, Expr) :-
-    thread_self(Me),
+    http_in_session(Session),
     rs_session(Me, Session),
+    !,
     rs_submit(Session, Alias, Expr).
+
+rx_submit(_, _) :-
+    resource_error(http_session).
 
 test :-
     rs_init(s1),
