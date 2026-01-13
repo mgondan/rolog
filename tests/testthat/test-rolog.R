@@ -1,3 +1,21 @@
+test_that("change working directory",
+{
+  query(call("working_directory", expression(X), getwd()))
+  q <- submit()
+  clear()
+
+  expect_type(q, "list")
+})
+
+test_that("swipl is working",
+{
+  query(call("test_installation", list(call("packages", FALSE))))
+  q <- submit()
+  clear()
+
+  expect_equal(q, list())
+})
+
 test_that("queries can be formed", 
 {
   types <- list(

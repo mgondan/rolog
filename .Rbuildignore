@@ -4,6 +4,7 @@
 ^inst/swipl
 ^src/rolog_cpp2.txt$
 ^src/crolog_cpp2.txt$
+^src/crolog_cpp.txt$
 ^.*\.git$
 ^.*\.plrc$
 ^.*\.fileheader$
