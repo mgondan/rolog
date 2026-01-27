@@ -1368,7 +1368,7 @@ PREDICATE(r_init_, 0)
   static char** argv ;
   if(!PL_is_initialised(&argc, &argv))
   {
-    throw PlException(PlTerm_string("Prolog not initialized. Exiting.")) ;
+    throw PlExceptionFromTerm(PlTerm_string("Prolog not initialized. Exiting.")) ;
     return false ;
   }
 
@@ -1379,7 +1379,7 @@ PREDICATE(r_init_, 0)
 PREDICATE(r_eval_, 1)
 {
   if(!R_TempDir)
-    throw PlException(PlTerm_string("R not initialized. Please invoke r_init.")) ;
+    throw PlExceptionFromTerm(PlTerm_string("R not initialized. Please invoke r_init.")) ;
 
   CharacterVector names ;
   PlTerm_var vars ;
@@ -1404,19 +1404,19 @@ PREDICATE(r_eval_, 1)
   {
     PlCompound syntax("evaluation_error", PlTermv(A1)) ;
     PlCompound context("context", PlTermv(PlTerm_string("foreign r_eval_/2"), PlTerm_string(ex.what()))) ;
-    throw PlException(PlCompound("error", PlTermv(syntax, context))) ;
+    throw PlExceptionFromTerm(PlCompound("error", PlTermv(syntax, context))) ;
   }
   
   catch(const std::exception& ex)
   {
     PlCompound syntax("evaluation_error", PlTermv(A1)) ;
     PlCompound context("context", PlTermv(PlTerm_string("foreign r_eval_/2"), PlTerm_string(ex.what()))) ;
-    throw PlException(PlCompound("error", PlTermv(syntax, context))) ;
+    throw PlExceptionFromTerm(PlCompound("error", PlTermv(syntax, context))) ;
   }
 
   catch(...)
   {
-    throw PlException(PlTerm_string("unknown exception")) ;
+    throw PlExceptionFromTerm(PlTerm_string("unknown exception")) ;
     return false ;
   }
 
@@ -1426,7 +1426,7 @@ PREDICATE(r_eval_, 1)
 PREDICATE(r_eval_, 2)
 {
   if(!R_TempDir)
-    throw PlException(PlTerm_string("R not initialized. Please invoke r_init.")) ;
+    throw PlExceptionFromTerm(PlTerm_string("R not initialized. Please invoke r_init.")) ;
 
   CharacterVector names ;
   PlTerm_var vars ;
@@ -1451,19 +1451,19 @@ PREDICATE(r_eval_, 2)
   {
     PlCompound syntax("evaluation_error", PlTermv(A1)) ;
     PlCompound context("context", PlTermv(PlTerm_string("foreign r_eval_/2"), PlTerm_string(ex.what()))) ;
-    throw PlException(PlCompound("error", PlTermv(syntax, context))) ;
+    throw PlExceptionFromTerm(PlCompound("error", PlTermv(syntax, context))) ;
   }
 
   catch(const std::exception& ex)
   {
     PlCompound syntax("evaluation_error", PlTermv(A1)) ;
     PlCompound context("context", PlTermv(PlTerm_string("foreign r_eval_/2"), PlTerm_string(ex.what()))) ;
-    throw PlException(PlCompound("error", PlTermv(syntax, context))) ;
+    throw PlExceptionFromTerm(PlCompound("error", PlTermv(syntax, context))) ;
   }
 
   catch(...)
   {
-    throw PlException(PlTerm_string("unknown exception")) ;
+    throw PlExceptionFromTerm(PlTerm_string("unknown exception")) ;
     return false ;
   }
 
@@ -1471,20 +1471,20 @@ PREDICATE(r_eval_, 2)
   {
     if(!A2.unify_term(r2pl(Res, names, vars, options)))
     {
-      throw PlException(PlTerm_string("r_eval/2: Cannot unify R object.")) ;
+      throw PlExceptionFromTerm(PlTerm_string("r_eval/2: Cannot unify R object.")) ;
       return false ;
     }
   }
 
   catch(std::exception& ex)
   {
-    throw PlException(PlTerm_string(ex.what())) ;
+    throw PlExceptionFromTerm(PlTerm_string(ex.what())) ;
     return false ;
   }
 
   catch(...)
   {
-    throw PlException(PlTerm_string("unknown exception1")) ;
+    throw PlExceptionFromTerm(PlTerm_string("unknown exception1")) ;
     return false ;
   }
 
