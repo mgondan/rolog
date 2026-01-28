@@ -24,13 +24,13 @@ RoxygenNote: 7.2.3
 Encoding: UTF-8
 SystemRequirements:
     GNU Make,
-    swi-prolog
+    swi-prolog (>= 10.1.2)
 Suggests: 
     rmarkdown,
     knitr,
     DiagrammeR,
     DiagrammeRsvg,
-    rswipl,
+    rswipl (>= 10.1.2),
     rsvg,
     htmltools,
     testthat (>= 3.0.0)
