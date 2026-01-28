@@ -1256,7 +1256,7 @@ PREDICATE(r_eval, 1)
 
   catch(std::exception& ex)
   {
-    throw PlException(PlCompound("r_eval1", PlTermv(A1, PlTerm_atom(ex.what())))) ;
+    throw PlExceptionFromTerm(PlCompound("r_eval1", PlTermv(A1, PlTerm_atom(ex.what())))) ;
   }
 
   return true ;
@@ -1288,7 +1288,7 @@ PREDICATE(r_eval, 2)
   
   catch(std::exception& ex)
   {
-    throw PlException(PlCompound("r_eval2", PlTermv(A1, PlTerm_atom(ex.what())))) ;
+    throw PlExceptionFromTerm(PlCompound("r_eval2", PlTermv(A1, PlTerm_atom(ex.what())))) ;
   }
 
   PlTerm_var pl ;
@@ -1299,7 +1299,7 @@ PREDICATE(r_eval, 2)
   
   catch(std::exception& ex)
   {
-    throw PlException(PlCompound("r_eval2", PlTermv(A1, PlTerm_atom(ex.what())))) ;
+    throw PlExceptionFromTerm(PlCompound("r_eval2", PlTermv(A1, PlTerm_atom(ex.what())))) ;
   }
 
   return A2.unify_term(pl) ;
