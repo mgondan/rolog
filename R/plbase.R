@@ -128,6 +128,17 @@
   plbase <- grep("^PLBASE=", vars, value=TRUE)
   plbase <- gsub("^PLBASE=\"", "", plbase)
   plbase <- gsub("\"\\;$", "", plbase)
+
+  plversion <- grep("^PLVERSION=", vars, value=TRUE)
+  plversion <- gsub("^PLVERSION=\"", "", plversion)
+  plversion <- gsub("\"\\;$", "", plversion)
+  if(as.numeric(plversion) < 100102)
+  {
+    if(warn)
+      warning("plbase.R: swipl in PATH is below 10.1.2")
+    return(NA)
+  }
+
   return(plbase)
 }
 
