@@ -97,6 +97,17 @@
       system2(c("swipl", "--dump-runtime-variables=cmd"), stdout=TRUE, stderr=FALSE))
     plbase <- grep("^SET PLBASE=", vars, value=TRUE)
     plbase <- gsub("^SET PLBASE=", "", plbase)
+    
+    plversion <- grep("^SET PLVERSION=", vars, value=TRUE)
+    plversion <- gsub("^SET PLVERSION=\"", "", plversion)
+    plversion <- gsub("\"\\;$", "", plversion)
+    if(as.numeric(plversion) < 100102)
+    {
+      if(warn)
+        warning("plbase.R: swipl.exe in PATH is below 10.1.2")
+      return(NA)
+    }
+    
     return(plbase)
   }
 
@@ -112,7 +123,7 @@
       pl1 <- grep("RUNPATH", pl, value=TRUE)
       if(length(pl1))
       {
-	rpath <- gsub("^ *RUNPATH +", "", pl1)
+        rpath <- gsub("^ *RUNPATH +", "", pl1)
         if(length(rpath) == 1)
           Sys.setenv(LD_LIBRARY_PATH=paste(rpath, ld_path, sep=":"))
       }

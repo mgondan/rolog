@@ -2,7 +2,7 @@ Package: rolog
 Type: Package
 Title: Query 'SWI'-'Prolog' from R
 Version: 0.9.25
-Date: 2026-01-27
+Date: 2026-02-23
 Authors@R: c(person("Matthias", "Gondan", role=c("aut", "com", "cre"),
   email="Matthias.Gondan-Rochon@uibk.ac.at", comment="University of Innsbruck"),
   person("European Commission", role="fnd",
