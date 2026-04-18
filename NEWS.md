@@ -1,3 +1,7 @@
+# rolog 0.9.26
+
+* Unicode support
+
 # rolog 0.9.25
 
 * run swipl's unit tests during R CMD check
