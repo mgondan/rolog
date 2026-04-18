@@ -183,7 +183,7 @@ String pl2r_string(PlTerm pl)
   if(pl.is_atom() && pl.as_string() == "na")
     return NA_STRING ;
   
-  return pl.as_string(PlEncoding::Locale) ;
+  return pl.as_string(PlEncoding::UTF8) ;
 }
 
 CharacterVector pl2r_char(PlTerm pl)
@@ -705,10 +705,16 @@ PlTerm r2pl_var(ExpressionVector r, CharacterVector& names, PlTerm& vars, List o
 {
   // Variable name in R
   Symbol n = as<Symbol>(r[0]) ;
-  
+  CharacterVector nn = as<CharacterVector>(n) ;
+  const char* c = Rf_translateCharUTF8(nn(0)) ;
+
   // If the variable should be "atomized" for pretty printing
   if(as<LogicalVector>(options("atomize"))(0))
-    return PlTerm_atom(n.c_str()) ; // TODO: 
+  {
+    PlTerm_var ret ;
+    PlCheckFail(ret.unify_chars(PL_ATOM|REP_UTF8, strlen(c), c)) ;
+    return ret ;
+  }
 
   // Do not map the anonymous variable to a known variable name
   if(n == "_")
@@ -720,12 +726,12 @@ PlTerm r2pl_var(ExpressionVector r, CharacterVector& names, PlTerm& vars, List o
   for(R_xlen_t i=0 ; i<names.length() ; i++)
   {
     PlCheckFail(tail.next(v)) ;
-    if(n == names(i))
+    if(!strcmp(c, Rf_translateCharUTF8(names(i))))
       return v ;
   }
 
   // If no such variable exists, create a new one and remember the name
-  names.push_back(n.c_str()) ;
+  names.push_back(c) ;
   PlTerm_var pl ;
   PlCheckFail(tail.append(pl)) ;
   return pl ;
@@ -734,7 +740,12 @@ PlTerm r2pl_var(ExpressionVector r, CharacterVector& names, PlTerm& vars, List o
 // Translate R symbol to prolog atom
 PlTerm r2pl_atom(Symbol r)
 {
-  return PlTerm_atom(r.c_str()) ;
+  CharacterVector n = as<CharacterVector>(r) ;
+  const char* c = Rf_translateCharUTF8(n(0)) ;
+  
+  PlTerm_var ret ;
+  PlCheckFail(ret.unify_chars(PL_ATOM|REP_UTF8, strlen(c), c)) ;
+  return ret ;
 }
 
 // Translate to matrix $$$($$(1, 2), $$(3, 4))
@@ -767,7 +778,10 @@ PlTerm r2pl_string(CharacterVector r, List options)
     if(na[0])
       return r2pl_na() ;
     
-    return PlTerm_string(r(0)) ;
+    const char* c = Rf_translateCharUTF8(r(0)) ;
+    PlTerm_var ret ;
+    PlCheckFail(ret.unify_chars(PL_STRING|REP_UTF8, strlen(c), c)) ;
+    return ret ;
   }
 
   // compound like $("a", "b", "c")
@@ -778,7 +792,10 @@ PlTerm r2pl_string(CharacterVector r, List options)
     if(na[i])
       PlCheckFail(args[i].unify_term(r2pl_na())) ;
     else
-      PlCheckFail(args[i].unify_term(PlTerm_string(r(i)))) ; // DO NOT SUBMIT - unify_string()
+    {
+      const char* c = Rf_translateCharUTF8(r(i)) ;
+      PlCheckFail(args[i].unify_chars(PL_STRING|REP_UTF8, strlen(c), c)) ;
+    }
   }
 
   return PlCompound((const char*) options("charvec"), args) ;
@@ -795,32 +812,50 @@ PlTerm r2pl_compound(Language r, CharacterVector& names, PlTerm& vars, List opti
   size_t len = (size_t) l.size() ;
   if(len == 0)
   {
-    PlTermv pl(3) ;
-    PlCheckFail(pl[1].unify_atom(as<Symbol>(CAR(r)).c_str())) ;
-    PlCheckFail(pl[2].unify_integer(0)) ;
-    PlCall("compound_name_arity", pl) ;
-    return pl[0] ;
+    CharacterVector n = as<CharacterVector>(CAR(r)) ;
+    const char* c = Rf_translateCharUTF8(n(0)) ;
+
+    PlTermv cna(3) ;
+    PlCheckFail(cna[1].unify_chars(PL_ATOM|REP_UTF8, strlen(c), c)) ;
+    PlCheckFail(cna[2].unify_integer(0)) ;
+    PlCall("compound_name_arity", cna) ;
+    return cna[0] ;
   }
 
   // Extract names of arguments
   CharacterVector n ;
+
   // if there are no names, l.names() returns NULL and n has length 0
   if(TYPEOF(l.names()) == STRSXP)
     n = l.names() ;
   
-  PlTermv pl(len) ;
+  PlTerm_var pl ;
+  PlTerm_tail tail(pl) ;
   for(size_t i=0 ; i<len ; i++)
   {
     PlTerm arg = r2pl(l(i), names, vars, options) ;
     
     // Convert named arguments to prolog compounds a=X
     if(n.length() && n(i) != "")
-      PlCheckFail(pl[i].unify_term(PlCompound("=", PlTermv(PlTerm_atom(n(i)), arg)))) ;
+    {
+      const char* c = Rf_translateCharUTF8(n(i)) ;
+      PlTerm_var nn ;
+      PlCheckFail(nn.unify_chars(PL_ATOM|REP_UTF8, strlen(c), c)) ;
+      PlCheckFail(tail.append(PlCompound("=", PlTermv(nn, arg)))) ;
+    }
     else
-      PlCheckFail(pl[i].unify_term(arg)) ; // no name
+      PlCheckFail(tail.append(arg)) ; // no name
   }
+  PlCheckFail(tail.close()) ;
 
-  return PlCompound(as<Symbol>(CAR(r)).c_str(), pl) ;
+  n = as<CharacterVector>(CAR(r)) ;
+  const char* c = Rf_translateCharUTF8(n(0)) ;
+
+  PlTermv cna(3) ;
+  PlCheckFail(cna[1].unify_chars(PL_ATOM|REP_UTF8, strlen(c), c)) ;
+  PlCheckFail(cna[2].unify_term(pl)) ;
+  PlCall("compound_name_arguments", cna) ;
+  return cna[0] ;
 }
 
 // Translate R list to prolog list, taking into account the names of the
@@ -843,7 +878,12 @@ PlTerm r2pl_list(List r, CharacterVector& names, PlTerm& vars, List options)
     
     // Convert named argument to prolog pair a-X.
     if(n.length() && n(i) != "")
-      PlCheckFail(tail.append(PlCompound("-", PlTermv(PlTerm_atom(n(i)), arg)))) ;
+    {
+      const char* c = Rf_translateCharUTF8(n(i)) ;
+      PlTerm_var nn ;
+      PlCheckFail(nn.unify_chars(PL_ATOM|REP_UTF8, strlen(c), c)) ;
+      PlCheckFail(tail.append(PlCompound("-", PlTermv(nn, arg)))) ;
+    }
     else
       PlCheckFail(tail.append(arg)) ; // no name
   }
@@ -878,7 +918,12 @@ PlTerm r2pl_function(Function r, CharacterVector& names, PlTerm& vars, List opti
   CharacterVector n = formals.names() ;
   PlTermv pl(len) ;
   for(size_t i=0 ; i<len ; i++)
-    PlCheckFail(pl[i].unify_atom(n(i))) ;
+  {
+    const char* c = Rf_translateCharUTF8(n(i)) ;
+    PlTerm_var nn ;
+    PlCheckFail(pl[i].unify_chars(PL_ATOM|REP_UTF8, strlen(c), c)) ;
+  }
+  
   PlCheckFail(fun[0].unify_term(PlCompound("$function", pl))) ;
   return PlCompound(":-", fun) ;
 }
@@ -978,7 +1023,7 @@ int RlQuery::next_solution()
 
   catch(PlException& ex)
   {
-    warning(ex.as_string(PlEncoding::Locale).c_str()) ;
+    warning(ex.as_string(PlEncoding::UTF8).c_str()) ;
     PL_clear_exception() ;
     stop("Query failed") ;
   }
@@ -1034,8 +1079,14 @@ List RlQuery::bindings()
   {
     PlCheckFail(tail.next(v)) ;
     RObject r = pl2r(v, names, vars, options) ;
-    if(TYPEOF(r) == EXPRSXP && names[i] == as<Symbol>(as<ExpressionVector>(r)[0]).c_str())
-    continue ;
+
+    if(TYPEOF(r) == EXPRSXP)
+    {
+      CharacterVector nn = as<CharacterVector>(as<ExpressionVector>(r)[0]) ;
+      const char* c = Rf_translateCharUTF8(nn[0]) ;
+      if(names[i] == c)
+	continue ;
+    }
 
     l.push_back(r, (const char*) names[i]) ;
   }
@@ -1147,12 +1198,15 @@ LogicalVector consult_(CharacterVector files)
   {
     try 
     {
-      PlCall("consult", PlTermv(PlTerm_string(files(i))));
+      const char* c = Rf_translateCharUTF8(files(i)) ;
+      PlTerm_var n ;
+      PlCheckFail(n.unify_chars(PL_STRING|REP_UTF8, strlen(c), c)) ;
+      PlCall("consult", PlTermv(n)) ;
     }
     
     catch(PlException& ex)
     { 
-      String err(ex.as_string(PlEncoding::Locale));
+      String err(ex.as_string(PlEncoding::UTF8));
       PL_clear_exception() ;
       stop("failed to consult %s: %s", (char*) files(i), err.get_cstring()) ;
     }
@@ -1192,9 +1246,9 @@ RObject portray_(RObject query, List options)
   
   catch(PlException& ex)
   {
-    warning(ex.as_string(PlEncoding::Locale).c_str()) ;
+    warning(ex.as_string(PlEncoding::UTF8).c_str()) ;
     PL_clear_exception() ;
-    stop("portray of %s failed.", pl[0].as_string(PlEncoding::Locale).c_str()) ;
+    stop("portray of %s failed.", pl[0].as_string(PlEncoding::UTF8).c_str()) ;
   }
   
   return pl2r(pl[1], names, vars, options) ;
