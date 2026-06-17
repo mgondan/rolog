@@ -24,18 +24,16 @@
     return()
   }
 
-  if(.Platform$OS.type == "windows")
-    plbase = shortPathName(plbase)
-
-  if(.Platform$OS.type == "unix")
+  swipllib <- .find.swipllib()
+  if(length(swipllib))
   {
-    swipllib <- dir(file.path(plbase, "lib"), pattern="libswipl.a", recursive=TRUE)
-    if(length(swipllib))
-    {
-      swipllib <- dir(file.path(plbase, "lib"), full.names=TRUE)
-      cat(sprintf("-L%s -lswipl", swipllib))
-    }
+    cat(sprintf("-L%s -lswipl", swipllib))
+    return(invisible())
   }
+
+  if(warn)
+    warning("plbase.R: PLLIBDIR not found")
+  return()
 }
 
 # Search for swipl in the various places
@@ -211,6 +209,18 @@
     return(NA)
   }
   return(plbase)
+}
+
+# Search for directory of libswipl.dll
+.find.swipllib <- function(warn=FALSE)
+{
+  libswipl <- .find.libswipl(warn=FALSE)
+  if(length(libswipl) & !is.na(libswipl))
+    return(dirname(libswipl))
+
+  if(warn)
+    warning("plbase.R: libswipl not found")
+  return(NA)
 }
 
 # Search for libswipl.dll

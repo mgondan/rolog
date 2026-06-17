@@ -1,3 +1,7 @@
+# rolog 0.9.27
+
+* remove LinkingTo rswipl
+
 # rolog 0.9.26
 
 * Unicode support
