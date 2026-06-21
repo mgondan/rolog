@@ -4,9 +4,8 @@
 # under linux). The reason is that rolog.so itself is able to load other 
 # packages (i.e. prolog libraries), and therefore exports a number of 
 # prolog-specific symbols. The additional option local=FALSE makes sure these
-# symbols are imported on startup. This option is not available in if we use
-# useDynLib in NAMESPACE.
-#
+# symbols are imported on startup. This option is not available in useDynLib
+# in NAMESPACE.
 .onLoad <- function(libname, pkgname)
 {
   rolog.ok <- FALSE
