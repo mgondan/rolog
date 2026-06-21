@@ -27,8 +27,8 @@
   swipllib <- .find.swipllib()
   if(length(swipllib))
   {
-    cat(sprintf("-L%s -lswipl", swipllib))
-    return(invisible())
+	  cat(sprintf("-L%s -lswipl -Wl,-rpath=%s", swipllib, swipllib))
+	  return(invisible())
   }
 
   if(warn)
