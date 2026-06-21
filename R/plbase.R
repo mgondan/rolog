@@ -14,6 +14,27 @@
   cat(plbase)
 }
 
+# From the internet
+get_os <- function()
+{
+  sysinf <- Sys.info()
+  if (!is.null(sysinf))
+  {
+    os <- sysinf['sysname']
+    if (os == 'Darwin')
+      os <- "osx"
+  } 
+  else
+  { ## mystery machine
+    os <- .Platform$OS.type
+    if (grepl("^darwin", R.version$os))
+      os <- "osx"
+    if (grepl("linux-gnu", R.version$os))
+      os <- "linux"
+  }
+  tolower(os)
+}
+
 .cat.swilibs <- function(warn=FALSE)
 {
   plbase <- .find.swipl64(warn)
@@ -27,7 +48,10 @@
   swipllib <- .find.swipllib()
   if(length(swipllib))
   {
-	  cat(sprintf("-L%s -lswipl -Wl,-rpath=%s", swipllib, swipllib))
+	  if(get_os == "linux")
+		  cat(sprintf("-L%s -lswipl -Wl,-rpath=%s", swipllib, swipllib))
+	  else
+		  cat(sprintf("-L%s -lswipl", swipllib))
 	  return(invisible())
   }
 
