@@ -15,7 +15,7 @@
 }
 
 # From the internet
-get_os <- function()
+.get.os <- function()
 {
   sysinf <- Sys.info()
   if (!is.null(sysinf))
@@ -48,7 +48,7 @@ get_os <- function()
   swipllib <- .find.swipllib()
   if(length(swipllib))
   {
-	  if(get_os == "linux")
+	  if(.get.os == "linux")
 		  cat(sprintf("-L%s -lswipl -Wl,-rpath=%s", swipllib, swipllib))
 	  else
 		  cat(sprintf("-L%s -lswipl", swipllib))
