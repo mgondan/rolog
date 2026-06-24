@@ -1,7 +1,7 @@
 ---
 title: "rolog: Prolog queries from R"
 author: "Matthias Gondan
-         (Department of Psychology, Universität Innsbruck, Austria)
+         (Department of Psychology, University of Innsbruck, Austria)
          and Jan Wielemaker
          (Vrije Universiteit Amsterdam/SWI-Prolog Solutions b.v.)"
 date: "2023-01-27"
@@ -21,9 +21,9 @@ library(DiagrammeRsvg)
 ```
 
   Matthias Gondan\
-  Universität Innsbruck\
+  University of Innsbruck\
   Department of Psychology\
-  Innrain 9\
+  Universitätsstraße 12\
   A-6020 Innsbruck\
   Matthias.Gondan-Rochon@uibk.ac.at
   
@@ -381,50 +381,6 @@ and can be intercepted at several stages.
 * R functions that post-process the result of a query
 
 The process is illustrated in Figure\ 1.
-
-```{r, echo=FALSE, fig.width=6, fig.height=2}
-HTML(export_svg(grViz(
-  'digraph G
-   {
-     rankdir=LR
-     Query Result
-
-     subgraph cluster_0 
-     {
-       style=filled
-       color=lightgrey
-       node [style=filled,color=white]
-       r2rolog -> forth -> rolog_pl
-     }
-
-     subgraph cluster_1 
-     {
-       style=filled
-       color=lightgrey
-       node [style=filled,color=white]
-       rolog2r -> back [dir=back]
-       back -> pl_rolog [dir=back]
-     }
-  
-     Query -> r2rolog
-     rolog_pl:e -> Prolog
-     pl_rolog:e -> Prolog [dir=back]
-     Result -> rolog2r [dir=back]
-
-     Query [shape=Mdiamond;width=0.7;height=0.7]
-     r2rolog [shape=rect,label="preproc"]
-     forth [label="(rolog)"]
-     rolog_pl [shape=rect,label="preproc/2"]
-     Prolog [shape=Mcircle]
-     pl_rolog [shape=rect,label="postproc/2"]
-     rolog2r [shape=rect,label="postproc"]
-     back [label="(rolog)"]
-     Result [shape=Msquare]
-   }')))
-```
-
-Figure\ 1
-: Workflow in rolog
 
 ## Preprocessing in R
 
@@ -919,7 +875,7 @@ If the R call raises an exception, an error is propagated to Prolog
 and finally to the `rolog` package:
 
 ```{r}
-#try(once(quote(r_eval(rnorm(-1))))) # return "-1" random normals
+try(once(quote(r_eval(rnorm(-1))))) # return "-1" random normals
 ```
 
 ## Interval arithmetic
@@ -948,21 +904,21 @@ in `pl/interval.pl`; a few examples are shown below. Again, Prolog rings back to
 R via `r_eval/2` to determine the result of `dbinom(X, Size, Prob, Log)`.
 
 ```{r}
-#consult(system.file(file.path("pl", "interval.pl"), package="rolog"))
+consult(system.file(file.path("pl", "interval.pl"), package="rolog"))
 
-#Q <- quote(int(`...`(1, 2) / `...`(-3, 3), .Res))
-#unlist(findall(Q, options=list(preproc=as.rolog)))
+Q <- quote(int(`...`(1, 2) / `...`(-3, 3), .Res))
+unlist(findall(Q, options=list(preproc=as.rolog)))
 
-#D  <- quote(`...`(5.7, 5.8))
-#mu <- 4
-#s  <- quote(`...`(3.8, 3.9))
-#N  <- 24L
-#tratio <- call("/", call("-", D, mu), call("/", s, call("sqrt", N)))
-#once(call("int", tratio, expression(Res)))
+D  <- quote(`...`(5.7, 5.8))
+mu <- 4
+s  <- quote(`...`(3.8, 3.9))
+N  <- 24L
+tratio <- call("/", call("-", D, mu), call("/", s, call("sqrt", N)))
+once(call("int", tratio, expression(Res)))
 
 # Binomial density
-#prob = quote(`...`(0.2, 0.3))
-#once(call("int", call("dbinom", 4L, 10L, prob, FALSE), expression(Res)))
+prob = quote(`...`(0.2, 0.3))
+once(call("int", call("dbinom", 4L, 10L, prob, FALSE), expression(Res)))
 ```
 
 The slightly cumbersome syntax for entering an interval $\langle \ell, u\rangle$
