@@ -1,3 +1,8 @@
+# rolog 0.9.28
+
+* fix a problem finding paths reported for musl
+* add LinkingTo rswipl until swi-prolog 10 is available on CRAN testing machines
+
 # rolog 0.9.27
 
 * remove LinkingTo rswipl
