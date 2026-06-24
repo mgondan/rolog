@@ -48,7 +48,7 @@
   swipllib <- .find.swipllib()
   if(length(swipllib))
   {
-	  if(.get.os == "linux")
+	  if(.get.os() == "linux")
 		  cat(sprintf("-L%s -lswipl -Wl,-rpath=%s", swipllib, swipllib))
 	  else
 		  cat(sprintf("-L%s -lswipl", swipllib))
