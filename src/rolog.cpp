@@ -1001,7 +1001,7 @@ RlQuery::RlQuery(RObject aquery, List aoptions, Environment aenv)
 {
   options("atomize") = false ;
   PlTerm pl = r2pl(aquery, names, vars, options) ;
-  qid = new PlQuery("call", PlTermv(PlTerm(pl))) ;
+  qid = new PlQuery("call", PlTermv(PlTerm(pl)), PL_Q_EXT_STATUS|PL_Q_PASS_EXCEPTION) ;
 }
 
 RlQuery::~RlQuery()
@@ -1015,58 +1015,7 @@ int RlQuery::next_solution()
   if(qid == NULL)
     stop("next_solution: no open query.") ;
 
-  int q ;
-  try
-  {
-    q = qid->next_solution() ;
-  }
-
-  catch(PlException& ex)
-  {
-    warning(ex.as_string(PlEncoding::UTF8).c_str()) ;
-    PL_clear_exception() ;
-    stop("Query failed") ;
-  }
-
-  return q ;
-
-/*
-  int q = qid->next_solution() ;
-  if(q == PL_S_TRUE)
-    return true ;
-
-  if(q == PL_S_LAST)
-    return true ;
-
-  if(q == PL_S_FALSE)
-  {
-    PL_close_query(qid) ;
-    qid = 0 ;
-    return false ;
-  }
-
-  if(q == PL_S_EXCEPTION)
-  {
-    PL_close_query(qid) ;
-    qid = 0 ;
-
-    term_t ex = PL_exception(0) ;
-    char* err ;
-    if(PL_get_chars(ex, &err, BUF_DISCARDABLE|CVT_WRITE|REP_UTF8))
-    {
-      PL_clear_exception() ;
-      warning(err) ;
-      return false ;
-    }
-
-    PL_clear_exception() ;
-    warning("query: unknown exception occurred") ;
-    return false ;
-  }
-
-  // should not be reached
-  return q ;
-  */
+  return qid->next_solution() ;
 }
 
 List RlQuery::bindings()
@@ -1130,15 +1079,37 @@ RObject submit_()
     warning("submit: no open query.") ;
     return wrap(false) ;
   }
-
-  if(!query_id->next_solution())
+  
+  int r = query_id->next_solution() ;
+  if(r == PL_S_TRUE)
+    return query_id->bindings() ;
+  
+  if(r == PL_S_FALSE)
   {
     delete query_id ;
     query_id = NULL ;
     return wrap(false) ;
   }
-
-  return query_id->bindings() ;
+  
+  if(r == PL_S_LAST)
+  {
+    RObject r = query_id->bindings() ;
+    delete query_id ;
+    query_id = NULL ;
+    return r ;
+  }
+  
+  if(r == PL_S_EXCEPTION)
+  {
+    PlTerm ex(PL_exception(0)) ;
+    std::string s = ex.as_string() ;
+    PL_clear_exception() ;
+    delete query_id ;
+    query_id = NULL ;
+    stop(s) ;
+  }
+  
+  stop("The program is in an undefined state.") ;
 }
 
 // Execute a query once and return conditions
