@@ -30,7 +30,6 @@ Suggests:
     DiagrammeR,
     DiagrammeRsvg,
     rswipl (>= 10.1.5),
-    rsvg,
     htmltools,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
