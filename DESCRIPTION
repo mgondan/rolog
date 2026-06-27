@@ -27,8 +27,6 @@ SystemRequirements:
 Suggests: 
     rmarkdown,
     knitr,
-    DiagrammeR,
-    DiagrammeRsvg,
     rswipl (>= 10.1.5),
     htmltools,
     testthat (>= 3.0.0)
