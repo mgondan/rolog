@@ -62,6 +62,16 @@ test_that("strings are properly translated",
   expect_equal(q$X, "b")
 })
 
+test_that("unicode works",
+{
+  query(call("member", expression(X), list(quote(a), "äöü", 3L, 4, TRUE, expression(Y), NA, NaN, Inf, NULL)))
+  submit()
+  q <- submit()
+  clear()
+
+  expect_equal(q$X, "äöü")
+})
+
 test_that("integers are properly translated",
 {
   query(call("member", expression(X), list(quote(a), "b", 3L, 4, TRUE, expression(Y), NA, NaN, Inf, NULL)))
