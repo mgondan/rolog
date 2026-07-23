@@ -1076,7 +1076,7 @@ RObject submit_()
 {
   if(query_id == NULL)
   {
-    warning("submit: no open query.") ;
+    warning("submit: no open query") ;
     return wrap(false) ;
   }
   
@@ -1148,11 +1148,29 @@ List findall_(RObject query, List options, Environment env)
   List results ;
   while(true)
   {
-    RObject l = submit_() ;
-    if(TYPEOF(l) == LGLSXP)
-      break ;
+    int r = query_id->next_solution() ;
+    if(r == PL_S_TRUE)
+    {
+      results.push_back(query_id->bindings()) ;
+      continue ;
+    }
     
-    results.push_back(l) ;
+    if(r == PL_S_FALSE)
+      break ;
+
+    if(r == PL_S_LAST)
+    {
+      results.push_back(query_id->bindings()) ;
+      break ;
+    }
+    
+    if(r == PL_S_EXCEPTION)
+    {
+      PlTerm ex(PL_exception(0)) ;
+      std::string s = ex.as_string() ;
+      PL_clear_exception() ;
+      stop(s) ;
+    }
   }
   
   clear_() ;
