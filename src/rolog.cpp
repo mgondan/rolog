@@ -1292,9 +1292,10 @@ PREDICATE(r_eval, 1)
   RObject Res = Expr ;
   try
   {
-    Language id("dontCheck") ;
+    Language id("identity") ;
     id.push_back(Expr) ;
-    Res = id.eval() ;
+    // Res = id.eval() ;
+    Res = Rcpp_eval(id, query_id->get_env()) ;
   }
 
   catch(std::exception& ex)
@@ -1324,9 +1325,10 @@ PREDICATE(r_eval, 2)
   RObject Res = Expr ;
   try
   {
-    Language id("dontCheck") ;
+    Language id("identity") ;
     id.push_back(Expr) ;
-    Res = id.eval() ;
+    // Res = id.eval() ;
+    Res = Rcpp_eval(id, query_id->get_env()) ;
   }
   
   catch(std::exception& ex)
