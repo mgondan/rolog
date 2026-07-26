@@ -1200,6 +1200,33 @@ LogicalVector consult_(CharacterVector files)
       stop("failed to consult %s: %s", (char*) files(i), err.get_cstring()) ;
     }
   }
+  
+  return true ;
+}
+
+// use_module with one or more files. If something fails, the procedure stops, 
+// and will not try to consult the remaining files.
+//
+// [[Rcpp::export(.usemodule)]]
+LogicalVector usemodule_(CharacterVector files)
+{
+  for(R_xlen_t i=0; i<files.size(); i++)
+  {
+    try 
+    {
+      const char* c = Rf_translateCharUTF8(files(i)) ;
+      PlTerm_var n ;
+      PlCheckFail(n.unify_chars(PL_STRING|REP_UTF8, strlen(c), c)) ;
+      PlCall("use_module", PlTermv(n)) ;
+    }
+    
+    catch(PlException& ex)
+    { 
+      String err(ex.as_string(PlEncoding::UTF8));
+      PL_clear_exception() ;
+      stop("failed to use_module %s: %s", (char*) files(i), err.get_cstring()) ;
+    }
+  }
 
   return true ;
 }

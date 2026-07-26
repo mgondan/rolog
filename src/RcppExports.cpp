@@ -80,6 +80,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// usemodule_
+LogicalVector usemodule_(CharacterVector files);
+RcppExport SEXP _rolog_usemodule_(SEXP filesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< CharacterVector >::type files(filesSEXP);
+    rcpp_result_gen = Rcpp::wrap(usemodule_(files));
+    return rcpp_result_gen;
+END_RCPP
+}
 // portray_
 RObject portray_(RObject query, List options);
 RcppExport SEXP _rolog_portray_(SEXP querySEXP, SEXP optionsSEXP) {
@@ -132,6 +143,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_rolog_once_", (DL_FUNC) &_rolog_once_, 3},
     {"_rolog_findall_", (DL_FUNC) &_rolog_findall_, 3},
     {"_rolog_consult_", (DL_FUNC) &_rolog_consult_, 1},
+    {"_rolog_usemodule_", (DL_FUNC) &_rolog_usemodule_, 1},
     {"_rolog_portray_", (DL_FUNC) &_rolog_portray_, 2},
     {"_rolog_call_", (DL_FUNC) &_rolog_call_, 1},
     {"_rolog_init_", (DL_FUNC) &_rolog_init_, 1},

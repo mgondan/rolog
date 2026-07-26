@@ -20,7 +20,6 @@ BugReports: https://github.com/mgondan/rolog/issues
 LinkingTo:
     Rcpp,
     rswipl (>= 10.1.5)
-RoxygenNote: 7.2.3
 Encoding: UTF-8
 SystemRequirements:
     GNU Make
@@ -32,3 +31,4 @@ Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 VignetteBuilder: knitr, rmarkdown
+Config/roxygen2/version: 8.0.0

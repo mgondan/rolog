@@ -25,6 +25,10 @@
     .Call('_rolog_consult_', PACKAGE = 'rolog', files)
 }
 
+.usemodule <- function(files) {
+    .Call('_rolog_usemodule_', PACKAGE = 'rolog', files)
+}
+
 .portray <- function(query, options) {
     .Call('_rolog_portray_', PACKAGE = 'rolog', query, options)
 }

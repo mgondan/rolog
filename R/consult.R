@@ -9,7 +9,7 @@
 #' @md
 #'
 #' @seealso
-#' [once()], [findall()], and [query()]/[submit()]/[clear()] for executing queries
+#' [once()], [findall()], and [usemodule()] for other convenience functions
 #' 
 #' @examples
 #' consult(fname=system.file(file.path("pl", "family.pl"), package="rolog"))
