@@ -1,3 +1,7 @@
+# rolog 0.9.29
+
+* allow access to modules like in lists::member(X, [1, 2, 3])
+
 # rolog 0.9.28
 
 * fix a problem finding paths reported for musl

@@ -812,6 +812,22 @@ PlTerm r2pl_compound(Language r, CharacterVector& names, PlTerm& vars, List opti
   size_t len = (size_t) l.size() ;
   if(len == 0)
   {
+    if(TYPEOF(CAR(r)) == LANGSXP)
+    {
+      PlTerm head = r2pl_compound(CAR(r), names, vars, options) ;
+      if(strcmp(head.name().as_string(PlEncoding::UTF8).c_str(), "::"))
+        stop("Compound name must be character or module::character") ;
+      if(head.arity() != 2)
+        stop("Compound name must be character or ::/2") ;
+      
+      PlTermv cna(3) ;
+      PlCheckFail(cna[1].unify_term(head[2])) ;
+      PlCheckFail(cna[2].unify_integer(0)) ;
+      PlCall("compound_name_arity", cna) ;
+      
+      return PlCompound(":", PlTermv(head[1], cna[0])) ;
+    }
+
     CharacterVector n = as<CharacterVector>(CAR(r)) ;
     const char* c = Rf_translateCharUTF8(n(0)) ;
 
@@ -847,6 +863,22 @@ PlTerm r2pl_compound(Language r, CharacterVector& names, PlTerm& vars, List opti
       PlCheckFail(tail.append(arg)) ; // no name
   }
   PlCheckFail(tail.close()) ;
+
+  if(TYPEOF(CAR(r)) == LANGSXP)
+  {
+    PlTerm head = r2pl_compound(CAR(r), names, vars, options) ;
+    if(strcmp(head.name().as_string(PlEncoding::UTF8).c_str(), "::"))
+      stop("Compound name must be character or module::character") ;
+    if(head.arity() != 2)
+      stop("Compound name must be character or ::/2") ;
+
+    PlTermv cna(3) ;
+    PlCheckFail(cna[1].unify_term(head[2])) ;
+    PlCheckFail(cna[2].unify_term(pl)) ;
+    PlCall("compound_name_arguments", cna) ;
+    
+    return PlCompound(":", PlTermv(head[1], cna[0])) ;
+  }
 
   n = as<CharacterVector>(CAR(r)) ;
   const char* c = Rf_translateCharUTF8(n(0)) ;

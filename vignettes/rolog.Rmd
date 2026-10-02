@@ -173,6 +173,12 @@ submit()
 
 # close the query
 clear()
+
+# Call a predicate in a module like lists:member(X, [1, 2, 3])
+ns_call <- call("::", as.symbol("lists"), as.symbol("member"))
+query(as.call(list(ns_call, expression(X), list(1, 2, 3))))
+submit()
+clear()
 ```
 
 Listing\ 1.
@@ -189,7 +195,8 @@ the section below. The function returns `TRUE` on success. Note that `query`
 does not check if a Prolog predicate corresponding to `call` actually
 exists (see `submit()` below). Only a single query can be opened at a given
 time. If a new query _Q_ is created while another query _R_ is still open, a
-warning is shown and _R_ is closed.
+warning is shown and _R_ is closed. As the last example shows, access to
+prolog modules is cumbersome, but possible.
 
 `submit`. Once a query has been created, it can be submitted using `submit()`.
 If the query fails, the return value is `FALSE`. If the query succeeds, a list
